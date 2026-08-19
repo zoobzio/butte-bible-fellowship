@@ -1,0 +1,92 @@
+/* Base site shell, styled with aurora untheme tokens from the foundation layer. */
+
+body {
+  margin: 0;
+  font: var(--type-body);
+  letter-spacing: var(--type-body-letter-spacing);
+  background: var(--surface);
+  color: var(--on-surface);
+}
+
+.site-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+}
+
+/* Header */
+
+.site-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-5);
+  padding: var(--space-4) var(--space-6);
+  background: var(--surface-container);
+  border-bottom: 1px var(--stroke-solid) var(--outline-muted);
+}
+
+.site-brand {
+  font: var(--type-title);
+  letter-spacing: var(--type-title-letter-spacing);
+  color: var(--on-surface);
+  text-decoration: none;
+}
+
+.site-nav {
+  display: flex;
+  gap: var(--space-4);
+}
+
+.site-nav-link {
+  color: var(--on-surface-muted);
+  text-decoration: none;
+}
+
+.site-nav-link:hover,
+.site-nav-link[aria-current="page"] {
+  color: var(--on-surface);
+}
+
+/* Main */
+
+.site-main {
+  flex: 1;
+  padding: var(--space-7) var(--space-6);
+  max-width: 72rem;
+  width: 100%;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+.page-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-4);
+}
+
+.page-title {
+  margin: 0;
+  font: var(--type-headline);
+  letter-spacing: var(--type-headline-letter-spacing);
+}
+
+.page-lead {
+  margin: 0;
+  color: var(--on-surface-muted);
+  max-width: 60ch;
+}
+
+/* Footer */
+
+.site-footer {
+  padding: var(--space-4) var(--space-6);
+  background: var(--surface-container);
+  border-top: 1px var(--stroke-solid) var(--outline-muted);
+  color: var(--on-surface-muted);
+}
+
+.site-footer p {
+  margin: 0;
+}
