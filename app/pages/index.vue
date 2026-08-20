@@ -1,14 +1,58 @@
+<script lang="ts">
+import Hero from "@zoobzio/foundation/components/core/hero.vue";
+import Anchor from "@zoobzio/foundation/components/common/anchor.vue";
+import Section from "@zoobzio/foundation/components/common/section.vue";
+
+import {
+  computed,
+  createError,
+  queryCollection,
+  useAsyncData,
+  useHead,
+} from "#imports";
+
+import { MARKDOWN_COMPONENTS } from "~/constants/markdown";
+</script>
+
 <script setup lang="ts">
-import Button from "@zoobzio/foundation/components/common/button.vue";
+const { data: page } = await useAsyncData("page:home", () =>
+  queryCollection("pages").path("/").first(),
+);
+
+if (!page.value) {
+  throw createError({ statusCode: 404, statusMessage: "Page not found" });
+}
+
+useHead(() => ({ title: page.value?.title }));
+
+const hero = computed(() => page.value?.hero);
 </script>
 
 <template>
-  <section class="page-hero">
-    <h1 class="page-title">Welcome to Butte Bible Fellowship</h1>
-    <p class="page-lead">
-      A church family gathering around the Word. Join us for worship this
-      Sunday.
-    </p>
-    <Button label="Plan a Visit" />
-  </section>
+  <div v-if="page">
+    <div v-if="hero" class="home-hero">
+      <Hero
+        :tagline="hero.tagline"
+        :tagline-highlight="hero.highlight"
+        :description="hero.description"
+      >
+        <template #button>
+          <Anchor
+            v-if="hero.cta"
+            :to="hero.cta.to"
+            :label="hero.cta.label"
+            class="cta"
+          />
+        </template>
+      </Hero>
+    </div>
+
+    <Section class="prose">
+      <ContentRenderer
+        :value="page"
+        :components="MARKDOWN_COMPONENTS"
+        :prose="false"
+      />
+    </Section>
+  </div>
 </template>
