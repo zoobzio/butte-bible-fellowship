@@ -8,7 +8,12 @@
     "generate": "nuxi generate",
     "preview": "nuxi preview",
     "postinstall": "nuxi prepare",
-    "typecheck": "nuxi typecheck"
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "typecheck": "nuxi typecheck",
+    "test": "vitest run --passWithNoTests",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage --passWithNoTests"
   },
   "dependencies": {
     "@nuxt/content": "^3.15.2",
@@ -18,16 +23,23 @@
   },
   "devDependencies": {
     "@icon-sheets/nuxt": "^0.0.3",
+    "@nuxt/eslint-config": "^1.17.0",
     "@nuxt/fonts": "^0.14.0",
     "@nuxt/kit": "^4.5.2",
     "@nuxtjs/mdc": "^0.23.1",
     "@untheme/aurora": "^0.2.3",
     "@untheme/nuxt": "^0.2.3",
+    "@vitejs/plugin-vue": "^6.0.8",
+    "@vitest/coverage-v8": "^4.1.11",
+    "@vue/test-utils": "^2.4.11",
     "@zoobzio/foundation-mcp": "^0.0.21",
+    "eslint": "^9.39.5",
+    "happy-dom": "^20.11.6",
     "objectively": "^0.1.1",
     "reka-ui": "^2.10.3",
     "typescript": "^5.9.3",
     "untheme": "^0.2.3",
+    "vitest": "^4.1.11",
     "vue-tsc": "^2.1.10"
   }
 }
