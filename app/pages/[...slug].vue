@@ -3,6 +3,7 @@ import Article from "@zoobzio/foundation/components/common/article.vue";
 
 import {
   createError,
+  definePageMeta,
   queryCollection,
   useAsyncData,
   useHead,
@@ -13,6 +14,10 @@ import { MARKDOWN_COMPONENTS } from "~/constants/markdown";
 </script>
 
 <script setup lang="ts">
+definePageMeta({
+  keepalive: true,
+});
+
 const route = useRoute();
 
 const { data: page } = await useAsyncData(`page:${route.path}`, () =>
