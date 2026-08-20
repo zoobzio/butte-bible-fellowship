@@ -7,6 +7,9 @@ dist
 # Test coverage
 .coverage
 
+# Vercel CLI
+.vercel
+
 # Dependencies
 node_modules
 
@@ -23,3 +26,4 @@ node_modules
 
 # Legacy 
 legacy
+.env*.local
