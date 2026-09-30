@@ -8,7 +8,17 @@ export default defineNuxtConfig({
 
   extends: ["@zoobzio/foundation"],
 
-  modules: ["@nuxt/content", "@nuxt/fonts"],
+  modules: ["@nuxt/content", "@nuxt/fonts", "nuxt-studio"],
+
+  // Content editor served at /_studio; publishing commits to this repository.
+  studio: {
+    repository: {
+      provider: "github",
+      owner: "zoobzio",
+      repo: "butte-bible-fellowship",
+      branch: "main",
+    },
+  },
 
   fonts: {
     families: [
