@@ -10,8 +10,8 @@ export default defineNuxtConfig({
 
   modules: ["@nuxt/content", "@nuxt/fonts", "nuxt-studio"],
 
-  // Content editor served at /_studio; publishing commits to this repository.
   studio: {
+    route: "/admin",
     repository: {
       provider: "github",
       owner: "zoobzio",
@@ -53,8 +53,6 @@ export default defineNuxtConfig({
     },
   },
 
-  // Pre-render every page at build time so the site is served statically;
-  // only Studio's auth/publish routes run as server functions.
   nitro: {
     prerender: {
       routes: ["/"],
@@ -62,7 +60,6 @@ export default defineNuxtConfig({
     },
   },
 
-  // Build assets and fonts are content-hashed, so they can be cached forever.
   routeRules: {
     "/_nuxt/**": {
       headers: { "cache-control": "public, max-age=31536000, immutable" },
