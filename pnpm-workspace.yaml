@@ -1,2 +1,0 @@
-patchedDependencies:
-  nuxt-studio@1.7.0: patches/nuxt-studio@1.7.0.patch

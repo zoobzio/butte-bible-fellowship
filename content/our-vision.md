@@ -10,9 +10,12 @@ description: A new community for the cause of Christ.
 Modern wisdom says that the best vision statements are clever,
 easy-to-remember slogans, and above all…brief. If that’s your cup of tea …
 
-> Our intent is to be the Church;\
-> Imperfect people in biblical community …\
-> Pursuing the character of Christ,\
+> Our intent is to be the Church;
+>
+> Imperfect people in biblical community …
+>
+> Pursuing the character of Christ,
+>
 > So that we might further the cause of Christ.
 
 You might, however, prefer a more complete thought. If *that’s* your cup of
@@ -25,7 +28,8 @@ A new community for the cause of Christ.
 > It will cost something to walk slow in the parade of the ages, while
 > excited men of time rush about confusing motion with progress. But it will
 > pay in the long run and the true Christian is not much interested in
-> anything short of that.\
+> anything short of that.
+>
 > – A.W. Tozer, June 3, 1950
 
 BBF, the Church on Pillsbury Road, is an inclusive biblical community. Heavy
@@ -90,8 +94,9 @@ forgiveness, and…
 > - reconciliation and restoration
 > - discipleship / apprenticeship
 > - truth telling and the expressions of giftedness
-> - humility and sacrifice\
->   … and a resurrected Jesus who will one day return.
+> - humility and sacrifice
+>
+> … and a resurrected Jesus who will one day return.
 
 We desire that our dreams for spiritual growth and health morph into reality
 under the direction of the Holy Spirit in response to our prayer, our
@@ -108,11 +113,15 @@ With one heart and singleness of purpose, our desire is to experience life
 together in ways that hold to the core values expressed in Acts 2 and,
 indeed, throughout Scripture.
 
-> Jesus then came into Galilee announcing the good news from God.\
-> ‘All the preliminaries have been taken care of,’ he said,\
+> Jesus then came into Galilee announcing the good news from God.
+>
+> ‘All the preliminaries have been taken care of,’ he said,
+>
 > ‘and the rule of God is now accessible to everyone. Review your plans for
-> living [repent]\
-> and base your life on this remarkable new opportunity.’\
+> living [repent]
+>
+> and base your life on this remarkable new opportunity.’
+>
 > – Mark 1:14-15 (par)
 
 As we pursue the cause of Christ, we assume that change is both possible and
@@ -126,7 +135,8 @@ kingdom of the heavens. “For I was sent for this purpose,” he said
 (Luke 4:43). If we are faithful to this simple truth, if we do justice to it
 in full devotion, we will find joy.
 
-> Joy is the fulfillment of that for which we have been created.\
+> Joy is the fulfillment of that for which we have been created.
+>
 > – Oswald Chambers
 
 **Our Intention** is to be “kingdom people.” That is, the vision of life in

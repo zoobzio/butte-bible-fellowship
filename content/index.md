@@ -31,14 +31,18 @@ transition into a spiritually healthy multigenerational church that honors
 valued Christian traditions while living and serving well in 21st century
 Chico.
 
-> **Our intent is to be the Church;**\
-> **Imperfect people in biblical community…**\
-> **Pursuing the character of Christ,**\
+> **Our intent is to be the Church;**
+>
+> **Imperfect people in biblical community…**
+>
+> **Pursuing the character of Christ,**
+>
 > **Furthering the cause of Christ.**
 
 We hope you’ll consider joining us.
 
 ::visit-callout
-**Join us Sundays at 10:00am**\
+**Join us Sundays at 10:00am**
+
 2255 Pillsbury Road, Chico · [see the weekly schedule](/calendar)
 ::

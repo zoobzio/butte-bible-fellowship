@@ -21,8 +21,10 @@ description: Visit us at 2255 Pillsbury Road, Chico, California.
   :::connect-card
   ## Office Hours
 
-  Tuesday–Thursday: 9am–4pm\
-  Friday: 9am–noon\
+  Tuesday–Thursday: 9am–4pm
+
+  Friday: 9am–noon
+
   Saturday, Sunday, Monday: closed
   :::
 ::

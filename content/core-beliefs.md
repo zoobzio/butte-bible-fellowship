@@ -192,6 +192,8 @@ Spirit of promise, who is given as a pledge of our inheritance, with a view
 to the redemption of God’s own possession, to the praise of His glory”
 (Eph. 1:13-14; cf. 1 Cor. 1:22).
 
-> Justification delivers from the penalty of sin\
-> Sanctification delivers from the power of sin\
+> Justification delivers from the penalty of sin
+>
+> Sanctification delivers from the power of sin
+>
 > Glorification delivers from the presence of sin
