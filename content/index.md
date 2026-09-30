@@ -12,24 +12,13 @@ hero:
 
 ## Welcome to Butte Bible Fellowship
 
-We’re very glad you’ve found our website! We are a non-denominational local
-church that exists to glorify God by loving Him, living our lives as best we
-can consistent with what Jesus taught and modeled, and inviting others into
-biblical community. We’d be pleased if you join us for a few Sundays to get a
-feel for who we are and who we are becoming.
+We’re very glad you’ve found our website! We are a non-denominational local church that exists to glorify God by loving Him, living our lives as best we can consistent with what Jesus taught and modeled, and inviting others into biblical community. We’d be pleased if you join us for a few Sundays to get a feel for who we are and who we are becoming.
 
-> “They devoted themselves to the apostles’ teaching and to fellowship … and
-> to prayer.” *Acts 2:42*
+> “They devoted themselves to the apostles’ teaching and to fellowship … and to prayer.” *Acts 2:42*
 
-Someone once said that the local church is like a hospital where even the
-doctors are sick. To be the Church…that’s our desire; a local expression of
-the new community described in Acts where everyone’s welcome to grow
-together―finding hope together―in Christ.
+Someone once said that the local church is like a hospital where even the doctors are sick. To be the Church…that’s our desire; a local expression of the new community described in Acts where everyone’s welcome to grow together―finding hope together―in Christ.
 
-We are currently a small gathering of seasoned believers who desire to
-transition into a spiritually healthy multigenerational church that honors
-valued Christian traditions while living and serving well in 21st century
-Chico.
+We are currently a small gathering of seasoned believers who desire to transition into a spiritually healthy multigenerational church that honors valued Christian traditions while living and serving well in 21st century Chico.
 
 > **Our intent is to be the Church;**
 >

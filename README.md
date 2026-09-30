@@ -21,6 +21,15 @@ pnpm dev          # start the dev server at http://localhost:3000
 | `pnpm preview`   | Preview the production build    |
 | `pnpm typecheck` | Type-check (`nuxi typecheck`)   |
 
+## Content
+
+Markdown lives in `content/` and is edited through Nuxt Studio at `/admin`.
+Keep each paragraph, list item and quote line on a single line: do not
+hard-wrap prose at 80 columns, and do not use backslash or `:br` line breaks.
+Nuxt Studio 1.7.0 turns every newline inside a paragraph into a hard-break
+node when the paragraph is edited, and serializes each one as
+`--- Unknown node: hardBreak ---` (upstream issue #265, fixed after 1.7.0).
+
 ## Architecture
 
 The app extends the Foundation layer from `nuxt.config.ts`:
