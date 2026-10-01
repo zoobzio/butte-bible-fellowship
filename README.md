@@ -24,11 +24,22 @@ pnpm dev          # start the dev server at http://localhost:3000
 ## Content
 
 Markdown lives in `content/` and is edited through Nuxt Studio at `/admin`.
-Keep each paragraph, list item and quote line on a single line: do not
-hard-wrap prose at 80 columns, and do not use backslash or `:br` line breaks.
-Nuxt Studio 1.7.0 turns every newline inside a paragraph into a hard-break
-node when the paragraph is edited, and serializes each one as
-`--- Unknown node: hardBreak ---` (upstream issue #265, fixed after 1.7.0).
+
+Nuxt Studio 1.7.0 cannot serialize the hard break that Shift+Enter inserts and
+writes `--- Unknown node: hardBreak ---` instead (upstream issue #265, fixed
+after 1.7.0). Until that fix is released, `patches/nuxt-studio@1.7.0.patch`
+works around it:
+
+- Shift+Enter is saved as `:br`, and `:br` or backslash line breaks load back
+  into the editor as line breaks.
+- A paragraph hard-wrapped across several lines is joined onto one line when it
+  is edited in Studio, instead of gaining a line break at every wrap.
+- The Studio app is served from `/_studio-app/1.7.0-hardbreak.1/`. The bundle
+  is cached as immutable, so browsers would otherwise keep the unpatched copy;
+  bump that suffix whenever the patch changes.
+
+When upgrading `nuxt-studio`, delete the patch file and its
+`patchedDependencies` entry in `pnpm-workspace.yaml`, then run `pnpm install`.
 
 ## Architecture
 
