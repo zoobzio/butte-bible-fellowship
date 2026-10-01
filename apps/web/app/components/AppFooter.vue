@@ -17,7 +17,8 @@ defineOptions({ name: "AppFooter" });
 
       <div class="site-footer-col">
         <p><strong>Contact</strong></p>
-        <p>2255 Pillsbury Road, Chico, California 95926</p>
+        <p>2255 Pillsbury Road</p>
+        <p>Chico, California 95926</p>
         <p><a href="tel:5308920521">530-892-0521</a></p>
         <p>
           <a href="mailto:office@bbfchurchchico.org">
@@ -29,13 +30,16 @@ defineOptions({ name: "AppFooter" });
       <div class="site-footer-col">
         <p><strong>Online</strong></p>
         <p>
-          <a href="https://www.facebook.com/bbfchurchchico/" target="_blank">
+          <a
+            href="https://www.facebook.com/buttebiblefellowship/"
+            target="_blank"
+          >
             Facebook
           </a>
         </p>
         <p>
           <a
-            href="https://www.youtube.com/@ButteBibleFellowshipChico"
+            href="https://www.youtube.com/@ButteBibleFellowship"
             target="_blank"
           >
             YouTube
