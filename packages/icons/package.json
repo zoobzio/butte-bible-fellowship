@@ -1,0 +1,28 @@
+{
+  "name": "@bbf/icons",
+  "private": true,
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.mts",
+      "import": "./dist/index.mjs"
+    },
+    "./*.svg": "./dist/*.svg",
+    "./*": {
+      "types": "./dist/*.d.mts",
+      "import": "./dist/*.mjs"
+    }
+  },
+  "scripts": {
+    "build": "icon-sheets build",
+    "prepare": "icon-sheets build"
+  },
+  "dependencies": {
+    "icon-sheets": "0.0.6"
+  },
+  "devDependencies": {
+    "@icon-sheets/kit": "0.0.6",
+    "@iconify-json/lucide": "^1.2.138"
+  }
+}

@@ -15,9 +15,15 @@ importers:
 
   apps/web:
     dependencies:
+      '@bbf/icons':
+        specifier: workspace:*
+        version: link:../../packages/icons
       '@bbf/theme':
         specifier: workspace:*
         version: link:../../packages/theme
+      '@icon-sheets/nuxt':
+        specifier: 0.0.6
+        version: 0.0.6(magic-string@1.2.1)(magicast@0.5.4)(oxc-parser@0.139.0)(rolldown@1.2.5)(typescript@5.9.3)(unplugin@3.3.0(esbuild@0.28.2)(rolldown@1.2.5)(rollup@4.62.4)(vite@8.2.1(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(yaml@2.9.0)))
       '@nuxt/content':
         specifier: ^3.15.2
         version: 3.15.2(@oxc-project/types@0.146.0)(esbuild@0.28.2)(magic-string@1.2.1)(magicast@0.5.4)(oxc-parser@0.139.0)(rolldown@1.2.5)(rollup@4.62.4)(vite@8.2.1(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(yaml@2.9.0))
@@ -73,6 +79,19 @@ importers:
       vue-tsc:
         specifier: ^2.1.10
         version: 2.2.12(typescript@5.9.3)
+
+  packages/icons:
+    dependencies:
+      icon-sheets:
+        specifier: 0.0.6
+        version: 0.0.6
+    devDependencies:
+      '@icon-sheets/kit':
+        specifier: 0.0.6
+        version: 0.0.6
+      '@iconify-json/lucide':
+        specifier: ^1.2.138
+        version: 1.2.138
 
   packages/theme:
     devDependencies:
@@ -746,11 +765,42 @@ packages:
     resolution: {integrity: sha512-bV0Tgo9K4hfPCek+aMAn81RppFKv2ySDQeMoSZuvTASywNTnVJCArCZE2FWqpvIatKu7VMRLWlR1EazvVhDyhQ==}
     engines: {node: '>=18.18'}
 
+  '@icon-sheets/catalog@0.0.6':
+    resolution: {integrity: sha512-k5JvQIXbswo7s3BzJLuoFHAfkCUjMoGX5JwhtpREA1SzXI2u8PdVKZe8clybYwggMvk+Y9hIvN9HdtgMukmsNA==}
+
+  '@icon-sheets/core@0.0.6':
+    resolution: {integrity: sha512-zFcJE+GpkPBd8yQDIQ5Ce1RUw4pShWcbFYqjePr+xNTQ+SU4tk0rUZLvAhAmSYZUw/vSRD+tf0tuAEfuR8qeTg==}
+
+  '@icon-sheets/iconify@0.0.6':
+    resolution: {integrity: sha512-El4AhYjHq/EluG0G8QcYQGNLrKxfol8p+CsBHGlXO0kRu+C4F8BBK4ATATqM6pfEw+J3xmcAp+aagSiCYNHL+A==}
+
+  '@icon-sheets/kit@0.0.6':
+    resolution: {integrity: sha512-AYAs3b1EGHaxHH8e6YVDZlES8xQFUdLLSLU0Z51T9B/bV6qV0Q3RFXM1Ylgb8DE9xoJWdBCawPHCYvqwi0YVAA==}
+    hasBin: true
+
+  '@icon-sheets/nuxt@0.0.6':
+    resolution: {integrity: sha512-UoPzLOWHb5X6a2GJDIS2y+412AkxT2eprd5TrrV3OUVU+yh2y40+J4em3+K2gCTXyymYE05fWQG7XfN7HiPyKw==}
+
+  '@icon-sheets/schema@0.0.6':
+    resolution: {integrity: sha512-NAQ+PDngUDu0mQMLjKd2uNJK6zSwjEBUeyG21aSiZRpottWUPwyPYlwRpeE59xvkyOdftraGTFISb2Hhgut0Rg==}
+
+  '@icon-sheets/svg@0.0.6':
+    resolution: {integrity: sha512-rNyWamfnSfKTE8eWJmIVRNEd7Yv6aWTFcZSH3y5J4P7A/E5b92UojF8UEOPULn+WFFOdRqf7CTdhp3r4oZxO2g==}
+
+  '@icon-sheets/utils@0.0.6':
+    resolution: {integrity: sha512-LScB4elK8FafbLxa2F3a4iYLP4vzYMMNGMwmK7VBkGpCT+SX0veHuAhPDYN5yFQqVoFfadPVm1AkGIS4DALXYQ==}
+
   '@iconify-json/lucide@1.2.124':
     resolution: {integrity: sha512-mO6JyBVNER7uXEkW2bXiN9Rrm6w91IXxwnNmIMbu2KZX0ZPcVZH1xDUTw94pryxESUIpBhinkOUIZIav+TA9ng==}
 
+  '@iconify-json/lucide@1.2.138':
+    resolution: {integrity: sha512-+J5+/6HOZsN6sG5PGNxGLcB0UCJtKrH2TPTNeSeXukRzR1C9QRocHaFjLRhoc14zE+XS2ss1i7QWPfunKpYHaQ==}
+
   '@iconify/types@2.0.0':
     resolution: {integrity: sha512-+wluvCrRhXrhyOmRDJ3q8mux9JkKy5SJ/v8ol2tu4FVjyYvtEzkc/3pK15ET6RKg4b4w4BmTk1+gsCUhf21Ykg==}
+
+  '@iconify/utils@3.1.7':
+    resolution: {integrity: sha512-JZHlwdID+dy+lTgbYC8NEC4zeugqeYsc6jewvzb4c58kHauJn+X7rNwQjxz5p2qSjqaEeQoLkCIQ9v/H4PK0/w==}
 
   '@img/colour@1.1.0':
     resolution: {integrity: sha512-Td76q7j57o/tLVdgS746cYARfSyxk8iEfRxewL9h4OMzYhbW4TAcppl0mT4eyqXddh6L/jwoM75mo7ixa/pCeQ==}
@@ -3393,6 +3443,9 @@ packages:
     resolution: {integrity: sha512-AXcZb6vzzrFAUE61HnN4mpLqd/cSIwNQjtNWR0euPm6y0iqx3G4gOXaIDdtdDwZmhwe82LA6+zinmW4UBWVePQ==}
     engines: {node: '>=16.17.0'}
 
+  icon-sheets@0.0.6:
+    resolution: {integrity: sha512-pALJDKLtKlAbVQjcIE/bpoEVVxAo4WTPsgO+a0S+l0e4Kcag6bKROZj4ayh5Eh+R6Q6Pi7souTq4ZNDmKA+jgQ==}
+
   identifier-regex@1.1.0:
     resolution: {integrity: sha512-SLX4H/vtcYlYnL7XqnuJKHU7Z8517TgsW9nmQiGOgMCjQ8V/deLYu6bEmbGoXe7WMMhc9+EUGyFFneHja8KabA==}
     engines: {node: '>=18'}
@@ -3414,6 +3467,9 @@ packages:
   import-fresh@3.3.1:
     resolution: {integrity: sha512-TR3KfrTZTYLPB6jUjfx6MF9WcWrHL9su5TObK4ZkYgBdWKPOFoSoQIdEuTuR82pmtxH2spWG9h6etwfr1pLBqQ==}
     engines: {node: '>=6'}
+
+  import-meta-resolve@4.2.0:
+    resolution: {integrity: sha512-Iqv2fzaTQN28s/FwZAoFq0ZSs/7hMAHJVX+w8PZl3cY19Pxk6jFFalxQoIfW2826i/fDLXv8IiEZRIT0lDuWcg==}
 
   impound@1.1.7:
     resolution: {integrity: sha512-v/7sJ+2BX17U5VV9J1H72ExlRtfGoieRpYZG9DTos6gtCbB65C1l0CPehXCXq9phYZn6viphV5XayyZFHi85zg==}
@@ -6320,11 +6376,78 @@ snapshots:
 
   '@humanwhocodes/retry@0.4.3': {}
 
+  '@icon-sheets/catalog@0.0.6':
+    dependencies:
+      '@icon-sheets/schema': 0.0.6
+      objectively: 0.1.1
+
+  '@icon-sheets/core@0.0.6':
+    dependencies:
+      '@icon-sheets/schema': 0.0.6
+      '@icon-sheets/utils': 0.0.6
+      objectively: 0.1.1
+
+  '@icon-sheets/iconify@0.0.6':
+    dependencies:
+      '@icon-sheets/schema': 0.0.6
+      '@iconify/types': 2.0.0
+      '@iconify/utils': 3.1.7
+      objectively: 0.1.1
+
+  '@icon-sheets/kit@0.0.6':
+    dependencies:
+      '@icon-sheets/iconify': 0.0.6
+      '@icon-sheets/schema': 0.0.6
+      '@icon-sheets/svg': 0.0.6
+      '@icon-sheets/utils': 0.0.6
+      jiti: 2.7.0
+
+  '@icon-sheets/nuxt@0.0.6(magic-string@1.2.1)(magicast@0.5.4)(oxc-parser@0.139.0)(rolldown@1.2.5)(typescript@5.9.3)(unplugin@3.3.0(esbuild@0.28.2)(rolldown@1.2.5)(rollup@4.62.4)(vite@8.2.1(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(yaml@2.9.0)))':
+    dependencies:
+      '@icon-sheets/kit': 0.0.6
+      '@nuxt/kit': 4.5.2(magic-string@1.2.1)(magicast@0.5.4)(oxc-parser@0.139.0)(rolldown@1.2.5)(unplugin@3.3.0(esbuild@0.28.2)(rolldown@1.2.5)(rollup@4.62.4)(vite@8.2.1(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(yaml@2.9.0)))
+      h3: 1.15.11
+      icon-sheets: 0.0.6
+      objectively: 0.1.1
+      vue: 3.5.41(typescript@5.9.3)
+    transitivePeerDependencies:
+      - magic-string
+      - magicast
+      - oxc-parser
+      - rolldown
+      - typescript
+      - unplugin
+
+  '@icon-sheets/schema@0.0.6':
+    dependencies:
+      '@iconify/types': 2.0.0
+      objectively: 0.1.1
+
+  '@icon-sheets/svg@0.0.6':
+    dependencies:
+      '@icon-sheets/schema': 0.0.6
+      '@iconify/utils': 3.1.7
+
+  '@icon-sheets/utils@0.0.6':
+    dependencies:
+      '@icon-sheets/schema': 0.0.6
+      objectively: 0.1.1
+
   '@iconify-json/lucide@1.2.124':
     dependencies:
       '@iconify/types': 2.0.0
 
+  '@iconify-json/lucide@1.2.138':
+    dependencies:
+      '@iconify/types': 2.0.0
+
   '@iconify/types@2.0.0': {}
+
+  '@iconify/utils@3.1.7':
+    dependencies:
+      '@antfu/install-pkg': 2.0.1
+      '@iconify/types': 2.0.0
+      import-meta-resolve: 4.2.0
 
   '@img/colour@1.1.0':
     optional: true
@@ -9604,6 +9727,14 @@ snapshots:
 
   human-signals@5.0.0: {}
 
+  icon-sheets@0.0.6:
+    dependencies:
+      '@icon-sheets/catalog': 0.0.6
+      '@icon-sheets/core': 0.0.6
+      '@icon-sheets/schema': 0.0.6
+      '@icon-sheets/svg': 0.0.6
+      '@icon-sheets/utils': 0.0.6
+
   identifier-regex@1.1.0:
     dependencies:
       reserved-identifiers: 1.2.0
@@ -9620,6 +9751,8 @@ snapshots:
     dependencies:
       parent-module: 1.0.1
       resolve-from: 4.0.0
+
+  import-meta-resolve@4.2.0: {}
 
   impound@1.1.7(esbuild@0.28.2)(rolldown@1.2.5)(rollup@4.62.4)(vite@8.2.1(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(yaml@2.9.0)):
     dependencies:

@@ -1,9 +1,15 @@
 import { defineNuxtConfig } from "nuxt/config";
 
+import { prefix } from "@bbf/icons";
+import icons from "@bbf/icons/config";
+import sets from "@bbf/icons/sets";
+
 export default defineNuxtConfig({
   compatibilityDate: "2026-08-19",
 
-  modules: ["@nuxt/content", "@nuxt/fonts", "nuxt-studio"],
+  modules: ["@nuxt/content", "@nuxt/fonts", "@icon-sheets/nuxt", "nuxt-studio"],
+
+  iconSheets: { ...icons, sets, prefix },
 
   studio: {
     route: "/admin",
