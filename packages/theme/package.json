@@ -1,0 +1,22 @@
+{
+  "name": "@bbf/theme",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./css": "./dist/index.css"
+  },
+  "scripts": {
+    "build": "tz build",
+    "prepare": "tz build",
+    "lint": "tz check"
+  },
+  "devDependencies": {
+    "@terrazzo/cli": "^2.7.1",
+    "@terrazzo/plugin-css": "^2.7.1",
+    "@terrazzo/plugin-js": "^2.7.1"
+  }
+}

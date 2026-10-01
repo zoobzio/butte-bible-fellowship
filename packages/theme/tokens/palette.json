@@ -1,0 +1,59 @@
+{
+  "palette": {
+    "$type": "color",
+    "$description": "Raw tonal stops. Reference these from semantic tokens rather than using them directly.",
+    "primary": {
+      "$description": "Brand blue, from the logo background (#2379de, pinned at 600).",
+      "50": { "$value": { "colorSpace": "srgb", "components": [0.94118, 0.96471, 1], "hex": "#f0f6ff" } },
+      "100": { "$value": { "colorSpace": "srgb", "components": [0.87843, 0.92941, 1], "hex": "#e0edff" } },
+      "200": { "$value": { "colorSpace": "srgb", "components": [0.75686, 0.86275, 1], "hex": "#c1dcff" } },
+      "300": { "$value": { "colorSpace": "srgb", "components": [0.59608, 0.77255, 1], "hex": "#98c5ff" } },
+      "400": { "$value": { "colorSpace": "srgb", "components": [0.41961, 0.67059, 1], "hex": "#6babff" } },
+      "500": { "$value": { "colorSpace": "srgb", "components": [0.22353, 0.56471, 0.98039], "hex": "#3990fa" } },
+      "600": { "$value": { "colorSpace": "srgb", "components": [0.13725, 0.47451, 0.87059], "hex": "#2379de" } },
+      "700": { "$value": { "colorSpace": "srgb", "components": [0.07451, 0.37255, 0.71373], "hex": "#135fb6" } },
+      "800": { "$value": { "colorSpace": "srgb", "components": [0.02353, 0.28627, 0.56863], "hex": "#064991" } },
+      "950": { "$value": { "colorSpace": "srgb", "components": [0, 0.1451, 0.31373], "hex": "#002550" } }
+    },
+    "tertiary": {
+      "$description": "Autumn red (seeded from #b03a2e).",
+      "100": { "$value": { "colorSpace": "srgb", "components": [0.98824, 0.90196, 0.88627], "hex": "#fce6e2" } },
+      "300": { "$value": { "colorSpace": "srgb", "components": [0.95686, 0.67843, 0.63529], "hex": "#f4ada2" } },
+      "500": { "$value": { "colorSpace": "srgb", "components": [0.88235, 0.39216, 0.32941], "hex": "#e16454" } },
+      "800": { "$value": { "colorSpace": "srgb", "components": [0.50196, 0.16471, 0.12941], "hex": "#802a21" } }
+    },
+    "secondary": {
+      "$description": "Sunset orange (seeded from #ff9a5c).",
+      "50": { "$value": { "colorSpace": "srgb", "components": [0.99608, 0.95294, 0.92941], "hex": "#fef3ed" } },
+      "100": { "$value": { "colorSpace": "srgb", "components": [0.99216, 0.90196, 0.85098], "hex": "#fde6d9" } },
+      "200": { "$value": { "colorSpace": "srgb", "components": [0.99608, 0.80784, 0.69804], "hex": "#feceb2" } },
+      "300": { "$value": { "colorSpace": "srgb", "components": [0.99608, 0.67059, 0.48235], "hex": "#feab7b" } },
+      "400": { "$value": { "colorSpace": "srgb", "components": [0.94118, 0.54902, 0.30588], "hex": "#f08c4e" } },
+      "600": { "$value": { "colorSpace": "srgb", "components": [0.72941, 0.35294, 0.06275], "hex": "#ba5a10" } },
+      "700": { "$value": { "colorSpace": "srgb", "components": [0.59608, 0.27451, 0], "hex": "#984600" } },
+      "800": { "$value": { "colorSpace": "srgb", "components": [0.46275, 0.20784, 0], "hex": "#763500" } },
+      "950": { "$value": { "colorSpace": "srgb", "components": [0.24706, 0.09804, 0], "hex": "#3f1900" } }
+    },
+    "neutral": {
+      "$description": "Warm grey.",
+      "50": { "$value": { "colorSpace": "srgb", "components": [0.96863, 0.96078, 0.95686], "hex": "#f7f5f4" } },
+      "100": { "$value": { "colorSpace": "srgb", "components": [0.92941, 0.92157, 0.91373], "hex": "#edebe9" } },
+      "300": { "$value": { "colorSpace": "srgb", "components": [0.77647, 0.75294, 0.73333], "hex": "#c6c0bb" } },
+      "400": { "$value": { "colorSpace": "srgb", "components": [0.68235, 0.65882, 0.63137], "hex": "#aea8a1" } },
+      "600": { "$value": { "colorSpace": "srgb", "components": [0.49412, 0.47059, 0.44314], "hex": "#7e7871" } },
+      "700": { "$value": { "colorSpace": "srgb", "components": [0.39608, 0.37647, 0.35294], "hex": "#65605a" } },
+      "900": { "$value": { "colorSpace": "srgb", "components": [0.21961, 0.20784, 0.19216], "hex": "#383531" } },
+      "950": { "$value": { "colorSpace": "srgb", "components": [0.15686, 0.1451, 0.13725], "hex": "#282523" } }
+    },
+    "neutral-variant": {
+      "$description": "Warm grey with a brown cast, for outlines.",
+      "200": { "$value": { "colorSpace": "srgb", "components": [0.87843, 0.84314, 0.81961], "hex": "#e0d7d1" } },
+      "800": { "$value": { "colorSpace": "srgb", "components": [0.32549, 0.28235, 0.25882], "hex": "#534842" } }
+    },
+    "parchment": {
+      "$description": "Off-ramp paper tones for light-mode surfaces.",
+      "50": { "$value": { "colorSpace": "srgb", "components": [0.98431, 0.96078, 0.92549], "hex": "#fbf5ec" } },
+      "100": { "$value": { "colorSpace": "srgb", "components": [0.95686, 0.92157, 0.86667], "hex": "#f4ebdd" } }
+    }
+  }
+}

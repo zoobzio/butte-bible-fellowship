@@ -1,8 +1,0 @@
-{
-  "mcpServers": {
-    "foundation": {
-      "command": "pnpm",
-      "args": ["exec", "foundation-mcp"]
-    }
-  }
-}

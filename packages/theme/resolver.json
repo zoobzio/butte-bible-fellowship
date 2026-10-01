@@ -1,0 +1,29 @@
+{
+  "name": "Butte Bible Fellowship",
+  "version": "2025.10",
+  "sets": {
+    "base": {
+      "sources": [
+        { "$ref": "tokens/palette.json" },
+        { "$ref": "tokens/typography.json" },
+        { "$ref": "tokens/layout.json" },
+        { "$ref": "tokens/motion.json" },
+        { "$ref": "tokens/effects.json" }
+      ]
+    }
+  },
+  "modifiers": {
+    "color": {
+      "description": "Light or dark color scheme.",
+      "contexts": {
+        "light": [{ "$ref": "tokens/color/light.json" }],
+        "dark": [{ "$ref": "tokens/color/dark.json" }]
+      },
+      "default": "light"
+    }
+  },
+  "resolutionOrder": [
+    { "$ref": "#/sets/base" },
+    { "$ref": "#/modifiers/color" }
+  ]
+}

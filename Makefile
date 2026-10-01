@@ -41,6 +41,6 @@ check: lint typecheck test ## Run lint, typecheck, and tests
 ci: clean install check coverage ## Full CI simulation
 
 clean: ## Remove generated files
-	rm -rf node_modules/.cache
-	rm -rf .coverage
-	rm -rf .nuxt .output
+	rm -rf node_modules/.cache apps/*/node_modules/.cache
+	rm -rf apps/*/.coverage
+	rm -rf apps/*/.nuxt apps/*/.output
