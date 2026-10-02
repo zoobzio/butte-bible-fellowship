@@ -7,6 +7,19 @@ import sets from "@bbf/icons/sets";
 export default defineNuxtConfig({
   compatibilityDate: "2026-08-19",
 
+  extends: ["@zoobzio/foundation"],
+
+  hooks: {
+    // Foundation's layer config includes "../tests/**/*" for its own suite,
+    // which drags our vitest tests (written against the #imports shim) into
+    // nuxi typecheck. Drop them; vitest owns those files.
+    "prepare:types": ({ tsConfig }) => {
+      tsConfig.include = tsConfig.include?.filter(
+        (path) => !path.startsWith("../tests/"),
+      );
+    },
+  },
+
   modules: ["@nuxt/content", "@nuxt/fonts", "@icon-sheets/nuxt", "nuxt-studio"],
 
   imports: { autoImport: false },
