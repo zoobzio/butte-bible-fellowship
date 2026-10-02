@@ -1,28 +1,20 @@
 <script lang="ts">
-import type { MenuGroup, MenuItem } from "~/components/Menu.vue";
+import type { MenuGroup } from "~/components/Menu.vue";
 
 import Menu from "~/components/Menu.vue";
-import { navigateTo } from "#imports";
-import { NAVIGATION } from "~/constants/navigation";
+import { Icon } from "#components";
+import { useAppConfig } from "#imports";
 </script>
 
 <script setup lang="ts">
-const groups: MenuGroup[] = [
-  {
-    key: "primary",
-    items: NAVIGATION.map((link) => ({ label: link.label })),
-  },
-];
+const { header } = useAppConfig();
 
-const onSelect = (item: MenuItem) => {
-  const link = NAVIGATION.find((candidate) => candidate.label === item.label);
-  if (link) navigateTo(link.to);
-};
+const groups: MenuGroup[] = [{ key: "primary", items: header.links }];
 </script>
 
 <template>
   <div class="site-nav-mobile">
-    <Menu :groups="groups" align="end" @select="onSelect">
+    <Menu :groups="groups" align="end">
       <button type="button" aria-label="Open navigation">
         <Icon name="menu" class="icon" />
       </button>

@@ -8,5 +8,5 @@ export default defineConfig({
     moon: "lucide:moon",
     sun: "lucide:sun",
   },
-  outDir: "dist",
+  outDir: ".output",
 });

@@ -39,5 +39,6 @@ Only tokens the site actually uses are defined. Add a token when you need it.
 
 ## Scripts
 
-- `pnpm build`: writes `dist/`. It also runs on install via `prepare`.
+- `pnpm build`: writes `.output/`. It also runs on install via `prepare`.
 - `pnpm lint`: runs `tz check` over the resolver and its sources.
+- `pnpm test`: rebuilds, then checks the CSS and JS output against the token sources.

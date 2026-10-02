@@ -1,4 +1,6 @@
 <script lang="ts">
+import { NuxtLink } from "#components";
+
 import {
   DropdownMenuRoot,
   DropdownMenuTrigger,
@@ -12,6 +14,8 @@ import {
 
 export type MenuItem = {
   label: string;
+  /** Renders the item as a link to this URL. */
+  to?: string;
   disabled?: boolean;
 };
 
@@ -91,6 +95,16 @@ const open = defineModel<boolean>("open", { default: false });
               <template v-for="item in group.items" :key="item.label">
                 <slot name="item" :item="item">
                   <DropdownMenuItem
+                    v-if="item.to"
+                    class="menu-item"
+                    :disabled="item.disabled"
+                    as-child
+                    @select="emit('select', item)"
+                  >
+                    <NuxtLink :to="item.to">{{ item.label }}</NuxtLink>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    v-else
                     class="menu-item"
                     :disabled="item.disabled"
                     @select="emit('select', item)"

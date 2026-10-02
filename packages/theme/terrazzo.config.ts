@@ -4,7 +4,7 @@ import js from "@terrazzo/plugin-js";
 
 export default defineConfig({
   tokens: ["./resolver.json"],
-  outDir: "./dist/",
+  outDir: "./.output/",
   plugins: [
     css({
       filename: "index.css",

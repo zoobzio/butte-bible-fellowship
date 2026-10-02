@@ -5,13 +5,6 @@ import { useArchLines } from "~/composables/arches";
 </script>
 
 <script setup lang="ts">
-/**
- * Scroll-drawn arch lines for the home page, adapted from the design
- * pass's preview script. Geometry lives in ~/utils/arches, behavior in
- * ~/composables/arches; this component is the markup and refs. Decorative
- * only — mounted by the layout on the home route.
- */
-
 const track = useTemplateRef<HTMLDivElement>("track");
 const svg = useTemplateRef<SVGSVGElement>("svg");
 const pathA = useTemplateRef<SVGPathElement>("pathA");

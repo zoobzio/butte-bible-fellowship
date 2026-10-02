@@ -1,41 +1,24 @@
-import type { Ref } from "vue";
-import type { ArchLineConfig } from "~/utils/arches";
+import type { ArchLineKey, ArchLineMeta, ArchLinesOptions } from "~/types/arches";
 
-import { onBeforeUnmount, onMounted, nextTick } from "#imports";
+import { onBeforeUnmount, onMounted, nextTick, watch } from "vue";
 
-import { ARCH_VB_W, describeArchLine } from "~/utils/arches";
-import { easeOutCubic, scrollProgress } from "~/utils/motion";
-
-/** Load-in draw duration. */
-const INTRO_MS = 1700;
-
-/**
- * Vertical shift of the whole track, as a fraction of the hero height.
- * The geometry is untouched — the same arch simply translates down so its
- * crown settles toward the bottom of the hero instead of the top.
- */
-const Y_SHIFT = 0.6;
-
-type LineKey = "A" | "B";
-
-/** Per-line geometry, in ARCH_VB_W units. */
-const CONFIGS: Record<LineKey, ArchLineConfig> = {
-  A: { legX: 690, crownX: 880, span: 330, drift: 300 },
-  B: { legX: 780, crownX: 930, span: 210, drift: 430 },
-};
-
-interface LineMeta {
-  el: SVGPathElement;
-  len: number;
-  stop: number;
-}
-
-export interface ArchLinesOptions {
-  track: Readonly<Ref<HTMLDivElement | null>>;
-  svg: Readonly<Ref<SVGSVGElement | null>>;
-  pathA: Readonly<Ref<SVGPathElement | null>>;
-  pathB: Readonly<Ref<SVGPathElement | null>>;
-}
+import {
+  ARCH_CONFIGS,
+  ARCH_INTRO_MS,
+  ARCH_LAG,
+  ARCH_LINE_KEYS,
+  ARCH_VB_W,
+} from "~/constants/arches";
+import { MOTION_REDUCED_QUERY } from "~/constants/motion";
+import {
+  archBounds,
+  archReveal,
+  archSignature,
+  archStop,
+  describeArchLine,
+} from "~/utils/arches";
+import { easeOutCubic } from "~/utils/motion";
+import { useFrame, useScrollProgress } from "~/composables/motion";
 
 /**
  * Drives the scroll-drawn arch lines.
@@ -46,15 +29,22 @@ export interface ArchLinesOptions {
  * Phase 3 — scroll up: reveal is a pure function of scroll offset, so it
  *   erases back along the identical track.
  *
- * Geometry lives in ~/utils/arches; this composable owns the measuring,
- * painting, listeners, and teardown.
+ * Geometry lives in ~/utils/arches and scroll progress comes from
+ * ~/composables/motion; this composable owns the measuring, painting,
+ * layout listeners, and teardown.
  */
-export const useArchLines = ({ track, svg, pathA, pathB }: ArchLinesOptions) => {
-  const meta: Partial<Record<LineKey, LineMeta>> = {};
+export const useArchLines = ({
+  track,
+  svg,
+  pathA,
+  pathB,
+}: ArchLinesOptions) => {
+  const { progress, refresh } = useScrollProgress();
+
+  const meta: Partial<Record<ArchLineKey, ArchLineMeta>> = {};
   /** The line terminates here — top of the footer, in document px. */
   let endY = 0;
   let intro = 0;
-  let queued = false;
   let signature = "";
   let introFrame = 0;
   let observer: ResizeObserver | null = null;
@@ -77,11 +67,8 @@ export const useArchLines = ({ track, svg, pathA, pathB }: ArchLinesOptions) => 
     // while it is tall would grow the page on every pass.
     trackEl.style.height = "0px";
 
-    const rect = hero.getBoundingClientRect();
     const scrollY = window.scrollY;
-    const shift = rect.height * Y_SHIFT;
-    const top = rect.top + scrollY + shift;
-    let bottom = rect.bottom + scrollY + shift;
+    const { top, bottom } = archBounds(hero.getBoundingClientRect(), scrollY);
 
     const footer = document.querySelector(".site-footer");
     endY = footer
@@ -95,46 +82,37 @@ export const useArchLines = ({ track, svg, pathA, pathB }: ArchLinesOptions) => 
     trackEl.style.height = `${endY}px`;
     svgEl.setAttribute("viewBox", `0 0 ${ARCH_VB_W} ${endY}`);
 
-    // Overshoot the hero edge, as the original static arches did, so the
-    // load-in draw reads as covering the whole hero.
-    bottom += (bottom - top) * 0.14;
-
-    for (const key of ["A", "B"] as const) {
+    for (const key of ARCH_LINE_KEYS) {
       const el = els[key];
-      const spec = describeArchLine(top, bottom, endY, CONFIGS[key]);
+      const spec = describeArchLine(top, bottom, endY, ARCH_CONFIGS[key]);
       const archLen = measure(el, spec.arch);
       const total = measure(el, spec.d);
       el.style.strokeDasharray = String(total);
-      meta[key] = { el, len: total, stop: Math.min(0.95, archLen / total) };
+      meta[key] = { el, len: total, stop: archStop(archLen, total) };
     }
     return true;
   };
 
   const paint = () => {
-    queued = false;
-    const progress = scrollProgress(
-      window.scrollY,
-      document.documentElement.scrollHeight,
-      window.innerHeight,
-    );
-    (["A", "B"] as const).forEach((key, i) => {
+    for (const key of ARCH_LINE_KEYS) {
       const m = meta[key];
-      if (!m) return;
-      let reveal = (m.stop + (1 - m.stop) * progress) * intro;
-      if (i === 1) reveal = Math.max(0, reveal - 0.04 * intro * progress);
+      if (!m) continue;
+      const reveal = archReveal(m.stop, progress.value, intro, ARCH_LAG[key]);
       m.el.style.strokeDashoffset = (m.len * (1 - reveal)).toFixed(1);
-    });
+    }
   };
 
-  const schedule = () => {
-    if (queued) return;
-    queued = true;
-    requestAnimationFrame(paint);
+  /** Paints against a fresh read of the page, not the last scroll's. */
+  const repaint = () => {
+    refresh();
+    paint();
   };
+
+  const { schedule } = useFrame(repaint);
 
   const relayout = () => {
     layout();
-    paint();
+    repaint();
   };
 
   /**
@@ -145,40 +123,40 @@ export const useArchLines = ({ track, svg, pathA, pathB }: ArchLinesOptions) => 
     const hero = document.querySelector(".home-hero");
     if (!hero) return;
     const footer = document.querySelector(".site-footer");
-    const next =
-      `${Math.round(hero.getBoundingClientRect().height)}/` +
-      `${footer ? Math.round(footer.getBoundingClientRect().top + window.scrollY) : 0}/` +
-      `${window.innerWidth}`;
+    const next = archSignature(
+      hero.getBoundingClientRect().height,
+      footer ? footer.getBoundingClientRect().top + window.scrollY : 0,
+      window.innerWidth,
+    );
     if (next === signature) return;
     signature = next;
     relayout();
   };
 
+  watch(progress, paint);
+
   onMounted(() => {
-    const reduce = window.matchMedia(
-      "(prefers-reduced-motion: reduce)",
-    ).matches;
+    const reduce = window.matchMedia(MOTION_REDUCED_QUERY).matches;
     intro = reduce ? 1 : 0;
 
     // On client-side navigation the page content may still be mounting.
     if (!layout()) {
       nextTick(relayout);
     }
-    paint();
+    repaint();
 
     if (!reduce) {
       let start: number | null = null;
       const step = (ts: number) => {
         if (start === null) start = ts;
-        const t = Math.min(1, (ts - start) / INTRO_MS);
+        const t = Math.min(1, (ts - start) / ARCH_INTRO_MS);
         intro = easeOutCubic(t);
-        paint();
+        repaint();
         if (t < 1) introFrame = requestAnimationFrame(step);
       };
       introFrame = requestAnimationFrame(step);
     }
 
-    window.addEventListener("scroll", schedule, { passive: true });
     window.addEventListener("resize", relayout);
     window.addEventListener("load", relayout);
     observer = new ResizeObserver(guardedRelayout);
@@ -187,7 +165,6 @@ export const useArchLines = ({ track, svg, pathA, pathB }: ArchLinesOptions) => 
 
   onBeforeUnmount(() => {
     cancelAnimationFrame(introFrame);
-    window.removeEventListener("scroll", schedule);
     window.removeEventListener("resize", relayout);
     window.removeEventListener("load", relayout);
     observer?.disconnect();

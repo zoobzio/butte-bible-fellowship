@@ -9,6 +9,10 @@ export default defineNuxtConfig({
 
   modules: ["@nuxt/content", "@nuxt/fonts", "@icon-sheets/nuxt", "nuxt-studio"],
 
+  imports: { autoImport: false },
+
+  components: { dirs: [] },
+
   iconSheets: { ...icons, sets, prefix },
 
   studio: {

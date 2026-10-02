@@ -13,7 +13,6 @@ export default createConfigForNuxt({
       "**/.nuxt/**",
       "**/.output/**",
       "**/.data/**",
-      "**/dist/**",
       "legacy/**",
     ],
   },

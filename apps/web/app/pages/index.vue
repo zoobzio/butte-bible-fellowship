@@ -1,4 +1,5 @@
 <script lang="ts">
+import { ContentRenderer, NuxtLink } from "#components";
 import {
   computed,
   createError,
