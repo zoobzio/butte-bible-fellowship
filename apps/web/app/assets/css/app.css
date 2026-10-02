@@ -60,7 +60,11 @@ iframe {
 a {
   color: var(--color-primary-high-contrast);
   text-decoration: underline;
-  text-decoration-color: color-mix(in oklab, var(--color-primary) 60%, transparent);
+  text-decoration-color: color-mix(
+    in oklab,
+    var(--color-primary) 60%,
+    transparent
+  );
   text-decoration-thickness: 1px;
   text-underline-offset: 4px;
   transition:
@@ -137,7 +141,11 @@ a:hover {
 .site-nav-link {
   position: relative;
   padding: var(--space-2) 0;
-  font-size: clamp(var(--font-size-label), 0.4vw + 0.8rem, var(--font-size-body));
+  font-size: clamp(
+    var(--font-size-label),
+    0.4vw + 0.8rem,
+    var(--font-size-body)
+  );
   letter-spacing: var(--typography-label-letter-spacing);
   color: var(--color-on-surface-muted-medium-contrast);
   text-decoration: none;
@@ -395,7 +403,8 @@ blockquote li::before {
   transform-origin: 30% 40%;
   rotate: -14deg;
   border-radius: 62% 38% 54% 46% / 58% 44% 56% 42%;
-  background: radial-gradient(
+  background:
+    radial-gradient(
       ellipse 62% 74% at 32% 30%,
       color-mix(in oklab, var(--color-primary-container) 92%, transparent),
       transparent 72%
@@ -421,7 +430,8 @@ blockquote li::before {
   transform-origin: 70% 60%;
   rotate: 11deg;
   border-radius: 44% 56% 38% 62% / 52% 60% 40% 48%;
-  background: radial-gradient(
+  background:
+    radial-gradient(
       ellipse 70% 56% at 64% 66%,
       color-mix(in oklab, var(--color-secondary-container) 74%, transparent),
       transparent 74%
@@ -454,7 +464,8 @@ blockquote li::before {
 }
 
 [data-color="light"] .orb-left {
-  background: radial-gradient(
+  background:
+    radial-gradient(
       ellipse 62% 74% at 32% 30%,
       color-mix(in oklab, var(--palette-primary-300) 66%, transparent),
       transparent 72%
@@ -472,7 +483,8 @@ blockquote li::before {
 }
 
 [data-color="light"] .orb-right {
-  background: radial-gradient(
+  background:
+    radial-gradient(
       ellipse 70% 56% at 64% 66%,
       color-mix(in oklab, var(--palette-secondary-300) 52%, transparent),
       transparent 74%
@@ -545,7 +557,8 @@ blockquote li::before {
   inset: 0;
   z-index: -1;
   pointer-events: none;
-  background: radial-gradient(
+  background:
+    radial-gradient(
       circle at 14% 22%,
       color-mix(in oklab, var(--color-primary-container) 62%, transparent),
       transparent 58%
@@ -562,7 +575,8 @@ blockquote li::before {
 }
 
 [data-color="light"] .home-hero::before {
-  background: radial-gradient(
+  background:
+    radial-gradient(
       circle at 14% 22%,
       color-mix(in oklab, var(--palette-primary-300) 52%, transparent),
       transparent 64%
@@ -609,7 +623,11 @@ blockquote li::before {
 
 .home-hero p {
   font: var(--typography-title);
-  font-size: clamp(var(--font-size-title), 2.2vw, calc(var(--font-size-title) * 1.35));
+  font-size: clamp(
+    var(--font-size-title),
+    2.2vw,
+    calc(var(--font-size-title) * 1.35)
+  );
   line-height: 1.6;
   color: var(--color-on-surface-medium-contrast);
   max-width: 44ch;
@@ -668,8 +686,10 @@ blockquote li::before {
   padding: var(--space-6) var(--space-6) var(--space-6) var(--space-7);
   border: 1px var(--stroke-solid)
     color-mix(in oklab, var(--color-primary) 40%, var(--color-outline-muted));
-  border-radius: var(--radius-lg) var(--radius-lg) var(--radius-lg) var(--radius-lg);
-  background: linear-gradient(
+  border-radius: var(--radius-lg) var(--radius-lg) var(--radius-lg)
+    var(--radius-lg);
+  background:
+    linear-gradient(
       150deg,
       color-mix(in oklab, var(--color-secondary-container) 40%, transparent),
       transparent 70%
@@ -737,7 +757,11 @@ blockquote li::before {
   width: 100%;
   margin: var(--space-7) 0;
   border-collapse: collapse;
-  font-size: clamp(var(--font-size-body), 1.9vw, calc(var(--font-size-body) * 1.1));
+  font-size: clamp(
+    var(--font-size-body),
+    1.9vw,
+    calc(var(--font-size-body) * 1.1)
+  );
 }
 
 .events-table thead th,
@@ -783,7 +807,11 @@ blockquote li::before {
 
 .events-table tbody tr:hover td,
 .prose table tbody tr:hover td {
-  background: color-mix(in oklab, var(--color-primary-container) 30%, transparent);
+  background: color-mix(
+    in oklab,
+    var(--color-primary-container) 30%,
+    transparent
+  );
 }
 
 /* ---------- Connect page --------------------------------------------- */
@@ -826,7 +854,11 @@ blockquote li::before {
   display: block;
   margin: 0 0 var(--space-4);
   padding-bottom: var(--space-3);
-  font-size: clamp(var(--font-size-title), 2.2vw, calc(var(--font-size-headline) * 0.9));
+  font-size: clamp(
+    var(--font-size-title),
+    2.2vw,
+    calc(var(--font-size-headline) * 0.9)
+  );
   border-bottom: 1px var(--stroke-solid)
     color-mix(in oklab, var(--color-primary) 45%, transparent);
 }
@@ -893,7 +925,8 @@ blockquote li::before {
   margin-top: var(--space-9);
   padding: clamp(var(--space-7), 7vw, var(--space-8))
     clamp(var(--space-4), 4vw, var(--space-7)) var(--space-6);
-  background: linear-gradient(
+  background:
+    linear-gradient(
       color-mix(in oklab, var(--color-primary-container) 34%, transparent),
       transparent
     ),
@@ -973,7 +1006,11 @@ blockquote li::before {
 .theme-toggle:hover {
   color: var(--color-on-surface-high-contrast);
   border-color: color-mix(in oklab, var(--color-primary) 65%, transparent);
-  background: color-mix(in oklab, var(--color-primary-container) 30%, transparent);
+  background: color-mix(
+    in oklab,
+    var(--color-primary-container) 30%,
+    transparent
+  );
 }
 
 .theme-toggle-icon {
@@ -1134,7 +1171,11 @@ body {
 }
 
 .menu-item[data-highlighted] {
-  background: color-mix(in oklab, var(--color-primary-container) 40%, transparent);
+  background: color-mix(
+    in oklab,
+    var(--color-primary-container) 40%,
+    transparent
+  );
   color: var(--color-on-surface-high-contrast);
 }
 

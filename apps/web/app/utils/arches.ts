@@ -1,8 +1,4 @@
-import type {
-  ArchBounds,
-  ArchLinePath,
-  ArchLineConfig,
-} from "~/types/arches";
+import type { ArchBounds, ArchLinePath, ArchLineConfig } from "~/types/arches";
 import {
   ARCH_BLEED,
   ARCH_CROWN_LIFT,

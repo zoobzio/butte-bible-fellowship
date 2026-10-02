@@ -18,8 +18,7 @@ export default defineConfig({
           // stays declared once on :root.
           input: { color: "dark" },
           include: ["color.**"],
-          prepare: (contents) =>
-            `:root[data-color="dark"] {\n  ${contents}\n}`,
+          prepare: (contents) => `:root[data-color="dark"] {\n  ${contents}\n}`,
         },
       ],
     }),

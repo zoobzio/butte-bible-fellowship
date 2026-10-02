@@ -1,4 +1,8 @@
-import type { ArchLineKey, ArchLineMeta, ArchLinesOptions } from "~/types/arches";
+import type {
+  ArchLineKey,
+  ArchLineMeta,
+  ArchLinesOptions,
+} from "~/types/arches";
 
 import { onBeforeUnmount, onMounted, nextTick, watch } from "vue";
 

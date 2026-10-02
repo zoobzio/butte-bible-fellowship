@@ -20,7 +20,10 @@ const expectedAliases = Object.keys(config.icons).sort();
 
 /** What each alias should resolve to, read from its Iconify collection. */
 const source = (alias: string) => {
-  const [collection, name] = config.icons[alias]!.split(":") as [string, string];
+  const [collection, name] = config.icons[alias]!.split(":") as [
+    string,
+    string,
+  ];
   const data = JSON.parse(
     read(`node_modules/@iconify-json/${collection}/icons.json`),
   ) as IconifyCollection;
@@ -33,9 +36,13 @@ const source = (alias: string) => {
 };
 
 const symbols = (svg: string): Symbol[] =>
-  [...svg.matchAll(/<symbol id="([^"]+)" viewBox="([^"]+)">(.*?)<\/symbol>/g)].map(
-    ([, id, viewBox, body]) => ({ id: id!, viewBox: viewBox!, body: body! }),
-  );
+  [
+    ...svg.matchAll(/<symbol id="([^"]+)" viewBox="([^"]+)">(.*?)<\/symbol>/g),
+  ].map(([, id, viewBox, body]) => ({
+    id: id!,
+    viewBox: viewBox!,
+    body: body!,
+  }));
 
 const expectedSymbols: Symbol[] = expectedAliases.map((alias) => {
   const { body, width, height } = source(alias);

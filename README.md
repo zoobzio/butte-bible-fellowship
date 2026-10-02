@@ -13,13 +13,13 @@ pnpm dev          # start the dev server at http://localhost:3000
 
 ## Scripts
 
-| Command          | Description                     |
-| ---------------- | ------------------------------- |
-| `pnpm dev`       | Start the Nuxt dev server       |
-| `pnpm build`     | Build for production            |
-| `pnpm generate`  | Prerender a static site         |
-| `pnpm preview`   | Preview the production build    |
-| `pnpm typecheck` | Type-check (`nuxi typecheck`)   |
+| Command          | Description                   |
+| ---------------- | ----------------------------- |
+| `pnpm dev`       | Start the Nuxt dev server     |
+| `pnpm build`     | Build for production          |
+| `pnpm generate`  | Prerender a static site       |
+| `pnpm preview`   | Preview the production build  |
+| `pnpm typecheck` | Type-check (`nuxi typecheck`) |
 
 ## Content
 

@@ -1,4 +1,4 @@
-.PHONY: help install dev build generate preview lint lint-fix typecheck test test-watch coverage check ci clean
+.PHONY: help install dev build generate preview lint lint-fix format format-check typecheck test test-watch coverage check ci clean
 
 help: ## Show available commands
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-15s\033[0m %s\n", $$1, $$2}'
@@ -18,11 +18,17 @@ generate: ## Generate the static site
 preview: ## Preview the production build
 	pnpm preview
 
-lint: ## Run ESLint
+lint: ## Run oxlint
 	pnpm lint
 
-lint-fix: ## Run ESLint with auto-fix
+lint-fix: ## Run oxlint with auto-fix
 	pnpm lint:fix
+
+format: ## Format with oxfmt
+	pnpm format
+
+format-check: ## Check formatting with oxfmt
+	pnpm format:check
 
 typecheck: ## Run type checking
 	pnpm typecheck

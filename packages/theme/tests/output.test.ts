@@ -115,7 +115,10 @@ describe("css", () => {
   });
 
   it("points each color role at the palette stop it aliases", () => {
-    for (const [scheme, selector] of [["light", LIGHT], ["dark", DARK]] as const) {
+    for (const [scheme, selector] of [
+      ["light", LIGHT],
+      ["dark", DARK],
+    ] as const) {
       for (const { id, token } of roles[scheme]) {
         const target = alias(token.$value);
         expect(target, `${scheme} ${id} aliases the palette`).not.toBeNull();
@@ -137,8 +140,10 @@ describe("css", () => {
 
   it("writes gradient.brand as a bare stop list", () => {
     const stops = (
-      base.find((source) => source.id === "gradient.brand")!.token
-        .$value as { color: string; position: number }[]
+      base.find((source) => source.id === "gradient.brand")!.token.$value as {
+        color: string;
+        position: number;
+      }[]
     ).map(
       (stop) => `var(${variable(alias(stop.color)!)}) ${stop.position * 100}%`,
     );

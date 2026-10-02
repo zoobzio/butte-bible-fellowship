@@ -20,7 +20,12 @@ import {
   describeArchLine,
 } from "~/utils/arches";
 
-const CONFIG: ArchLineConfig = { legX: 700, crownX: 880, span: 300, drift: 300 };
+const CONFIG: ArchLineConfig = {
+  legX: 700,
+  crownX: 880,
+  span: 300,
+  drift: 300,
+};
 
 /** The end point of every curve in a path, in order. */
 const curveEnds = (d: string) =>
@@ -78,7 +83,9 @@ describe("describeArchLine", () => {
 
   it("adds one switchback per wave down to the end of the page", () => {
     const endY = 600 + ARCH_WAVE * 2.5;
-    const switchbacks = curveEnds(describeArchLine(100, 600, endY, CONFIG).d).slice(2);
+    const switchbacks = curveEnds(
+      describeArchLine(100, 600, endY, CONFIG).d,
+    ).slice(2);
     expect(switchbacks.map((point) => point.y)).toEqual([
       600 + ARCH_WAVE,
       600 + ARCH_WAVE * 2,
@@ -88,7 +95,9 @@ describe("describeArchLine", () => {
 
   it("alternates sides, starting to the left", () => {
     const origin = CONFIG.legX - CONFIG.span;
-    const switchbacks = curveEnds(describeArchLine(100, 600, 4000, CONFIG).d).slice(2);
+    const switchbacks = curveEnds(
+      describeArchLine(100, 600, 4000, CONFIG).d,
+    ).slice(2);
     expect(switchbacks.map((point) => Math.sign(point.x - origin))).toEqual([
       -1, 1, -1, 1, -1,
     ]);
@@ -96,7 +105,9 @@ describe("describeArchLine", () => {
 
   it("never drifts further than the bleed past either edge", () => {
     const wide = { ...CONFIG, drift: 5000 };
-    const switchbacks = curveEnds(describeArchLine(100, 600, 4000, wide).d).slice(2);
+    const switchbacks = curveEnds(
+      describeArchLine(100, 600, 4000, wide).d,
+    ).slice(2);
     expect(switchbacks.map((point) => point.x)).toEqual([
       -ARCH_BLEED,
       ARCH_VB_W + ARCH_BLEED,

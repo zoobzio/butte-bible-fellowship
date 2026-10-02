@@ -19,6 +19,6 @@
     "@terrazzo/cli": "^2.7.1",
     "@terrazzo/plugin-css": "^2.7.1",
     "@terrazzo/plugin-js": "^2.7.1",
-    "vitest": "^4.1.11"
+    "vitest": "^5.0.3"
   }
 }

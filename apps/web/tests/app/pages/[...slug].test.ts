@@ -15,7 +15,9 @@ describe("content page", () => {
     setRoutePath("/visit");
     const { wrapper } = await mountSuspended(Page);
 
-    const renderer = wrapper.find("article.prose").findComponent(ContentRenderer);
+    const renderer = wrapper
+      .find("article.prose")
+      .findComponent(ContentRenderer);
     expect(renderer.props("value")).toEqual(VISIT);
   });
 
@@ -33,7 +35,9 @@ describe("content page", () => {
     setContentPages({ "/about-us": ABOUT });
     setRoutePath("/about-us");
     await mountSuspended(Page);
-    expect(useHead.mock.calls[0]![0]()).toEqual({ title: "About – Test Church" });
+    expect(useHead.mock.calls[0]![0]()).toEqual({
+      title: "About – Test Church",
+    });
   });
 
   it("throws a 404 when no page exists at the path", async () => {

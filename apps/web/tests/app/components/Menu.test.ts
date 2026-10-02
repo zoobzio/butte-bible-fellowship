@@ -22,7 +22,9 @@ const GROUPS: MenuGroup[] = [
 ];
 
 // The menu content is portalled to the body, so it is queried from there.
-const mountMenu = async (options: Parameters<typeof mount<typeof Menu>>[1] = {}) => {
+const mountMenu = async (
+  options: Parameters<typeof mount<typeof Menu>>[1] = {},
+) => {
   const wrapper = mount(Menu, {
     attachTo: document.body,
     ...options,
@@ -33,12 +35,15 @@ const mountMenu = async (options: Parameters<typeof mount<typeof Menu>>[1] = {})
   return wrapper;
 };
 
-const items = () =>
-  [...document.body.querySelectorAll<HTMLElement>('[role="menuitem"]')];
+const items = () => [
+  ...document.body.querySelectorAll<HTMLElement>('[role="menuitem"]'),
+];
 
 describe("Menu", () => {
   it("renders a button with the label as its trigger", async () => {
-    const wrapper = await mountMenu({ props: { groups: GROUPS, label: "More" } });
+    const wrapper = await mountMenu({
+      props: { groups: GROUPS, label: "More" },
+    });
     const trigger = wrapper.find("button");
     expect(trigger.text()).toBe("More");
     expect(trigger.attributes("aria-haspopup")).toBe("menu");

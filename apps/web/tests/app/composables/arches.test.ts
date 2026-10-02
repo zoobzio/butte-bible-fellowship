@@ -42,7 +42,10 @@ const stubResizeObserver = () => {
       }
     },
   );
-  return { observers, notify: () => observers.forEach((callback) => callback()) };
+  return {
+    observers,
+    notify: () => observers.forEach((callback) => callback()),
+  };
 };
 
 interface Geometry {
@@ -87,7 +90,16 @@ const setup = ({ reduce = true, chrome = true } = {}) => {
       pathB: ref(pathB),
     }),
   );
-  return { ...mounted, ...page, ...resizeObserver, geometry, track, svg, pathA, pathB };
+  return {
+    ...mounted,
+    ...page,
+    ...resizeObserver,
+    geometry,
+    track,
+    svg,
+    pathA,
+    pathB,
+  };
 };
 
 /** What a line should look like for `geometry`, by the pure helpers. */
@@ -100,14 +112,21 @@ const expected = (key: "A" | "B", geometry: Geometry) => {
     },
     0,
   );
-  const spec = describeArchLine(top, bottom, geometry.footerTop, ARCH_CONFIGS[key]);
+  const spec = describeArchLine(
+    top,
+    bottom,
+    geometry.footerTop,
+    ARCH_CONFIGS[key],
+  );
   const length = spec.d.length;
   const stop = archStop(spec.arch.length, length);
   return {
     d: spec.d,
     length,
     offset: (progress: number, intro: number) =>
-      (length * (1 - archReveal(stop, progress, intro, ARCH_LAG[key]))).toFixed(1),
+      (length * (1 - archReveal(stop, progress, intro, ARCH_LAG[key]))).toFixed(
+        1,
+      ),
   };
 };
 
@@ -127,7 +146,10 @@ describe("useArchLines", () => {
 
   it("draws each line from the hero down to the footer", () => {
     const { pathA, pathB, geometry } = setup();
-    for (const [key, path] of [["A", pathA], ["B", pathB]] as const) {
+    for (const [key, path] of [
+      ["A", pathA],
+      ["B", pathB],
+    ] as const) {
       const line = expected(key, geometry);
       expect(path.getAttribute("d")).toBe(line.d);
       expect(path.style.strokeDasharray).toBe(String(line.length));
@@ -136,8 +158,12 @@ describe("useArchLines", () => {
 
   it("shows the arch straight away under reduced motion", () => {
     const { pathA, pathB, geometry, pending } = setup({ reduce: true });
-    expect(pathA.style.strokeDashoffset).toBe(expected("A", geometry).offset(0, 1));
-    expect(pathB.style.strokeDashoffset).toBe(expected("B", geometry).offset(0, 1));
+    expect(pathA.style.strokeDashoffset).toBe(
+      expected("A", geometry).offset(0, 1),
+    );
+    expect(pathB.style.strokeDashoffset).toBe(
+      expected("B", geometry).offset(0, 1),
+    );
     expect(pending()).toBe(0);
   });
 
@@ -162,17 +188,25 @@ describe("useArchLines", () => {
 
     scroll(1600);
     await frame();
-    expect(pathA.style.strokeDashoffset).toBe(expected("A", geometry).offset(0.5, 1));
-    expect(pathB.style.strokeDashoffset).toBe(expected("B", geometry).offset(0.5, 1));
+    expect(pathA.style.strokeDashoffset).toBe(
+      expected("A", geometry).offset(0.5, 1),
+    );
+    expect(pathB.style.strokeDashoffset).toBe(
+      expected("B", geometry).offset(0.5, 1),
+    );
 
     scroll(3200);
     await frame();
     expect(pathA.style.strokeDashoffset).toBe("0.0");
-    expect(pathB.style.strokeDashoffset).toBe(expected("B", geometry).offset(1, 1));
+    expect(pathB.style.strokeDashoffset).toBe(
+      expected("B", geometry).offset(1, 1),
+    );
 
     scroll(0);
     await frame();
-    expect(pathA.style.strokeDashoffset).toBe(expected("A", geometry).offset(0, 1));
+    expect(pathA.style.strokeDashoffset).toBe(
+      expected("A", geometry).offset(0, 1),
+    );
   });
 
   it("lays out again on resize and on load", () => {

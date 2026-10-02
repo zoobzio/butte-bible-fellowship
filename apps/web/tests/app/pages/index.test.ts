@@ -56,7 +56,9 @@ describe("home page", () => {
     setContentPages({ "/": page });
     const { wrapper } = await mountSuspended(Page);
 
-    const renderer = wrapper.find("section.prose").findComponent(ContentRenderer);
+    const renderer = wrapper
+      .find("section.prose")
+      .findComponent(ContentRenderer);
     expect(renderer.props("value")).toEqual(page);
     expect(renderer.props("components")).toBe(MARKDOWN_COMPONENTS);
     expect(renderer.props("prose")).toBe(false);
@@ -65,7 +67,9 @@ describe("home page", () => {
   it("titles the document after the page", async () => {
     setContentPages({ "/": home(HERO) });
     await mountSuspended(Page);
-    expect(useHead.mock.calls[0]![0]()).toEqual({ title: "Home – Test Church" });
+    expect(useHead.mock.calls[0]![0]()).toEqual({
+      title: "Home – Test Church",
+    });
   });
 
   it("throws a 404 when the home page does not exist", async () => {

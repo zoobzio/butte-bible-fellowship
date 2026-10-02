@@ -94,6 +94,9 @@ export const queryCollection = (_collection: string) => ({
 });
 
 // useAsyncData: awaits the handler and hands back its result as `data`.
-export const useAsyncData = async <T>(_key: string, handler: () => Promise<T>) => ({
+export const useAsyncData = async <T>(
+  _key: string,
+  handler: () => Promise<T>,
+) => ({
   data: ref(await handler()),
 });

@@ -83,11 +83,7 @@ const open = defineModel<boolean>("open", { default: false });
               class="menu-separator"
             />
             <DropdownMenuGroup class="menu-group">
-              <DropdownMenuLabel
-                v-if="group.label"
-                class="menu-label"
-                as-child
-              >
+              <DropdownMenuLabel v-if="group.label" class="menu-label" as-child>
                 <slot name="groupLabel" :group="group">
                   <div>{{ group.label }}</div>
                 </slot>
