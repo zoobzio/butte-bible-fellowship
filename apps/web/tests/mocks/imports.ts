@@ -7,6 +7,9 @@
 
 import { reactive, ref, type Ref } from "vue";
 import { vi } from "vitest";
+import { makeUntheme } from "untheme";
+import { useUnthemeConfig } from "untheme/config";
+import theme from "@bbf/theme/config";
 
 // Real Vue APIs (ref, computed, watch, onMounted, useTemplateRef, useId, …).
 export * from "vue";
@@ -40,6 +43,48 @@ export const useCookie = (
   cookieRegistry.set(key, cookie);
   return cookie;
 };
+
+// useUntheme: the real service over the app's built theme, in a reactive
+// container held like the module holds it — in useState, so the registry
+// reset between tests gives each test a fresh selection.
+const services = new WeakMap<object, ReturnType<typeof makeUntheme>>();
+
+export const useUntheme = () => {
+  const container = useState("untheme:config", () =>
+    reactive(useUnthemeConfig(theme)),
+  ).value as object;
+  let service = services.get(container);
+  if (!service) {
+    const key = useCookie("untheme-key");
+    service = makeUntheme(container as ReturnType<typeof useUnthemeConfig>, {
+      set: {
+        config: {
+          theme: (next) => {
+            key.value = next.id;
+            return next;
+          },
+        },
+      },
+    });
+    services.set(container, service);
+  }
+  return service;
+};
+
+// accessUntheme: the module's cookie refs. Like the module's service, the
+// shim writes the active theme's id to `untheme-key` when one is applied.
+export const accessUntheme = () => ({
+  cookies: {
+    input: useCookie("untheme-input"),
+    key: useCookie("untheme-key"),
+  },
+});
+
+// useRequestEvent: there is no request under vitest, as in the browser.
+export const useRequestEvent = () => undefined;
+
+// defineNuxtPlugin: hands the plugin back so a test can run its setup.
+export const defineNuxtPlugin = <T>(plugin: T): T => plugin;
 
 // useAppConfig: tests supply their own config so they don't depend on the
 // site's content.

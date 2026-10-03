@@ -5,7 +5,9 @@ import { setAppConfig } from "#imports";
 import AppFooter from "~/components/AppFooter.vue";
 
 const mountFooter = () =>
-  mount(AppFooter, { global: { stubs: { ColorMode: true } } });
+  mount(AppFooter, {
+    global: { stubs: { ColorMode: true, ThemePicker: true } },
+  });
 
 beforeEach(() => {
   setAppConfig({

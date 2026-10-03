@@ -4,21 +4,25 @@
   "type": "module",
   "exports": {
     ".": {
-      "types": "./.output/index.d.ts",
-      "default": "./.output/index.js"
+      "types": "./.output/index.d.mts",
+      "default": "./.output/index.mjs"
     },
-    "./css": "./.output/index.css"
+    "./config": {
+      "types": "./.output/config.d.mts",
+      "default": "./.output/config.mjs"
+    }
   },
   "scripts": {
-    "build": "tz build",
-    "prepare": "tz build",
-    "lint": "tz check",
+    "build": "untheme build",
+    "prepare": "untheme build",
     "test": "vitest run"
   },
+  "dependencies": {
+    "untheme": "^0.4.0"
+  },
   "devDependencies": {
-    "@terrazzo/cli": "^2.7.1",
-    "@terrazzo/plugin-css": "^2.7.1",
-    "@terrazzo/plugin-js": "^2.7.1",
+    "@untheme/aurora": "^0.4.0",
+    "@untheme/kit": "^0.4.0",
     "vitest": "^5.0.3"
   }
 }

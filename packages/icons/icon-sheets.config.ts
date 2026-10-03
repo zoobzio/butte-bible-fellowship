@@ -6,6 +6,7 @@ export default defineConfig({
   icons: {
     menu: "lucide:menu",
     moon: "lucide:moon",
+    palette: "lucide:palette",
     sun: "lucide:sun",
   },
   outDir: ".output",

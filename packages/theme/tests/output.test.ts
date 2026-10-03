@@ -1,84 +1,57 @@
 import { execFileSync } from "node:child_process";
+import { createRequire } from "node:module";
 import { existsSync, readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
 import { beforeAll, describe, expect, it } from "vitest";
 
 type Json = Record<string, unknown>;
-type Source = { id: string; token: Json };
-type Scheme = "light" | "dark";
+type Token = { $type: string; $value: unknown };
+type Tokens = Record<string, Token>;
 
 const root = fileURLToPath(new URL("..", import.meta.url));
 const read = (file: string) => readFileSync(`${root}${file}`, "utf8");
 const json = (file: string) => JSON.parse(read(file)) as Json;
 
-/**
- * Flattens a DTCG file into its tokens. A group's `$root` token takes the
- * group's own id, as it does in the build.
- */
-const flatten = (node: Json, path: string[] = []): Source[] =>
-  Object.entries(node).flatMap(([key, value]) => {
-    if (key.startsWith("$") && key !== "$root") return [];
-    if (typeof value !== "object" || value === null) return [];
-    const next = key === "$root" ? path : [...path, key];
-    return "$value" in value
-      ? [{ id: next.join("."), token: value as Json }]
-      : flatten(value as Json, next);
-  });
+// Aurora's documents, read from the installed package the config points at.
+const require = createRequire(`${root}package.json`);
+const aurora = (file: string) =>
+  JSON.parse(readFileSync(require.resolve(`@untheme/aurora/${file}`), "utf8"));
 
-const refs = (entries: unknown) =>
-  (entries as { $ref: string }[]).map((entry) => entry.$ref);
-
-/** `{palette.primary.600}` → `palette.primary.600`; null for a literal. */
-const alias = (value: unknown) =>
-  typeof value === "string" ? (/^\{(.+)\}$/.exec(value)?.[1] ?? null) : null;
-
-/** The CSS variable a token id is written as. */
-const variable = (id: string) => `--${id.replaceAll(".", "-")}`;
-
-// The sources, read the way resolver.json wires them together.
-const resolverFile = json("resolver.json") as {
-  sets: { base: { sources: unknown } };
-  modifiers: { color: { contexts: Record<Scheme, unknown> } };
+const resolver = aurora("aurora.resolver.json") as {
+  sets: Record<string, { sources: { $ref: string }[] }>;
+  modifiers: Record<
+    string,
+    { contexts: Record<string, unknown>; default: string }
+  >;
 };
-const base = refs(resolverFile.sets.base.sources).flatMap((file) =>
-  flatten(json(file)),
-);
-const roles: Record<Scheme, Source[]> = {
-  light: refs(resolverFile.modifiers.color.contexts.light).flatMap((file) =>
-    flatten(json(file)),
-  ),
-  dark: refs(resolverFile.modifiers.color.contexts.dark).flatMap((file) =>
-    flatten(json(file)),
-  ),
+
+/** Every token aurora's base sets define, by name. */
+const upstream = Object.fromEntries(
+  Object.values(resolver.sets)
+    .flatMap((set) => set.sources.map((source) => source.$ref))
+    .flatMap((ref) => Object.entries(aurora(ref.slice(2)) as Tokens)),
+) as Tokens;
+
+// Our resolver, and the ramp files of ours its colors set points at.
+const AURORA = "npm:/@untheme/aurora/";
+const mirror = json("bbf.resolver.json") as unknown as typeof resolver & {
+  resolutionOrder: unknown;
 };
-const ids = (sources: Source[]) => sources.map((source) => source.id).sort();
+const local = Object.values(mirror.sets)
+  .flatMap((set) => set.sources.map((source) => source.$ref))
+  .filter((ref) => !ref.startsWith(AURORA));
+const ours = Object.fromEntries(
+  local.flatMap((ref) => Object.entries(json(ref) as Tokens)),
+) as Tokens;
 
-/** The declarations of each rule in the built stylesheet, by selector. */
-const rules = (css: string) =>
-  Object.fromEntries(
-    [...css.matchAll(/^([^\s/][^{\n]*?)\s*\{\n([\s\S]*?)\n\}/gm)].map(
-      ([, selector, body]) => [
-        selector,
-        Object.fromEntries(
-          [...body!.matchAll(/^\s*(--[\w-]+):\s*(.+);$/gm)].map(
-            ([, name, value]) => [name, value],
-          ),
-        ),
-      ],
-    ),
-  ) as Record<string, Record<string, string>>;
-
-const LIGHT = ":root";
-const DARK = ':root[data-color="dark"]';
-
-let css: Record<string, Record<string, string>>;
-let tokens: typeof import("../.output/index.js");
+let config: typeof import("../.output/config.mjs");
+let index: typeof import("../.output/index.mjs");
 
 beforeAll(async () => {
   execFileSync("pnpm", ["run", "build"], { cwd: root, stdio: "pipe" });
-  css = rules(read(".output/index.css"));
-  tokens = await import("../.output/index.js");
+  config = await import("../.output/config.mjs");
+  index = await import("../.output/index.mjs");
 });
 
 describe("package exports", () => {
@@ -96,108 +69,129 @@ describe("package exports", () => {
   });
 });
 
-describe("css", () => {
-  it("declares the light scheme on :root and the dark scheme on its data-color block", () => {
-    expect(Object.keys(css)).toEqual([LIGHT, DARK]);
-  });
-
-  it("declares a variable for every token", () => {
-    const declared = Object.keys(css[LIGHT]!);
-    for (const { id } of [...base, ...roles.light]) {
-      expect(declared, id).toContain(variable(id));
-    }
-  });
-
-  it("re-declares only the color roles for dark, and all of them", () => {
-    const expected = ids(roles.dark).map(variable).sort();
-    expect(Object.keys(css[DARK]!).sort()).toEqual(expected);
-    expect(ids(roles.dark)).toEqual(ids(roles.light));
-  });
-
-  it("points each color role at the palette stop it aliases", () => {
-    for (const [scheme, selector] of [
-      ["light", LIGHT],
-      ["dark", DARK],
-    ] as const) {
-      for (const { id, token } of roles[scheme]) {
-        const target = alias(token.$value);
-        expect(target, `${scheme} ${id} aliases the palette`).not.toBeNull();
-        expect(css[selector]![variable(id)], `${scheme} ${id}`).toBe(
-          `var(${variable(target!)})`,
-        );
-      }
-    }
-  });
-
-  it("writes dimensions with their units", () => {
-    const dimensions = flatten(json("tokens/layout.json"));
-    expect(dimensions.length).toBeGreaterThan(0);
-    for (const { id, token } of dimensions) {
-      const { value, unit } = token.$value as { value: number; unit: string };
-      expect(css[LIGHT]![variable(id)], id).toBe(`${value}${unit}`);
-    }
-  });
-
-  it("writes gradient.brand as a bare stop list", () => {
-    const stops = (
-      base.find((source) => source.id === "gradient.brand")!.token.$value as {
-        color: string;
-        position: number;
-      }[]
-    ).map(
-      (stop) => `var(${variable(alias(stop.color)!)}) ${stop.position * 100}%`,
+describe("resolver", () => {
+  it("mirrors aurora's sets, modifiers and resolution order", () => {
+    const original = aurora("aurora.resolver.json");
+    expect(Object.keys(mirror.sets)).toEqual(Object.keys(resolver.sets));
+    expect(mirror.resolutionOrder).toEqual(original.resolutionOrder);
+    expect(Object.keys(mirror.modifiers)).toEqual(
+      Object.keys(resolver.modifiers),
     );
-    expect(css[LIGHT]!["--gradient-brand"]).toBe(stops.join(", "));
-  });
-});
-
-describe("js", () => {
-  it("lists the light and dark permutations", () => {
-    expect(tokens.resolver.listPermutations()).toEqual([
-      { color: "light" },
-      { color: "dark" },
-    ]);
-  });
-
-  it("resolves every token in each scheme", () => {
-    for (const scheme of ["light", "dark"] as const) {
-      const resolved = tokens.resolver.apply({ color: scheme });
-      expect(Object.keys(resolved).sort(), scheme).toEqual(
-        ids([...base, ...roles[scheme]]),
+    for (const [name, modifier] of Object.entries(resolver.modifiers)) {
+      expect(mirror.modifiers[name]!.default, name).toBe(modifier.default);
+      expect(mirror.modifiers[name]!.contexts, name).toEqual(
+        Object.fromEntries(
+          Object.entries(
+            modifier.contexts as Record<string, { $ref: string }[]>,
+          ).map(([context, refs]) => [
+            context,
+            refs.map((ref) => ({ $ref: AURORA + ref.$ref.slice(2) })),
+          ]),
+        ),
       );
     }
   });
 
-  it("defaults to the light scheme", () => {
-    expect(tokens.resolver.apply({})).toBe(
-      tokens.resolver.apply({ color: "light" }),
-    );
+  it("points only the colors set at files of ours", () => {
+    for (const [name, set] of Object.entries(resolver.sets)) {
+      const sources = mirror.sets[name]!.sources.map((source) => source.$ref);
+      expect(sources.length, name).toBe(set.sources.length);
+      set.sources.forEach((source, at) => {
+        // Each entry is aurora's file, or — in colors — ours of the same path.
+        const theirs = AURORA + source.$ref.slice(2);
+        if (name === "colors" && sources[at] === source.$ref) {
+          return;
+        }
+        expect(sources[at], name).toBe(theirs);
+      });
+    }
+    expect(local.length).toBeGreaterThan(0);
   });
 
-  it("resolves each color role to the palette stop it aliases", () => {
-    for (const scheme of ["light", "dark"] as const) {
-      const resolved = tokens.resolver.apply({ color: scheme }) as Record<
-        string,
-        { $value: { hex: string } }
-      >;
-      for (const { id, token } of roles[scheme]) {
-        const stop = base.find((source) => source.id === alias(token.$value))!;
-        expect(resolved[id]!.$value.hex, `${scheme} ${id}`).toBe(
-          (stop.token.$value as { hex: string }).hex,
+  it("defines in each ramp of ours exactly the tokens aurora's defines", () => {
+    for (const ref of local) {
+      const theirs = aurora(ref.slice(2)) as Tokens;
+      const mine = json(ref) as Tokens;
+      expect(Object.keys(mine), ref).toEqual(Object.keys(theirs));
+      for (const [token, slot] of Object.entries(mine)) {
+        expect(slot.$type, token).toBe("color");
+        expect((slot.$value as { hex: string }).hex, token).toMatch(
+          /^#[0-9a-f]{6}$/,
         );
       }
     }
   });
+});
 
-  it("keeps tokens that do not depend on color identical across schemes", () => {
-    const light = tokens.resolver.apply({ color: "light" }) as Json;
-    const dark = tokens.resolver.apply({ color: "dark" }) as Json;
-    const independent = ids(base).filter((id) =>
-      /^(palette|space|radius|font|duration|delay|easing)\./.test(id),
+describe("theme", () => {
+  it("carries the site's identity", () => {
+    expect(config.theme.id).toBe("bbf");
+    expect(config.theme.name).toBe("Butte Bible Fellowship");
+  });
+
+  it("defines exactly aurora's tokens", () => {
+    expect([...index.tokens].sort()).toEqual(Object.keys(upstream).sort());
+  });
+
+  it("binds our ramps as authored and everything else as aurora does", async () => {
+    // Terrazzo normalizes what it reads — an explicit alpha on a color, a
+    // single shadow layer as a list — so compare the custom properties each
+    // side renders to rather than the value shapes.
+    const { makeUntheme } = await import("untheme");
+    const { useUnthemeConfig } = await import("untheme/config");
+    const { defineRenderer } = await import("untheme/css");
+    const built = defineRenderer(makeUntheme(useUnthemeConfig(config.default)));
+    const expected = { ...upstream, ...ours };
+    const authored = defineRenderer({
+      config: { theme: { tokens: expected } },
+      tokens: () =>
+        Object.fromEntries(
+          Object.entries(expected).map(([token, slot]) => [token, slot.$value]),
+        ),
+    } as never);
+    expect(built.variables()).toEqual(authored.variables());
+  });
+
+  it("declares aurora's modifiers, in order, and boots at its defaults", () => {
+    expect(config.theme.order).toEqual(Object.keys(resolver.modifiers));
+    for (const [name, modifier] of Object.entries(resolver.modifiers)) {
+      expect(
+        index.modifiers[name as keyof typeof index.modifiers],
+        name,
+      ).toEqual(Object.keys(modifier.contexts));
+    }
+    expect(config.input).toEqual(
+      Object.fromEntries(
+        Object.entries(resolver.modifiers).map(([name, modifier]) => [
+          name,
+          modifier.default,
+        ]),
+      ),
     );
-    expect(independent.length).toBeGreaterThan(0);
-    for (const id of independent) {
-      expect(dark[id], id).toEqual(light[id]);
+  });
+
+  it("accepts every theme in aurora's catalog as a layer", async () => {
+    const { makeUntheme } = await import("untheme");
+    const { useUnthemeConfig } = await import("untheme/config");
+    const untheme = makeUntheme(useUnthemeConfig(config.default));
+    const catalog = aurora("themes/index.json") as {
+      id: string;
+      name: string;
+    }[];
+    expect(catalog.length).toBeGreaterThan(0);
+    for (const { id, name } of catalog) {
+      const files = resolver.sets.colors!.sources.map((source) =>
+        source.$ref.replace("./tokens/", `themes/${id}/`),
+      );
+      const tokens = Object.fromEntries(
+        files.flatMap((file) =>
+          Object.entries(aurora(file) as Tokens).map(([token, source]) => [
+            token,
+            source.$value,
+          ]),
+        ),
+      );
+      expect(() => untheme.create({ id, name, tokens }), id).not.toThrow();
     }
   });
 });

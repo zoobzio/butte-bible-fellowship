@@ -3,30 +3,28 @@ import { defineNuxtConfig } from "nuxt/config";
 import { prefix } from "@bbf/icons";
 import icons from "@bbf/icons/config";
 import sets from "@bbf/icons/sets";
+import untheme from "@bbf/theme/config";
 
 export default defineNuxtConfig({
   compatibilityDate: "2026-08-19",
 
   extends: ["@zoobzio/foundation"],
 
-  hooks: {
-    // Foundation's layer config includes "../tests/**/*" for its own suite,
-    // which drags our vitest tests (written against the #imports shim) into
-    // nuxi typecheck. Drop them; vitest owns those files.
-    "prepare:types": ({ tsConfig }) => {
-      tsConfig.include = tsConfig.include?.filter(
-        (path) => !path.startsWith("../tests/"),
-      );
-    },
-  },
-
-  modules: ["@nuxt/content", "@nuxt/fonts", "@icon-sheets/nuxt", "nuxt-studio"],
+  modules: [
+    "@nuxt/content",
+    "@nuxt/fonts",
+    "@icon-sheets/nuxt",
+    "@untheme/nuxt",
+    "nuxt-studio",
+  ],
 
   imports: { autoImport: false },
 
   components: { dirs: [] },
 
   iconSheets: { ...icons, sets, prefix },
+
+  untheme,
 
   studio: {
     route: "/admin",
@@ -60,7 +58,7 @@ export default defineNuxtConfig({
     ],
   },
 
-  css: ["@bbf/theme/css", "~/assets/css/app.css"],
+  css: ["~/assets/css/app.css"],
 
   content: {
     experimental: {

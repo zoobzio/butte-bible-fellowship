@@ -3,6 +3,7 @@ import { NuxtLink } from "#components";
 import { useAppConfig } from "#imports";
 
 import ColorMode from "~/components/ColorMode.vue";
+import ThemePicker from "~/components/ThemePicker.vue";
 </script>
 
 <script setup lang="ts">
@@ -32,7 +33,10 @@ const { site, footer } = useAppConfig();
     </div>
 
     <div class="site-footer-legal">
-      <ColorMode />
+      <div class="site-footer-controls">
+        <ColorMode />
+        <ThemePicker />
+      </div>
       <span>© {{ new Date().getFullYear() }} {{ site.name }}</span>
     </div>
   </footer>

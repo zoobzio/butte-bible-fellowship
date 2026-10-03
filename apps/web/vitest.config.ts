@@ -24,6 +24,9 @@ export default defineConfig({
     // its own VM context, so tests stay isolated from one another.
     pool: "vmThreads",
     include: ["tests/**/*.test.ts"],
+    // Keep transformed modules on disk between runs. The cache lives under
+    // node_modules, so reinstalling dependencies clears it.
+    fsModuleCache: true,
     setupFiles: ["tests/setup.ts"],
     coverage: {
       include: ["app/**/*.{ts,vue}"],

@@ -1,1 +1,3 @@
-export type ColorMode = "light" | "dark";
+import type { AppUnthemeInput } from "#imports";
+
+export type ColorMode = AppUnthemeInput["color"];

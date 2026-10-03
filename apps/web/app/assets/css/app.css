@@ -3,8 +3,19 @@
    Warm, typographic treatment of the semantic element / app class
    vocabulary.
    Every color, font, space, radius, shadow and transition comes from
-   @bbf/theme variables; both schemes are supported through color roles.
+   @bbf/theme variables — aurora, with the site's tonal ramps; both schemes
+   are supported through color roles. The one value aurora has no token
+   for is declared below.
    ===================================================================== */
+
+/* ---------- Site properties ------------------------------------------- */
+
+/* The display serif. Aurora's type scale is set in its sans and carries no
+   display face, and the face is the site's rather than the theme's, so it
+   lives here as a plain custom property beside the theme's tokens. */
+:root {
+  --font-display: "Newsreader", Georgia, serif;
+}
 
 /* ---------- Reset & page shell ---------------------------------------- */
 
@@ -21,22 +32,22 @@ html {
 
 body {
   margin: 0;
-  background: var(--color-surface);
-  color: var(--color-on-surface-medium-contrast);
-  font: var(--typography-body);
+  background: var(--surface);
+  color: var(--on-surface-medium-contrast);
+  font: var(--type-body);
   font-size: clamp(
-    var(--font-size-body),
+    var(--body-size),
     0.55vw + 0.95rem,
-    calc(var(--font-size-body) * 1.25)
+    calc(var(--body-size) * 1.25)
   );
-  letter-spacing: var(--typography-body-letter-spacing);
+  letter-spacing: var(--type-body-letter-spacing);
   text-wrap: pretty;
 }
 
 /* Light mode: the surface is near-white, so the washes need deeper tints. */
 [data-color="light"] body,
 html[data-color="light"] body {
-  background: var(--color-surface);
+  background: var(--surface);
 }
 
 img,
@@ -45,26 +56,22 @@ iframe {
 }
 
 ::selection {
-  background: var(--color-primary-container);
-  color: var(--color-primary-on-container);
+  background: var(--primary-container);
+  color: var(--on-primary-container);
 }
 
 :focus-visible {
   outline: var(--border-focus);
   outline-offset: var(--space-1);
-  border-radius: var(--radius-sm);
+  border-radius: var(--shape-sm);
 }
 
 /* ---------- Links ----------------------------------------------------- */
 
 a {
-  color: var(--color-primary-high-contrast);
+  color: var(--primary-high-contrast);
   text-decoration: underline;
-  text-decoration-color: color-mix(
-    in oklab,
-    var(--color-primary) 60%,
-    transparent
-  );
+  text-decoration-color: color-mix(in oklab, var(--primary) 60%, transparent);
   text-decoration-thickness: 1px;
   text-underline-offset: 4px;
   transition:
@@ -73,8 +80,8 @@ a {
 }
 
 a:hover {
-  color: var(--color-secondary-high-contrast);
-  text-decoration-color: var(--color-secondary);
+  color: var(--secondary-high-contrast);
+  text-decoration-color: var(--secondary);
   text-decoration-thickness: 2px;
 }
 
@@ -91,7 +98,7 @@ a:hover {
   gap: var(--space-4) var(--space-6);
   padding: var(--space-5) clamp(var(--space-4), 4vw, var(--space-7))
     var(--space-4);
-  background: color-mix(in oklab, var(--color-surface) 88%, transparent);
+  background: color-mix(in oklab, var(--surface) 88%, transparent);
   backdrop-filter: blur(var(--blur-sm)) saturate(1.2);
 }
 
@@ -100,7 +107,12 @@ a:hover {
   position: absolute;
   inset: auto 0 0 0;
   height: 1px;
-  background: linear-gradient(108deg, var(--gradient-brand));
+  background: linear-gradient(
+    108deg,
+    var(--primary-500),
+    var(--secondary-400) 52%,
+    var(--tertiary-400)
+  );
   opacity: 0.85;
 }
 
@@ -111,22 +123,24 @@ a:hover {
 }
 
 .site-brand-name {
-  font: var(--typography-headline);
-  font-size: clamp(var(--font-size-title), 2.4vw, var(--font-size-headline));
-  letter-spacing: var(--typography-headline-letter-spacing);
-  color: var(--color-on-surface-high-contrast);
+  font: var(--type-headline);
+  font-family: var(--font-display);
+  font-size: clamp(var(--title-size), 2.4vw, var(--headline-size));
+  letter-spacing: var(--type-headline-letter-spacing);
+  color: var(--on-surface-high-contrast);
 }
 
 .site-brand-tag {
-  font: var(--typography-title);
-  font-size: var(--font-size-label);
+  font: var(--type-title);
+  font-family: var(--font-display);
+  font-size: var(--label-size);
   font-style: italic;
-  letter-spacing: var(--typography-title-letter-spacing);
-  color: var(--color-primary-medium-contrast);
+  letter-spacing: var(--type-title-letter-spacing);
+  color: var(--primary-medium-contrast);
 }
 
 .site-brand:hover .site-brand-name {
-  color: var(--color-primary-high-contrast);
+  color: var(--primary-high-contrast);
 }
 
 .site-nav {
@@ -141,13 +155,9 @@ a:hover {
 .site-nav-link {
   position: relative;
   padding: var(--space-2) 0;
-  font-size: clamp(
-    var(--font-size-label),
-    0.4vw + 0.8rem,
-    var(--font-size-body)
-  );
-  letter-spacing: var(--typography-label-letter-spacing);
-  color: var(--color-on-surface-muted-medium-contrast);
+  font-size: clamp(var(--label-size), 0.4vw + 0.8rem, var(--body-size));
+  letter-spacing: var(--type-label-letter-spacing);
+  color: var(--on-surface-muted-medium-contrast);
   text-decoration: none;
   transition: color var(--transition-fast);
 }
@@ -157,14 +167,14 @@ a:hover {
   position: absolute;
   inset: auto 0 0 0;
   height: 2px;
-  background: var(--color-primary);
+  background: var(--primary);
   transform: scaleX(0);
   transform-origin: left;
   transition: transform var(--transition-base);
 }
 
 .site-nav-link:hover {
-  color: var(--color-on-surface-high-contrast);
+  color: var(--on-surface-high-contrast);
 }
 
 .site-nav-link:hover::after {
@@ -172,8 +182,8 @@ a:hover {
 }
 
 .site-nav-link.router-link-exact-active {
-  color: var(--color-on-surface-high-contrast);
-  font-weight: var(--font-weight-medium);
+  color: var(--on-surface-high-contrast);
+  font-weight: var(--weight-medium);
 }
 
 .site-nav-link.router-link-exact-active::after {
@@ -198,15 +208,16 @@ a:hover {
 /* ---------- Headings -------------------------------------------------- */
 
 h1 {
-  font: var(--typography-display);
+  font: var(--type-display);
+  font-family: var(--font-display);
   font-size: clamp(
-    calc(var(--font-size-headline) * 1.15),
+    calc(var(--headline-size) * 1.15),
     5.5vw,
-    calc(var(--font-size-display) * 1.2)
+    calc(var(--display-size) * 1.2)
   );
-  letter-spacing: var(--typography-display-letter-spacing);
-  line-height: var(--font-line-height-display);
-  color: var(--color-on-surface-high-contrast);
+  letter-spacing: var(--type-display-letter-spacing);
+  line-height: var(--display-line-height);
+  color: var(--on-surface-high-contrast);
   margin: 0 0 var(--space-5);
   text-wrap: balance;
 }
@@ -222,14 +233,20 @@ h1 {
   inset: auto auto 0 0;
   width: var(--space-8);
   height: 2px;
-  background: linear-gradient(108deg, var(--gradient-brand));
+  background: linear-gradient(
+    108deg,
+    var(--primary-500),
+    var(--secondary-400) 52%,
+    var(--tertiary-400)
+  );
 }
 
 h2 {
-  font: var(--typography-headline);
-  font-size: clamp(var(--font-size-title), 3vw, var(--font-size-headline));
-  letter-spacing: var(--typography-headline-letter-spacing);
-  color: var(--color-on-surface-high-contrast);
+  font: var(--type-headline);
+  font-family: var(--font-display);
+  font-size: clamp(var(--title-size), 3vw, var(--headline-size));
+  letter-spacing: var(--type-headline-letter-spacing);
+  color: var(--on-surface-high-contrast);
   margin: var(--space-8) 0 var(--space-4);
   display: flex;
   align-items: baseline;
@@ -241,20 +258,21 @@ h2::before {
   flex: none;
   width: var(--space-5);
   height: 1px;
-  background: var(--color-primary);
+  background: var(--primary);
   transform: translateY(-0.35em);
 }
 
 h3 {
-  font: var(--typography-title);
+  font: var(--type-title);
+  font-family: var(--font-display);
   font-size: clamp(
-    calc(var(--font-size-body) * 1.1),
+    calc(var(--body-size) * 1.1),
     2vw,
-    calc(var(--font-size-title) * 1.05)
+    calc(var(--title-size) * 1.05)
   );
   font-style: italic;
-  letter-spacing: var(--typography-title-letter-spacing);
-  color: var(--color-primary-medium-contrast);
+  letter-spacing: var(--type-title-letter-spacing);
+  color: var(--primary-medium-contrast);
   margin: var(--space-6) 0 var(--space-3);
 }
 
@@ -269,21 +287,22 @@ p {
 /* Opening paragraph of a page opens with a set initial. */
 h1 + p::first-letter {
   float: left;
-  font: var(--typography-display);
+  font: var(--type-display);
+  font-family: var(--font-display);
   font-size: 3.4em;
   line-height: 0.78;
   padding: 0.06em var(--space-2) 0 0;
-  color: var(--color-primary-medium-contrast);
+  color: var(--primary-medium-contrast);
 }
 
 strong {
-  font-weight: var(--font-weight-medium);
-  color: var(--color-on-surface-high-contrast);
+  font-weight: var(--weight-medium);
+  color: var(--on-surface-high-contrast);
 }
 
 em {
   font-style: italic;
-  color: var(--color-primary-high-contrast);
+  color: var(--primary-high-contrast);
 }
 
 ul {
@@ -307,7 +326,7 @@ li::before {
   top: 0.72em;
   width: var(--space-3);
   height: 1px;
-  background: var(--color-primary);
+  background: var(--primary);
 }
 
 /* ---------- Scripture & pull quotes ---------------------------------- */
@@ -317,7 +336,7 @@ blockquote {
   margin: var(--space-7) 0;
   padding: 0 0 0 clamp(var(--space-6), 6vw, var(--space-8));
   border-left: 1px var(--stroke-solid)
-    color-mix(in oklab, var(--color-primary) 55%, transparent);
+    color-mix(in oklab, var(--primary) 55%, transparent);
 }
 
 blockquote::before {
@@ -325,41 +344,43 @@ blockquote::before {
   position: absolute;
   left: var(--space-2);
   top: -0.28em;
-  font: var(--typography-display);
-  font-size: calc(var(--font-size-display) * 1.6);
+  font: var(--type-display);
+  font-family: var(--font-display);
+  font-size: calc(var(--display-size) * 1.6);
   line-height: 1;
-  color: color-mix(in oklab, var(--color-primary) 40%, transparent);
+  color: color-mix(in oklab, var(--primary) 40%, transparent);
   pointer-events: none;
 }
 
 blockquote p {
-  font: var(--typography-title);
+  font: var(--type-title);
+  font-family: var(--font-display);
   font-size: clamp(
-    calc(var(--font-size-body) * 1.25),
+    calc(var(--body-size) * 1.25),
     2.6vw,
-    calc(var(--font-size-title) * 1.3)
+    calc(var(--title-size) * 1.3)
   );
   font-style: italic;
   line-height: 1.5;
-  color: var(--color-on-surface-high-contrast);
+  color: var(--on-surface-high-contrast);
   margin: 0;
   max-width: 46ch;
 }
 
 blockquote p strong {
   font-style: normal;
-  font-weight: var(--font-weight-regular);
+  font-weight: var(--weight-regular);
 }
 
 blockquote p em {
   display: block;
   margin-top: var(--space-4);
-  font: var(--typography-label);
-  font-size: var(--font-size-label);
+  font: var(--type-label);
+  font-size: var(--label-size);
   font-variant-caps: all-small-caps;
   font-style: normal;
-  letter-spacing: calc(var(--typography-label-letter-spacing) * 2);
-  color: var(--color-secondary-medium-contrast);
+  letter-spacing: calc(var(--type-label-letter-spacing) * 2);
+  color: var(--secondary-medium-contrast);
 }
 
 blockquote ul {
@@ -367,13 +388,14 @@ blockquote ul {
 }
 
 blockquote li {
-  font: var(--typography-title);
+  font: var(--type-title);
+  font-family: var(--font-display);
   font-style: italic;
-  color: var(--color-on-surface-high-contrast);
+  color: var(--on-surface-high-contrast);
 }
 
 blockquote li::before {
-  background: var(--color-secondary);
+  background: var(--secondary);
 }
 
 /* ---------- Drifting background orbs --------------------------------- */
@@ -406,17 +428,17 @@ blockquote li::before {
   background:
     radial-gradient(
       ellipse 62% 74% at 32% 30%,
-      color-mix(in oklab, var(--color-primary-container) 92%, transparent),
+      color-mix(in oklab, var(--primary-container) 92%, transparent),
       transparent 72%
     ),
     radial-gradient(
       ellipse 78% 44% at 68% 62%,
-      color-mix(in oklab, var(--color-primary-container) 58%, transparent),
+      color-mix(in oklab, var(--primary-container) 58%, transparent),
       transparent 74%
     ),
     radial-gradient(
       ellipse 40% 60% at 12% 74%,
-      color-mix(in oklab, var(--color-tertiary-container) 46%, transparent),
+      color-mix(in oklab, var(--tertiary-container) 46%, transparent),
       transparent 76%
     );
   animation: orb-morph-a 46s var(--easing-standard) infinite alternate;
@@ -433,17 +455,17 @@ blockquote li::before {
   background:
     radial-gradient(
       ellipse 70% 56% at 64% 66%,
-      color-mix(in oklab, var(--color-secondary-container) 74%, transparent),
+      color-mix(in oklab, var(--secondary-container) 74%, transparent),
       transparent 74%
     ),
     radial-gradient(
       ellipse 46% 72% at 30% 40%,
-      color-mix(in oklab, var(--color-secondary-container) 44%, transparent),
+      color-mix(in oklab, var(--secondary-container) 44%, transparent),
       transparent 76%
     ),
     radial-gradient(
       ellipse 58% 40% at 84% 24%,
-      color-mix(in oklab, var(--color-tertiary-container) 38%, transparent),
+      color-mix(in oklab, var(--tertiary-container) 38%, transparent),
       transparent 76%
     );
   animation: orb-morph-b 58s var(--easing-standard) infinite alternate;
@@ -467,17 +489,17 @@ blockquote li::before {
   background:
     radial-gradient(
       ellipse 62% 74% at 32% 30%,
-      color-mix(in oklab, var(--palette-primary-300) 66%, transparent),
+      color-mix(in oklab, var(--primary-300) 66%, transparent),
       transparent 72%
     ),
     radial-gradient(
       ellipse 78% 44% at 68% 62%,
-      color-mix(in oklab, var(--palette-primary-200) 72%, transparent),
+      color-mix(in oklab, var(--primary-200) 72%, transparent),
       transparent 74%
     ),
     radial-gradient(
       ellipse 40% 60% at 12% 74%,
-      color-mix(in oklab, var(--palette-tertiary-300) 34%, transparent),
+      color-mix(in oklab, var(--tertiary-300) 34%, transparent),
       transparent 76%
     );
 }
@@ -486,17 +508,17 @@ blockquote li::before {
   background:
     radial-gradient(
       ellipse 70% 56% at 64% 66%,
-      color-mix(in oklab, var(--palette-secondary-300) 52%, transparent),
+      color-mix(in oklab, var(--secondary-300) 52%, transparent),
       transparent 74%
     ),
     radial-gradient(
       ellipse 46% 72% at 30% 40%,
-      color-mix(in oklab, var(--palette-secondary-200) 62%, transparent),
+      color-mix(in oklab, var(--secondary-200) 62%, transparent),
       transparent 76%
     ),
     radial-gradient(
       ellipse 58% 40% at 84% 24%,
-      color-mix(in oklab, var(--palette-tertiary-300) 30%, transparent),
+      color-mix(in oklab, var(--tertiary-300) 30%, transparent),
       transparent 76%
     );
 }
@@ -529,17 +551,17 @@ blockquote li::before {
 }
 
 .arch-line-a {
-  stroke: color-mix(in oklab, var(--color-primary) 45%, transparent);
+  stroke: color-mix(in oklab, var(--primary) 45%, transparent);
 }
 .arch-line-b {
-  stroke: color-mix(in oklab, var(--color-secondary) 32%, transparent);
+  stroke: color-mix(in oklab, var(--secondary) 32%, transparent);
 }
 
 [data-color="light"] .arch-line-a {
-  stroke: color-mix(in oklab, var(--palette-primary-600) 52%, transparent);
+  stroke: color-mix(in oklab, var(--primary-600) 52%, transparent);
 }
 [data-color="light"] .arch-line-b {
-  stroke: color-mix(in oklab, var(--palette-secondary-600) 40%, transparent);
+  stroke: color-mix(in oklab, var(--secondary-600) 40%, transparent);
 }
 
 /* ---------- Home hero ------------------------------------------------ */
@@ -560,17 +582,17 @@ blockquote li::before {
   background:
     radial-gradient(
       circle at 14% 22%,
-      color-mix(in oklab, var(--color-primary-container) 62%, transparent),
+      color-mix(in oklab, var(--primary-container) 62%, transparent),
       transparent 58%
     ),
     radial-gradient(
       circle at 86% 88%,
-      color-mix(in oklab, var(--color-tertiary-container) 42%, transparent),
+      color-mix(in oklab, var(--tertiary-container) 42%, transparent),
       transparent 60%
     ),
     linear-gradient(
-      color-mix(in oklab, var(--color-primary-container) 26%, transparent),
-      var(--color-surface)
+      color-mix(in oklab, var(--primary-container) 26%, transparent),
+      var(--surface)
     );
 }
 
@@ -578,17 +600,17 @@ blockquote li::before {
   background:
     radial-gradient(
       circle at 14% 22%,
-      color-mix(in oklab, var(--palette-primary-300) 52%, transparent),
+      color-mix(in oklab, var(--primary-300) 52%, transparent),
       transparent 64%
     ),
     radial-gradient(
       circle at 86% 88%,
-      color-mix(in oklab, var(--palette-tertiary-300) 38%, transparent),
+      color-mix(in oklab, var(--tertiary-300) 38%, transparent),
       transparent 64%
     ),
     linear-gradient(
-      color-mix(in oklab, var(--palette-primary-200) 50%, transparent),
-      color-mix(in oklab, var(--color-surface) 55%, transparent)
+      color-mix(in oklab, var(--primary-200) 50%, transparent),
+      color-mix(in oklab, var(--surface) 55%, transparent)
     );
 }
 
@@ -609,27 +631,24 @@ blockquote li::before {
 .home-hero h1 {
   margin: 0;
   font-size: clamp(
-    calc(var(--font-size-display) * 0.85),
+    calc(var(--display-size) * 0.85),
     7.5vw,
-    calc(var(--font-size-display) * 1.85)
+    calc(var(--display-size) * 1.85)
   );
   line-height: 1.05;
 }
 
 .home-hero h1 em {
   display: block;
-  color: var(--color-primary-medium-contrast);
+  color: var(--primary-medium-contrast);
 }
 
 .home-hero p {
-  font: var(--typography-title);
-  font-size: clamp(
-    var(--font-size-title),
-    2.2vw,
-    calc(var(--font-size-title) * 1.35)
-  );
+  font: var(--type-title);
+  font-family: var(--font-display);
+  font-size: clamp(var(--title-size), 2.2vw, calc(var(--title-size) * 1.35));
   line-height: 1.6;
-  color: var(--color-on-surface-medium-contrast);
+  color: var(--on-surface-medium-contrast);
   max-width: 44ch;
   margin: 0;
 }
@@ -642,13 +661,13 @@ blockquote li::before {
   gap: var(--space-3);
   margin-top: var(--space-3);
   padding: var(--space-4) var(--space-6);
-  border-radius: var(--radius-full);
-  background: var(--color-primary);
-  color: var(--color-primary-on);
-  font-family: var(--font-family-sans);
-  font-size: var(--font-size-body);
-  font-weight: var(--font-weight-medium);
-  letter-spacing: var(--typography-label-letter-spacing);
+  border-radius: var(--shape-full);
+  background: var(--primary);
+  color: var(--on-primary);
+  font-family: var(--font-sans);
+  font-size: var(--body-size);
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--type-label-letter-spacing);
   text-decoration: none;
   box-shadow: var(--elevation-low);
   transition:
@@ -663,8 +682,8 @@ blockquote li::before {
 }
 
 .cta:hover {
-  background: var(--color-secondary);
-  color: var(--color-secondary-on);
+  background: var(--primary-medium-contrast);
+  color: var(--on-primary);
   transform: translateY(-2px);
   box-shadow: var(--elevation-mid);
 }
@@ -685,16 +704,15 @@ blockquote li::before {
   margin: var(--space-8) 0 0;
   padding: var(--space-6) var(--space-6) var(--space-6) var(--space-7);
   border: 1px var(--stroke-solid)
-    color-mix(in oklab, var(--color-primary) 40%, var(--color-outline-muted));
-  border-radius: var(--radius-lg) var(--radius-lg) var(--radius-lg)
-    var(--radius-lg);
+    color-mix(in oklab, var(--primary) 40%, var(--outline-muted));
+  border-radius: var(--shape-lg) var(--shape-lg) var(--shape-lg) var(--shape-lg);
   background:
     linear-gradient(
       150deg,
-      color-mix(in oklab, var(--color-secondary-container) 40%, transparent),
+      color-mix(in oklab, var(--secondary-container) 40%, transparent),
       transparent 70%
     ),
-    var(--color-surface-container);
+    var(--surface-container);
 }
 
 .visit-callout::before {
@@ -702,28 +720,34 @@ blockquote li::before {
   position: absolute;
   inset: 0 auto 0 0;
   width: 3px;
-  background: linear-gradient(108deg, var(--gradient-brand));
+  background: linear-gradient(
+    108deg,
+    var(--primary-500),
+    var(--secondary-400) 52%,
+    var(--tertiary-400)
+  );
 }
 
 .visit-callout p {
   margin: 0;
   font-size: clamp(
-    calc(var(--font-size-body) * 1.05),
+    calc(var(--body-size) * 1.05),
     2vw,
-    calc(var(--font-size-body) * 1.15)
+    calc(var(--body-size) * 1.15)
   );
   line-height: 1.8;
-  color: var(--color-on-surface-high-contrast);
+  color: var(--on-surface-high-contrast);
   max-width: none;
 }
 
 .visit-callout strong {
   display: block;
-  font: var(--typography-headline);
-  font-size: clamp(var(--font-size-title), 2.6vw, var(--font-size-headline));
-  font-weight: var(--font-weight-regular);
+  font: var(--type-headline);
+  font-family: var(--font-display);
+  font-size: clamp(var(--title-size), 2.6vw, var(--headline-size));
+  font-weight: var(--weight-regular);
   margin-bottom: var(--space-2);
-  color: var(--color-on-surface-high-contrast);
+  color: var(--on-surface-high-contrast);
 }
 
 /* ---------- Images — arched, like a window --------------------------- */
@@ -732,9 +756,9 @@ blockquote li::before {
   display: block;
   margin: var(--space-8) auto 0;
   padding: var(--space-5);
-  border-radius: var(--radius-lg);
-  background: var(--color-surface-container);
-  border: 1px var(--stroke-solid) var(--color-outline-muted);
+  border-radius: var(--shape-lg);
+  background: var(--surface-container);
+  border: 1px var(--stroke-solid) var(--outline-muted);
   box-shadow: var(--elevation-low);
 }
 
@@ -742,12 +766,12 @@ blockquote li::before {
   float: right;
   width: min(40%, 20rem);
   margin: var(--space-2) 0 var(--space-5) var(--space-6);
-  border-radius: 50% 50% var(--radius-sm) var(--radius-sm) / 34% 34%
-    var(--radius-sm) var(--radius-sm);
+  border-radius: 50% 50% var(--shape-sm) var(--shape-sm) / 34% 34%
+    var(--shape-sm) var(--shape-sm);
   border: 1px var(--stroke-solid)
-    color-mix(in oklab, var(--color-primary) 45%, var(--color-outline-muted));
+    color-mix(in oklab, var(--primary) 45%, var(--outline-muted));
   padding: var(--space-2);
-  background: var(--color-surface-container);
+  background: var(--surface-container);
 }
 
 /* ---------- Events table — ruled, not boxed -------------------------- */
@@ -757,24 +781,21 @@ blockquote li::before {
   width: 100%;
   margin: var(--space-7) 0;
   border-collapse: collapse;
-  font-size: clamp(
-    var(--font-size-body),
-    1.9vw,
-    calc(var(--font-size-body) * 1.1)
-  );
+  font-size: clamp(var(--body-size), 1.9vw, calc(var(--body-size) * 1.1));
 }
 
 .events-table thead th,
 .prose table thead th {
-  font: var(--typography-title);
-  font-size: var(--font-size-label);
+  font: var(--type-title);
+  font-family: var(--font-display);
+  font-size: var(--label-size);
   font-variant-caps: all-small-caps;
-  letter-spacing: calc(var(--typography-label-letter-spacing) * 2);
-  color: var(--color-primary-medium-contrast);
+  letter-spacing: calc(var(--type-label-letter-spacing) * 2);
+  color: var(--primary-medium-contrast);
   text-align: left;
   padding: 0 var(--space-5) var(--space-3) 0;
   border-bottom: 2px var(--stroke-solid)
-    color-mix(in oklab, var(--color-primary) 60%, transparent);
+    color-mix(in oklab, var(--primary) 60%, transparent);
   white-space: nowrap;
 }
 
@@ -783,35 +804,32 @@ blockquote li::before {
   vertical-align: top;
   text-align: left;
   padding: var(--space-5) var(--space-5) var(--space-5) 0;
-  font: var(--typography-headline);
-  font-size: clamp(var(--font-size-body), 2vw, var(--font-size-title));
-  font-weight: var(--font-weight-regular);
-  color: var(--color-on-surface-high-contrast);
+  font: var(--type-headline);
+  font-family: var(--font-display);
+  font-size: clamp(var(--body-size), 2vw, var(--title-size));
+  font-weight: var(--weight-regular);
+  color: var(--on-surface-high-contrast);
   border-top: 1px var(--stroke-solid)
-    color-mix(in oklab, var(--color-primary) 35%, transparent);
+    color-mix(in oklab, var(--primary) 35%, transparent);
   white-space: nowrap;
 }
 
 .events-table td,
 .prose table td {
   padding: var(--space-4) var(--space-5) var(--space-4) 0;
-  color: var(--color-on-surface-medium-contrast);
-  border-top: 1px var(--stroke-solid) var(--color-outline-muted);
+  color: var(--on-surface-medium-contrast);
+  border-top: 1px var(--stroke-solid) var(--outline-muted);
   vertical-align: top;
 }
 
 .events-table td:last-child,
 .prose table td:last-child {
-  color: var(--color-on-surface-high-contrast);
+  color: var(--on-surface-high-contrast);
 }
 
 .events-table tbody tr:hover td,
 .prose table tbody tr:hover td {
-  background: color-mix(
-    in oklab,
-    var(--color-primary-container) 30%,
-    transparent
-  );
+  background: color-mix(in oklab, var(--primary-container) 30%, transparent);
 }
 
 /* ---------- Connect page --------------------------------------------- */
@@ -829,9 +847,9 @@ blockquote li::before {
   display: flex;
   flex-direction: column;
   padding: var(--space-6);
-  border-radius: var(--radius-lg);
-  background: var(--color-surface-container);
-  border: 1px var(--stroke-solid) var(--color-outline-muted);
+  border-radius: var(--shape-lg);
+  background: var(--surface-container);
+  border: 1px var(--stroke-solid) var(--outline-muted);
   transition:
     border-color var(--transition-base),
     transform var(--transition-base);
@@ -842,11 +860,16 @@ blockquote li::before {
   position: absolute;
   inset: 0 auto 0 0;
   width: 3px;
-  background: linear-gradient(108deg, var(--gradient-brand));
+  background: linear-gradient(
+    108deg,
+    var(--primary-500),
+    var(--secondary-400) 52%,
+    var(--tertiary-400)
+  );
 }
 
 .connect-card:hover {
-  border-color: color-mix(in oklab, var(--color-primary) 50%, transparent);
+  border-color: color-mix(in oklab, var(--primary) 50%, transparent);
   transform: translateY(-2px);
 }
 
@@ -854,13 +877,9 @@ blockquote li::before {
   display: block;
   margin: 0 0 var(--space-4);
   padding-bottom: var(--space-3);
-  font-size: clamp(
-    var(--font-size-title),
-    2.2vw,
-    calc(var(--font-size-headline) * 0.9)
-  );
+  font-size: clamp(var(--title-size), 2.2vw, calc(var(--headline-size) * 0.9));
   border-bottom: 1px var(--stroke-solid)
-    color-mix(in oklab, var(--color-primary) 45%, transparent);
+    color-mix(in oklab, var(--primary) 45%, transparent);
 }
 
 .connect-card h2::before {
@@ -873,7 +892,7 @@ blockquote li::before {
   padding-block: var(--space-3);
   line-height: 1.7;
   max-width: none;
-  border-top: 1px var(--stroke-solid) var(--color-outline-muted);
+  border-top: 1px var(--stroke-solid) var(--outline-muted);
 }
 
 .connect-card p:has(strong) {
@@ -895,15 +914,15 @@ blockquote li::before {
 .connect-card p:not(:has(strong)) {
   font-variant-numeric: tabular-nums;
   line-height: 2.1;
-  color: var(--color-on-surface-high-contrast);
+  color: var(--on-surface-high-contrast);
 }
 
 .connect-card strong {
-  color: var(--color-primary-medium-contrast);
-  font: var(--typography-label);
+  color: var(--primary-medium-contrast);
+  font: var(--type-label);
   font-variant-caps: all-small-caps;
-  font-size: var(--font-size-body);
-  letter-spacing: calc(var(--typography-label-letter-spacing) * 1.5);
+  font-size: var(--body-size);
+  letter-spacing: calc(var(--type-label-letter-spacing) * 1.5);
   margin-right: 0;
 }
 
@@ -913,9 +932,9 @@ blockquote li::before {
   aspect-ratio: 16 / 9;
   min-height: 18rem;
   border: 1px var(--stroke-solid)
-    color-mix(in oklab, var(--color-primary) 40%, var(--color-outline-muted));
-  border-radius: var(--radius-lg);
-  background: var(--color-surface-container);
+    color-mix(in oklab, var(--primary) 40%, var(--outline-muted));
+  border-radius: var(--shape-lg);
+  background: var(--surface-container);
 }
 
 /* ---------- Footer ---------------------------------------------------- */
@@ -927,10 +946,10 @@ blockquote li::before {
     clamp(var(--space-4), 4vw, var(--space-7)) var(--space-6);
   background:
     linear-gradient(
-      color-mix(in oklab, var(--color-primary-container) 34%, transparent),
+      color-mix(in oklab, var(--primary-container) 34%, transparent),
       transparent
     ),
-    var(--color-surface-container);
+    var(--surface-container);
 }
 
 .site-footer::before {
@@ -938,7 +957,12 @@ blockquote li::before {
   position: absolute;
   inset: 0 0 auto 0;
   height: 1px;
-  background: linear-gradient(108deg, var(--gradient-brand));
+  background: linear-gradient(
+    108deg,
+    var(--primary-500),
+    var(--secondary-400) 52%,
+    var(--tertiary-400)
+  );
   opacity: 0.85;
 }
 
@@ -953,18 +977,19 @@ blockquote li::before {
 .site-footer-col p {
   margin: 0 0 var(--space-2);
   line-height: 1.7;
-  color: var(--color-on-surface-muted-medium-contrast);
+  color: var(--on-surface-muted-medium-contrast);
   max-width: none;
 }
 
 .site-footer-col strong {
   display: block;
   margin-bottom: var(--space-3);
-  font: var(--typography-title);
-  font-size: var(--font-size-body);
+  font: var(--type-title);
+  font-family: var(--font-display);
+  font-size: var(--body-size);
   font-variant-caps: all-small-caps;
-  letter-spacing: calc(var(--typography-label-letter-spacing) * 2);
-  color: var(--color-primary-medium-contrast);
+  letter-spacing: calc(var(--type-label-letter-spacing) * 2);
+  color: var(--primary-medium-contrast);
 }
 
 .site-footer-legal {
@@ -972,12 +997,12 @@ blockquote li::before {
   max-width: none;
   margin: var(--space-7) auto 0;
   padding-top: var(--space-4);
-  border-top: 1px var(--stroke-solid) var(--color-outline-muted);
-  font: var(--typography-label);
-  font-size: var(--font-size-label);
+  border-top: 1px var(--stroke-solid) var(--outline-muted);
+  font: var(--type-label);
+  font-size: var(--label-size);
   font-variant-caps: all-small-caps;
-  letter-spacing: calc(var(--typography-label-letter-spacing) * 2.5);
-  color: var(--color-on-surface-muted);
+  letter-spacing: calc(var(--type-label-letter-spacing) * 2.5);
+  color: var(--on-surface-muted);
   text-align: right;
 }
 
@@ -988,14 +1013,14 @@ blockquote li::before {
   align-items: center;
   gap: var(--space-2);
   padding: var(--space-2) var(--space-4);
-  border-radius: var(--radius-full);
+  border-radius: var(--shape-full);
   border: 1px var(--stroke-solid)
-    color-mix(in oklab, var(--color-primary) 35%, var(--color-outline-muted));
+    color-mix(in oklab, var(--primary) 35%, var(--outline-muted));
   background: transparent;
-  color: var(--color-on-surface-muted-medium-contrast);
-  font-family: var(--font-family-sans);
-  font-size: var(--font-size-label);
-  letter-spacing: var(--typography-label-letter-spacing);
+  color: var(--on-surface-muted-medium-contrast);
+  font-family: var(--font-sans);
+  font-size: var(--label-size);
+  letter-spacing: var(--type-label-letter-spacing);
   cursor: pointer;
   transition:
     color var(--transition-base),
@@ -1004,13 +1029,9 @@ blockquote li::before {
 }
 
 .theme-toggle:hover {
-  color: var(--color-on-surface-high-contrast);
-  border-color: color-mix(in oklab, var(--color-primary) 65%, transparent);
-  background: color-mix(
-    in oklab,
-    var(--color-primary-container) 30%,
-    transparent
-  );
+  color: var(--on-surface-high-contrast);
+  border-color: color-mix(in oklab, var(--primary) 65%, transparent);
+  background: color-mix(in oklab, var(--primary-container) 30%, transparent);
 }
 
 .theme-toggle-icon {
@@ -1095,6 +1116,13 @@ body {
   gap: var(--space-4);
 }
 
+/* The mode toggle and the theme picker sit together on the left. */
+.site-footer-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
 /* Icon-only variant of the design's theme toggle: square padding, sized
    sprite icon. */
 .theme-toggle {
@@ -1127,10 +1155,10 @@ body {
   align-items: center;
   justify-content: center;
   padding: var(--space-2);
-  border: 1px var(--stroke-solid) var(--color-outline-muted);
-  border-radius: var(--radius-md);
+  border: 1px var(--stroke-solid) var(--outline-muted);
+  border-radius: var(--shape-md);
   background: transparent;
-  color: var(--color-on-surface-medium-contrast);
+  color: var(--on-surface-medium-contrast);
   cursor: pointer;
   transition:
     color var(--transition-fast),
@@ -1139,8 +1167,8 @@ body {
 
 .site-nav-mobile .f-dropdown-menu-trigger:hover,
 .site-nav-mobile .f-dropdown-menu-trigger[data-state="open"] {
-  color: var(--color-on-surface-high-contrast);
-  border-color: color-mix(in oklab, var(--color-primary) 65%, transparent);
+  color: var(--on-surface-high-contrast);
+  border-color: color-mix(in oklab, var(--primary) 65%, transparent);
 }
 
 .site-nav-mobile .icon {
@@ -1153,9 +1181,9 @@ body {
 .f-dropdown-menu-content {
   min-width: 13rem;
   padding: var(--space-2);
-  background: var(--color-surface-container);
-  border: 1px var(--stroke-solid) var(--color-outline-muted);
-  border-radius: var(--radius-md);
+  background: var(--surface-container);
+  border: 1px var(--stroke-solid) var(--outline-muted);
+  border-radius: var(--shape-md);
   box-shadow: var(--elevation-mid);
   z-index: 60;
 }
@@ -1163,20 +1191,33 @@ body {
 .f-dropdown-menu-item {
   display: block;
   padding: var(--space-2) var(--space-3);
-  border-radius: var(--radius-sm);
-  color: var(--color-on-surface-medium-contrast);
+  border-radius: var(--shape-sm);
+  color: var(--on-surface-medium-contrast);
   text-decoration: none;
   cursor: pointer;
   outline: none;
 }
 
+/* The theme picker's list is long: it scrolls inside the space the menu
+   has, and marks the active theme. */
+.f-dropdown-menu-content {
+  max-height: min(22rem, var(--reka-dropdown-menu-content-available-height));
+  overflow-y: auto;
+}
+
+.f-dropdown-menu-item[data-disabled] {
+  color: var(--on-surface-muted);
+  cursor: default;
+}
+
+.f-dropdown-menu-item [aria-current="true"] {
+  color: var(--primary-high-contrast);
+  font-weight: var(--weight-medium);
+}
+
 .f-dropdown-menu-item[data-highlighted] {
-  background: color-mix(
-    in oklab,
-    var(--color-primary-container) 40%,
-    transparent
-  );
-  color: var(--color-on-surface-high-contrast);
+  background: color-mix(in oklab, var(--primary-container) 40%, transparent);
+  color: var(--on-surface-high-contrast);
 }
 
 /* ---------- Font faces ------------------------------------------------ */

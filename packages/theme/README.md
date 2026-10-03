@@ -1,44 +1,61 @@
 # @bbf/theme
 
-The site's design tokens as [DTCG](https://www.designtokens.org/) JSON,
-built by [Terrazzo](https://terrazzo.app) into CSS variables and a JS
-resolver.
+The site's design tokens: the [aurora](https://github.com/zoobzio/untheme/tree/main/presets/aurora)
+preset with the site's own tonal ramps, built by
+[`@untheme/kit`](https://github.com/zoobzio/untheme/tree/main/packages/kit)
+into the modules the untheme runtime consumes.
 
 ## Layout
 
 ```
-resolver.json          DTCG resolver: one base set plus a `color` modifier
-tokens/
-  palette.json         raw tonal stops (palette.primary.600, …)
-  typography.json      font families, weights, sizes, line heights; typography composites
-  layout.json          space scale, radii
-  motion.json          durations, delay, easings, transitions
-  effects.json         elevation shadows, blur, stroke, focus border, brand gradient
-  color/light.json     semantic color roles for the light scheme
-  color/dark.json      the same roles for the dark scheme
+untheme.config.ts      the kit config: the resolver, the theme's id, the output directory
+bbf.resolver.json      aurora's resolver, by npm:/ reference, with the colors set pointed at ours
+tokens/colors/         the ramps the site owns, one file each, in aurora's format
+  primary.json           brand blue      seed #0a68ff
+  secondary.json         sunset orange   seed #ff9a5c
+  tertiary.json          yellow          seed #ffde59
+  neutral.json           warm grey       seed #7e7871
+  neutral-variant.json   warm grey with a brown cast, for outlines   seed #85776d
 ```
 
-Semantic colors (`color.*`) reference the palette and exist only in the
-`color` modifier's contexts. Everything else is scheme-independent.
+Everything else is aurora's, untouched: the `error`, `success` and `warning`
+ramps, the color roles and their contrast and vibrancy channels, the type
+scale, shape, space, elevation, motion, state, blur, stroke, border and
+gradient tokens, and all eight modifier axes. The roles only reference ramp
+stops, so the dark scheme, contrast and vibrancy follow the site's ramps
+without any bindings of ours.
 
-Only tokens the site actually uses are defined. Add a token when you need it.
+## The contract is aurora's
+
+Our ramp files define exactly the tokens aurora's define — the eleven stops,
+and for an accent the muted and vivid columns — and the resolver adds none.
+An aurora theme is those same ramp tokens with other values, so every theme
+in aurora's catalog applies to this build as a layer. Adding a token, or
+dropping a stop, would break that; the tests compare the token set against
+aurora's.
+
+## Changing a color
+
+The ramp files are generated, not hand-written. Each is the output of
+aurora's generator (`presets/aurora/scripts/generate.mjs` in the untheme
+repo) for the seed above: the seed gives hue and chroma, and every ramp
+shares aurora's lightness ladder. To change a color, run that generator's
+`ramp(name, seed)` with the new seed and replace the file. To take a ramp
+from aurora or one of its themes instead, point its entry in the resolver's
+`colors` set at that file (`npm:/@untheme/aurora/themes/<id>/colors/<ramp>.json`).
 
 ## Exports
 
-- `@bbf/theme/css`: `:root` declares every token in the light scheme.
-  `:root[data-color="dark"]` re-declares only the `color.*` roles.
-  Variable names are the token path joined with hyphens, and a group's
-  `$root` token takes the group's name (`color.primary.$root` →
-  `--color-primary`, `color.primary.container` →
-  `--color-primary-container`).
-- `@bbf/theme`: `resolver.apply({ color: "dark" })` returns the resolved
-  token set.
-
-`gradient.brand` carries stops only. Wrap it where you use it, e.g.
-`linear-gradient(108deg, var(--gradient-brand))`.
+- `@bbf/theme/config`: the built `{ theme, input }`. The app passes it to
+  `@untheme/nuxt` as the `untheme` option, which renders the static cascade,
+  injects the live custom properties, and mirrors each modifier's selected
+  context onto `<html>` as `data-<modifier>`. Its declaration exports the
+  `Contract` type.
+- `@bbf/theme`: the `tokens` and `modifiers` lists, the `isToken` /
+  `isModifier` guards, and the `Token`, `Modifier` and `Mod` types.
 
 ## Scripts
 
 - `pnpm build`: writes `.output/`. It also runs on install via `prepare`.
-- `pnpm lint`: runs `tz check` over the resolver and its sources.
-- `pnpm test`: rebuilds, then checks the CSS and JS output against the token sources.
+- `pnpm test`: rebuilds, then checks the modules against the resolver, our
+  ramp files, and aurora's documents.

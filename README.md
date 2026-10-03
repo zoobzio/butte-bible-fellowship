@@ -59,8 +59,23 @@ import Button from "@zoobzio/foundation/components/common/button.vue";
 import { useTable } from "@zoobzio/foundation/factories/table";
 ```
 
-Styling uses the aurora untheme tokens (`--surface`, `--space-*`, `--type-*`, …)
-provided by the layer.
+Styling uses the aurora untheme tokens (`--surface`, `--space-*`, `--type-*`, …).
+[`@bbf/theme`](packages/theme) builds the aurora preset, with the site's own tonal ramps, using
+[untheme](https://github.com/zoobzio/untheme), and `@untheme/nuxt` renders it
+into the app and mirrors the color scheme onto `<html>` as `data-color`.
+
+### Themes
+
+The build defines exactly aurora's tokens, so every aurora theme applies to
+it. `server/api/untheme/[...path].get.ts` serves the site's own theme and
+all of aurora's over untheme's catalog protocol: listings at
+`/api/untheme/themes`, one theme's layer at `/api/untheme/themes/:id`. The
+palette button in the footer lists them and applies the one picked; a plugin
+restores the choice from the cookie the untheme module keeps.
+
+`server/aurora/files.ts` maps each theme to its files in the aurora package
+and is generated. After upgrading `@untheme/aurora`, run
+`pnpm --filter @bbf/web generate:themes` and `pnpm format`.
 
 ## Structure
 

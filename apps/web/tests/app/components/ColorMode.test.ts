@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { mount } from "@vue/test-utils";
 
-import { useCookie } from "#imports";
+import { useUntheme } from "#imports";
 import ColorMode from "~/components/ColorMode.vue";
 
 const icon = (wrapper: ReturnType<typeof mount>) =>
@@ -15,22 +15,22 @@ describe("ColorMode", () => {
   });
 
   it("offers light mode from dark, with the sun icon", () => {
-    useCookie("color-mode").value = "dark";
+    useUntheme().swap("color", "dark");
     const wrapper = mount(ColorMode);
     expect(wrapper.attributes("aria-label")).toBe("Switch to light mode");
     expect(icon(wrapper)).toBe("#sun");
   });
 
-  it("switches mode on click and persists the choice", async () => {
+  it("switches mode on click", async () => {
     const wrapper = mount(ColorMode);
 
     await wrapper.trigger("click");
     expect(wrapper.attributes("aria-label")).toBe("Switch to light mode");
     expect(icon(wrapper)).toBe("#sun");
-    expect(useCookie("color-mode").value).toBe("dark");
+    expect(useUntheme().config.input.color).toBe("dark");
 
     await wrapper.trigger("click");
     expect(wrapper.attributes("aria-label")).toBe("Switch to dark mode");
-    expect(useCookie("color-mode").value).toBe("light");
+    expect(useUntheme().config.input.color).toBe("light");
   });
 });

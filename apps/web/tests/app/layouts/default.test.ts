@@ -2,8 +2,7 @@ import { describe, expect, it } from "vitest";
 import { nextTick } from "vue";
 import { mount } from "@vue/test-utils";
 
-import { setRoutePath, useHead } from "#imports";
-import { useColorMode } from "~/composables/theme";
+import { setRoutePath } from "#imports";
 import Layout from "~/layouts/default.vue";
 import { stubMatchMedia } from "#test/support/page";
 
@@ -29,15 +28,6 @@ describe("default layout", () => {
     expect(has(wrapper, "AppHeader")).toBe(true);
     expect(has(wrapper, "AppFooter")).toBe(true);
     expect(wrapper.find("main.site-main .page").text()).toBe("Page");
-  });
-
-  it("binds the color mode to data-color on the html element", async () => {
-    await mountLayout();
-    const { htmlAttrs } = useHead.mock.calls[0]![0];
-    expect(htmlAttrs["data-color"].value).toBe("light");
-
-    useColorMode().set("dark");
-    expect(htmlAttrs["data-color"].value).toBe("dark");
   });
 
   it("shows the orbs and the arches on the home page", async () => {
