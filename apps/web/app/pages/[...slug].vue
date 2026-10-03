@@ -1,4 +1,5 @@
 <script lang="ts">
+import { ContentRenderer } from "#components";
 import {
   createError,
   definePageMeta,

@@ -3,13 +3,28 @@ import { defineNuxtConfig } from "nuxt/config";
 import { prefix } from "@bbf/icons";
 import icons from "@bbf/icons/config";
 import sets from "@bbf/icons/sets";
+import untheme from "@bbf/theme/config";
 
 export default defineNuxtConfig({
   compatibilityDate: "2026-08-19",
 
-  modules: ["@nuxt/content", "@nuxt/fonts", "@icon-sheets/nuxt", "nuxt-studio"],
+  extends: ["@zoobzio/foundation"],
+
+  modules: [
+    "@nuxt/content",
+    "@nuxt/fonts",
+    "@icon-sheets/nuxt",
+    "@untheme/nuxt",
+    "nuxt-studio",
+  ],
+
+  imports: { autoImport: false },
+
+  components: { dirs: [] },
 
   iconSheets: { ...icons, sets, prefix },
+
+  untheme,
 
   studio: {
     route: "/admin",
@@ -43,7 +58,7 @@ export default defineNuxtConfig({
     ],
   },
 
-  css: ["@bbf/theme/css", "~/assets/css/app.css"],
+  css: ["~/assets/css/app.css"],
 
   content: {
     experimental: {

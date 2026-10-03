@@ -5,24 +5,26 @@
   "sideEffects": false,
   "exports": {
     ".": {
-      "types": "./dist/index.d.mts",
-      "import": "./dist/index.mjs"
+      "types": "./.output/index.d.mts",
+      "import": "./.output/index.mjs"
     },
-    "./*.svg": "./dist/*.svg",
+    "./*.svg": "./.output/*.svg",
     "./*": {
-      "types": "./dist/*.d.mts",
-      "import": "./dist/*.mjs"
+      "types": "./.output/*.d.mts",
+      "import": "./.output/*.mjs"
     }
   },
   "scripts": {
     "build": "icon-sheets build",
-    "prepare": "icon-sheets build"
+    "prepare": "icon-sheets build",
+    "test": "vitest run"
   },
   "dependencies": {
     "icon-sheets": "0.0.6"
   },
   "devDependencies": {
     "@icon-sheets/kit": "0.0.6",
-    "@iconify-json/lucide": "^1.2.138"
+    "@iconify-json/lucide": "^1.2.138",
+    "vitest": "^5.0.3"
   }
 }

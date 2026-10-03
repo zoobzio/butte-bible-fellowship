@@ -5,7 +5,11 @@
 // Vue APIs and stub the Nuxt-runtime composables. Type-only imports are erased
 // by esbuild before this module loads, so only value exports matter here.
 
-import { ref, type Ref } from "vue";
+import { reactive, ref, type Ref } from "vue";
+import { vi } from "vitest";
+import { makeUntheme } from "untheme";
+import { useUnthemeConfig } from "untheme/config";
+import theme from "@bbf/theme/config";
 
 // Real Vue APIs (ref, computed, watch, onMounted, useTemplateRef, useId, …).
 export * from "vue";
@@ -39,3 +43,105 @@ export const useCookie = (
   cookieRegistry.set(key, cookie);
   return cookie;
 };
+
+// useUntheme: the real service over the app's built theme, in a reactive
+// container held like the module holds it — in useState, so the registry
+// reset between tests gives each test a fresh selection.
+const services = new WeakMap<object, ReturnType<typeof makeUntheme>>();
+
+export const useUntheme = () => {
+  const container = useState("untheme:config", () =>
+    reactive(useUnthemeConfig(theme)),
+  ).value as object;
+  let service = services.get(container);
+  if (!service) {
+    const key = useCookie("untheme-key");
+    service = makeUntheme(container as ReturnType<typeof useUnthemeConfig>, {
+      set: {
+        config: {
+          theme: (next) => {
+            key.value = next.id;
+            return next;
+          },
+        },
+      },
+    });
+    services.set(container, service);
+  }
+  return service;
+};
+
+// accessUntheme: the module's cookie refs. Like the module's service, the
+// shim writes the active theme's id to `untheme-key` when one is applied.
+export const accessUntheme = () => ({
+  cookies: {
+    input: useCookie("untheme-input"),
+    key: useCookie("untheme-key"),
+  },
+});
+
+// useRequestEvent: there is no request under vitest, as in the browser.
+export const useRequestEvent = () => undefined;
+
+// defineNuxtPlugin: hands the plugin back so a test can run its setup.
+export const defineNuxtPlugin = <T>(plugin: T): T => plugin;
+
+// useAppConfig: tests supply their own config so they don't depend on the
+// site's content.
+let appConfig: Record<string, unknown> = {};
+
+export const setAppConfig = (config: Record<string, unknown>) => {
+  appConfig = config;
+};
+
+export const clearAppConfig = () => setAppConfig({});
+
+export const useAppConfig = () => appConfig;
+
+// useRoute: one reactive route, moved with setRoutePath.
+const route = reactive({ path: "/" });
+
+export const setRoutePath = (path: string) => {
+  route.path = path;
+};
+
+export const useRoute = () => route;
+
+// useHead: records what it was given.
+export const useHead = vi.fn();
+
+// createError: an Error carrying the status fields.
+export const createError = (input: {
+  statusCode: number;
+  statusMessage: string;
+}) => Object.assign(new Error(input.statusMessage), input);
+
+// definePageMeta is compiled away by Nuxt; here it is a no-op.
+export const definePageMeta = () => {};
+
+// queryCollection: resolves pages by path from a registry filled with
+// setContentPages. A path with no page resolves to null, as in Nuxt Content.
+const contentPages = new Map<string, unknown>();
+
+export const setContentPages = (pages: Record<string, unknown>) => {
+  contentPages.clear();
+  for (const [path, page] of Object.entries(pages)) {
+    contentPages.set(path, page);
+  }
+};
+
+export const clearContentPages = () => contentPages.clear();
+
+export const queryCollection = (_collection: string) => ({
+  path: (path: string) => ({
+    first: async () => contentPages.get(path) ?? null,
+  }),
+});
+
+// useAsyncData: awaits the handler and hands back its result as `data`.
+export const useAsyncData = async <T>(
+  _key: string,
+  handler: () => Promise<T>,
+) => ({
+  data: ref(await handler()),
+});

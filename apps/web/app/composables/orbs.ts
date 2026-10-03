@@ -1,35 +1,23 @@
-import type { Ref } from "vue";
+import type { OrbDriftOptions } from "~/types/orbs";
 
-import { onBeforeUnmount, onMounted } from "#imports";
+import { onMounted, watch } from "vue";
 
-import { scrollProgress } from "~/utils/motion";
-
-export interface OrbDriftOptions {
-  /** The orb travelling down with scroll. */
-  left: Readonly<Ref<HTMLElement | null>>;
-  /** The orb travelling up with scroll. */
-  right: Readonly<Ref<HTMLElement | null>>;
-  /** px of drift across the whole page. */
-  travel: number;
-}
+import { MOTION_REDUCED_QUERY } from "~/constants/motion";
+import { orbDrift } from "~/utils/orbs";
+import { useFrame, useScrollProgress } from "~/composables/motion";
 
 /**
- * Drives the two drifting background orbs: an rAF-throttled scroll/resize
- * paint moving the orbs in opposite directions, skipped entirely under
- * prefers-reduced-motion, torn down on unmount. Returns `schedule` so the
- * caller can request a repaint (e.g. after navigation changes page height).
+ * Drives the two drifting background orbs: they move in opposite directions
+ * with scroll progress, and hold still against scroll under
+ * prefers-reduced-motion. Returns `schedule` so the caller can request a
+ * repaint (e.g. after navigation changes page height).
  */
-export const useOrbDrift = ({ left, right, travel }: OrbDriftOptions) => {
-  let queued = false;
+export const useOrbDrift = ({ left, right }: OrbDriftOptions) => {
+  const { progress, refresh } = useScrollProgress();
+  let reduce = false;
 
   const paint = () => {
-    queued = false;
-    const progress = scrollProgress(
-      window.scrollY,
-      document.documentElement.scrollHeight,
-      window.innerHeight,
-    );
-    const drift = (progress * travel).toFixed(1);
+    const drift = orbDrift(progress.value);
     if (left.value) {
       left.value.style.transform = `translate3d(0, ${drift}px, 0)`;
     }
@@ -38,22 +26,21 @@ export const useOrbDrift = ({ left, right, travel }: OrbDriftOptions) => {
     }
   };
 
-  const schedule = () => {
-    if (queued) return;
-    queued = true;
-    requestAnimationFrame(paint);
+  /** Paints against a fresh read of the page, not the last scroll's. */
+  const repaint = () => {
+    refresh();
+    paint();
   };
 
-  onMounted(() => {
-    paint();
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    window.addEventListener("scroll", schedule, { passive: true });
-    window.addEventListener("resize", schedule);
+  const { schedule } = useFrame(repaint);
+
+  watch(progress, () => {
+    if (!reduce) paint();
   });
 
-  onBeforeUnmount(() => {
-    window.removeEventListener("scroll", schedule);
-    window.removeEventListener("resize", schedule);
+  onMounted(() => {
+    reduce = window.matchMedia(MOTION_REDUCED_QUERY).matches;
+    repaint();
   });
 
   return { schedule };
