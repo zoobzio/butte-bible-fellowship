@@ -17,8 +17,8 @@
     "test:coverage": "pnpm -r test:coverage"
   },
   "devDependencies": {
-    "oxfmt": "^0.71.0",
-    "oxlint": "^1.86.0"
+    "oxfmt": "catalog:",
+    "oxlint": "catalog:"
   },
   "packageManager": "pnpm@10.27.0"
 }

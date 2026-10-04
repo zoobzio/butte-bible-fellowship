@@ -18,11 +18,11 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "untheme": "^0.4.0"
+    "untheme": "catalog:"
   },
   "devDependencies": {
-    "@untheme/aurora": "^0.4.0",
-    "@untheme/kit": "^0.4.0",
-    "vitest": "^5.0.3"
+    "@untheme/aurora": "catalog:",
+    "@untheme/kit": "catalog:",
+    "vitest": "catalog:"
   }
 }

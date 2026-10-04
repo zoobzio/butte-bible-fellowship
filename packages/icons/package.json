@@ -20,11 +20,11 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "icon-sheets": "0.0.6"
+    "icon-sheets": "catalog:"
   },
   "devDependencies": {
-    "@icon-sheets/kit": "0.0.6",
-    "@iconify-json/lucide": "^1.2.138",
-    "vitest": "^5.0.3"
+    "@icon-sheets/kit": "catalog:",
+    "@iconify-json/lucide": "catalog:",
+    "vitest": "catalog:"
   }
 }
