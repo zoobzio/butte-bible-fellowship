@@ -7,7 +7,7 @@ import Dialog from "@zoobzio/foundation/components/core/dialog.vue";
 import SegmentedControl from "@zoobzio/foundation/components/core/segmented-control.vue";
 
 import { Icon } from "#components";
-import { computed, ref } from "#imports";
+import { ref } from "#imports";
 import { defineCommand } from "@zoobzio/foundation/definitions/command";
 import { defineDialog } from "@zoobzio/foundation/definitions/dialog";
 import { defineSegmentedControl } from "@zoobzio/foundation/definitions/segmented-control";
@@ -28,49 +28,46 @@ const options: ThemeOption[] = themes.map(({ id, name }) => ({
   label: name,
 }));
 
-const dialog = computed(() =>
-  defineDialog({
-    title: "Appearance",
-    description: "Pick a theme, then tune how the site looks and feels.",
-    open: open.value,
-    "onUpdate:open": (value) => {
-      open.value = value;
-    },
-  }),
-);
+const dialog = defineDialog(() => ({
+  title: "Appearance",
+  description: "Pick a theme, then tune how the site looks and feels.",
+  open: open.value,
+  "onUpdate:open": (value) => {
+    open.value = value;
+  },
+}));
 
 // Picking the active theme again would clear a single selection; the
 // selection is the service's, so an empty pick changes nothing.
-const command = computed(() =>
-  defineCommand({
-    groups: [{ key: "themes", label: "Themes", options }],
-    modelValue: options.filter((option) => option.value === active.value),
-    placeholder: "Search themes…",
-    "onUpdate:modelValue": ([option] = []) => {
-      if (option) {
-        choose(option.value);
-      }
-    },
-  }),
-);
+const command = defineCommand(() => ({
+  groups: [{ key: "themes", label: "Themes", options }],
+  modelValue: options.filter((option) => option.value === active.value),
+  placeholder: "Search themes…",
+  "onUpdate:modelValue": ([option] = []) => {
+    if (option) {
+      choose(option.value);
+    }
+  },
+}));
 
-const controls = computed(() =>
-  settings.map(({ id, name, contexts }) => ({
+const controls = settings.map(({ id, name, contexts }) => {
+  const options = contexts.map((context) => ({
+    value: context.id,
+    label: context.name,
+  }));
+  return {
     id,
     name,
-    control: defineSegmentedControl({
-      options: contexts.map((context) => ({
-        value: context.id,
-        label: context.name,
-      })),
+    control: defineSegmentedControl(() => ({
+      options,
       modelValue: selection.value[id],
       required: true,
       "onUpdate:modelValue": (value) => {
         set(id, value);
       },
-    }),
-  })),
-);
+    })),
+  };
+});
 </script>
 
 <template>
@@ -106,7 +103,7 @@ const controls = computed(() =>
         >
           <span :id="`theme-picker-${id}`" class="f-caption">{{ name }}</span>
           <SegmentedControl
-            v-bind="control"
+            v-bind="control.value"
             :aria-labelledby="`theme-picker-${id}`"
           />
         </div>

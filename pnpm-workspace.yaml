@@ -19,7 +19,7 @@ catalog:
   "@vitejs/plugin-vue": "^6.0.8"
   "@vitest/coverage-v8": "^5.0.3"
   "@vue/test-utils": "^2.4.11"
-  "@zoobzio/foundation": "^1.0.4"
+  "@zoobzio/foundation": "^1.0.5"
   happy-dom: "^20.11.6"
   icon-sheets: "0.0.6"
   nuxt: "^4.2.1"
