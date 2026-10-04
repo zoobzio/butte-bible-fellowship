@@ -16,42 +16,49 @@ const json = (file: string) => JSON.parse(read(file)) as Json;
 // Aurora's documents, read from the installed package the config points at.
 const require = createRequire(`${root}package.json`);
 const aurora = (file: string) =>
-  JSON.parse(readFileSync(require.resolve(`@untheme/aurora/${file}`), "utf8"));
+  JSON.parse(
+    readFileSync(require.resolve(`@untheme/aurora/src/${file}`), "utf8"),
+  );
 
-const resolver = aurora("aurora.resolver.json") as {
+const resolver = aurora("resolver.json") as {
   sets: Record<string, { sources: { $ref: string }[] }>;
   modifiers: Record<
     string,
-    { contexts: Record<string, unknown>; default: string }
+    { contexts: Record<string, { $ref: string }[]>; default: string }
   >;
 };
 
-/** Every token aurora's base sets define, by name. */
-const upstream = Object.fromEntries(
-  Object.values(resolver.sets)
-    .flatMap((set) => set.sources.map((source) => source.$ref))
-    .flatMap((ref) => Object.entries(aurora(ref.slice(2)) as Tokens)),
-) as Tokens;
+/** The tokens of a document: its entries less the `$`-prefixed metadata. */
+const tokensOf = (document: Json) =>
+  Object.fromEntries(
+    Object.entries(document).filter(([name]) => !name.startsWith("$")),
+  ) as Tokens;
 
-// Our resolver, and the ramp files of ours its colors set points at.
-const AURORA = "npm:/@untheme/aurora/";
-const mirror = json("bbf.resolver.json") as unknown as typeof resolver & {
-  resolutionOrder: unknown;
-};
-const local = Object.values(mirror.sets)
-  .flatMap((set) => set.sources.map((source) => source.$ref))
-  .filter((ref) => !ref.startsWith(AURORA));
-const ours = Object.fromEntries(
-  local.flatMap((ref) => Object.entries(json(ref) as Tokens)),
-) as Tokens;
+/** One aurora theme's ramps, by token name. */
+const palette = (id: string) => tokensOf(aurora(`modifiers/theme/${id}.json`));
+
+/** Every token aurora defines: its base sets, and the ramps a theme supplies. */
+const upstream = {
+  ...palette(resolver.modifiers.theme!.default),
+  ...Object.fromEntries(
+    Object.values(resolver.sets)
+      .flatMap((set) => set.sources.map((source) => source.$ref))
+      .flatMap((ref) => Object.entries(tokensOf(aurora(ref.slice(2))))),
+  ),
+} as Tokens;
+
+// The site's palette: all eight ramps, in one file.
+const ours = tokensOf(json("src/bbf.json"));
 
 let config: typeof import("../.output/config.mjs");
 let index: typeof import("../.output/index.mjs");
+let manifest: typeof import("../.output/manifest.mjs");
 
 beforeAll(async () => {
   execFileSync("pnpm", ["run", "build"], { cwd: root, stdio: "pipe" });
   config = await import("../.output/config.mjs");
   index = await import("../.output/index.mjs");
+  manifest = await import("../.output/manifest.mjs");
 });
 
 describe("package exports", () => {
@@ -69,56 +76,15 @@ describe("package exports", () => {
   });
 });
 
-describe("resolver", () => {
-  it("mirrors aurora's sets, modifiers and resolution order", () => {
-    const original = aurora("aurora.resolver.json");
-    expect(Object.keys(mirror.sets)).toEqual(Object.keys(resolver.sets));
-    expect(mirror.resolutionOrder).toEqual(original.resolutionOrder);
-    expect(Object.keys(mirror.modifiers)).toEqual(
-      Object.keys(resolver.modifiers),
-    );
-    for (const [name, modifier] of Object.entries(resolver.modifiers)) {
-      expect(mirror.modifiers[name]!.default, name).toBe(modifier.default);
-      expect(mirror.modifiers[name]!.contexts, name).toEqual(
-        Object.fromEntries(
-          Object.entries(
-            modifier.contexts as Record<string, { $ref: string }[]>,
-          ).map(([context, refs]) => [
-            context,
-            refs.map((ref) => ({ $ref: AURORA + ref.$ref.slice(2) })),
-          ]),
-        ),
+describe("palette", () => {
+  it("defines exactly the tokens an aurora theme defines", () => {
+    const theirs = palette(resolver.modifiers.theme!.default);
+    expect(Object.keys(ours)).toEqual(Object.keys(theirs));
+    for (const [token, slot] of Object.entries(ours)) {
+      expect(slot.$type, token).toBe("color");
+      expect((slot.$value as { hex: string }).hex, token).toMatch(
+        /^#[0-9a-f]{6}$/,
       );
-    }
-  });
-
-  it("points only the colors set at files of ours", () => {
-    for (const [name, set] of Object.entries(resolver.sets)) {
-      const sources = mirror.sets[name]!.sources.map((source) => source.$ref);
-      expect(sources.length, name).toBe(set.sources.length);
-      set.sources.forEach((source, at) => {
-        // Each entry is aurora's file, or — in colors — ours of the same path.
-        const theirs = AURORA + source.$ref.slice(2);
-        if (name === "colors" && sources[at] === source.$ref) {
-          return;
-        }
-        expect(sources[at], name).toBe(theirs);
-      });
-    }
-    expect(local.length).toBeGreaterThan(0);
-  });
-
-  it("defines in each ramp of ours exactly the tokens aurora's defines", () => {
-    for (const ref of local) {
-      const theirs = aurora(ref.slice(2)) as Tokens;
-      const mine = json(ref) as Tokens;
-      expect(Object.keys(mine), ref).toEqual(Object.keys(theirs));
-      for (const [token, slot] of Object.entries(mine)) {
-        expect(slot.$type, token).toBe("color");
-        expect((slot.$value as { hex: string }).hex, token).toMatch(
-          /^#[0-9a-f]{6}$/,
-        );
-      }
     }
   });
 });
@@ -133,7 +99,7 @@ describe("theme", () => {
     expect([...index.tokens].sort()).toEqual(Object.keys(upstream).sort());
   });
 
-  it("binds our ramps as authored and everything else as aurora does", async () => {
+  it("binds our palette as authored and everything else as aurora does", async () => {
     // Terrazzo normalizes what it reads — an explicit alpha on a color, a
     // single shadow layer as a list — so compare the custom properties each
     // side renders to rather than the value shapes.
@@ -152,46 +118,50 @@ describe("theme", () => {
     expect(built.variables()).toEqual(authored.variables());
   });
 
-  it("declares aurora's modifiers, in order, and boots at its defaults", () => {
+  it("declares aurora's modifiers, in order, with our theme added and booted", () => {
     expect(config.theme.order).toEqual(Object.keys(resolver.modifiers));
     for (const [name, modifier] of Object.entries(resolver.modifiers)) {
+      const contexts = Object.keys(modifier.contexts);
       expect(
         index.modifiers[name as keyof typeof index.modifiers],
         name,
-      ).toEqual(Object.keys(modifier.contexts));
+      ).toEqual(name === "theme" ? [...contexts, "bbf"] : contexts);
     }
-    expect(config.input).toEqual(
-      Object.fromEntries(
+    expect(config.input).toEqual({
+      ...Object.fromEntries(
         Object.entries(resolver.modifiers).map(([name, modifier]) => [
           name,
           modifier.default,
         ]),
       ),
-    );
+      theme: "bbf",
+    });
   });
 
-  it("accepts every theme in aurora's catalog as a layer", async () => {
+  it("names and describes our theme in the manifest", () => {
+    const theme = manifest.manifest.find((modifier) => modifier.id === "theme");
+    const { description, ...entry } = theme!.contexts.find(
+      (context) => context.id === "bbf",
+    )!;
+    expect(entry).toEqual({ id: "bbf", name: "Butte Bible Fellowship" });
+    expect(description).toBeTruthy();
+  });
+
+  it("switches to every aurora theme and back to ours", async () => {
     const { makeUntheme } = await import("untheme");
     const { useUnthemeConfig } = await import("untheme/config");
     const untheme = makeUntheme(useUnthemeConfig(config.default));
-    const catalog = aurora("themes/index.json") as {
-      id: string;
-      name: string;
-    }[];
-    expect(catalog.length).toBeGreaterThan(0);
-    for (const { id, name } of catalog) {
-      const files = resolver.sets.colors!.sources.map((source) =>
-        source.$ref.replace("./tokens/", `themes/${id}/`),
-      );
-      const tokens = Object.fromEntries(
-        files.flatMap((file) =>
-          Object.entries(aurora(file) as Tokens).map(([token, source]) => [
-            token,
-            source.$value,
-          ]),
-        ),
-      );
-      expect(() => untheme.create({ id, name, tokens }), id).not.toThrow();
+    const hex = (token: string) =>
+      (untheme.resolve(token as never) as { hex: string }).hex;
+    const own = (ours["primary-600"]!.$value as { hex: string }).hex;
+    const themes = Object.keys(resolver.modifiers.theme!.contexts);
+    expect(themes.length).toBeGreaterThan(0);
+    for (const id of themes) {
+      untheme.swap("theme", id as never);
+      const theirs = palette(id)["primary-600"]!.$value as { hex: string };
+      expect(hex("primary-600"), id).toBe(theirs.hex);
     }
+    untheme.swap("theme", "bbf");
+    expect(hex("primary-600")).toBe(own);
   });
 });

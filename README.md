@@ -66,16 +66,13 @@ into the app and mirrors the color scheme onto `<html>` as `data-color`.
 
 ### Themes
 
-The build defines exactly aurora's tokens, so every aurora theme applies to
-it. `server/api/untheme/[...path].get.ts` serves the site's own theme and
-all of aurora's over untheme's catalog protocol: listings at
-`/api/untheme/themes`, one theme's layer at `/api/untheme/themes/:id`. The
-palette button in the footer lists them and applies the one picked; a plugin
-restores the choice from the cookie the untheme module keeps.
-
-`server/aurora/files.ts` maps each theme to its files in the aurora package
-and is generated. After upgrading `@untheme/aurora`, run
-`pnpm --filter @bbf/web generate:themes` and `pnpm format`.
+The site's palette is a context of aurora's `theme` modifier — `bbf`, the
+default — beside every aurora theme, all built into the app's theme. The
+palette button in the footer lists them from the build's manifest and
+switches with `useUntheme().swap("theme", id)`; the untheme module keeps the
+selection in its cookie and renders it on the server, the same as the color
+scheme. There is no theme route and nothing to regenerate after upgrading
+`@untheme/aurora`.
 
 ## Structure
 

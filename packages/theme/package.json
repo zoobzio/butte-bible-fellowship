@@ -10,6 +10,10 @@
     "./config": {
       "types": "./.output/config.d.mts",
       "default": "./.output/config.mjs"
+    },
+    "./manifest": {
+      "types": "./.output/manifest.d.mts",
+      "default": "./.output/manifest.mjs"
     }
   },
   "scripts": {

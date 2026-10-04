@@ -3,7 +3,6 @@ import { afterEach, beforeEach } from "vitest";
 import {
   clearAppConfig,
   clearContentPages,
-  clearNuxtCookieRegistry,
   clearNuxtStateRegistry,
   setRoutePath,
   useHead,
@@ -17,7 +16,6 @@ config.global.components = { ...config.global.components, NuxtLink };
 // Shared mock state (see mocks/imports.ts) must not leak between tests.
 beforeEach(() => {
   clearNuxtStateRegistry();
-  clearNuxtCookieRegistry();
   clearAppConfig();
   clearContentPages();
   setRoutePath("/");

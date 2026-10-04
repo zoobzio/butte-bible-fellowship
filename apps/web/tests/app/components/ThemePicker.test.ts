@@ -1,10 +1,9 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { nextTick } from "vue";
 import { mount } from "@vue/test-utils";
 
 import { useUntheme } from "#imports";
 import ThemePicker from "~/components/ThemePicker.vue";
-import { stubCatalog } from "#test/support/catalog";
 
 // The menu content is portalled to the body, so it is queried from there.
 const items = () => [
@@ -21,33 +20,12 @@ const open = async () => {
 
 const listed = () => vi.waitFor(() => expect(items().length).toBe(32));
 
-beforeEach(() => {
-  stubCatalog();
-});
-
-afterEach(() => {
-  vi.unstubAllGlobals();
-});
-
 describe("ThemePicker", () => {
   it("opens from a labelled palette button", () => {
     const trigger = mount(ThemePicker).find("button");
     expect(trigger.attributes("aria-label")).toBe("Choose a theme");
     expect(trigger.attributes("aria-haspopup")).toBe("menu");
     expect(trigger.find("use").attributes("href")).toBe("#palette");
-  });
-
-  it("requests nothing until it is opened", () => {
-    mount(ThemePicker);
-    expect(globalThis.fetch).not.toHaveBeenCalled();
-  });
-
-  it("holds an inert placeholder until the catalog answers", async () => {
-    await open();
-    const [placeholder] = items();
-    expect(placeholder!.textContent).toContain("Loading themes");
-    expect(placeholder!.hasAttribute("data-disabled")).toBe(true);
-    await listed();
   });
 
   it("lists every theme by name, the site's among them", async () => {
@@ -76,6 +54,8 @@ describe("ThemePicker", () => {
     nord.dispatchEvent(
       new KeyboardEvent("keydown", { key: "Enter", bubbles: true }),
     );
-    await vi.waitFor(() => expect(useUntheme().config.theme.id).toBe("nord"));
+    await vi.waitFor(() =>
+      expect(useUntheme().config.input.theme).toBe("nord"),
+    );
   });
 });

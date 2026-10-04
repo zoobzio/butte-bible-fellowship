@@ -11,15 +11,13 @@
     "typecheck": "nuxi typecheck",
     "test": "vitest run --passWithNoTests",
     "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage --passWithNoTests",
-    "generate:themes": "node scripts/aurora.mjs"
+    "test:coverage": "vitest run --coverage --passWithNoTests"
   },
   "dependencies": {
     "@bbf/icons": "workspace:*",
     "@bbf/theme": "workspace:*",
     "@icon-sheets/nuxt": "catalog:",
     "@nuxt/content": "catalog:",
-    "@untheme/aurora": "catalog:",
     "@untheme/nuxt": "catalog:",
     "@zoobzio/foundation": "catalog:",
     "nuxt": "catalog:",

@@ -28,14 +28,14 @@ catalogs:
       specifier: ^0.23.1
       version: 0.23.1
     '@untheme/aurora':
-      specifier: ^0.4.0
-      version: 0.4.0
+      specifier: ^0.5.0
+      version: 0.5.0
     '@untheme/kit':
-      specifier: ^0.4.0
-      version: 0.4.0
+      specifier: ^0.5.0
+      version: 0.5.0
     '@untheme/nuxt':
-      specifier: ^0.4.0
-      version: 0.4.0
+      specifier: ^0.5.0
+      version: 0.5.0
     '@vitejs/plugin-vue':
       specifier: ^6.0.8
       version: 6.0.8
@@ -76,8 +76,8 @@ catalogs:
       specifier: ^5.9.3
       version: 5.9.3
     untheme:
-      specifier: ^0.4.0
-      version: 0.4.0
+      specifier: ^0.5.0
+      version: 0.5.0
     vitest:
       specifier: ^5.0.3
       version: 5.0.3
@@ -118,12 +118,9 @@ importers:
       '@nuxt/content':
         specifier: 'catalog:'
         version: 3.15.2(@oxc-project/types@0.146.0)(esbuild@0.28.2)(magic-string@1.4.2)(magicast@0.5.4)(oxc-parser@0.139.0)(rolldown@1.2.5)(rollup@4.62.4)(vite@8.2.1(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(yaml@2.9.0))
-      '@untheme/aurora':
-        specifier: 'catalog:'
-        version: 0.4.0
       '@untheme/nuxt':
         specifier: 'catalog:'
-        version: 0.4.0(magic-string@1.4.2)(magicast@0.5.4)(oxc-parser@0.139.0)(rolldown@1.2.5)(typescript@5.9.3)(unplugin@3.3.0(esbuild@0.28.2)(rolldown@1.2.5)(rollup@4.62.4)(vite@8.2.1(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(yaml@2.9.0)))
+        version: 0.5.0(magic-string@1.4.2)(magicast@0.5.4)(oxc-parser@0.139.0)(rolldown@1.2.5)(typescript@5.9.3)(unplugin@3.3.0(esbuild@0.28.2)(rolldown@1.2.5)(rollup@4.62.4)(vite@8.2.1(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(yaml@2.9.0)))
       '@zoobzio/foundation':
         specifier: 'catalog:'
         version: 1.0.4(magic-string@1.4.2)(magicast@0.5.4)(nuxt@4.5.2(@babel/plugin-syntax-jsx@7.29.7(@babel/core@7.29.7))(@babel/plugin-syntax-typescript@7.29.7(@babel/core@7.29.7))(@oxc-project/types@0.146.0)(@types/node@26.2.0)(@vue/compiler-sfc@3.5.41)(db0@0.3.4)(esbuild@0.28.2)(eslint@9.39.5(jiti@2.7.0))(ioredis@5.11.1)(lightningcss@1.33.0)(magicast@0.5.4)(optionator@0.9.4)(oxc-parser@0.139.0)(oxlint@1.86.0)(rolldown@1.2.5)(rollup-plugin-visualizer@7.1.1(rolldown@1.2.5)(rollup@4.62.4))(rollup@4.62.4)(srvx@0.11.22)(terser@5.50.0)(typescript@5.9.3)(vite@8.2.1(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(yaml@2.9.0))(vue-tsc@2.2.12(typescript@5.9.3))(yaml@2.9.0))(oxc-parser@0.139.0)(rolldown@1.2.5)(unplugin@3.3.0(esbuild@0.28.2)(rolldown@1.2.5)(rollup@4.62.4)(vite@8.2.1(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(yaml@2.9.0)))(vue@3.5.41(typescript@5.9.3))
@@ -135,7 +132,7 @@ importers:
         version: 1.7.0(patch_hash=ccf1ead934e347d7490c5d3b4c1be21a16cbc26f3d62024f0ee7eee2416b4739)(@vue/test-utils@2.4.11(@vue/compiler-dom@3.5.41)(@vue/server-renderer@3.5.41)(vue@3.5.41(typescript@5.9.3)))(db0@0.3.4)(ioredis@5.11.1)(magic-string@1.4.2)(magicast@0.5.4)(oxc-parser@0.139.0)(rolldown@1.2.5)(srvx@0.11.22)(unplugin@3.3.0(esbuild@0.28.2)(rolldown@1.2.5)(rollup@4.62.4)(vite@8.2.1(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(yaml@2.9.0)))(vue@3.5.41(typescript@5.9.3))
       untheme:
         specifier: 'catalog:'
-        version: 0.4.0
+        version: 0.5.0
       vue:
         specifier: 'catalog:'
         version: 3.5.41(typescript@5.9.3)
@@ -197,14 +194,14 @@ importers:
     dependencies:
       untheme:
         specifier: 'catalog:'
-        version: 0.4.0
+        version: 0.5.0
     devDependencies:
       '@untheme/aurora':
         specifier: 'catalog:'
-        version: 0.4.0
+        version: 0.5.0
       '@untheme/kit':
         specifier: 'catalog:'
-        version: 0.4.0(yaml-to-momoa@0.1.0)
+        version: 0.5.0(yaml-to-momoa@0.1.0)
       vitest:
         specifier: 'catalog:'
         version: 5.0.3(@opentelemetry/api@1.9.1)(@types/node@26.2.0)(@vitest/coverage-v8@5.0.3)(happy-dom@20.11.6)(vite@8.2.1(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(yaml@2.9.0))
@@ -2062,30 +2059,30 @@ packages:
       webpack:
         optional: true
 
-  '@untheme/aurora@0.4.0':
-    resolution: {integrity: sha512-ACFp51JR62a44G5EW8ItwokP1nn/jtLP6iF75gicuqNNcj2u0szS4ptS1k5T9yIGyiS4TesgcvV8jETZOq8gcA==}
+  '@untheme/aurora@0.5.0':
+    resolution: {integrity: sha512-DG6JQMSZvFBnbpy9mL1x+3RJ5dN3Hl8+hacacAma6fHlLvTsEmeR6RjMjvwuI/edovpZoKSKLJ0hjl2KpiR55g==}
 
-  '@untheme/catalog@0.4.0':
-    resolution: {integrity: sha512-HchURH3RlyBlAiQy5rahBP0YP35dQSbVXs3N+caOrv4bSbUwDzDhFxkMJUxCZ1wUzoo8NTZEOdEH0x6cHy7YhQ==}
+  '@untheme/catalog@0.5.0':
+    resolution: {integrity: sha512-95e2u1b33nETMws2HyXPVaaC9OX18tzV04O6EIOkIaG1A6RpTEtA8LaYSqUN8XHgL1xyK4Wg9MP7yN+SgKWIgg==}
 
-  '@untheme/core@0.4.0':
-    resolution: {integrity: sha512-RbQF1RoytdDu7rBxvjdHloCIqg9seUG7/9QdbcVCuuRbysgmFnElQjqKb0VQAZg1bRQYIYTjpfwsj+ki/Se5og==}
+  '@untheme/core@0.5.0':
+    resolution: {integrity: sha512-75MVpp6egNwQtiY78VYsmPATj62W9XSIhBdZ8p8byL2WOnG3u0eChClFBNNox5a896UkDjNVL7i2gTvOoJ1XFA==}
 
-  '@untheme/css@0.4.0':
-    resolution: {integrity: sha512-+/I2SF/nJ/nuZ6fcP/ckDw1Cejk07LhiML0olbGa98E1CJ4NZY8rOBAFigFMFTKOIZhbRNLgU7vNs19swjo4Jg==}
+  '@untheme/css@0.5.0':
+    resolution: {integrity: sha512-6n/+O60qT28fm2pZ6dwYgFprtLUGn8E9iWj6QPKqHh1CPregyIhwCvdEaiUQ+NbwLZkUEf0SVlS3HKF7nnQsPA==}
 
-  '@untheme/kit@0.4.0':
-    resolution: {integrity: sha512-PeYFLXsKc5nTQZ0DNDZIVk8vVwE3C0q+5gU41v5u6AHEgbJQJmd1itL6RhlJSAjbTE5EiixsJmFVVyayld1tew==}
+  '@untheme/kit@0.5.0':
+    resolution: {integrity: sha512-Xo9DXAP0ff62C8HfTV3E/kdRbMytZK7Ojoc5Yx3Txg5tVyxbmtzxD9Y0+WP4onuJQ8NUPGKG3evLGGTdUqT/FQ==}
     hasBin: true
 
-  '@untheme/nuxt@0.4.0':
-    resolution: {integrity: sha512-ttG21LvEwdCXI/FOh/+N4NBz1hzIdCgzad9plQ7kOeonS77X2M7BMphjZkD4W5xwDRlEsZvcPthYewJMD93qXA==}
+  '@untheme/nuxt@0.5.0':
+    resolution: {integrity: sha512-oK6WafkeVyHbSqh+wBWK4lmf5OJuvZHl1FbpEBcUWhzTKkckCmT2WH5bvX8JWhx+a8lEgNGjsT8tDV7nMbr/gA==}
 
-  '@untheme/schema@0.4.0':
-    resolution: {integrity: sha512-1wswt3XoujbmdBFGiKE34wOrxypTI/Y25t2WVtOgRo8eMG6xHcCFYSUucKYgMiJwUdtj3vrskQvtcfxhMn2nOw==}
+  '@untheme/schema@0.5.0':
+    resolution: {integrity: sha512-wE1g9q7SQ3J3e8ldFi4OfGe/odAhg7pXugi5ccIah13kiQAe4MvUT+ldrCc4fPl1J01xuS6Vj6iJLx+b6bii6Q==}
 
-  '@untheme/utils@0.4.0':
-    resolution: {integrity: sha512-8/LbAHiku3QStj7Rq8WiyI9FHVu7DClCc1a7gdVsbUEH1O+hsYoVwZy/MFMHhTqAjKJOALRmMpWN4aZPld5Vsg==}
+  '@untheme/utils@0.5.0':
+    resolution: {integrity: sha512-tWlhoREYJkzrLsUrgqL5hoy+JLSxtsmTqseU1pJiykGSANU9b+xMVMfohlLozJl1Q11yS/t31jU5clPee6fdAQ==}
 
   '@vercel/nft@1.11.0':
     resolution: {integrity: sha512-m1QFg+U+3yPOnP1xSYJ73UIRxLOXdts1JOhiOiyPYqEsALgrXFFINvgUaD6R6iNvaBFAjHllBCbkfx4FuOdpaA==}
@@ -5185,8 +5182,8 @@ packages:
       uploadthing:
         optional: true
 
-  untheme@0.4.0:
-    resolution: {integrity: sha512-lpYkQrmTYDiIRBCSBLqv+2x6oDdKWXnOg/urnOFBJvJxFMCUYIbeEeM3+DguCc7fM3CF/6f/yFSoNNGLGYHsow==}
+  untheme@0.5.0:
+    resolution: {integrity: sha512-GupkjANHr+vdNh9p6iC4wnGeC89HowrQdlTN89gsyvdaT16h+jSlhyJdVjWsvVLFhEek3Rq+eDpdJnKWKI10JA==}
 
   untun@0.2.2:
     resolution: {integrity: sha512-+NnOJcSiEtYsVgJmXUzQbJeRAFXJC4yPJYuh6kF9B0Rm6zunXcs/3GZOTllyocSbUDIxD6Bj7e/4ATw7sph1Sw==}
@@ -7623,42 +7620,42 @@ snapshots:
       - rollup
       - unloader
 
-  '@untheme/aurora@0.4.0': {}
+  '@untheme/aurora@0.5.0': {}
 
-  '@untheme/catalog@0.4.0':
+  '@untheme/catalog@0.5.0':
     dependencies:
-      '@untheme/schema': 0.4.0
+      '@untheme/schema': 0.5.0
       objectively: 0.1.1
 
-  '@untheme/core@0.4.0':
+  '@untheme/core@0.5.0':
     dependencies:
-      '@untheme/schema': 0.4.0
-      '@untheme/utils': 0.4.0
+      '@untheme/schema': 0.5.0
+      '@untheme/utils': 0.5.0
       objectively: 0.1.1
 
-  '@untheme/css@0.4.0':
+  '@untheme/css@0.5.0':
     dependencies:
-      '@untheme/schema': 0.4.0
+      '@untheme/schema': 0.5.0
       objectively: 0.1.1
 
-  '@untheme/kit@0.4.0(yaml-to-momoa@0.1.0)':
+  '@untheme/kit@0.5.0(yaml-to-momoa@0.1.0)':
     dependencies:
       '@terrazzo/parser': 2.7.1(yaml-to-momoa@0.1.0)
-      '@untheme/core': 0.4.0
-      '@untheme/schema': 0.4.0
-      '@untheme/utils': 0.4.0
+      '@untheme/core': 0.5.0
+      '@untheme/schema': 0.5.0
+      '@untheme/utils': 0.5.0
       jiti: 2.7.0
       objectively: 0.1.1
     transitivePeerDependencies:
       - yaml-to-momoa
 
-  '@untheme/nuxt@0.4.0(magic-string@1.4.2)(magicast@0.5.4)(oxc-parser@0.139.0)(rolldown@1.2.5)(typescript@5.9.3)(unplugin@3.3.0(esbuild@0.28.2)(rolldown@1.2.5)(rollup@4.62.4)(vite@8.2.1(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(yaml@2.9.0)))':
+  '@untheme/nuxt@0.5.0(magic-string@1.4.2)(magicast@0.5.4)(oxc-parser@0.139.0)(rolldown@1.2.5)(typescript@5.9.3)(unplugin@3.3.0(esbuild@0.28.2)(rolldown@1.2.5)(rollup@4.62.4)(vite@8.2.1(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(yaml@2.9.0)))':
     dependencies:
       '@nuxt/kit': 4.5.2(magic-string@1.4.2)(magicast@0.5.4)(oxc-parser@0.139.0)(rolldown@1.2.5)(unplugin@3.3.0(esbuild@0.28.2)(rolldown@1.2.5)(rollup@4.62.4)(vite@8.2.1(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(yaml@2.9.0)))
-      '@untheme/kit': 0.4.0(yaml-to-momoa@0.1.0)
+      '@untheme/kit': 0.5.0(yaml-to-momoa@0.1.0)
       h3: 1.15.11
       objectively: 0.1.1
-      untheme: 0.4.0
+      untheme: 0.5.0
       vue: 3.5.41(typescript@5.9.3)
     transitivePeerDependencies:
       - magic-string
@@ -7669,13 +7666,13 @@ snapshots:
       - unplugin
       - yaml-to-momoa
 
-  '@untheme/schema@0.4.0':
+  '@untheme/schema@0.5.0':
     dependencies:
       objectively: 0.1.1
 
-  '@untheme/utils@0.4.0':
+  '@untheme/utils@0.5.0':
     dependencies:
-      '@untheme/schema': 0.4.0
+      '@untheme/schema': 0.5.0
       objectively: 0.1.1
 
   '@vercel/nft@1.11.0(rollup@4.62.4)':
@@ -11683,13 +11680,13 @@ snapshots:
       db0: 0.3.4
       ioredis: 5.11.1
 
-  untheme@0.4.0:
+  untheme@0.5.0:
     dependencies:
-      '@untheme/catalog': 0.4.0
-      '@untheme/core': 0.4.0
-      '@untheme/css': 0.4.0
-      '@untheme/schema': 0.4.0
-      '@untheme/utils': 0.4.0
+      '@untheme/catalog': 0.5.0
+      '@untheme/core': 0.5.0
+      '@untheme/css': 0.5.0
+      '@untheme/schema': 0.5.0
+      '@untheme/utils': 0.5.0
 
   untun@0.2.2: {}
 

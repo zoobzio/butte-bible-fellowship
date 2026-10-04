@@ -1,14 +1,21 @@
 import { defineConfig } from "@untheme/kit";
 
 /**
- * The site's theme: aurora with the site's tonal ramps. `bbf.resolver.json`
- * mirrors aurora's resolver, pointing at its files by `npm:/` reference, and
- * swaps in `tokens/colors/` for the ramps the site owns. The token set is
- * aurora's exactly, so every theme in aurora's catalog applies unchanged.
- * `untheme build` turns it into the modules in `.output/`.
+ * The site's theme: aurora, with the site's palette added to its `theme`
+ * modifier as the `bbf` context and booted by default. `src/bbf.json` is the
+ * whole palette — all eight ramps, with its name and description — in the
+ * format of aurora's own theme files, and every aurora theme stays a context
+ * beside it. `untheme build` turns it into the modules in `.output/`.
  */
 export default defineConfig({
-  source: "./bbf.resolver.json",
+  source: "npm:/@untheme/aurora/src/resolver.json",
   id: "bbf",
+  name: "Butte Bible Fellowship",
   outDir: ".output",
+  modifiers: {
+    theme: {
+      add: { bbf: "./src/bbf.json" },
+      default: "bbf",
+    },
+  },
 });

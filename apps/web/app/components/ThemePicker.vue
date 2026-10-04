@@ -1,47 +1,29 @@
 <script lang="ts">
 import type { MenuItem } from "@zoobzio/foundation/types/core/menu";
+import type { Theme } from "~/types/theme";
 
 import Menu from "@zoobzio/foundation/components/core/menu.vue";
 
 import { Icon } from "#components";
-import { computed } from "#imports";
 import { useThemes } from "~/composables/themes";
 </script>
 
 <script setup lang="ts">
-type ThemeItem = MenuItem & { id: string };
+type ThemeItem = MenuItem & { id: Theme };
 
-const { themes, active, load, choose } = useThemes();
+const { themes, active, choose } = useThemes();
 
-/* The catalog is listed the first time the menu opens; until it answers,
-   the menu holds one inert placeholder. */
-const items = computed<ThemeItem[]>(() =>
-  themes.value.length > 0
-    ? themes.value.map(({ id, name }) => ({ id, label: name }))
-    : [{ id: "", label: "Loading themes…", disabled: true }],
-);
+const items: ThemeItem[] = themes.map(({ id, name }) => ({ id, label: name }));
 
-const groups = computed(() => [{ key: "themes", items: items.value }]);
-
-const onOpen = (open: boolean) => {
-  if (open) {
-    void load();
-  }
-};
+const groups = [{ key: "themes", items }];
 
 const onSelect = (item: ThemeItem) => {
-  void choose(item.id);
+  choose(item.id);
 };
 </script>
 
 <template>
-  <Menu
-    :groups="groups"
-    side="top"
-    align="start"
-    @update:open="onOpen"
-    @select="onSelect"
-  >
+  <Menu :groups="groups" side="top" align="start" @select="onSelect">
     <button type="button" class="theme-toggle" aria-label="Choose a theme">
       <Icon name="palette" class="icon" />
     </button>

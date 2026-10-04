@@ -28,22 +28,6 @@ export const useState = (key: string, init?: () => unknown): Ref<unknown> => {
   return state;
 };
 
-// useCookie: a keyed registry like useState, applying the `default` option.
-const cookieRegistry = new Map<string, Ref<unknown>>();
-
-export const clearNuxtCookieRegistry = () => cookieRegistry.clear();
-
-export const useCookie = (
-  key: string,
-  opts?: { default?: () => unknown },
-): Ref<unknown> => {
-  const existing = cookieRegistry.get(key);
-  if (existing) return existing;
-  const cookie = ref(opts?.default ? opts.default() : undefined);
-  cookieRegistry.set(key, cookie);
-  return cookie;
-};
-
 // useUntheme: the real service over the app's built theme, in a reactive
 // container held like the module holds it — in useState, so the registry
 // reset between tests gives each test a fresh selection.
@@ -55,36 +39,11 @@ export const useUntheme = () => {
   ).value as object;
   let service = services.get(container);
   if (!service) {
-    const key = useCookie("untheme-key");
-    service = makeUntheme(container as ReturnType<typeof useUnthemeConfig>, {
-      set: {
-        config: {
-          theme: (next) => {
-            key.value = next.id;
-            return next;
-          },
-        },
-      },
-    });
+    service = makeUntheme(container as ReturnType<typeof useUnthemeConfig>);
     services.set(container, service);
   }
   return service;
 };
-
-// accessUntheme: the module's cookie refs. Like the module's service, the
-// shim writes the active theme's id to `untheme-key` when one is applied.
-export const accessUntheme = () => ({
-  cookies: {
-    input: useCookie("untheme-input"),
-    key: useCookie("untheme-key"),
-  },
-});
-
-// useRequestEvent: there is no request under vitest, as in the browser.
-export const useRequestEvent = () => undefined;
-
-// defineNuxtPlugin: hands the plugin back so a test can run its setup.
-export const defineNuxtPlugin = <T>(plugin: T): T => plugin;
 
 // useAppConfig: tests supply their own config so they don't depend on the
 // site's content.
