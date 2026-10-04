@@ -2,20 +2,12 @@ import type { Theme, ThemeEntry } from "~/types/theme";
 
 import { computed, useUntheme } from "#imports";
 import { manifest } from "@bbf/theme/manifest";
+import { transition } from "~/utils/theme";
 
 /** The themes the build carries: the `theme` modifier's contexts, by name. */
 const themes: ThemeEntry[] = [
   ...manifest.find((modifier) => modifier.id === "theme")!.contexts,
 ].sort((a, b) => a.name.localeCompare(b.name));
-
-/** Runs a change as a view-transition cross-fade where the browser can. */
-const transition = (change: () => void) => {
-  if (typeof document !== "undefined" && "startViewTransition" in document) {
-    document.startViewTransition(change);
-    return;
-  }
-  change();
-};
 
 /**
  * The themes on offer, and the one active: untheme's `theme` modifier, whose

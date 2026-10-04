@@ -68,10 +68,12 @@ into the app and mirrors the color scheme onto `<html>` as `data-color`.
 
 The site's palette is a context of aurora's `theme` modifier — `bbf`, the
 default — beside every aurora theme, all built into the app's theme. The
-palette button in the footer lists them from the build's manifest and
-switches with `useUntheme().swap("theme", id)`; the untheme module keeps the
-selection in its cookie and renders it on the server, the same as the color
-scheme. There is no theme route and nothing to regenerate after upgrading
+palette button in the footer opens a modal built from Foundation's `Dialog`:
+on the left a `Command` searches the themes the build's manifest lists, and
+on the right a `SegmentedControl` per remaining modifier — color scheme,
+vibrancy, contrast, text size, density, corner radius, depth and motion.
+Each choice is `useUntheme().swap(modifier, context)`; the untheme module
+keeps the selection in its cookie and renders it on the server. There is no theme route and nothing to regenerate after upgrading
 `@untheme/aurora`.
 
 ## Structure

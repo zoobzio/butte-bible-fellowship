@@ -7,7 +7,9 @@ export default defineConfig({
     menu: "lucide:menu",
     moon: "lucide:moon",
     palette: "lucide:palette",
+    search: "lucide:search",
     sun: "lucide:sun",
+    x: "lucide:x",
   },
   outDir: ".output",
 });
