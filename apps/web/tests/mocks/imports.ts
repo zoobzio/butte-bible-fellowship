@@ -48,14 +48,14 @@ export const useUntheme = () => {
   return service;
 };
 
-// useT: the real resolver over the site's built messages, in the source
-// locale — what the module provides as `$t`.
+// useNuxtApp: the app, as far as the tests reach into it — `$t`, the real
+// resolver over the site's built messages, in the source locale.
 const fibber = makeFibber(
   contract,
   reactive({ locale, messages: await bundles[locale]() }),
 );
 
-export const useT = () => fibber.createResolver();
+export const useNuxtApp = () => ({ $t: fibber.createResolver() });
 
 // useLocale: the service's one locale, as the module exposes it.
 type Locale = (typeof contract.locales)[number];

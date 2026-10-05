@@ -3,7 +3,7 @@ import type { FooterConfig } from "~/types/footer";
 import { beforeEach, describe, expect, it } from "vitest";
 import { mount } from "@vue/test-utils";
 
-import { setAppConfig, useT } from "#imports";
+import { setAppConfig, useNuxtApp } from "#imports";
 import AppFooter from "~/components/AppFooter.vue";
 
 // The first column's lines are plain, a message and a literal; the second's
@@ -28,7 +28,7 @@ const FOOTER: FooterConfig = {
   ],
 };
 
-const t = useT();
+const { $t } = useNuxtApp();
 
 const mountFooter = () =>
   mount(AppFooter, {
@@ -45,16 +45,16 @@ describe("AppFooter", () => {
   it("renders a column per configured column, headed by its title", () => {
     const columns = mountFooter().findAll(".site-footer-col");
     expect(columns.map((column) => column.find("strong").text())).toEqual([
-      t.site.name(),
-      t.footer.contact(),
+      $t.site.name(),
+      $t.footer.contact(),
     ]);
   });
 
   it("renders lines without an href as plain text, messages resolved", () => {
     const [first] = mountFooter().findAll(".site-footer-col");
     expect(first!.findAll("p").map((line) => line.text())).toEqual([
-      t.site.name(),
-      t.footer.worship(),
+      $t.site.name(),
+      $t.footer.worship(),
       "Testville",
     ]);
     expect(first!.find("a").exists()).toBe(false);
@@ -71,7 +71,7 @@ describe("AppFooter", () => {
     ).toEqual([
       { label: "555-0100", href: "tel:5550100", target: undefined },
       {
-        label: t.footer.online(),
+        label: $t.footer.online(),
         href: "https://example.com/video",
         target: "_blank",
       },
@@ -82,7 +82,7 @@ describe("AppFooter", () => {
     const legal = mountFooter().find(".site-footer-legal");
     expect(legal.findComponent({ name: "ColorMode" }).exists()).toBe(true);
     expect(legal.find("span").text()).toBe(
-      t.footer.copyright({ year: new Date().getFullYear() }),
+      $t.footer.copyright({ year: new Date().getFullYear() }),
     );
   });
 });

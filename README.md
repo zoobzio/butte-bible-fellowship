@@ -68,7 +68,7 @@ the upstream fix is released; the three options have to be carried over.
 
 The site's interface text lives in [`@bbf/i18n`](packages/i18n) as
 [fibber](https://github.com/zoobzio/fibber) messages, not in components.
-`@fibber/nuxt` provides `useT`; `app.config.ts` names the header's and
+`@fibber/nuxt` provides `$t` on the Nuxt app; `app.config.ts` names the header's and
 footer's messages by key.
 
 English is at the routes as written (`/about-us`); every other locale has the

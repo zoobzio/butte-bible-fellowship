@@ -5,7 +5,7 @@ import { defineAppConfig } from "#imports";
 
 // The site's words live in `@bbf/i18n`: a `label` or `title` here is the
 // key of a message there, checked against its contract and resolved with
-// `t(message)` where it is rendered.
+// `$t(message)` where it is rendered.
 
 const header: HeaderConfig = {
   links: [

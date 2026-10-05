@@ -1,6 +1,12 @@
 <script lang="ts">
 import { ContentRenderer, NuxtLink } from "#components";
-import { computed, createError, useHead, useT, definePageMeta } from "#imports";
+import {
+  computed,
+  createError,
+  useHead,
+  useNuxtApp,
+  definePageMeta,
+} from "#imports";
 
 import { useRouteLocale } from "~/composables/locale";
 import { usePage } from "~/composables/page";
@@ -16,7 +22,10 @@ const { data: page } = await usePage();
 const { localize } = useRouteLocale();
 
 if (!page.value) {
-  throw createError({ statusCode: 404, statusMessage: useT().page.notFound() });
+  throw createError({
+    statusCode: 404,
+    statusMessage: useNuxtApp().$t.page.notFound(),
+  });
 }
 
 useHead(() => ({ title: page.value?.title }));

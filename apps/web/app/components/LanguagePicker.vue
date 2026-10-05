@@ -2,14 +2,14 @@
 import Menu from "@zoobzio/foundation/components/core/menu.vue";
 
 import { Icon } from "#components";
-import { useLocale, useT } from "#imports";
+import { useLocale, useNuxtApp } from "#imports";
 import { defineMenu } from "@zoobzio/foundation/definitions/menu";
 import { useRouteLocale } from "~/composables/locale";
 import { joinLocalePath, languageName } from "~/utils/locale";
 </script>
 
 <script setup lang="ts">
-const t = useT();
+const { $t } = useNuxtApp();
 const { locales } = useLocale();
 const { locale, path } = useRouteLocale();
 
@@ -34,7 +34,7 @@ const menu = defineMenu(() => ({
     <button
       type="button"
       class="theme-toggle language-toggle"
-      :aria-label="t.language.open()"
+      :aria-label="$t.language.open()"
     >
       <Icon name="languages" class="icon" />
       <span>{{ languageName(locale) }}</span>

@@ -89,10 +89,10 @@ fibber.format("navigation.home"); // "Home"
 ## In the app
 
 The web app hands the build to `@fibber/nuxt` in `nuxt.config.ts` —
-`fibber: { build: "@bbf/i18n" }` — which provides `useT`. A component
-calls a message it names (`t.navigation.open()`); data carries one by key,
+`fibber: { build: "@bbf/i18n" }` — which provides `$t` on the Nuxt app. A component
+calls a message it names (`$t.navigation.open()`); data carries one by key,
 typed as `AppFibberMessage`, and resolves it where it renders
-(`t(link.label)`). The header and footer in `app.config.ts` are data of that
+(`$t(link.label)`). The header and footer in `app.config.ts` are data of that
 kind. Nuxt reads the built output when it loads its config, so restart
 `pnpm dev` after rebuilding this package.
 

@@ -1,6 +1,6 @@
 <script lang="ts">
 import { ContentRenderer } from "#components";
-import { createError, definePageMeta, useHead, useT } from "#imports";
+import { createError, definePageMeta, useHead, useNuxtApp } from "#imports";
 
 import { usePage } from "~/composables/page";
 import { MARKDOWN_COMPONENTS } from "~/constants/markdown";
@@ -14,7 +14,10 @@ definePageMeta({
 const { data: page } = await usePage();
 
 if (!page.value) {
-  throw createError({ statusCode: 404, statusMessage: useT().page.notFound() });
+  throw createError({
+    statusCode: 404,
+    statusMessage: useNuxtApp().$t.page.notFound(),
+  });
 }
 
 useHead(() => ({ title: page.value?.title }));

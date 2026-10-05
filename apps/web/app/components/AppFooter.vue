@@ -2,7 +2,7 @@
 import type { FooterLine } from "~/types/footer";
 
 import { NuxtLink } from "#components";
-import { useAppConfig, useT } from "#imports";
+import { useAppConfig, useNuxtApp } from "#imports";
 
 import ColorMode from "~/components/ColorMode.vue";
 import LanguagePicker from "~/components/LanguagePicker.vue";
@@ -13,13 +13,13 @@ import ThemePicker from "~/components/ThemePicker.vue";
 defineOptions({ name: "AppFooter" });
 
 const { footer } = useAppConfig();
-const t = useT();
+const { $t } = useNuxtApp();
 
 const year = new Date().getFullYear();
 
 /** A line's text: its message in the active locale, or its text as written. */
 const text = (line: FooterLine) => {
-  return "label" in line ? t(line.label) : line.text;
+  return "label" in line ? $t(line.label) : line.text;
 };
 </script>
 
@@ -32,7 +32,7 @@ const text = (line: FooterLine) => {
         class="site-footer-col"
       >
         <p>
-          <strong>{{ t(column.title) }}</strong>
+          <strong>{{ $t(column.title) }}</strong>
         </p>
         <p v-for="(line, position) in column.lines" :key="position">
           <NuxtLink v-if="line.href" :to="line.href" :target="line.target">
@@ -49,7 +49,7 @@ const text = (line: FooterLine) => {
         <ColorMode />
         <ThemePicker />
       </div>
-      <span>{{ t.footer.copyright({ year }) }}</span>
+      <span>{{ $t.footer.copyright({ year }) }}</span>
     </div>
   </footer>
 </template>
@@ -60,8 +60,7 @@ const text = (line: FooterLine) => {
   margin-top: var(--space-9);
   padding: clamp(var(--space-7), 7vw, var(--space-8))
     clamp(var(--space-4), 4vw, var(--space-7)) var(--space-6);
-  background:
-    linear-gradient(
+  background: linear-gradient(
       color-mix(in oklab, var(--primary-container) 34%, transparent),
       transparent
     ),

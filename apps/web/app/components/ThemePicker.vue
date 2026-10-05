@@ -7,7 +7,7 @@ import Dialog from "@zoobzio/foundation/components/core/dialog.vue";
 import SegmentedControl from "@zoobzio/foundation/components/core/segmented-control.vue";
 
 import { Icon } from "#components";
-import { ref, useT } from "#imports";
+import { ref, useNuxtApp } from "#imports";
 import { defineCommand } from "@zoobzio/foundation/definitions/command";
 import { defineDialog } from "@zoobzio/foundation/definitions/dialog";
 import { defineSegmentedControl } from "@zoobzio/foundation/definitions/segmented-control";
@@ -21,7 +21,7 @@ type ThemeOption = CommandOption & { value: Theme };
 const { themes, active, choose } = useThemes();
 const { settings, selection, set } = useModifiers();
 
-const t = useT();
+const { $t } = useNuxtApp();
 
 const open = ref(false);
 
@@ -31,8 +31,8 @@ const options: ThemeOption[] = themes.map(({ id, name }) => ({
 }));
 
 const dialog = defineDialog(() => ({
-  title: t.appearance.title(),
-  description: t.appearance.description(),
+  title: $t.appearance.title(),
+  description: $t.appearance.description(),
   open: open.value,
   "onUpdate:open": (value) => {
     open.value = value;
@@ -42,9 +42,9 @@ const dialog = defineDialog(() => ({
 // Picking the active theme again would clear a single selection; the
 // selection is the service's, so an empty pick changes nothing.
 const command = defineCommand(() => ({
-  groups: [{ key: "themes", label: t.appearance.themes(), options }],
+  groups: [{ key: "themes", label: $t.appearance.themes(), options }],
   modelValue: options.filter((option) => option.value === active.value),
-  placeholder: t.appearance.search(),
+  placeholder: $t.appearance.search(),
   "onUpdate:modelValue": ([option] = []) => {
     if (option) {
       choose(option.value);
@@ -76,7 +76,7 @@ const controls = settings.map(({ id, name, contexts }) => {
   <button
     type="button"
     class="theme-toggle"
-    :aria-label="t.appearance.open()"
+    :aria-label="$t.appearance.open()"
     aria-haspopup="dialog"
     @click="open = true"
   >
@@ -86,7 +86,7 @@ const controls = settings.map(({ id, name, contexts }) => {
     <button
       type="button"
       class="theme-picker-close"
-      :aria-label="t.appearance.close()"
+      :aria-label="$t.appearance.close()"
       @click="open = false"
     >
       <Icon name="x" class="icon" />
