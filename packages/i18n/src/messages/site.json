@@ -1,0 +1,14 @@
+{
+  "name": {
+    "defaultMessage": "Butte Bible Fellowship",
+    "description": "The church's name: the header brand, the footer and the default page title."
+  },
+  "tagline": {
+    "defaultMessage": "The Church on Pillsbury Road",
+    "description": "The line under the church's name in the header and the footer."
+  },
+  "description": {
+    "defaultMessage": "Butte Bible Fellowship — a Bible-teaching church community.",
+    "description": "The default meta description, shown by search engines."
+  }
+}

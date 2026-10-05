@@ -8,7 +8,7 @@ union, and SVG sprites.
 
 ```
 icon-sheets.config.ts  each alias mapped to its Iconify ref
-dist/                  the kit's output (generated, not committed)
+.output/               the kit's output (generated, not committed)
 ```
 
 Aliases name an icon by role (`menu`, `sun`), and the ref behind each one
@@ -33,4 +33,5 @@ after rebuilding this package.
 
 ## Scripts
 
-- `pnpm build`: writes `dist/`. It also runs on install via `prepare`.
+- `pnpm build`: writes `.output/`. It also runs on install via `prepare`.
+- `pnpm test`: rebuilds, then checks the output against the config and its Iconify sources.

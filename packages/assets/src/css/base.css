@@ -1,0 +1,76 @@
+/* ---------- Site properties ------------------------------------------- */
+
+/* The display serif. Aurora's type scale is set in its sans and carries no
+   display face, and the face is the site's rather than the theme's, so it
+   lives here as a plain custom property beside the theme's tokens. */
+:root {
+  --font-display: "Newsreader", Georgia, serif;
+}
+
+/* ---------- Reset & page shell ---------------------------------------- */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: var(--surface);
+  color: var(--on-surface-medium-contrast);
+  font: var(--type-body);
+  font-size: clamp(
+    var(--body-size),
+    0.55vw + 0.95rem,
+    calc(var(--body-size) * 1.25)
+  );
+  letter-spacing: var(--type-body-letter-spacing);
+  text-wrap: pretty;
+}
+
+/* Light mode: the surface is near-white, so the washes need deeper tints. */
+[data-color="light"] body,
+html[data-color="light"] body {
+  background: var(--surface);
+}
+
+img,
+iframe {
+  max-width: 100%;
+}
+
+::selection {
+  background: var(--primary-container);
+  color: var(--on-primary-container);
+}
+
+:focus-visible {
+  outline: var(--border-focus);
+  outline-offset: var(--space-1);
+  border-radius: var(--shape-sm);
+}
+
+/* ---------- Links ----------------------------------------------------- */
+
+a {
+  color: var(--primary-high-contrast);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in oklab, var(--primary) 60%, transparent);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+  transition:
+    color var(--transition-fast),
+    text-decoration-color var(--transition-fast);
+}
+
+a:hover {
+  color: var(--secondary-high-contrast);
+  text-decoration-color: var(--secondary);
+  text-decoration-thickness: 2px;
+}

@@ -1,0 +1,37 @@
+---
+title: Butte Bible Fellowship – L’Église de Pillsbury Road
+description: Une église locale non confessionnelle à Chico, en Californie.
+hero:
+  tagline: Découvrez
+  highlight: l’amour, la grâce et la vérité de Dieu
+  description: Rejoignez-nous pour mettre les gens en contact avec la présence de Jésus-Christ, qui transforme les vies, et pour rechercher son caractère.
+  cta:
+    label: Vous êtes invités
+    to: /youre-invited
+---
+
+## Bienvenue à Butte Bible Fellowship
+
+Nous sommes très heureux que vous ayez trouvé notre site ! Nous sommes une église locale non confessionnelle dont la raison d’être est de glorifier Dieu en l’aimant, en vivant du mieux que nous le pouvons selon ce que Jésus a enseigné et montré par son exemple, et en invitant d’autres personnes à entrer dans une communauté biblique. Nous serions heureux que vous vous joigniez à nous pendant quelques dimanches pour découvrir qui nous sommes et qui nous sommes en train de devenir.
+
+> « Ils persévéraient dans l’enseignement des apôtres, dans la communion fraternelle … et dans les prières. » *Actes 2:42*
+
+Quelqu’un a dit un jour que l’Église locale est comme un hôpital où même les médecins sont malades. Être l’Église… c’est notre désir : une expression locale de la nouvelle communauté décrite dans les Actes, où chacun est le bienvenu pour grandir avec les autres―et trouver l’espérance ensemble―en Christ.
+
+Nous sommes actuellement un petit groupe de croyants expérimentés qui désirent évoluer vers une église multigénérationnelle spirituellement saine, qui honore les précieuses traditions chrétiennes tout en vivant et en servant bien dans le Chico du XXIᵉ siècle.
+
+> **Notre intention est d’être l’Église ;**
+>
+> **Des personnes imparfaites dans une communauté biblique…**
+>
+> **À la poursuite du caractère du Christ,**
+>
+> **Au service de la cause du Christ.**
+
+Nous espérons que vous envisagerez de vous joindre à nous.
+
+::visit-callout
+**Rejoignez-nous le dimanche à 10 h**
+
+2255 Pillsbury Road, Chico · [voir l’horaire de la semaine](/calendar)
+::

@@ -1,0 +1,238 @@
+{
+  "es": {
+    "messages": {
+      "appearance.scheme": {
+        "source": "d16151d20dd4fa5a",
+        "translation": "ef7bb51d28e2f744"
+      },
+      "appearance.open": {
+        "source": "fb92afc484e9b5e6",
+        "translation": "f0c6a794e4b2850b"
+      },
+      "appearance.close": {
+        "source": "7d9eb7acb13e2462",
+        "translation": "aeccae342e4bd0a7"
+      },
+      "appearance.title": {
+        "source": "3907fa7f80722a6f",
+        "translation": "e3e9cbaccaec3d2a"
+      },
+      "appearance.description": {
+        "source": "563d354e09828757",
+        "translation": "c8d53bc82f45cfcf"
+      },
+      "appearance.themes": {
+        "source": "43ae3265b99f2f34",
+        "translation": "4c55543349b35fe1"
+      },
+      "appearance.search": {
+        "source": "a13ac564360d6c18",
+        "translation": "db7e6dea3b6c3b63"
+      },
+      "footer.worship": {
+        "source": "0b23552a4b772671",
+        "translation": "3b0795bbc026d313"
+      },
+      "footer.contact": {
+        "source": "2b5c3d26721ae9c3",
+        "translation": "771b96b0812dd393"
+      },
+      "footer.online": {
+        "source": "0d21bd52022ca7f7",
+        "translation": "19162fce02947f7d"
+      },
+      "footer.copyright": {
+        "source": "bce8f445e7b8513d",
+        "translation": "bce8f445e7b8513d"
+      },
+      "language.open": {
+        "source": "009ed110badf6e7b",
+        "translation": "48a468d875e628df"
+      },
+      "navigation.label": {
+        "source": "efe10c80ec8a9f38",
+        "translation": "afc19f1734c1d195"
+      },
+      "navigation.open": {
+        "source": "0ed77fd2619ba8ab",
+        "translation": "3b1e8affeb872106"
+      },
+      "navigation.home": {
+        "source": "3a78695388b38b5c",
+        "translation": "58fcc9468fe1f607"
+      },
+      "navigation.invited": {
+        "source": "e72a3723251e8dd9",
+        "translation": "a95b5ea413d27584"
+      },
+      "navigation.about": {
+        "source": "5d8c71abc527284c",
+        "translation": "e9b1e22d9fbb59cd"
+      },
+      "navigation.calendar": {
+        "source": "9b00a5fbc6ffa846",
+        "translation": "22e9fba03655c93b"
+      },
+      "navigation.connect": {
+        "source": "1549759c407afd9a",
+        "translation": "c642eff9e07392aa"
+      },
+      "page.notFound": {
+        "source": "a469ab4ca4e55bf5",
+        "translation": "66d468d4451f7e36"
+      },
+      "site.name": {
+        "source": "18d13db9c0adf05f",
+        "translation": "18d13db9c0adf05f"
+      },
+      "site.tagline": {
+        "source": "1da6c261660c3b79",
+        "translation": "26ec52fa09331061"
+      },
+      "site.description": {
+        "source": "35ef0def3703d76b",
+        "translation": "03b661652eb9b3f4"
+      }
+    },
+    "documents": {
+      "about-us.md": {
+        "source": "38b08e039ba4f40c",
+        "translation": "809472f473c8345b"
+      },
+      "calendar.md": {
+        "source": "5a2ca7923699662d",
+        "translation": "20878d721d5cb475"
+      },
+      "connect.md": {
+        "source": "d8095a437fdcc30d",
+        "translation": "ec3d1478d7555180"
+      },
+      "index.md": {
+        "source": "57bf4b91b2cf28f1",
+        "translation": "d8b0aba43ed85dca"
+      },
+      "youre-invited.md": {
+        "source": "6bd383ee258f321c",
+        "translation": "70a57fb997a2ac7b"
+      }
+    }
+  },
+  "fr": {
+    "messages": {
+      "appearance.scheme": {
+        "source": "d16151d20dd4fa5a",
+        "translation": "c2e76c92e1f4257a"
+      },
+      "appearance.open": {
+        "source": "fb92afc484e9b5e6",
+        "translation": "932d1f7fd87564e2"
+      },
+      "appearance.close": {
+        "source": "7d9eb7acb13e2462",
+        "translation": "711e5f2e198df1b6"
+      },
+      "appearance.title": {
+        "source": "3907fa7f80722a6f",
+        "translation": "04140bf2a113078a"
+      },
+      "appearance.description": {
+        "source": "563d354e09828757",
+        "translation": "dfce1e5add1bd7f6"
+      },
+      "appearance.themes": {
+        "source": "43ae3265b99f2f34",
+        "translation": "19f60660ff63ad70"
+      },
+      "appearance.search": {
+        "source": "a13ac564360d6c18",
+        "translation": "d4bbedd945aa36c8"
+      },
+      "footer.worship": {
+        "source": "0b23552a4b772671",
+        "translation": "ce133c283ab39337"
+      },
+      "footer.contact": {
+        "source": "2b5c3d26721ae9c3",
+        "translation": "2b5c3d26721ae9c3"
+      },
+      "footer.online": {
+        "source": "0d21bd52022ca7f7",
+        "translation": "e2053fb68b742c89"
+      },
+      "footer.copyright": {
+        "source": "bce8f445e7b8513d",
+        "translation": "bce8f445e7b8513d"
+      },
+      "language.open": {
+        "source": "009ed110badf6e7b",
+        "translation": "e93dffab73934281"
+      },
+      "navigation.label": {
+        "source": "efe10c80ec8a9f38",
+        "translation": "f3e57fb4aedd48c1"
+      },
+      "navigation.open": {
+        "source": "0ed77fd2619ba8ab",
+        "translation": "46fb987f23f985f7"
+      },
+      "navigation.home": {
+        "source": "3a78695388b38b5c",
+        "translation": "533161735639c51a"
+      },
+      "navigation.invited": {
+        "source": "e72a3723251e8dd9",
+        "translation": "5e75230b8374ae63"
+      },
+      "navigation.about": {
+        "source": "5d8c71abc527284c",
+        "translation": "7dae79554d58b67d"
+      },
+      "navigation.calendar": {
+        "source": "9b00a5fbc6ffa846",
+        "translation": "e0561b4e18fa1575"
+      },
+      "navigation.connect": {
+        "source": "1549759c407afd9a",
+        "translation": "7c292801301a17ac"
+      },
+      "page.notFound": {
+        "source": "a469ab4ca4e55bf5",
+        "translation": "6ed2223d2886bd72"
+      },
+      "site.name": {
+        "source": "18d13db9c0adf05f",
+        "translation": "18d13db9c0adf05f"
+      },
+      "site.tagline": {
+        "source": "1da6c261660c3b79",
+        "translation": "fa34802a285eb84d"
+      },
+      "site.description": {
+        "source": "35ef0def3703d76b",
+        "translation": "f20f5657e4f71c68"
+      }
+    },
+    "documents": {
+      "about-us.md": {
+        "source": "38b08e039ba4f40c",
+        "translation": "69e4205777f7d3b5"
+      },
+      "calendar.md": {
+        "source": "5a2ca7923699662d",
+        "translation": "c5ba3992fc9f4640"
+      },
+      "connect.md": {
+        "source": "d8095a437fdcc30d",
+        "translation": "aac650051b56d868"
+      },
+      "index.md": {
+        "source": "57bf4b91b2cf28f1",
+        "translation": "5ebdb406e935d6a2"
+      },
+      "youre-invited.md": {
+        "source": "6bd383ee258f321c",
+        "translation": "7463db0664e3cee7"
+      }
+    }
+  }
+}

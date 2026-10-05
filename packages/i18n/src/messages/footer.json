@@ -1,0 +1,18 @@
+{
+  "worship": {
+    "defaultMessage": "Sunday worship · 10:00am",
+    "description": "When the Sunday service starts, under the church's name in the footer."
+  },
+  "contact": {
+    "defaultMessage": "Contact",
+    "description": "The heading of the footer column with the address, phone number and email."
+  },
+  "online": {
+    "defaultMessage": "Online",
+    "description": "The heading of the footer column linking to the church's social media."
+  },
+  "copyright": {
+    "defaultMessage": "© {year} Butte Bible Fellowship",
+    "description": "The copyright line. `year` is the current year, already written out."
+  }
+}

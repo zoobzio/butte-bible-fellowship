@@ -1,0 +1,33 @@
+{
+  "name": "@bbf/i18n",
+  "private": true,
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./.output/index.d.mts",
+      "import": "./.output/index.mjs"
+    },
+    "./bundles": {
+      "types": "./.output/bundles.d.mts",
+      "import": "./.output/bundles.mjs"
+    },
+    "./content/*": "./.output/content/*"
+  },
+  "scripts": {
+    "build": "fibber build",
+    "prepare": "fibber build",
+    "translate": "fibber translate",
+    "translate:check": "fibber translate --check",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "fibber-lang": "catalog:"
+  },
+  "devDependencies": {
+    "@ai-sdk/anthropic": "catalog:",
+    "@fibber/kit": "catalog:",
+    "@fibber/translate": "catalog:",
+    "vitest": "catalog:"
+  }
+}

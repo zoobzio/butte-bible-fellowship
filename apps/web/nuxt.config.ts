@@ -1,15 +1,49 @@
+import { fileURLToPath } from "node:url";
+
 import { defineNuxtConfig } from "nuxt/config";
 
+import { locale as source, locales } from "@bbf/i18n";
 import { prefix } from "@bbf/icons";
 import icons from "@bbf/icons/config";
 import sets from "@bbf/icons/sets";
+import untheme from "@bbf/theme/config";
+
+/** The locales the site is translated to: each has its pages under `/<locale>`. */
+const targets = locales.filter((locale) => locale !== source);
+
+/** The English pages, as authored: `@bbf/i18n`'s sources, beside its build. */
+const content = fileURLToPath(
+  new URL("../src/content", import.meta.resolve("@bbf/i18n")),
+);
+
+/** The static assets: `@bbf/assets`'s sources, served from the site's root. */
+const assets = fileURLToPath(
+  new URL("src", import.meta.resolve("@bbf/assets/package.json")),
+);
 
 export default defineNuxtConfig({
   compatibilityDate: "2026-08-19",
 
-  modules: ["@nuxt/content", "@nuxt/fonts", "@icon-sheets/nuxt", "nuxt-studio"],
+  extends: ["@zoobzio/foundation"],
+
+  modules: [
+    "@nuxt/content",
+    "@nuxt/fonts",
+    "@icon-sheets/nuxt",
+    "@untheme/nuxt",
+    "@fibber/nuxt",
+    "nuxt-studio",
+  ],
+
+  imports: { autoImport: false },
+
+  components: { dirs: [] },
 
   iconSheets: { ...icons, sets, prefix },
+
+  untheme,
+
+  fibber: { build: "@bbf/i18n" },
 
   studio: {
     route: "/admin",
@@ -19,7 +53,16 @@ export default defineNuxtConfig({
       repo: "butte-bible-fellowship",
       branch: "main",
       rootDir: "apps/web",
+      // Where Studio commits: the pages and the media each have a package.
+      paths: {
+        content: "packages/i18n/src/content",
+        public: "packages/assets/src",
+      },
     },
+    // The same two directories on disk, for a local Studio.
+    source: { content, public: assets },
+    // Only English is authored: the translations are generated from it.
+    collections: { exclude: targets.map((locale) => `pages_${locale}`) },
   },
 
   fonts: {
@@ -43,7 +86,7 @@ export default defineNuxtConfig({
     ],
   },
 
-  css: ["@bbf/theme/css", "~/assets/css/app.css"],
+  css: ["@bbf/assets/css/index.css"],
 
   content: {
     experimental: {
@@ -51,9 +94,27 @@ export default defineNuxtConfig({
     },
   },
 
+  hooks: {
+    // English keeps the routes as the pages declare them; every other
+    // locale gets the same pages again under its own prefix.
+    "pages:extend": (pages) => {
+      const own = pages.filter((page) => page.file?.includes("/app/pages/"));
+      for (const locale of targets) {
+        for (const page of own) {
+          pages.push({
+            ...page,
+            name: `${page.name}___${locale}`,
+            path: page.path === "/" ? `/${locale}` : `/${locale}${page.path}`,
+          });
+        }
+      }
+    },
+  },
+
   nitro: {
+    publicAssets: [{ dir: assets }],
     prerender: {
-      routes: ["/"],
+      routes: ["/", ...targets.map((locale) => `/${locale}`)],
       crawlLinks: true,
     },
   },
@@ -69,15 +130,8 @@ export default defineNuxtConfig({
 
   app: {
     head: {
-      title: "Butte Bible Fellowship",
-      htmlAttrs: { lang: "en" },
       meta: [
         { name: "viewport", content: "width=device-width, initial-scale=1" },
-        {
-          name: "description",
-          content:
-            "Butte Bible Fellowship — a Bible-teaching church community.",
-        },
       ],
     },
   },

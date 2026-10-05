@@ -1,0 +1,31 @@
+import type { Theme, ThemeEntry } from "~/types/theme";
+
+import { computed, useUntheme } from "#imports";
+import { manifest } from "@bbf/theme/manifest";
+import { transition } from "~/utils/theme";
+
+/** The themes the build carries: the `theme` modifier's contexts, by name. */
+const themes: ThemeEntry[] = [
+  ...manifest.find((modifier) => modifier.id === "theme")!.contexts,
+].sort((a, b) => a.name.localeCompare(b.name));
+
+/**
+ * The themes on offer, and the one active: untheme's `theme` modifier, whose
+ * contexts are the site's palette and every aurora theme. Like the color
+ * scheme, the selection is held app-wide, persisted in a cookie so SSR
+ * renders the visitor's choice, and mirrored onto <html> as `data-theme`.
+ */
+export const useThemes = () => {
+  const untheme = useUntheme();
+
+  const active = computed<Theme>(() => untheme.config.input.theme);
+
+  const choose = (id: Theme) => {
+    if (id === active.value) {
+      return;
+    }
+    transition(() => untheme.swap("theme", id));
+  };
+
+  return { themes, active, choose };
+};

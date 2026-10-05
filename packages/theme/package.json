@@ -4,19 +4,29 @@
   "type": "module",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
+      "types": "./.output/index.d.mts",
+      "default": "./.output/index.mjs"
     },
-    "./css": "./dist/index.css"
+    "./config": {
+      "types": "./.output/config.d.mts",
+      "default": "./.output/config.mjs"
+    },
+    "./manifest": {
+      "types": "./.output/manifest.d.mts",
+      "default": "./.output/manifest.mjs"
+    }
   },
   "scripts": {
-    "build": "tz build",
-    "prepare": "tz build",
-    "lint": "tz check"
+    "build": "untheme build",
+    "prepare": "untheme build",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "untheme": "catalog:"
   },
   "devDependencies": {
-    "@terrazzo/cli": "^2.7.1",
-    "@terrazzo/plugin-css": "^2.7.1",
-    "@terrazzo/plugin-js": "^2.7.1"
+    "@untheme/aurora": "catalog:",
+    "@untheme/kit": "catalog:",
+    "vitest": "catalog:"
   }
 }

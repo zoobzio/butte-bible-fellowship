@@ -1,0 +1,30 @@
+{
+  "scheme": {
+    "defaultMessage": "{mode, select, dark {Switch to dark mode} other {Switch to light mode}}",
+    "description": "The accessible name of the color scheme toggle. `mode` is the scheme it switches to."
+  },
+  "open": {
+    "defaultMessage": "Choose a theme",
+    "description": "The accessible name of the button that opens the appearance dialog."
+  },
+  "close": {
+    "defaultMessage": "Close",
+    "description": "The accessible name of the button that closes the appearance dialog."
+  },
+  "title": {
+    "defaultMessage": "Appearance",
+    "description": "The title of the appearance dialog."
+  },
+  "description": {
+    "defaultMessage": "Pick a theme, then tune how the site looks and feels.",
+    "description": "The line under the appearance dialog's title."
+  },
+  "themes": {
+    "defaultMessage": "Themes",
+    "description": "The heading over the list of themes in the appearance dialog."
+  },
+  "search": {
+    "defaultMessage": "Search themes…",
+    "description": "The placeholder of the field that filters the list of themes."
+  }
+}

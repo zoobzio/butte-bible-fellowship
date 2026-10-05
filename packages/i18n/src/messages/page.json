@@ -1,0 +1,6 @@
+{
+  "notFound": {
+    "defaultMessage": "Page not found",
+    "description": "The error shown when an address matches no page."
+  }
+}

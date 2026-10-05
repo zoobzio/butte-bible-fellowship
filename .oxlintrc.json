@@ -1,0 +1,82 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["typescript", "unicorn", "oxc", "import", "vue", "jsdoc"],
+  "categories": {
+    "correctness": "error"
+  },
+  "rules": {
+    "no-array-constructor": "error",
+    "no-case-declarations": "error",
+    "no-empty": "error",
+    "no-fallthrough": "error",
+    "no-prototype-builtins": "error",
+    "no-regex-spaces": "error",
+    "no-unexpected-multiline": "error",
+    "no-unused-vars": [
+      "error",
+      {
+        "args": "after-used",
+        "argsIgnorePattern": "^_",
+        "ignoreRestSiblings": true,
+        "vars": "all",
+        "varsIgnorePattern": "^_"
+      }
+    ],
+    "no-useless-constructor": "error",
+    "no-var": "error",
+    "prefer-const": "error",
+    "prefer-regex-literals": "error",
+    "prefer-rest-params": "error",
+    "prefer-spread": "error",
+    "preserve-caught-error": "error",
+
+    "import/first": "error",
+    "import/no-duplicates": "error",
+    "import/no-mutable-exports": "error",
+    "import/no-named-default": "error",
+
+    "typescript/consistent-type-imports": [
+      "error",
+      { "disallowTypeAnnotations": false, "prefer": "type-imports" }
+    ],
+    "typescript/no-dynamic-delete": "error",
+    "typescript/no-empty-object-type": [
+      "error",
+      { "allowObjectTypes": "always" }
+    ],
+    "typescript/no-explicit-any": "error",
+    "typescript/no-extraneous-class": "error",
+    "typescript/no-import-type-side-effects": "error",
+    "typescript/no-invalid-void-type": "error",
+    "typescript/no-namespace": "error",
+    "typescript/no-non-null-asserted-nullish-coalescing": "error",
+    "typescript/no-require-imports": "error",
+    "typescript/no-unnecessary-type-constraint": "error",
+    "typescript/no-unsafe-function-type": "error",
+    "typescript/prefer-literal-enum-member": "error",
+    "typescript/unified-signatures": "error",
+
+    "unicorn/error-message": "error",
+    "unicorn/escape-case": "error",
+    "unicorn/no-instanceof-array": "error",
+    "unicorn/no-new-buffer": "error",
+    "unicorn/number-literal-case": "error",
+    "unicorn/prefer-dom-node-text-content": "error",
+    "unicorn/prefer-includes": "error",
+    "unicorn/prefer-node-protocol": "error",
+    "unicorn/prefer-number-properties": "error",
+    "unicorn/prefer-type-error": "error",
+    "unicorn/throw-new-error": "error",
+
+    "vue/component-definition-name-casing": "warn",
+    "vue/no-multiple-slot-args": "warn",
+    "vue/no-required-prop-with-default": "warn",
+    "vue/prop-name-casing": "warn",
+    "vue/require-prop-types": "warn",
+
+    "jsdoc/check-access": "warn",
+    "jsdoc/empty-tags": "warn",
+    "jsdoc/require-param-name": "warn",
+    "jsdoc/require-returns-description": "warn"
+  }
+}

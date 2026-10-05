@@ -2,17 +2,23 @@
   "name": "butte-bible-fellowship",
   "private": true,
   "type": "module",
-  "packageManager": "pnpm@10.27.0",
   "scripts": {
     "dev": "pnpm --filter @bbf/web dev",
     "build": "pnpm --filter @bbf/web build",
     "generate": "pnpm --filter @bbf/web generate",
     "preview": "pnpm --filter @bbf/web preview",
-    "lint": "pnpm -r lint",
-    "lint:fix": "pnpm -r lint:fix",
+    "lint": "oxlint && pnpm -r lint",
+    "lint:fix": "oxlint --fix",
+    "format": "oxfmt",
+    "format:check": "oxfmt --check",
     "typecheck": "pnpm -r typecheck",
     "test": "pnpm -r test",
     "test:watch": "pnpm --filter @bbf/web test:watch",
     "test:coverage": "pnpm -r test:coverage"
-  }
+  },
+  "devDependencies": {
+    "oxfmt": "catalog:",
+    "oxlint": "catalog:"
+  },
+  "packageManager": "pnpm@10.27.0"
 }

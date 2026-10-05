@@ -1,0 +1,16 @@
+/* =====================================================================
+   Butte Bible Fellowship — the design system's stylesheet
+   Warm, typographic treatment of the semantic elements and of the
+   classes every page shares.
+   Every color, font, space, radius, shadow and transition comes from
+   @bbf/theme variables — aurora, with the site's tonal ramps; both schemes
+   are supported through color roles. The one value aurora has no token
+   for is declared in base.css.
+   What only one page or component wears is styled in that component.
+   ===================================================================== */
+
+@import "./base.css";
+@import "./prose.css";
+@import "./components.css";
+/* Last: its longhands have to win over the `font:` shorthands above. */
+@import "./fonts.css";

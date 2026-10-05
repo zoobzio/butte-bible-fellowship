@@ -1,41 +1,49 @@
 <script lang="ts">
-import { computed, useHead, useRoute } from "#imports";
+import { Body } from "#components";
+import { computed, useHead, useLocale, useT } from "#imports";
 
-import { useColorMode } from "~/composables/color-mode";
+import { useRouteLocale } from "~/composables/locale";
 import { useMediaQuery } from "~/composables/viewport";
 import AppHeader from "~/components/AppHeader.vue";
 import AppFooter from "~/components/AppFooter.vue";
-import AppOrbs from "~/components/AppOrbs.vue";
-import AppArchLines from "~/components/AppArchLines.vue";
+import Orbs from "~/components/Orbs.vue";
+import Arches from "~/components/Arches.vue";
 </script>
 
 <script setup lang="ts">
-const route = useRoute();
+const { path } = useRouteLocale();
+const t = useT();
+const { locale } = useLocale();
 
-// @bbf/theme keys its dark scheme off `data-color` on <html>.
-const { mode } = useColorMode();
-useHead({ htmlAttrs: { "data-color": mode } });
+// The defaults a page overrides with its own title. The language is set
+// here as well as by the fibber module, since Foundation's root sets "en".
+useHead(() => ({
+  htmlAttrs: { lang: locale.value },
+  title: t.site.name(),
+  meta: [{ name: "description", content: t.site.description() }],
+}));
 
-const isHome = computed(() => route.path === "/");
-
-// The orbs and arch lines are scroll-driven decoration that doesn't pay for
-// itself on phones. Gate them behind the mobile breakpoint (mirrors the
-// `max-width: 44rem` in app.css) so on small screens they never mount — no
-// scroll listeners, ResizeObserver, or rAF loops run at all.
 const isMobile = useMediaQuery("(max-width: 44rem)");
+const isHome = computed(() => path.value === "/");
 const decor = computed(() => !isMobile.value);
 </script>
 
 <template>
   <Body>
-    <AppOrbs v-if="decor" />
+    <Orbs v-if="decor" />
     <AppHeader />
     <main class="site-main">
       <slot />
     </main>
     <AppFooter />
-    <!-- After the footer so the hero and footer are mounted before the
-         arch geometry measures them. -->
-    <AppArchLines v-if="isHome && decor" />
+    <Arches v-if="isHome && decor" />
   </Body>
 </template>
+
+<style>
+.site-main {
+  display: block;
+  min-height: 60vh;
+  padding-bottom: var(--space-9);
+}
+</style>
