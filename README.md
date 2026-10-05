@@ -23,7 +23,14 @@ pnpm dev          # start the dev server at http://localhost:3000
 
 ## Content
 
-Markdown lives in `content/` and is edited through Nuxt Studio at `/admin`.
+The pages are Markdown in [`@bbf/i18n`](packages/i18n), which builds
+them for every locale. `apps/web/content.config.ts` gives each locale a Nuxt
+Content collection over that build (`pages_en`, …), and `usePage` queries the
+one for the active locale. After editing a page, rebuild the package
+(`pnpm --filter @bbf/i18n build`) for the app to pick it up.
+
+Nuxt Studio at `/admin` still expects the pages under `apps/web/content`, so
+it cannot edit them until its patch is taught the package's layout.
 
 Nuxt Studio 1.7.0 cannot serialize the hard break that Shift+Enter inserts and
 writes `--- Unknown node: hardBreak ---` instead (upstream issue #265, fixed
@@ -40,6 +47,20 @@ works around it:
 
 When upgrading `nuxt-studio`, delete the patch file and its
 `patchedDependencies` entry in `pnpm-workspace.yaml`, then run `pnpm install`.
+
+## Language
+
+The site's interface text lives in [`@bbf/i18n`](packages/i18n) as
+[fibber](https://github.com/zoobzio/fibber) messages, not in components.
+`@fibber/nuxt` provides `useT`; `app.config.ts` names the header's and
+footer's messages by key.
+
+English is at the routes as written (`/about-us`); every other locale has the
+same pages under its prefix (`/es/about-us`), all prerendered. The route
+decides the language: a global middleware switches fibber to the locale the
+path names, `usePage` reads that locale's collection, and `useRouteLocale`
+keeps links inside it. The language button in the footer links to the page
+being read in each language.
 
 ## Architecture
 

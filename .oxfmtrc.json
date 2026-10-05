@@ -1,5 +1,9 @@
 {
   "$schema": "./node_modules/oxfmt/configuration_schema.json",
   "printWidth": 80,
-  "ignorePatterns": ["apps/web/content/**", "packages/theme/src/**"]
+  "ignorePatterns": [
+    "packages/i18n/.cache/**",
+    "packages/i18n/src/content/**",
+    "packages/theme/src/**"
+  ]
 }

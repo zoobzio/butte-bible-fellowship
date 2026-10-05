@@ -3,6 +3,7 @@ import { afterEach, beforeEach } from "vitest";
 import {
   clearAppConfig,
   clearContentPages,
+  clearLocale,
   clearNuxtStateRegistry,
   setRoutePath,
   useHead,
@@ -18,6 +19,7 @@ beforeEach(() => {
   clearNuxtStateRegistry();
   clearAppConfig();
   clearContentPages();
+  clearLocale();
   setRoutePath("/");
   useHead.mockClear();
 });

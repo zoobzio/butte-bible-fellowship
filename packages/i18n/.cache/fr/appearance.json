@@ -1,0 +1,9 @@
+{
+  "scheme": "{mode, select, dark {Passer en mode sombre} other {Passer en mode clair}}",
+  "open": "Choisir un thème",
+  "close": "Fermer",
+  "title": "Apparence",
+  "description": "Choisissez un thème, puis ajustez l’apparence et le confort d’utilisation du site.",
+  "themes": "Thèmes",
+  "search": "Rechercher un thème…"
+}

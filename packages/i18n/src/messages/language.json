@@ -1,0 +1,6 @@
+{
+  "open": {
+    "defaultMessage": "Change language",
+    "description": "The accessible name of the button that opens the list of languages the site can be read in."
+  }
+}

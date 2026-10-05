@@ -1,55 +1,50 @@
 import type { FooterConfig } from "~/types/footer";
 import type { HeaderConfig } from "~/types/header";
-import type { SiteConfig } from "~/types/site";
 
 import { defineAppConfig } from "#imports";
 
-const site: SiteConfig = {
-  name: "Butte Bible Fellowship",
-  tagline: "The Church on Pillsbury Road",
-};
+// The site's words live in `@bbf/i18n`: a `label` or `title` here is the
+// key of a message there, checked against its contract and resolved with
+// `t(message)` where it is rendered.
 
 const header: HeaderConfig = {
   links: [
-    { label: "Home", to: "/" },
-    { label: "You’re Invited", to: "/youre-invited" },
-    { label: "About Us", to: "/about-us" },
-    { label: "Weekly Events", to: "/calendar" },
-    { label: "Contact & Find Us", to: "/connect" },
+    { label: "navigation.home", to: "/" },
+    { label: "navigation.invited", to: "/youre-invited" },
+    { label: "navigation.about", to: "/about-us" },
+    { label: "navigation.calendar", to: "/calendar" },
+    { label: "navigation.connect", to: "/connect" },
   ],
 };
 
 const footer: FooterConfig = {
   columns: [
     {
-      title: "Butte Bible Fellowship",
-      lines: [
-        { label: "The Church on Pillsbury Road" },
-        { label: "Sunday worship · 10:00am" },
-      ],
+      title: "site.name",
+      lines: [{ label: "site.tagline" }, { label: "footer.worship" }],
     },
     {
-      title: "Contact",
+      title: "footer.contact",
       lines: [
-        { label: "2255 Pillsbury Road" },
-        { label: "Chico, California 95926" },
-        { label: "530-892-0521", href: "tel:5308920521" },
+        { text: "2255 Pillsbury Road" },
+        { text: "Chico, California 95926" },
+        { text: "530-892-0521", href: "tel:5308920521" },
         {
-          label: "office@bbfchurchchico.org",
+          text: "office@bbfchurchchico.org",
           href: "mailto:office@bbfchurchchico.org",
         },
       ],
     },
     {
-      title: "Online",
+      title: "footer.online",
       lines: [
         {
-          label: "Facebook",
+          text: "Facebook",
           href: "https://www.facebook.com/buttebiblefellowship/",
           target: "_blank",
         },
         {
-          label: "YouTube",
+          text: "YouTube",
           href: "https://www.youtube.com/@ButteBibleFellowship",
           target: "_blank",
         },
@@ -58,4 +53,4 @@ const footer: FooterConfig = {
   ],
 };
 
-export default defineAppConfig({ site, header, footer });
+export default defineAppConfig({ header, footer });

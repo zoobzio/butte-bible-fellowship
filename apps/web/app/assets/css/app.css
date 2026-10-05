@@ -1135,6 +1135,11 @@ body {
   display: block;
 }
 
+/* The language button names the language beside its icon. */
+.language-toggle {
+  padding-inline: var(--space-3);
+}
+
 /* ---------- Mobile nav — tabs collapse behind a menu button ------------ */
 
 .site-nav-mobile {

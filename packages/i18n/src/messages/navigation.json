@@ -1,0 +1,30 @@
+{
+  "label": {
+    "defaultMessage": "Primary",
+    "description": "The accessible name of the main navigation landmark."
+  },
+  "open": {
+    "defaultMessage": "Open navigation",
+    "description": "The accessible name of the button that opens the navigation menu on small screens."
+  },
+  "home": {
+    "defaultMessage": "Home",
+    "description": "Navigation link to the home page."
+  },
+  "invited": {
+    "defaultMessage": "You’re Invited",
+    "description": "Navigation link to the page inviting newcomers to visit."
+  },
+  "about": {
+    "defaultMessage": "About Us",
+    "description": "Navigation link to the church's vision and core beliefs."
+  },
+  "calendar": {
+    "defaultMessage": "Weekly Events",
+    "description": "Navigation link to the weekly schedule of gatherings."
+  },
+  "connect": {
+    "defaultMessage": "Contact & Find Us",
+    "description": "Navigation link to the contact details, office hours and map."
+  }
+}

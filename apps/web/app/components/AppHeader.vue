@@ -1,31 +1,34 @@
 <script lang="ts">
 import { NuxtLink } from "#components";
-import { useAppConfig } from "#imports";
+import { useAppConfig, useT } from "#imports";
 
 import AppMobileNav from "~/components/AppMobileNav.vue";
+import { useRouteLocale } from "~/composables/locale";
 </script>
 
 <script setup lang="ts">
 defineOptions({ name: "AppHeader" });
 
-const { site, header } = useAppConfig();
+const { header } = useAppConfig();
+const t = useT();
+const { localize } = useRouteLocale();
 </script>
 
 <template>
   <header class="site-header">
-    <NuxtLink to="/" class="site-brand">
-      <span class="site-brand-name">{{ site.name }}</span>
-      <span class="site-brand-tag">{{ site.tagline }}</span>
+    <NuxtLink :to="localize('/')" class="site-brand">
+      <span class="site-brand-name">{{ t.site.name() }}</span>
+      <span class="site-brand-tag">{{ t.site.tagline() }}</span>
     </NuxtLink>
 
-    <nav class="site-nav" aria-label="Primary">
+    <nav class="site-nav" :aria-label="t.navigation.label()">
       <NuxtLink
         v-for="link in header.links"
         :key="link.to"
-        :to="link.to"
+        :to="localize(link.to)"
         class="site-nav-link"
       >
-        {{ link.label }}
+        {{ t(link.label) }}
       </NuxtLink>
     </nav>
 

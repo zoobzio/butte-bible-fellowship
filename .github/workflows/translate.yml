@@ -1,0 +1,50 @@
+name: Translate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# One run per branch at a time. A newer push to a PR supersedes the run
+# before it; runs on main queue, so none is cut off mid-translation.
+concurrency:
+  group: translate-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: write
+
+jobs:
+  translate:
+    name: Translate
+    runs-on: ubuntu-latest
+    # A fork's PR gets neither the key nor a token that can push.
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # The branch itself, not the PR's merge commit, so the result can
+          # be pushed back to it.
+          ref: ${{ github.head_ref || github.ref_name }}
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22.22.0"
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @bbf/i18n translate
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      - name: Commit translations
+        run: |
+          git add packages/i18n/.cache
+          if git diff --cached --quiet; then
+            echo "Translations are up to date"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "chore: update translations"
+          git pull --rebase
+          git push

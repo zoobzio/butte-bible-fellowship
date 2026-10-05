@@ -1,9 +1,13 @@
 import { defineNuxtConfig } from "nuxt/config";
 
+import { locale as source, locales } from "@bbf/i18n";
 import { prefix } from "@bbf/icons";
 import icons from "@bbf/icons/config";
 import sets from "@bbf/icons/sets";
 import untheme from "@bbf/theme/config";
+
+/** The locales the site is translated to: each has its pages under `/<locale>`. */
+const targets = locales.filter((locale) => locale !== source);
 
 export default defineNuxtConfig({
   compatibilityDate: "2026-08-19",
@@ -15,6 +19,7 @@ export default defineNuxtConfig({
     "@nuxt/fonts",
     "@icon-sheets/nuxt",
     "@untheme/nuxt",
+    "@fibber/nuxt",
     "nuxt-studio",
   ],
 
@@ -25,6 +30,8 @@ export default defineNuxtConfig({
   iconSheets: { ...icons, sets, prefix },
 
   untheme,
+
+  fibber: { build: "@bbf/i18n" },
 
   studio: {
     route: "/admin",
@@ -66,9 +73,26 @@ export default defineNuxtConfig({
     },
   },
 
+  hooks: {
+    // English keeps the routes as the pages declare them; every other
+    // locale gets the same pages again under its own prefix.
+    "pages:extend": (pages) => {
+      const own = pages.filter((page) => page.file?.includes("/app/pages/"));
+      for (const locale of targets) {
+        for (const page of own) {
+          pages.push({
+            ...page,
+            name: `${page.name}___${locale}`,
+            path: page.path === "/" ? `/${locale}` : `/${locale}${page.path}`,
+          });
+        }
+      }
+    },
+  },
+
   nitro: {
     prerender: {
-      routes: ["/"],
+      routes: ["/", ...targets.map((locale) => `/${locale}`)],
       crawlLinks: true,
     },
   },
@@ -84,15 +108,8 @@ export default defineNuxtConfig({
 
   app: {
     head: {
-      title: "Butte Bible Fellowship",
-      htmlAttrs: { lang: "en" },
       meta: [
         { name: "viewport", content: "width=device-width, initial-scale=1" },
-        {
-          name: "description",
-          content:
-            "Butte Bible Fellowship — a Bible-teaching church community.",
-        },
       ],
     },
   },

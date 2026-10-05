@@ -5,10 +5,13 @@
 // Vue APIs and stub the Nuxt-runtime composables. Type-only imports are erased
 // by esbuild before this module loads, so only value exports matter here.
 
-import { reactive, ref, type Ref } from "vue";
+import { computed, reactive, ref, type Ref } from "vue";
 import { vi } from "vitest";
+import { makeFibber } from "fibber-lang";
 import { makeUntheme } from "untheme";
 import { useUnthemeConfig } from "untheme/config";
+import { contract, locale } from "@bbf/i18n";
+import { bundles } from "@bbf/i18n/bundles";
 import theme from "@bbf/theme/config";
 
 // Real Vue APIs (ref, computed, watch, onMounted, useTemplateRef, useId, …).
@@ -45,8 +48,35 @@ export const useUntheme = () => {
   return service;
 };
 
+// useT: the real resolver over the site's built messages, in the source
+// locale — what the module provides as `$t`.
+const fibber = makeFibber(
+  contract,
+  reactive({ locale, messages: await bundles[locale]() }),
+);
+
+export const useT = () => fibber.createResolver();
+
+// useLocale: the service's one locale, as the module exposes it.
+type Locale = (typeof contract.locales)[number];
+
+const source = fibber.config.messages;
+
+export const useLocale = () => ({
+  locale: computed(() => fibber.config.locale),
+  locales: fibber.locales(),
+  setLocale: async (next: Locale) => {
+    fibber.apply(next, await bundles[next]());
+  },
+});
+
+export const clearLocale = () => fibber.apply(locale, source);
+
+// defineNuxtRouteMiddleware hands the middleware back as it is.
+export const defineNuxtRouteMiddleware = <T>(middleware: T) => middleware;
+
 // useAppConfig: tests supply their own config so they don't depend on the
-// site's content.
+// site's own.
 let appConfig: Record<string, unknown> = {};
 
 export const setAppConfig = (config: Record<string, unknown>) => {
@@ -89,13 +119,22 @@ export const setContentPages = (pages: Record<string, unknown>) => {
   }
 };
 
-export const clearContentPages = () => contentPages.clear();
+// The collection each query asked, in order.
+export const queriedCollections: string[] = [];
 
-export const queryCollection = (_collection: string) => ({
-  path: (path: string) => ({
-    first: async () => contentPages.get(path) ?? null,
-  }),
-});
+export const clearContentPages = () => {
+  contentPages.clear();
+  queriedCollections.length = 0;
+};
+
+export const queryCollection = (collection: string) => {
+  queriedCollections.push(collection);
+  return {
+    path: (path: string) => ({
+      first: async () => contentPages.get(path) ?? null,
+    }),
+  };
+};
 
 // useAsyncData: awaits the handler and hands back its result as `data`.
 export const useAsyncData = async <T>(

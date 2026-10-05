@@ -1,14 +1,8 @@
 <script lang="ts">
 import { ContentRenderer } from "#components";
-import {
-  createError,
-  definePageMeta,
-  queryCollection,
-  useAsyncData,
-  useHead,
-  useRoute,
-} from "#imports";
+import { createError, definePageMeta, useHead, useT } from "#imports";
 
+import { usePage } from "~/composables/page";
 import { MARKDOWN_COMPONENTS } from "~/constants/markdown";
 </script>
 
@@ -17,14 +11,10 @@ definePageMeta({
   keepalive: true,
 });
 
-const route = useRoute();
-
-const { data: page } = await useAsyncData(`page:${route.path}`, () =>
-  queryCollection("pages").path(route.path).first(),
-);
+const { data: page } = await usePage();
 
 if (!page.value) {
-  throw createError({ statusCode: 404, statusMessage: "Page not found" });
+  throw createError({ statusCode: 404, statusMessage: useT().page.notFound() });
 }
 
 useHead(() => ({ title: page.value?.title }));

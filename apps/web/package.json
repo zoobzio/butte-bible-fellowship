@@ -14,12 +14,15 @@
     "test:coverage": "vitest run --coverage --passWithNoTests"
   },
   "dependencies": {
+    "@bbf/i18n": "workspace:*",
     "@bbf/icons": "workspace:*",
     "@bbf/theme": "workspace:*",
+    "@fibber/nuxt": "catalog:",
     "@icon-sheets/nuxt": "catalog:",
     "@nuxt/content": "catalog:",
     "@untheme/nuxt": "catalog:",
     "@zoobzio/foundation": "catalog:",
+    "fibber-lang": "catalog:",
     "nuxt": "catalog:",
     "nuxt-studio": "catalog:",
     "untheme": "catalog:",

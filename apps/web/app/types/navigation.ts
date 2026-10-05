@@ -1,4 +1,7 @@
+import type { AppFibberMessage } from "#imports";
+
 export interface NavigationLink {
-  label: string;
+  /** The link's text: a message of `@bbf/i18n`, by key. */
+  label: AppFibberMessage;
   to: string;
 }

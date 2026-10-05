@@ -1,14 +1,9 @@
 <script lang="ts">
 import { ContentRenderer, NuxtLink } from "#components";
-import {
-  computed,
-  createError,
-  queryCollection,
-  useAsyncData,
-  useHead,
-  definePageMeta,
-} from "#imports";
+import { computed, createError, useHead, useT, definePageMeta } from "#imports";
 
+import { useRouteLocale } from "~/composables/locale";
+import { usePage } from "~/composables/page";
 import { MARKDOWN_COMPONENTS } from "~/constants/markdown";
 </script>
 
@@ -17,12 +12,11 @@ definePageMeta({
   keepalive: true,
 });
 
-const { data: page } = await useAsyncData("page:home", () =>
-  queryCollection("pages").path("/").first(),
-);
+const { data: page } = await usePage();
+const { localize } = useRouteLocale();
 
 if (!page.value) {
-  throw createError({ statusCode: 404, statusMessage: "Page not found" });
+  throw createError({ statusCode: 404, statusMessage: useT().page.notFound() });
 }
 
 useHead(() => ({ title: page.value?.title }));
@@ -40,7 +34,7 @@ const hero = computed(() => page.value?.hero);
             <em v-if="hero.highlight">{{ hero.highlight }}</em>
           </h1>
           <p v-if="hero.description">{{ hero.description }}</p>
-          <NuxtLink v-if="hero.cta" :to="hero.cta.to" class="cta">
+          <NuxtLink v-if="hero.cta" :to="localize(hero.cta.to)" class="cta">
             {{ hero.cta.label }}
           </NuxtLink>
         </div>

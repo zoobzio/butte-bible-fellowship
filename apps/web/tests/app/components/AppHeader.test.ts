@@ -1,41 +1,42 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { mount } from "@vue/test-utils";
 
-import { setAppConfig } from "#imports";
+import type { NavigationLink } from "~/types/navigation";
+
+import { setAppConfig, useT } from "#imports";
 import AppHeader from "~/components/AppHeader.vue";
 
-const LINKS = [
-  { label: "Home", to: "/" },
-  { label: "Visit", to: "/visit" },
-  { label: "Contact", to: "/contact" },
+const LINKS: NavigationLink[] = [
+  { label: "navigation.home", to: "/" },
+  { label: "navigation.invited", to: "/visit" },
+  { label: "navigation.connect", to: "/contact" },
 ];
+
+const t = useT();
 
 const mountHeader = () =>
   mount(AppHeader, { global: { stubs: { AppMobileNav: true } } });
 
 beforeEach(() => {
-  setAppConfig({
-    site: { name: "Test Church", tagline: "On Test Road" },
-    header: { links: LINKS },
-  });
+  setAppConfig({ header: { links: LINKS } });
 });
 
 describe("AppHeader", () => {
   it("links the brand to the home page with the site name and tagline", () => {
     const brand = mountHeader().find("a.site-brand");
     expect(brand.attributes("href")).toBe("/");
-    expect(brand.find(".site-brand-name").text()).toBe("Test Church");
-    expect(brand.find(".site-brand-tag").text()).toBe("On Test Road");
+    expect(brand.find(".site-brand-name").text()).toBe(t.site.name());
+    expect(brand.find(".site-brand-tag").text()).toBe(t.site.tagline());
   });
 
   it("renders the configured links in order in the primary navigation", () => {
-    const nav = mountHeader().find('nav[aria-label="Primary"]');
+    const nav = mountHeader().find(`nav[aria-label="${t.navigation.label()}"]`);
     expect(
       nav.findAll("a.site-nav-link").map((link) => ({
         label: link.text(),
         to: link.attributes("href"),
       })),
-    ).toEqual(LINKS);
+    ).toEqual(LINKS.map(({ label, to }) => ({ label: t(label), to })));
   });
 
   it("includes the mobile navigation", () => {
