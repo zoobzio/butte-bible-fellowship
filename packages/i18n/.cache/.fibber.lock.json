@@ -73,6 +73,10 @@
         "source": "9b00a5fbc6ffa846",
         "translation": "22e9fba03655c93b"
       },
+      "navigation.sermons": {
+        "source": "37ad9d4c407fd2cd",
+        "translation": "b05d6e619c4db74c"
+      },
       "navigation.connect": {
         "source": "1549759c407afd9a",
         "translation": "c642eff9e07392aa"
@@ -80,6 +84,14 @@
       "page.notFound": {
         "source": "a469ab4ca4e55bf5",
         "translation": "66d468d4451f7e36"
+      },
+      "sermons.play": {
+        "source": "cb80d696c4012041",
+        "translation": "caf11cd0cafd87e6"
+      },
+      "sermons.all": {
+        "source": "81196499c1b19fa6",
+        "translation": "d331e4d3996e5332"
       },
       "site.name": {
         "source": "18d13db9c0adf05f",
@@ -110,6 +122,10 @@
       "index.md": {
         "source": "57bf4b91b2cf28f1",
         "translation": "d8b0aba43ed85dca"
+      },
+      "sermons.md": {
+        "source": "57e38276f9ec806b",
+        "translation": "0ce5bd5f5af5b437"
       },
       "youre-invited.md": {
         "source": "6bd383ee258f321c",
@@ -191,6 +207,10 @@
         "source": "9b00a5fbc6ffa846",
         "translation": "e0561b4e18fa1575"
       },
+      "navigation.sermons": {
+        "source": "37ad9d4c407fd2cd",
+        "translation": "0d4427827f4d39f7"
+      },
       "navigation.connect": {
         "source": "1549759c407afd9a",
         "translation": "7c292801301a17ac"
@@ -198,6 +218,14 @@
       "page.notFound": {
         "source": "a469ab4ca4e55bf5",
         "translation": "6ed2223d2886bd72"
+      },
+      "sermons.play": {
+        "source": "cb80d696c4012041",
+        "translation": "8b0e02d0239d3e39"
+      },
+      "sermons.all": {
+        "source": "81196499c1b19fa6",
+        "translation": "d48f1cbc76a4e888"
       },
       "site.name": {
         "source": "18d13db9c0adf05f",
@@ -228,6 +256,10 @@
       "index.md": {
         "source": "57bf4b91b2cf28f1",
         "translation": "5ebdb406e935d6a2"
+      },
+      "sermons.md": {
+        "source": "57e38276f9ec806b",
+        "translation": "1db2ad0c187cbf36"
       },
       "youre-invited.md": {
         "source": "6bd383ee258f321c",
