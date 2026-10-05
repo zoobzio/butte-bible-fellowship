@@ -39,3 +39,11 @@ const decor = computed(() => !isMobile.value);
     <Arches v-if="isHome && decor" />
   </Body>
 </template>
+
+<style>
+.site-main {
+  display: block;
+  min-height: 60vh;
+  padding-bottom: var(--space-9);
+}
+</style>

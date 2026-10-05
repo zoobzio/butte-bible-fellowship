@@ -14,6 +14,7 @@
     "test:coverage": "vitest run --coverage --passWithNoTests"
   },
   "dependencies": {
+    "@bbf/assets": "workspace:*",
     "@bbf/i18n": "workspace:*",
     "@bbf/icons": "workspace:*",
     "@bbf/theme": "workspace:*",

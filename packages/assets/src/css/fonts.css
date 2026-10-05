@@ -1,0 +1,16 @@
+/* ---------- Font faces ------------------------------------------------ */
+
+/* The same stacks the theme's font tokens carry, restated where
+   @nuxt/fonts' CSS scan can see them: this triggers font resolution,
+   preload links, and metric-adjusted fallback injection. Declared last so
+   the longhand wins over earlier `font:` shorthands — same families, plus
+   the generated fallback. */
+body {
+  font-family: "Work Sans", system-ui, sans-serif;
+}
+
+h1,
+h2,
+h3 {
+  font-family: "Newsreader", Georgia, serif;
+}

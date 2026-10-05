@@ -1,0 +1,242 @@
+/* ---------- Call to action ------------------------------------------- */
+
+.cta {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-top: var(--space-3);
+  padding: var(--space-4) var(--space-6);
+  border-radius: var(--shape-full);
+  background: var(--primary);
+  color: var(--on-primary);
+  font-family: var(--font-sans);
+  font-size: var(--body-size);
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--type-label-letter-spacing);
+  text-decoration: none;
+  box-shadow: var(--elevation-low);
+  transition:
+    background var(--transition-base),
+    transform var(--transition-base),
+    box-shadow var(--transition-base);
+}
+
+.cta::after {
+  content: "\2192";
+  transition: transform var(--transition-base);
+}
+
+.cta:hover {
+  background: var(--primary-medium-contrast);
+  color: var(--on-primary);
+  transform: translateY(-2px);
+  box-shadow: var(--elevation-mid);
+}
+
+.cta:hover::after {
+  transform: translateX(var(--space-1));
+}
+
+.cta:active {
+  transform: translateY(0);
+}
+
+/* ---------- Toggle button — the footer's controls --------------------- */
+
+/* Icon-only by default: square padding around a sized sprite icon. */
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2);
+  border-radius: var(--shape-full);
+  border: 1px var(--stroke-solid)
+    color-mix(in oklab, var(--primary) 35%, var(--outline-muted));
+  background: transparent;
+  color: var(--on-surface-muted-medium-contrast);
+  font-family: var(--font-sans);
+  font-size: var(--label-size);
+  letter-spacing: var(--type-label-letter-spacing);
+  cursor: pointer;
+  transition:
+    color var(--transition-base),
+    border-color var(--transition-base),
+    background var(--transition-base);
+}
+
+.theme-toggle:hover {
+  color: var(--on-surface-high-contrast);
+  border-color: color-mix(in oklab, var(--primary) 65%, transparent);
+  background: color-mix(in oklab, var(--primary-container) 30%, transparent);
+}
+
+.theme-toggle .icon {
+  width: var(--space-4);
+  height: var(--space-4);
+  display: block;
+}
+
+/* ---------- Menu ------------------------------------------------------ */
+
+/* The dropdown panel portals to body, so these rules stay unscoped. */
+.f-dropdown-menu-content {
+  min-width: 13rem;
+  padding: var(--space-2);
+  background: var(--surface-container);
+  border: 1px var(--stroke-solid) var(--outline-muted);
+  border-radius: var(--shape-md);
+  box-shadow: var(--elevation-mid);
+  z-index: 60;
+}
+
+.f-dropdown-menu-item {
+  display: block;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--shape-sm);
+  color: var(--on-surface-medium-contrast);
+  text-decoration: none;
+  cursor: pointer;
+  outline: none;
+}
+
+.f-dropdown-menu-item[data-disabled] {
+  color: var(--on-surface-muted);
+  cursor: default;
+}
+
+.f-dropdown-menu-item[data-highlighted] {
+  background: color-mix(in oklab, var(--primary-container) 40%, transparent);
+  color: var(--on-surface-high-contrast);
+}
+
+/* ---------- Dialog ---------------------------------------------------- */
+
+/* The dialog portals to body, so these rules stay unscoped. */
+.f-dialog-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  background: color-mix(in oklab, var(--scrim) 55%, transparent);
+  backdrop-filter: blur(var(--blur-sm));
+}
+
+.f-dialog-content {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  z-index: 71;
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr);
+  width: min(60rem, calc(100vw - var(--space-4) * 2));
+  height: min(42rem, calc(100dvh - var(--space-4) * 2));
+  padding: var(--space-5);
+  background: var(--surface-container);
+  border: 1px var(--stroke-solid) var(--outline-muted);
+  border-radius: var(--shape-lg);
+  box-shadow: var(--elevation-high);
+  color: var(--on-surface-medium-contrast);
+  font: var(--type-body);
+  transform: translate(-50%, -50%);
+}
+
+.f-dialog-title {
+  margin: 0;
+  padding-right: var(--space-7);
+  font: var(--type-title);
+  font-family: var(--font-display);
+  color: var(--on-surface-high-contrast);
+}
+
+.f-dialog-title::before {
+  content: none;
+}
+
+.f-dialog-description {
+  max-width: none;
+  margin: var(--space-1) 0 var(--space-4);
+  font: var(--type-label);
+  color: var(--on-surface-muted-medium-contrast);
+}
+
+/* ---------- Listbox --------------------------------------------------- */
+
+.f-listbox-filter {
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: var(--on-surface-high-contrast);
+  font: inherit;
+}
+
+.f-listbox-filter::placeholder {
+  color: var(--on-surface-muted);
+}
+
+.f-listbox-content {
+  flex: 1;
+  min-height: 0;
+}
+
+.f-listbox-item {
+  display: flex;
+  align-items: center;
+  margin-right: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--shape-sm);
+  color: var(--on-surface-medium-contrast);
+  cursor: pointer;
+  outline: none;
+}
+
+.f-listbox-item[data-highlighted] {
+  background: color-mix(in oklab, var(--primary-container) 40%, transparent);
+  color: var(--on-surface-high-contrast);
+}
+
+.f-listbox-item[data-state="checked"] {
+  color: var(--primary-high-contrast);
+  font-weight: var(--weight-medium);
+}
+
+/* ---------- Toggle group ---------------------------------------------- */
+
+.f-toggle-group-root {
+  display: flex;
+  padding: 2px;
+  border: 1px var(--stroke-solid) var(--outline-muted);
+  border-radius: var(--shape-md);
+}
+
+.f-toggle-group-item {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: var(--space-1);
+  border: 0;
+  border-radius: var(--shape-sm);
+  background: transparent;
+  color: var(--on-surface-muted-medium-contrast);
+  font: var(--type-label);
+  cursor: pointer;
+  transition:
+    color var(--transition-fast),
+    background var(--transition-fast);
+}
+
+.f-toggle-group-item .f-span {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.f-toggle-group-item:hover {
+  color: var(--on-surface-high-contrast);
+}
+
+.f-toggle-group-item[data-state="on"] {
+  background: var(--primary-container);
+  color: var(--on-primary-container);
+}

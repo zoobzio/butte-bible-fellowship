@@ -105,7 +105,7 @@ catalogs:
 
 patchedDependencies:
   nuxt-studio@1.7.0:
-    hash: ccf1ead934e347d7490c5d3b4c1be21a16cbc26f3d62024f0ee7eee2416b4739
+    hash: 3170327b9c98d2e258bb9e4a73d63e7a88579c1fe1226c80fa013b1cf58e59d5
     path: patches/nuxt-studio@1.7.0.patch
 
 importers:
@@ -121,6 +121,9 @@ importers:
 
   apps/web:
     dependencies:
+      '@bbf/assets':
+        specifier: workspace:*
+        version: link:../../packages/assets
       '@bbf/i18n':
         specifier: workspace:*
         version: link:../../packages/i18n
@@ -153,7 +156,7 @@ importers:
         version: 4.5.2(@babel/plugin-syntax-jsx@7.29.7(@babel/core@7.29.7))(@babel/plugin-syntax-typescript@7.29.7(@babel/core@7.29.7))(@oxc-project/types@0.146.0)(@types/node@26.2.0)(@vue/compiler-sfc@3.5.41)(db0@0.3.4)(esbuild@0.28.2)(eslint@9.39.5(jiti@2.7.0))(ioredis@5.11.1)(lightningcss@1.33.0)(magicast@0.5.4)(optionator@0.9.4)(oxc-parser@0.139.0)(oxlint@1.86.0)(rolldown@1.2.5)(rollup-plugin-visualizer@7.1.1(rolldown@1.2.5)(rollup@4.62.4))(rollup@4.62.4)(srvx@0.11.22)(terser@5.50.0)(typescript@5.9.3)(vite@8.2.1(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(yaml@2.9.0))(vue-tsc@2.2.12(typescript@5.9.3))(yaml@2.9.0)
       nuxt-studio:
         specifier: 'catalog:'
-        version: 1.7.0(patch_hash=ccf1ead934e347d7490c5d3b4c1be21a16cbc26f3d62024f0ee7eee2416b4739)(@vue/test-utils@2.4.11(@vue/compiler-dom@3.5.41)(@vue/server-renderer@3.5.41)(vue@3.5.41(typescript@5.9.3)))(db0@0.3.4)(ioredis@5.11.1)(magic-string@1.4.2)(magicast@0.5.4)(oxc-parser@0.139.0)(rolldown@1.2.5)(srvx@0.11.22)(unplugin@3.3.0(esbuild@0.28.2)(rolldown@1.2.5)(rollup@4.62.4)(vite@8.2.1(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(yaml@2.9.0)))(vue@3.5.41(typescript@5.9.3))
+        version: 1.7.0(patch_hash=3170327b9c98d2e258bb9e4a73d63e7a88579c1fe1226c80fa013b1cf58e59d5)(@vue/test-utils@2.4.11(@vue/compiler-dom@3.5.41)(@vue/server-renderer@3.5.41)(vue@3.5.41(typescript@5.9.3)))(db0@0.3.4)(ioredis@5.11.1)(magic-string@1.4.2)(magicast@0.5.4)(oxc-parser@0.139.0)(rolldown@1.2.5)(srvx@0.11.22)(unplugin@3.3.0(esbuild@0.28.2)(rolldown@1.2.5)(rollup@4.62.4)(vite@8.2.1(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(yaml@2.9.0)))(vue@3.5.41(typescript@5.9.3))
       untheme:
         specifier: 'catalog:'
         version: 0.5.0
@@ -197,6 +200,8 @@ importers:
       vue-tsc:
         specifier: 'catalog:'
         version: 2.2.12(typescript@5.9.3)
+
+  packages/assets: {}
 
   packages/i18n:
     dependencies:
@@ -10420,7 +10425,7 @@ snapshots:
       - magicast
       - rolldown
 
-  nuxt-studio@1.7.0(patch_hash=ccf1ead934e347d7490c5d3b4c1be21a16cbc26f3d62024f0ee7eee2416b4739)(@vue/test-utils@2.4.11(@vue/compiler-dom@3.5.41)(@vue/server-renderer@3.5.41)(vue@3.5.41(typescript@5.9.3)))(db0@0.3.4)(ioredis@5.11.1)(magic-string@1.4.2)(magicast@0.5.4)(oxc-parser@0.139.0)(rolldown@1.2.5)(srvx@0.11.22)(unplugin@3.3.0(esbuild@0.28.2)(rolldown@1.2.5)(rollup@4.62.4)(vite@8.2.1(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(yaml@2.9.0)))(vue@3.5.41(typescript@5.9.3)):
+  nuxt-studio@1.7.0(patch_hash=3170327b9c98d2e258bb9e4a73d63e7a88579c1fe1226c80fa013b1cf58e59d5)(@vue/test-utils@2.4.11(@vue/compiler-dom@3.5.41)(@vue/server-renderer@3.5.41)(vue@3.5.41(typescript@5.9.3)))(db0@0.3.4)(ioredis@5.11.1)(magic-string@1.4.2)(magicast@0.5.4)(oxc-parser@0.139.0)(rolldown@1.2.5)(srvx@0.11.22)(unplugin@3.3.0(esbuild@0.28.2)(rolldown@1.2.5)(rollup@4.62.4)(vite@8.2.1(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(yaml@2.9.0)))(vue@3.5.41(typescript@5.9.3)):
     dependencies:
       '@ai-sdk/gateway': 3.0.206(zod@4.6.5)
       '@ai-sdk/vue': 3.0.297(@vue/test-utils@2.4.11(@vue/compiler-dom@3.5.41)(@vue/server-renderer@3.5.41)(vue@3.5.41(typescript@5.9.3)))(vue@3.5.41(typescript@5.9.3))(zod@4.6.5)

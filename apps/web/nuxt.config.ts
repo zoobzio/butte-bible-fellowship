@@ -1,3 +1,5 @@
+import { fileURLToPath } from "node:url";
+
 import { defineNuxtConfig } from "nuxt/config";
 
 import { locale as source, locales } from "@bbf/i18n";
@@ -8,6 +10,16 @@ import untheme from "@bbf/theme/config";
 
 /** The locales the site is translated to: each has its pages under `/<locale>`. */
 const targets = locales.filter((locale) => locale !== source);
+
+/** The English pages, as authored: `@bbf/i18n`'s sources, beside its build. */
+const content = fileURLToPath(
+  new URL("../src/content", import.meta.resolve("@bbf/i18n")),
+);
+
+/** The static assets: `@bbf/assets`'s sources, served from the site's root. */
+const assets = fileURLToPath(
+  new URL("src", import.meta.resolve("@bbf/assets/package.json")),
+);
 
 export default defineNuxtConfig({
   compatibilityDate: "2026-08-19",
@@ -41,7 +53,16 @@ export default defineNuxtConfig({
       repo: "butte-bible-fellowship",
       branch: "main",
       rootDir: "apps/web",
+      // Where Studio commits: the pages and the media each have a package.
+      paths: {
+        content: "packages/i18n/src/content",
+        public: "packages/assets/src",
+      },
     },
+    // The same two directories on disk, for a local Studio.
+    source: { content, public: assets },
+    // Only English is authored: the translations are generated from it.
+    collections: { exclude: targets.map((locale) => `pages_${locale}`) },
   },
 
   fonts: {
@@ -65,7 +86,7 @@ export default defineNuxtConfig({
     ],
   },
 
-  css: ["~/assets/css/app.css"],
+  css: ["@bbf/assets/css/index.css"],
 
   content: {
     experimental: {
@@ -91,6 +112,7 @@ export default defineNuxtConfig({
   },
 
   nitro: {
+    publicAssets: [{ dir: assets }],
     prerender: {
       routes: ["/", ...targets.map((locale) => `/${locale}`)],
       crawlLinks: true,

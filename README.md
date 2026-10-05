@@ -23,30 +23,46 @@ pnpm dev          # start the dev server at http://localhost:3000
 
 ## Content
 
-The pages are Markdown in [`@bbf/i18n`](packages/i18n), which builds
-them for every locale. `apps/web/content.config.ts` gives each locale a Nuxt
-Content collection over that build (`pages_en`, …), and `usePage` queries the
-one for the active locale. After editing a page, rebuild the package
-(`pnpm --filter @bbf/i18n build`) for the app to pick it up.
+The pages are Markdown in [`@bbf/i18n`](packages/i18n), which builds them for
+every locale. `apps/web/content.config.ts` gives each locale a Nuxt Content
+collection (`pages_en`, …) and `usePage` queries the one the route names.
+English is read from the package's sources, so an edit shows at once; the
+translations are read from its build. The images the pages show are in
+[`@bbf/assets`](packages/assets), served from the site's root.
 
-Nuxt Studio at `/admin` still expects the pages under `apps/web/content`, so
-it cannot edit them until its patch is taught the package's layout.
+### Nuxt Studio
 
-Nuxt Studio 1.7.0 cannot serialize the hard break that Shift+Enter inserts and
-writes `--- Unknown node: hardBreak ---` instead (upstream issue #265, fixed
-after 1.7.0). Until that fix is released, `patches/nuxt-studio@1.7.0.patch`
-works around it:
+English pages and the media are edited through Nuxt Studio at `/admin`. Studio
+expects both inside the app, at `content/` and `public/`, so
+`patches/nuxt-studio@1.7.0.patch` adds three options, set in `nuxt.config.ts`:
+
+- `repository.paths` — where each of those two folders is in the repository:
+  the pages in `packages/i18n/src/content`, the media in
+  `packages/assets/src`. This is where Studio commits.
+- `source` — the same two directories on disk, for Studio run locally.
+- `collections.exclude` — the collections Studio leaves out: every
+  translation, since those are generated from the English.
+
+An edit made in Studio changes the English only. Run
+`pnpm --filter @bbf/i18n translate` afterwards to bring the translations up to
+date.
+
+The patch also works around Studio 1.7.0 being unable to serialize the hard
+break that Shift+Enter inserts — it writes `--- Unknown node: hardBreak ---`
+instead (upstream issue #265, fixed after 1.7.0):
 
 - Shift+Enter is saved as `:br`, and `:br` or backslash line breaks load back
   into the editor as line breaks.
 - A paragraph hard-wrapped across several lines is joined onto one line when it
   is edited in Studio, instead of gaining a line break at every wrap.
-- The Studio app is served from `/_studio-app/1.7.0-hardbreak.1/`. The bundle
-  is cached as immutable, so browsers would otherwise keep the unpatched copy;
-  bump that suffix whenever the patch changes.
 
-When upgrading `nuxt-studio`, delete the patch file and its
-`patchedDependencies` entry in `pnpm-workspace.yaml`, then run `pnpm install`.
+The Studio app is served from `/_studio-app/1.7.0-bbf.1/`. The bundle is
+cached as immutable, so browsers would otherwise keep an older copy; bump that
+suffix (`version` in the patched `module.mjs`) whenever the patch changes the
+app bundle.
+
+When upgrading `nuxt-studio`, the hard-break part of the patch can go once
+the upstream fix is released; the three options have to be carried over.
 
 ## Language
 
@@ -85,6 +101,16 @@ Styling uses the aurora untheme tokens (`--surface`, `--space-*`, `--type-*`, �
 [untheme](https://github.com/zoobzio/untheme), and `@untheme/nuxt` renders it
 into the app and mirrors the color scheme onto `<html>` as `data-color`.
 
+### Styles
+
+The design system's stylesheet is in [`@bbf/assets`](packages/assets), loaded
+from `nuxt.config.ts` as `@bbf/assets/css/index.css`: the semantic elements,
+the classes Markdown content wears, the shared controls and Foundation's
+unstyled parts. What only one page or component wears is in a `<style>` block
+of that component. The blocks are not scoped — Markdown is slotted in and
+Foundation's dialogs and menus portal to `<body>` — so a class is named for
+its component (`site-footer-*`, `theme-picker-*`).
+
 ### Themes
 
 The site's palette is a context of aurora's `theme` modifier — `bbf`, the
@@ -103,8 +129,7 @@ keeps the selection in its cookie and renders it on the server. There is no them
 app/
   app.vue           — root: NuxtLayout + NuxtPage
   layouts/default.vue
-  components/       — site chrome (AppHeader, AppFooter)
+  components/       — site chrome (AppHeader, AppFooter), each with its styles
   pages/            — routes
-  assets/css/       — global styles on untheme tokens
 nuxt.config.ts      — extends @zoobzio/foundation
 ```

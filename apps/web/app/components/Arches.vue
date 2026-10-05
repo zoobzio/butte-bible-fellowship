@@ -29,3 +29,42 @@ useArchLines({ track, svg, pathA, pathB });
     </svg>
   </div>
 </template>
+
+<style>
+.arch-track {
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.arch-track svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.arch-line {
+  stroke-width: 1;
+  stroke-linecap: round;
+}
+
+.arch-line-a {
+  stroke: color-mix(in oklab, var(--primary) 45%, transparent);
+}
+.arch-line-b {
+  stroke: color-mix(in oklab, var(--secondary) 32%, transparent);
+}
+
+[data-color="light"] .arch-line-a {
+  stroke: color-mix(in oklab, var(--primary-600) 52%, transparent);
+}
+[data-color="light"] .arch-line-b {
+  stroke: color-mix(in oklab, var(--secondary-600) 40%, transparent);
+}
+
+/* The track is absolutely positioned against the document. */
+body {
+  position: relative;
+}
+</style>

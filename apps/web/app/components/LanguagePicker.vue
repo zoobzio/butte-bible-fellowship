@@ -41,3 +41,11 @@ const menu = defineMenu(() => ({
     </button>
   </Menu>
 </template>
+
+<style>
+/* The language button names the language beside its icon, so it widens
+   the toggle button's square padding. */
+.theme-toggle.language-toggle {
+  padding-inline: var(--space-3);
+}
+</style>
