@@ -87,6 +87,11 @@ export const clearAppConfig = () => setAppConfig({});
 
 export const useAppConfig = () => appConfig;
 
+// useRuntimeConfig: the public config the app reads.
+export const useRuntimeConfig = () => ({
+  public: { youtube: { channel: "UCtest" } },
+});
+
 // useRoute: one reactive route, moved with setRoutePath.
 const route = reactive({ path: "/" });
 

@@ -16,6 +16,8 @@ export default defineConfig({
       "~": r("./app"),
       // Test-only support (mocks, mount factories).
       "#test": r("./tests"),
+      // Code the app and the server share.
+      "#shared": r("./shared"),
     },
   },
   test: {

@@ -13,6 +13,7 @@ const header: HeaderConfig = {
     { label: "navigation.invited", to: "/youre-invited" },
     { label: "navigation.about", to: "/about-us" },
     { label: "navigation.calendar", to: "/calendar" },
+    { label: "navigation.sermons", to: "/sermons" },
     { label: "navigation.connect", to: "/connect" },
   ],
 };

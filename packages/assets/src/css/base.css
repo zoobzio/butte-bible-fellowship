@@ -7,6 +7,13 @@
   --font-display: "Newsreader", Georgia, serif;
 }
 
+/* Foundation's root colors the page loading bar with a token of its own
+   naming. The theme has none by that name, so the bar would paint nothing:
+   give it the theme's primary. */
+:root {
+  --sys-primary: var(--primary);
+}
+
 /* ---------- Reset & page shell ---------------------------------------- */
 
 *,

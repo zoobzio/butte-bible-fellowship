@@ -4,6 +4,7 @@ import ConnectCard from "~/components/markdown/ConnectCard.vue";
 import ConnectGrid from "~/components/markdown/ConnectGrid.vue";
 import MapEmbed from "~/components/markdown/MapEmbed.vue";
 import MarkdownAnchor from "~/components/markdown/MarkdownAnchor.vue";
+import SermonGrid from "~/components/markdown/SermonGrid.vue";
 import VisitCallout from "~/components/markdown/VisitCallout.vue";
 
 /**
@@ -17,5 +18,6 @@ export const MARKDOWN_COMPONENTS: Record<string, Component> = {
   "connect-card": ConnectCard,
   "connect-grid": ConnectGrid,
   "map-embed": MapEmbed,
+  "sermon-grid": SermonGrid,
   "visit-callout": VisitCallout,
 };

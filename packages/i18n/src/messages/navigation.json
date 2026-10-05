@@ -23,6 +23,10 @@
     "defaultMessage": "Weekly Events",
     "description": "Navigation link to the weekly schedule of gatherings."
   },
+  "sermons": {
+    "defaultMessage": "Sermons",
+    "description": "Navigation link to the latest sermons from the church's YouTube channel."
+  },
   "connect": {
     "defaultMessage": "Contact & Find Us",
     "description": "Navigation link to the contact details, office hours and map."

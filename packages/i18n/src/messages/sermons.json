@@ -1,0 +1,10 @@
+{
+  "play": {
+    "defaultMessage": "Play “{title}”",
+    "description": "The accessible name of the button that starts a sermon. `title` is the sermon's title, as it is on YouTube."
+  },
+  "all": {
+    "defaultMessage": "See all sermons on YouTube",
+    "description": "The link under the latest sermons, to the church's YouTube channel."
+  }
+}

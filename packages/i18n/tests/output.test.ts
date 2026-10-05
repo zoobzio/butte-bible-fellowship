@@ -84,8 +84,8 @@ describe("bundles", () => {
       locale: index.locale,
       messages: await bundles.bundles[index.locale](),
     });
-    // The two messages that take a value are formatted with one below.
-    const taking = ["appearance.scheme", "footer.copyright"];
+    // The three messages that take a value are formatted with one below.
+    const taking = ["appearance.scheme", "footer.copyright", "sermons.play"];
     for (const [key, message] of Object.entries(source)) {
       if (!taking.includes(key)) {
         expect(fibber.format(key as never), key).toBe(message);
@@ -99,6 +99,9 @@ describe("bundles", () => {
     );
     expect(fibber.format("footer.copyright", { year: "2026" })).toBe(
       "© 2026 Butte Bible Fellowship",
+    );
+    expect(fibber.format("sermons.play", { title: "Faith & Works" })).toBe(
+      "Play “Faith & Works”",
     );
   });
 });

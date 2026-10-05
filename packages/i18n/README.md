@@ -30,6 +30,7 @@ each message is the note a translator reads.
 | `appearance.json` | the color scheme toggle and the appearance (theme) dialog |
 | `language.json`   | the language switcher                                     |
 | `page.json`       | page-level states: not found                              |
+| `sermons.json`    | the sermons page: the play button and the channel link    |
 
 Messages are ICU MessageFormat, where an ASCII apostrophe is the escape
 character — write a typographic one (`You’re`), as the pages already do.

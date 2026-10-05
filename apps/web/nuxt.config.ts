@@ -8,8 +8,16 @@ import icons from "@bbf/icons/config";
 import sets from "@bbf/icons/sets";
 import untheme from "@bbf/theme/config";
 
+import { SERMONS_MAX_AGE } from "./shared/constants/sermons";
+
 /** The locales the site is translated to: each has its pages under `/<locale>`. */
 const targets = locales.filter((locale) => locale !== source);
+
+/**
+ * The pages rendered by the server when they are asked for, rather than once
+ * at build: what they show changes without a deploy.
+ */
+const live = ["/sermons"];
 
 /** The English pages, as authored: `@bbf/i18n`'s sources, beside its build. */
 const content = fileURLToPath(
@@ -44,6 +52,13 @@ export default defineNuxtConfig({
   untheme,
 
   fibber: { build: "@bbf/i18n" },
+
+  runtimeConfig: {
+    public: {
+      // The channel whose sermons `/sermons` lists, by its YouTube id.
+      youtube: { channel: "UCCVz4wFgCBmw-Iwyz61OPng" },
+    },
+  },
 
   studio: {
     route: "/admin",
@@ -120,6 +135,16 @@ export default defineNuxtConfig({
   },
 
   routeRules: {
+    // A live page, in every locale, is rendered on request and that render
+    // kept as long as the sermons are: the crawler must not prerender it.
+    ...Object.fromEntries(
+      live
+        .flatMap((path) => [
+          path,
+          ...targets.map((locale) => `/${locale}${path}`),
+        ])
+        .map((path) => [path, { prerender: false, swr: SERMONS_MAX_AGE }]),
+    ),
     "/_nuxt/**": {
       headers: { "cache-control": "public, max-age=31536000, immutable" },
     },
