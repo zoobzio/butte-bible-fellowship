@@ -5,23 +5,15 @@
   },
   "open": {
     "defaultMessage": "Choose a theme",
-    "description": "The accessible name of the button that opens the appearance dialog."
+    "description": "The accessible name of the button that opens the list of themes."
   },
-  "close": {
-    "defaultMessage": "Close",
-    "description": "The accessible name of the button that closes the appearance dialog."
-  },
-  "title": {
-    "defaultMessage": "Appearance",
-    "description": "The title of the appearance dialog."
-  },
-  "description": {
-    "defaultMessage": "Pick a theme, then tune how the site looks and feels.",
-    "description": "The line under the appearance dialog's title."
+  "settings": {
+    "defaultMessage": "Appearance settings",
+    "description": "The accessible name of the button that opens the appearance settings (color scheme, contrast, text size and the like), and of the panel it opens."
   },
   "themes": {
     "defaultMessage": "Themes",
-    "description": "The heading over the list of themes in the appearance dialog."
+    "description": "The accessible name of the list of themes."
   },
   "search": {
     "defaultMessage": "Search themes…",

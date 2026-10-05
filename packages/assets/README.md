@@ -36,7 +36,7 @@ export default defineNuxtConfig({
 It styles what any page of the site shares: the semantic elements, the
 classes Markdown content wears (`.prose`, `.prose-figure`,
 `.prose-aside-image`, `.events-table`), the controls more than one component
-uses (`.cta`, `.theme-toggle`) and Foundation's unstyled parts (menu, dialog,
+uses (`.cta`, `.theme-toggle`) and Foundation's unstyled parts (menu, popover,
 listbox, toggle group). Every value is a `@bbf/theme` variable, but for
 `--font-display`, which `base.css` declares.
 

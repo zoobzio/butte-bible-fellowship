@@ -109,53 +109,23 @@
   color: var(--on-surface-high-contrast);
 }
 
-/* ---------- Dialog ---------------------------------------------------- */
+/* ---------- Popover --------------------------------------------------- */
 
-/* The dialog portals to body, so these rules stay unscoped. */
-.f-dialog-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 70;
-  background: color-mix(in oklab, var(--scrim) 55%, transparent);
-  backdrop-filter: blur(var(--blur-sm));
-}
-
-.f-dialog-content {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  z-index: 71;
-  display: grid;
-  grid-template-rows: auto auto minmax(0, 1fr);
-  width: min(60rem, calc(100vw - var(--space-4) * 2));
-  height: min(42rem, calc(100dvh - var(--space-4) * 2));
-  padding: var(--space-5);
+/* The popover portals to body, so these rules stay unscoped. It never
+   outgrows the room beside its trigger: past that, it scrolls. */
+.f-popover-content {
+  box-sizing: border-box;
+  max-width: calc(100vw - var(--space-4) * 2);
+  max-height: var(--reka-popover-content-available-height);
+  padding: var(--space-3);
+  overflow: hidden auto;
   background: var(--surface-container);
   border: 1px var(--stroke-solid) var(--outline-muted);
-  border-radius: var(--shape-lg);
-  box-shadow: var(--elevation-high);
+  border-radius: var(--shape-md);
+  box-shadow: var(--elevation-mid);
   color: var(--on-surface-medium-contrast);
   font: var(--type-body);
-  transform: translate(-50%, -50%);
-}
-
-.f-dialog-title {
-  margin: 0;
-  padding-right: var(--space-7);
-  font: var(--type-title);
-  font-family: var(--font-display);
-  color: var(--on-surface-high-contrast);
-}
-
-.f-dialog-title::before {
-  content: none;
-}
-
-.f-dialog-description {
-  max-width: none;
-  margin: var(--space-1) 0 var(--space-4);
-  font: var(--type-label);
-  color: var(--on-surface-muted-medium-contrast);
+  z-index: 60;
 }
 
 /* ---------- Listbox --------------------------------------------------- */

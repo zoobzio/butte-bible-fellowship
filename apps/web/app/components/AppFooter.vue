@@ -7,6 +7,7 @@ import { useAppConfig, useNuxtApp } from "#imports";
 import ColorMode from "~/components/ColorMode.vue";
 import LanguagePicker from "~/components/LanguagePicker.vue";
 import ThemePicker from "~/components/ThemePicker.vue";
+import ThemeSettings from "~/components/ThemeSettings.vue";
 </script>
 
 <script setup lang="ts">
@@ -48,6 +49,7 @@ const text = (line: FooterLine) => {
         <LanguagePicker />
         <ColorMode />
         <ThemePicker />
+        <ThemeSettings />
       </div>
       <span>{{ $t.footer.copyright({ year }) }}</span>
     </div>
@@ -60,7 +62,8 @@ const text = (line: FooterLine) => {
   margin-top: var(--space-9);
   padding: clamp(var(--space-7), 7vw, var(--space-8))
     clamp(var(--space-4), 4vw, var(--space-7)) var(--space-6);
-  background: linear-gradient(
+  background:
+    linear-gradient(
       color-mix(in oklab, var(--primary-container) 34%, transparent),
       transparent
     ),
@@ -126,7 +129,8 @@ const text = (line: FooterLine) => {
   text-align: right;
 }
 
-/* The mode toggle and the theme picker sit together on the left. */
+/* The language, mode, theme and settings controls sit together on the
+   left. */
 .site-footer-controls {
   display: flex;
   align-items: center;

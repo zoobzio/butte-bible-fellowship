@@ -1,9 +1,10 @@
 {
   "scheme": "{mode, select, dark {Cambiar al modo oscuro} other {Cambiar al modo claro}}",
   "open": "Elegir un tema",
-  "close": "Cerrar",
-  "title": "Apariencia",
-  "description": "Elige un tema y ajusta después el aspecto y la experiencia del sitio.",
+  "settings": "Ajustes de apariencia",
   "themes": "Temas",
-  "search": "Buscar temas…"
+  "search": "Buscar temas…",
+  "close": "Cerrar",
+  "description": "Elige un tema y ajusta después el aspecto y la experiencia del sitio.",
+  "title": "Apariencia"
 }

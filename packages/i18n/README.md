@@ -22,15 +22,15 @@ nest under its name: `home` in `navigation.json` is the message
 `navigation.home`, called as `$t.navigation.home()`. The `description` beside
 each message is the note a translator reads.
 
-| File              | Messages                                                  |
-| ----------------- | --------------------------------------------------------- |
-| `site.json`       | the church's name, its tagline and the meta description   |
-| `navigation.json` | the primary navigation: its links and accessible names    |
-| `footer.json`     | the footer's headings, service time and copyright line    |
-| `appearance.json` | the color scheme toggle and the appearance (theme) dialog |
-| `language.json`   | the language switcher                                     |
-| `page.json`       | page-level states: not found                              |
-| `sermons.json`    | the sermons page: the play button and the channel link    |
+| File              | Messages                                                 |
+| ----------------- | -------------------------------------------------------- |
+| `site.json`       | the church's name, its tagline and the meta description  |
+| `navigation.json` | the primary navigation: its links and accessible names   |
+| `footer.json`     | the footer's headings, service time and copyright line   |
+| `appearance.json` | the color scheme toggle, theme picker and theme settings |
+| `language.json`   | the language switcher                                    |
+| `page.json`       | page-level states: not found                             |
+| `sermons.json`    | the sermons page: the play button and the channel link   |
 
 Messages are ICU MessageFormat, where an ASCII apostrophe is the escape
 character — write a typographic one (`You’re`), as the pages already do.

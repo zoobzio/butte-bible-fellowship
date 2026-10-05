@@ -9,17 +9,9 @@
         "source": "fb92afc484e9b5e6",
         "translation": "f0c6a794e4b2850b"
       },
-      "appearance.close": {
-        "source": "7d9eb7acb13e2462",
-        "translation": "aeccae342e4bd0a7"
-      },
-      "appearance.title": {
-        "source": "3907fa7f80722a6f",
-        "translation": "e3e9cbaccaec3d2a"
-      },
-      "appearance.description": {
-        "source": "563d354e09828757",
-        "translation": "c8d53bc82f45cfcf"
+      "appearance.settings": {
+        "source": "e40070e11bbb3a82",
+        "translation": "81730b7747e9848d"
       },
       "appearance.themes": {
         "source": "43ae3265b99f2f34",
@@ -104,6 +96,18 @@
       "site.description": {
         "source": "35ef0def3703d76b",
         "translation": "03b661652eb9b3f4"
+      },
+      "appearance.close": {
+        "source": "7d9eb7acb13e2462",
+        "translation": "aeccae342e4bd0a7"
+      },
+      "appearance.description": {
+        "source": "563d354e09828757",
+        "translation": "c8d53bc82f45cfcf"
+      },
+      "appearance.title": {
+        "source": "3907fa7f80722a6f",
+        "translation": "e3e9cbaccaec3d2a"
       }
     },
     "documents": {
@@ -143,17 +147,9 @@
         "source": "fb92afc484e9b5e6",
         "translation": "932d1f7fd87564e2"
       },
-      "appearance.close": {
-        "source": "7d9eb7acb13e2462",
-        "translation": "711e5f2e198df1b6"
-      },
-      "appearance.title": {
-        "source": "3907fa7f80722a6f",
-        "translation": "04140bf2a113078a"
-      },
-      "appearance.description": {
-        "source": "563d354e09828757",
-        "translation": "dfce1e5add1bd7f6"
+      "appearance.settings": {
+        "source": "e40070e11bbb3a82",
+        "translation": "faf589b0b66f05bb"
       },
       "appearance.themes": {
         "source": "43ae3265b99f2f34",
@@ -238,6 +234,18 @@
       "site.description": {
         "source": "35ef0def3703d76b",
         "translation": "f20f5657e4f71c68"
+      },
+      "appearance.close": {
+        "source": "7d9eb7acb13e2462",
+        "translation": "711e5f2e198df1b6"
+      },
+      "appearance.description": {
+        "source": "563d354e09828757",
+        "translation": "dfce1e5add1bd7f6"
+      },
+      "appearance.title": {
+        "source": "3907fa7f80722a6f",
+        "translation": "04140bf2a113078a"
       }
     },
     "documents": {

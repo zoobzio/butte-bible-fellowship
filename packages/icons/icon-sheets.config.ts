@@ -10,6 +10,7 @@ export default defineConfig({
     palette: "lucide:palette",
     play: "lucide:play",
     search: "lucide:search",
+    sliders: "lucide:sliders-horizontal",
     sun: "lucide:sun",
     x: "lucide:x",
   },

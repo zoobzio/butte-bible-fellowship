@@ -33,7 +33,12 @@ const { $t } = useNuxtApp();
 const mountFooter = () =>
   mount(AppFooter, {
     global: {
-      stubs: { ColorMode: true, LanguagePicker: true, ThemePicker: true },
+      stubs: {
+        ColorMode: true,
+        LanguagePicker: true,
+        ThemePicker: true,
+        ThemeSettings: true,
+      },
     },
   });
 
