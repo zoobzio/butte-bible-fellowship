@@ -33,5 +33,5 @@ Esperamos que consideres unirte a nosotros.
 ::visit-callout
 **Acompáñanos los domingos a las 10:00 a. m.**
 
-2255 Pillsbury Road, Chico · [consulta el horario semanal](/calendar)
+2255 Pillsbury Road, Chico · [consulta nuestros eventos](/events)
 ::

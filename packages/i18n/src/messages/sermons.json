@@ -1,4 +1,16 @@
 {
+  "title": {
+    "defaultMessage": "Sermons",
+    "description": "The title at the top of the sermons page."
+  },
+  "description": {
+    "defaultMessage": "The latest messages from our Sunday worship services.",
+    "description": "The line under the sermons page's title, saying what the page lists."
+  },
+  "latest": {
+    "defaultMessage": "Latest sermon",
+    "description": "The label over the newest sermon, which the sermons page shows larger than the rest."
+  },
   "play": {
     "defaultMessage": "Play “{title}”",
     "description": "The accessible name of the button that starts a sermon. `title` is the sermon's title, as it is on YouTube."

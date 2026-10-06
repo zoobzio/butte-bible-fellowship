@@ -7,8 +7,8 @@ import { setAppConfig, useNuxtApp } from "#imports";
 import AppHeader from "~/components/AppHeader.vue";
 
 const LINKS: NavigationLink[] = [
-  { label: "navigation.home", to: "/" },
-  { label: "navigation.invited", to: "/visit" },
+  { label: "navigation.about", to: "/" },
+  { label: "navigation.events", to: "/visit" },
   { label: "navigation.connect", to: "/contact" },
 ];
 
@@ -39,6 +39,16 @@ describe("AppHeader", () => {
         to: link.attributes("href"),
       })),
     ).toEqual(LINKS.map(({ label, to }) => ({ label: $t(label), to })));
+  });
+
+  it("publishes its height to the root while it is mounted", () => {
+    const wrapper = mountHeader();
+    const root = document.documentElement.style;
+    expect(root.getPropertyValue("--header-height")).toBe(
+      `${wrapper.find("header").element.offsetHeight}px`,
+    );
+    wrapper.unmount();
+    expect(root.getPropertyValue("--header-height")).toBe("");
   });
 
   it("includes the mobile navigation", () => {

@@ -2,5 +2,9 @@
   "notFound": {
     "defaultMessage": "Page not found",
     "description": "The error shown when an address matches no page."
+  },
+  "contents": {
+    "defaultMessage": "On this page",
+    "description": "The heading and accessible name of a page's table of contents: the list of links to its sections."
   }
 }

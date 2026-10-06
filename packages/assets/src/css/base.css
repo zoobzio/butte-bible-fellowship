@@ -2,9 +2,17 @@
 
 /* The display serif. Aurora's type scale is set in its sans and carries no
    display face, and the face is the site's rather than the theme's, so it
-   lives here as a plain custom property beside the theme's tokens. */
+   lives here as a plain custom property beside the theme's tokens.
+   The header's height is the header's to say: it measures itself and sets
+   the property on the root, and until it has, nothing is under it.
+   The site's width is one measure: every page, the header and the footer
+   run to it, with the gutter — the room kept at the viewport's edges —
+   split between the two sides. */
 :root {
   --font-display: "Newsreader", Georgia, serif;
+  --header-height: 0px;
+  --site-width: 64rem;
+  --site-gutter: clamp(var(--space-5), 8vw, var(--space-8));
 }
 
 /* Foundation's root colors the page loading bar with a token of its own

@@ -24,6 +24,17 @@ h1 {
   text-wrap: balance;
 }
 
+/* A page's own title — the home hero's, and every page header's — is set
+   larger than the headings of its prose. */
+h1.page-title {
+  font-size: clamp(
+    calc(var(--display-size) * 0.85),
+    7.5vw,
+    calc(var(--display-size) * 1.85)
+  );
+  line-height: 1.05;
+}
+
 .prose > h1 {
   padding-bottom: var(--space-5);
   position: relative;
@@ -84,17 +95,6 @@ p {
   margin: 0 0 var(--space-5);
   line-height: 1.8;
   max-width: 66ch;
-}
-
-/* Opening paragraph of a page opens with a set initial. */
-h1 + p::first-letter {
-  float: left;
-  font: var(--type-display);
-  font-family: var(--font-display);
-  font-size: 3.4em;
-  line-height: 0.78;
-  padding: 0.06em var(--space-2) 0 0;
-  color: var(--primary-medium-contrast);
 }
 
 strong {

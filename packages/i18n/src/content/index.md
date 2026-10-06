@@ -33,5 +33,5 @@ We hope you’ll consider joining us.
 ::visit-callout
 **Join us Sundays at 10:00am**
 
-2255 Pillsbury Road, Chico · [see the weekly schedule](/calendar)
+2255 Pillsbury Road, Chico · [see our events](/events)
 ::

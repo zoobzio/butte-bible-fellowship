@@ -25,7 +25,7 @@ describe("home page", () => {
     const { wrapper } = await mountSuspended(Page);
 
     const hero = wrapper.find(".home-hero");
-    expect(hero.find("h1").text()).toBe("Discover Grace");
+    expect(hero.find("h1.page-title").text()).toBe("Discover Grace");
     expect(hero.find("h1 em").text()).toBe("Grace");
     expect(hero.find("p").text()).toBe("Join us on Sundays.");
 
@@ -76,7 +76,7 @@ describe("home page", () => {
     const { wrapper, error } = await mountSuspended(Page);
     expect(error).toMatchObject({
       statusCode: 404,
-      statusMessage: "Page not found",
+      message: "Page not found",
     });
     expect(wrapper.find(".prose").exists()).toBe(false);
   });

@@ -9,10 +9,8 @@ import { defineAppConfig } from "#imports";
 
 const header: HeaderConfig = {
   links: [
-    { label: "navigation.home", to: "/" },
-    { label: "navigation.invited", to: "/youre-invited" },
     { label: "navigation.about", to: "/about-us" },
-    { label: "navigation.calendar", to: "/calendar" },
+    { label: "navigation.events", to: "/events" },
     { label: "navigation.sermons", to: "/sermons" },
     { label: "navigation.connect", to: "/connect" },
   ],

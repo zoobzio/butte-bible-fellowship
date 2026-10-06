@@ -104,11 +104,9 @@ export const useRoute = () => route;
 // useHead: records what it was given.
 export const useHead = vi.fn();
 
-// createError: an Error carrying the status fields.
-export const createError = (input: {
-  statusCode: number;
-  statusMessage: string;
-}) => Object.assign(new Error(input.statusMessage), input);
+// createError: an Error carrying the status code.
+export const createError = (input: { statusCode: number; message: string }) =>
+  Object.assign(new Error(input.message), input);
 
 // definePageMeta is compiled away by Nuxt; here it is a no-op.
 export const definePageMeta = () => {};

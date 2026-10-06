@@ -5,8 +5,6 @@ description: Una nueva comunidad para la causa de Cristo.
 
 # Nuestra visión
 
-![Tulipanes en flor](/images/tulips.jpg){.prose-aside-image}
-
 La sabiduría moderna dice que las mejores declaraciones de visión son lemas ingeniosos, fáciles de recordar y, sobre todo… breves. Si eso es lo que usted busca …
 
 > Nuestra intención es ser la Iglesia;

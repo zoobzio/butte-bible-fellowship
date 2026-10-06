@@ -1,6 +1,12 @@
 <script lang="ts">
 import { NuxtLink } from "#components";
-import { useAppConfig, useNuxtApp } from "#imports";
+import {
+  onBeforeUnmount,
+  onMounted,
+  useAppConfig,
+  useNuxtApp,
+  useTemplateRef,
+} from "#imports";
 
 import AppMobileNav from "~/components/AppMobileNav.vue";
 import { useRouteLocale } from "~/composables/locale";
@@ -12,10 +18,37 @@ defineOptions({ name: "AppHeader" });
 const { header } = useAppConfig();
 const { $t } = useNuxtApp();
 const { localize } = useRouteLocale();
+
+// The header wraps and scales with the viewport, so its height is measured
+// and published as `--header-height`: what sticks under it reads where it
+// ends.
+const header$ = useTemplateRef<HTMLElement>("header");
+let observer: ResizeObserver | null = null;
+
+const publish = () => {
+  if (!header$.value) return;
+  document.documentElement.style.setProperty(
+    "--header-height",
+    `${header$.value.offsetHeight}px`,
+  );
+};
+
+onMounted(() => {
+  publish();
+  if (!header$.value) return;
+  observer = new ResizeObserver(publish);
+  observer.observe(header$.value);
+});
+
+onBeforeUnmount(() => {
+  observer?.disconnect();
+  observer = null;
+  document.documentElement.style.removeProperty("--header-height");
+});
 </script>
 
 <template>
-  <header class="site-header">
+  <header ref="header" class="site-header">
     <NuxtLink :to="localize('/')" class="site-brand">
       <span class="site-brand-name">{{ $t.site.name() }}</span>
       <span class="site-brand-tag">{{ $t.site.tagline() }}</span>
@@ -46,8 +79,9 @@ const { localize } = useRouteLocale();
   align-items: center;
   justify-content: space-between;
   gap: var(--space-4) var(--space-6);
-  padding: var(--space-5) clamp(var(--space-4), 4vw, var(--space-7))
-    var(--space-4);
+  /* The header alone runs the full viewport: the brand and the tabs stand
+     at the window's edges rather than inside the site column. */
+  padding: var(--space-5) calc(var(--site-gutter) / 2) var(--space-4);
   background: color-mix(in oklab, var(--surface) 88%, transparent);
   backdrop-filter: blur(var(--blur-sm)) saturate(1.2);
 }

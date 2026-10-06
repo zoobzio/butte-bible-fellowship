@@ -17,11 +17,24 @@ describe("scrollBehavior", () => {
     expect(scrollBehavior(location("#visit"), saved)).toBe(saved);
   });
 
-  it("scrolls to the anchor when the route has a hash", () => {
+  it("scrolls to the anchor, leaving a gap above it, when the route has a hash", () => {
     expect(scrollBehavior(location("#visit"), null)).toEqual({
       el: "#visit",
-      top: 0,
+      top: 24,
     });
+  });
+
+  it("stops an anchor short of the header that covers the top, and the gap under it", () => {
+    const header = document.createElement("header");
+    header.className = "site-header";
+    Object.defineProperty(header, "offsetHeight", { value: 96 });
+    document.body.append(header);
+
+    expect(scrollBehavior(location("#visit"), null)).toEqual({
+      el: "#visit",
+      top: 120,
+    });
+    header.remove();
   });
 
   it("jumps to the top without animating otherwise", () => {

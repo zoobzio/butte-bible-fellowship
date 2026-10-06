@@ -1,0 +1,12 @@
+{
+  "title": "Événements",
+  "description": "Nos rassemblements au 2255 Pillsbury Road. Tout le monde est le bienvenu.",
+  "calendar": "Calendrier",
+  "view": "Affichage du calendrier",
+  "week": "Semaine",
+  "month": "Mois",
+  "previous": "{view, select, week {Semaine précédente} other {Mois précédent}}",
+  "next": "{view, select, week {Semaine suivante} other {Mois suivant}}",
+  "today": "Aujourd’hui",
+  "none": "Rien de prévu"
+}

@@ -19,6 +19,9 @@ const targets = locales.filter((locale) => locale !== source);
  */
 const live = ["/sermons"];
 
+/** The pages that have moved: the path each was at, and where it is now. */
+const moved = { "/calendar": "/events" };
+
 /** The English pages, as authored: `@bbf/i18n`'s sources, beside its build. */
 const content = fileURLToPath(
   new URL("../src/content", import.meta.resolve("@bbf/i18n")),
@@ -144,6 +147,15 @@ export default defineNuxtConfig({
           ...targets.map((locale) => `/${locale}${path}`),
         ])
         .map((path) => [path, { prerender: false, swr: SERMONS_MAX_AGE }]),
+    ),
+    // A moved page, in every locale, sends its old address to its new one.
+    ...Object.fromEntries(
+      Object.entries(moved).flatMap(([from, to]) =>
+        ["", ...targets.map((locale) => `/${locale}`)].map((prefix) => [
+          `${prefix}${from}`,
+          { redirect: { to: `${prefix}${to}`, statusCode: 301 } },
+        ]),
+      ),
     ),
     "/_nuxt/**": {
       headers: { "cache-control": "public, max-age=31536000, immutable" },

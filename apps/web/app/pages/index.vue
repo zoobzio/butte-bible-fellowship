@@ -24,7 +24,7 @@ const { localize } = useRouteLocale();
 if (!page.value) {
   throw createError({
     statusCode: 404,
-    statusMessage: useNuxtApp().$t.page.notFound(),
+    message: useNuxtApp().$t.page.notFound(),
   });
 }
 
@@ -38,7 +38,7 @@ const hero = computed(() => page.value?.hero);
     <div v-if="hero" class="home-hero">
       <section class="home-hero-body">
         <div class="home-hero-content">
-          <h1>
+          <h1 class="page-title">
             {{ hero.tagline }}
             <em v-if="hero.highlight">{{ hero.highlight }}</em>
           </h1>
@@ -125,12 +125,6 @@ const hero = computed(() => page.value?.hero);
 
 .home-hero h1 {
   margin: 0;
-  font-size: clamp(
-    calc(var(--display-size) * 0.85),
-    7.5vw,
-    calc(var(--display-size) * 1.85)
-  );
-  line-height: 1.05;
 }
 
 .home-hero h1 em {

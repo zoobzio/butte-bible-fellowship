@@ -46,7 +46,7 @@ describe("content page", () => {
     const { wrapper, error } = await mountSuspended(Page);
     expect(error).toMatchObject({
       statusCode: 404,
-      statusMessage: "Page not found",
+      message: "Page not found",
     });
     expect(wrapper.find(".prose").exists()).toBe(false);
   });

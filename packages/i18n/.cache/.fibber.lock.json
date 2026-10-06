@@ -1,6 +1,10 @@
 {
   "es": {
     "messages": {
+      "about.title": {
+        "source": "5d8c71abc527284c",
+        "translation": "e9b1e22d9fbb59cd"
+      },
       "appearance.scheme": {
         "source": "d16151d20dd4fa5a",
         "translation": "ef7bb51d28e2f744"
@@ -20,6 +24,46 @@
       "appearance.search": {
         "source": "a13ac564360d6c18",
         "translation": "db7e6dea3b6c3b63"
+      },
+      "events.title": {
+        "source": "8d14f6e72de8f18a",
+        "translation": "aef5bda4f67e1171"
+      },
+      "events.description": {
+        "source": "4e56bb27db021525",
+        "translation": "414f8e68367db631"
+      },
+      "events.calendar": {
+        "source": "d5d0a30b517e3bea",
+        "translation": "68de201e0ef3fd85"
+      },
+      "events.view": {
+        "source": "66a89d9a70cdf18f",
+        "translation": "c11274957b3e7360"
+      },
+      "events.week": {
+        "source": "e78041ab51a818a2",
+        "translation": "51656a29fb46a0a1"
+      },
+      "events.month": {
+        "source": "310ca503ef36f177",
+        "translation": "024261f9bfbac9ed"
+      },
+      "events.previous": {
+        "source": "4c43913003b7c630",
+        "translation": "6d4f41e1c84268f8"
+      },
+      "events.next": {
+        "source": "9fb63ed1508534e5",
+        "translation": "33b4e400d2058b27"
+      },
+      "events.today": {
+        "source": "2b065c7c9ce466e5",
+        "translation": "55133d4e6eb6172a"
+      },
+      "events.none": {
+        "source": "61c8091bab4aa222",
+        "translation": "8e8a5802a1631327"
       },
       "footer.worship": {
         "source": "0b23552a4b772671",
@@ -49,33 +93,41 @@
         "source": "0ed77fd2619ba8ab",
         "translation": "3b1e8affeb872106"
       },
-      "navigation.home": {
-        "source": "3a78695388b38b5c",
-        "translation": "58fcc9468fe1f607"
-      },
-      "navigation.invited": {
-        "source": "e72a3723251e8dd9",
-        "translation": "a95b5ea413d27584"
-      },
       "navigation.about": {
         "source": "5d8c71abc527284c",
         "translation": "e9b1e22d9fbb59cd"
       },
-      "navigation.calendar": {
-        "source": "9b00a5fbc6ffa846",
-        "translation": "22e9fba03655c93b"
+      "navigation.events": {
+        "source": "8d14f6e72de8f18a",
+        "translation": "aef5bda4f67e1171"
       },
       "navigation.sermons": {
         "source": "37ad9d4c407fd2cd",
         "translation": "b05d6e619c4db74c"
       },
       "navigation.connect": {
-        "source": "1549759c407afd9a",
-        "translation": "c642eff9e07392aa"
+        "source": "2b5c3d26721ae9c3",
+        "translation": "771b96b0812dd393"
       },
       "page.notFound": {
         "source": "a469ab4ca4e55bf5",
         "translation": "66d468d4451f7e36"
+      },
+      "page.contents": {
+        "source": "b5658fc8edda24f9",
+        "translation": "a4847f7ca6bc42a8"
+      },
+      "sermons.title": {
+        "source": "37ad9d4c407fd2cd",
+        "translation": "b05d6e619c4db74c"
+      },
+      "sermons.description": {
+        "source": "2c00056e1f29ce59",
+        "translation": "3229842173f00c35"
+      },
+      "sermons.latest": {
+        "source": "ab1e4a2f1906f7d1",
+        "translation": "765381932420d6a8"
       },
       "sermons.play": {
         "source": "cb80d696c4012041",
@@ -108,28 +160,40 @@
       "appearance.title": {
         "source": "3907fa7f80722a6f",
         "translation": "e3e9cbaccaec3d2a"
+      },
+      "navigation.calendar": {
+        "source": "9b00a5fbc6ffa846",
+        "translation": "22e9fba03655c93b"
+      },
+      "navigation.home": {
+        "source": "3a78695388b38b5c",
+        "translation": "58fcc9468fe1f607"
+      },
+      "navigation.invited": {
+        "source": "e72a3723251e8dd9",
+        "translation": "a95b5ea413d27584"
       }
     },
     "documents": {
       "about-us.md": {
-        "source": "38b08e039ba4f40c",
-        "translation": "809472f473c8345b"
-      },
-      "calendar.md": {
-        "source": "5a2ca7923699662d",
-        "translation": "20878d721d5cb475"
+        "source": "021d9d823fe10014",
+        "translation": "530d8660b313618c"
       },
       "connect.md": {
         "source": "d8095a437fdcc30d",
         "translation": "ec3d1478d7555180"
       },
+      "events.md": {
+        "source": "2ea937a5ee7d972e",
+        "translation": "e07aee21de37b69e"
+      },
       "index.md": {
-        "source": "57bf4b91b2cf28f1",
-        "translation": "d8b0aba43ed85dca"
+        "source": "63c9b41c47cfb90b",
+        "translation": "a355b730e3ecaa29"
       },
       "sermons.md": {
-        "source": "57e38276f9ec806b",
-        "translation": "0ce5bd5f5af5b437"
+        "source": "74609402433942d4",
+        "translation": "b7d761dec8d4bd45"
       },
       "youre-invited.md": {
         "source": "6bd383ee258f321c",

@@ -60,8 +60,7 @@ const text = (line: FooterLine) => {
 .site-footer {
   position: relative;
   margin-top: var(--space-9);
-  padding: clamp(var(--space-7), 7vw, var(--space-8))
-    clamp(var(--space-4), 4vw, var(--space-7)) var(--space-6);
+  padding: clamp(var(--space-7), 7vw, var(--space-8)) 0 var(--space-6);
   background:
     linear-gradient(
       color-mix(in oklab, var(--primary-container) 34%, transparent),
@@ -88,7 +87,7 @@ const text = (line: FooterLine) => {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
   gap: var(--space-6);
-  width: min(100%, 74rem);
+  width: min(100% - var(--site-gutter), var(--site-width));
   margin-inline: auto;
 }
 
@@ -116,7 +115,7 @@ const text = (line: FooterLine) => {
   align-items: center;
   justify-content: space-between;
   gap: var(--space-4);
-  width: min(100%, 74rem);
+  width: min(100% - var(--site-gutter), var(--site-width));
   max-width: none;
   margin: var(--space-7) auto 0;
   padding-top: var(--space-4);

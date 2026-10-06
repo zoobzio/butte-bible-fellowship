@@ -9,8 +9,8 @@ import AppMobileNav from "~/components/AppMobileNav.vue";
 import Menu from "@zoobzio/foundation/components/core/menu";
 
 const LINKS: NavigationLink[] = [
-  { label: "navigation.home", to: "/" },
-  { label: "navigation.invited", to: "/visit" },
+  { label: "navigation.about", to: "/" },
+  { label: "navigation.events", to: "/visit" },
 ];
 
 const { $t } = useNuxtApp();
@@ -39,8 +39,8 @@ describe("AppMobileNav", () => {
       {
         key: "primary",
         items: [
-          { label: $t.navigation.home(), link: { to: "/" } },
-          { label: $t.navigation.invited(), link: { to: "/visit" } },
+          { label: $t.navigation.about(), link: { to: "/" } },
+          { label: $t.navigation.events(), link: { to: "/visit" } },
         ],
       },
     ]);

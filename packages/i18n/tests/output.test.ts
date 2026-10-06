@@ -84,8 +84,13 @@ describe("bundles", () => {
       locale: index.locale,
       messages: await bundles.bundles[index.locale](),
     });
-    // The three messages that take a value are formatted with one below.
-    const taking = ["appearance.scheme", "footer.copyright", "sermons.play"];
+    // The messages that take a value are formatted with one below.
+    const taking = [
+      "appearance.scheme",
+      "footer.copyright",
+      "sermons.play",
+      "events.day",
+    ];
     for (const [key, message] of Object.entries(source)) {
       if (!taking.includes(key)) {
         expect(fibber.format(key as never), key).toBe(message);
@@ -103,6 +108,9 @@ describe("bundles", () => {
     expect(fibber.format("sermons.play", { title: "Faith & Works" })).toBe(
       "Play “Faith & Works”",
     );
+    expect(
+      fibber.format("events.day", { date: "Sunday, October 4", count: 3 }),
+    ).toBe("Sunday, October 4, 3 events");
   });
 });
 

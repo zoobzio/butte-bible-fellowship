@@ -1,23 +1,24 @@
 <script lang="ts">
+import type { Sermon } from "#shared/types/sermons";
+
 import { NuxtLink } from "#components";
 import { useNuxtApp, useRuntimeConfig } from "#imports";
 
 import SermonCard from "~/components/SermonCard.vue";
-import { useSermons } from "~/composables/sermons";
 </script>
 
 <script setup lang="ts">
 defineOptions({ name: "SermonGrid" });
 
+const { sermons } = defineProps<{ sermons: Sermon[] }>();
+
 const { $t } = useNuxtApp();
 const { channel } = useRuntimeConfig().public.youtube;
-
-const { data: sermons } = await useSermons();
 </script>
 
 <template>
   <section class="sermon-grid">
-    <div v-if="sermons?.length" class="sermon-grid-list">
+    <div v-if="sermons.length" class="sermon-grid-list">
       <SermonCard v-for="sermon in sermons" :key="sermon.id" :sermon="sermon" />
     </div>
     <NuxtLink

@@ -16,7 +16,7 @@ const { data: page } = await usePage();
 if (!page.value) {
   throw createError({
     statusCode: 404,
-    statusMessage: useNuxtApp().$t.page.notFound(),
+    message: useNuxtApp().$t.page.notFound(),
   });
 }
 

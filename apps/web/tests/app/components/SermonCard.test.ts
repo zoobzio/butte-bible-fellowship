@@ -52,6 +52,24 @@ describe("SermonCard", () => {
     expect(time.text()).toBe("October 4, 2026");
   });
 
+  it("is not featured unless it is asked to be", () => {
+    const wrapper = card();
+    expect(wrapper.find(".sermon-card-featured").exists()).toBe(false);
+    expect(wrapper.find(".sermon-card-label").exists()).toBe(false);
+  });
+
+  it("labels a featured sermon as the latest, and loads its picture at once", () => {
+    const wrapper = mount(SermonCard, {
+      props: { sermon: SERMON, featured: true },
+    });
+    const meta = wrapper.find(".sermon-card-featured > .sermon-card-meta");
+    expect(meta.find(".sermon-card-label").text()).toBe(
+      useNuxtApp().$t.sermons.latest(),
+    );
+    expect(meta.find("h2").text()).toBe("Faith & Works");
+    expect(wrapper.find("img").attributes("loading")).toBe("eager");
+  });
+
   it("writes the date in the route's language", () => {
     setRoutePath("/es/sermons");
     expect(card().find("time").text()).toBe("4 de octubre de 2026");

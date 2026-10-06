@@ -1,10 +1,11 @@
 {
   "label": "Principale",
   "open": "Ouvrir la navigation",
-  "home": "Accueil",
-  "invited": "Vous êtes invités",
   "about": "À propos de nous",
-  "calendar": "Événements de la semaine",
+  "events": "Événements",
   "sermons": "Prédications",
-  "connect": "Contact et accès"
+  "connect": "Contact",
+  "calendar": "Événements de la semaine",
+  "home": "Accueil",
+  "invited": "Vous êtes invités"
 }

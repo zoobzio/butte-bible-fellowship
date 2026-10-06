@@ -5,8 +5,6 @@ description: A new community for the cause of Christ.
 
 # Our Vision
 
-![Tulips in bloom](/images/tulips.jpg){.prose-aside-image}
-
 Modern wisdom says that the best vision statements are clever, easy-to-remember slogans, and above all…brief. If that’s your cup of tea …
 
 > Our intent is to be the Church;

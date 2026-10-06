@@ -4,6 +4,8 @@ export default defineConfig({
   id: "bbf",
   name: "Butte Bible Fellowship",
   icons: {
+    "chevron-left": "lucide:chevron-left",
+    "chevron-right": "lucide:chevron-right",
     languages: "lucide:languages",
     menu: "lucide:menu",
     moon: "lucide:moon",
