@@ -21,13 +21,17 @@ const { channel } = useRuntimeConfig().public.youtube;
     <div v-if="sermons.length" class="sermon-grid-list">
       <SermonCard v-for="sermon in sermons" :key="sermon.id" :sermon="sermon" />
     </div>
-    <NuxtLink
-      :to="`https://www.youtube.com/channel/${channel}/videos`"
-      target="_blank"
-      class="cta"
-    >
-      {{ $t.sermons.all() }}
-    </NuxtLink>
+    <!-- The way on from the list: the channel, unless what holds the grid
+         hands it another. -->
+    <slot>
+      <NuxtLink
+        :to="`https://www.youtube.com/channel/${channel}/videos`"
+        target="_blank"
+        class="cta"
+      >
+        {{ $t.sermons.all() }}
+      </NuxtLink>
+    </slot>
   </section>
 </template>
 

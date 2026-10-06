@@ -58,6 +58,12 @@ export const monthOf = (date: string): string[] => {
   return dates;
 };
 
+/** The dates of a date's week, Sunday to Saturday. */
+export const weekOf = (date: string): string[] => {
+  const start = startOfWeek(date);
+  return Array.from({ length: 7 }, (_, days) => addDays(start, days));
+};
+
 /** A time of day written `HH:MM`, in minutes — `null` when it is not one. */
 export const minutes = (time: string | undefined): number | null => {
   const match = /^(\d{1,2}):(\d{2})$/.exec(time?.trim() ?? "");
@@ -115,3 +121,7 @@ export const eventsOn = (events: ChurchEvent[], date: string) => {
 /** The days the calendar shows for a date's month, each with its events. */
 export const calendar = (events: ChurchEvent[], date: string): CalendarDay[] =>
   monthOf(date).map((day) => ({ date: day, events: eventsOn(events, day) }));
+
+/** The days of a date's week, each with its events. */
+export const week = (events: ChurchEvent[], date: string): CalendarDay[] =>
+  weekOf(date).map((day) => ({ date: day, events: eventsOn(events, day) }));

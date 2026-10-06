@@ -8,8 +8,10 @@ import {
   definePageMeta,
 } from "#imports";
 
+import SermonGrid from "~/components/SermonGrid.vue";
 import { useRouteLocale } from "~/composables/locale";
 import { usePage } from "~/composables/page";
+import { useSermons } from "~/composables/sermons";
 import { MARKDOWN_COMPONENTS } from "~/constants/markdown";
 </script>
 
@@ -18,23 +20,30 @@ definePageMeta({
   keepalive: true,
 });
 
+const { $t } = useNuxtApp();
+
 const { data: page } = await usePage();
 const { localize } = useRouteLocale();
 
 if (!page.value) {
   throw createError({
     statusCode: 404,
-    message: useNuxtApp().$t.page.notFound(),
+    message: $t.page.notFound(),
   });
 }
 
 useHead(() => ({ title: page.value?.title }));
 
 const hero = computed(() => page.value?.hero);
+
+const { data: sermons } = await useSermons();
+
+// The three newest sermons close the page: the sermons page has the rest.
+const recent = computed(() => sermons.value?.slice(0, 3) ?? []);
 </script>
 
 <template>
-  <div v-if="page">
+  <div v-if="page" class="home">
     <div v-if="hero" class="home-hero">
       <section class="home-hero-body">
         <div class="home-hero-content">
@@ -47,6 +56,9 @@ const hero = computed(() => page.value?.hero);
             {{ hero.cta.label }}
           </NuxtLink>
         </div>
+        <div class="home-hero-media">
+          <img v-if="hero.image" :src="hero.image" alt="" />
+        </div>
       </section>
     </div>
 
@@ -57,63 +69,39 @@ const hero = computed(() => page.value?.hero);
         :prose="false"
       />
     </section>
+
+    <section v-if="recent.length" class="home-sermons">
+      <h2>{{ $t.sermons.recent() }}</h2>
+      <SermonGrid :sermons="recent">
+        <NuxtLink :to="localize('/sermons')" class="cta">
+          {{ $t.sermons.more() }}
+        </NuxtLink>
+      </SermonGrid>
+    </section>
   </div>
 </template>
 
 <style>
-.home-hero {
-  position: relative;
-  background: transparent;
+/* The page keeps the site's measure, as every page does: the hero, the
+   article and the sermons each fill it. */
+.home {
+  width: min(100% - var(--site-gutter), var(--site-width));
+  margin-inline: auto;
 }
 
-/* The hero wash paints on a negative-z layer so the scroll-drawn arch
-   track (also negative-z, appended later) reads on top of it. */
-.home-hero::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  background:
-    radial-gradient(
-      circle at 14% 22%,
-      color-mix(in oklab, var(--primary-container) 62%, transparent),
-      transparent 58%
-    ),
-    radial-gradient(
-      circle at 86% 88%,
-      color-mix(in oklab, var(--tertiary-container) 42%, transparent),
-      transparent 60%
-    ),
-    linear-gradient(
-      color-mix(in oklab, var(--primary-container) 26%, transparent),
-      var(--surface)
-    );
+.home .prose {
+  width: auto;
+  margin-inline: 0;
 }
 
-[data-color="light"] .home-hero::before {
-  background:
-    radial-gradient(
-      circle at 14% 22%,
-      color-mix(in oklab, var(--primary-300) 52%, transparent),
-      transparent 64%
-    ),
-    radial-gradient(
-      circle at 86% 88%,
-      color-mix(in oklab, var(--tertiary-300) 38%, transparent),
-      transparent 64%
-    ),
-    linear-gradient(
-      color-mix(in oklab, var(--primary-200) 50%, transparent),
-      color-mix(in oklab, var(--surface) 55%, transparent)
-    );
-}
-
+/* The content, and to its right the window its picture is in. */
 .home-hero-body {
   position: relative;
   z-index: 1;
-  width: min(100% - clamp(var(--space-5), 8vw, var(--space-8)), 88ch);
-  margin-inline: auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 22rem);
+  align-items: center;
+  gap: clamp(var(--space-7), 6vw, var(--space-9));
   padding-block: clamp(var(--space-8), 12vw, var(--space-10));
 }
 
@@ -142,10 +130,53 @@ const hero = computed(() => page.value?.hero);
   margin: 0;
 }
 
+/* The staff card's arched window, holding its shape with or without a
+   picture: until the page names one, it stands empty in its place. */
+.home-hero-media {
+  overflow: hidden;
+  aspect-ratio: 4 / 5;
+  padding: var(--space-2);
+  border: 1px var(--stroke-solid)
+    color-mix(in oklab, var(--primary) 45%, var(--outline-muted));
+  border-radius: 50% 50% var(--shape-sm) var(--shape-sm) / 34% 34%
+    var(--shape-sm) var(--shape-sm);
+  background: var(--surface-container);
+}
+
+/* The picture takes the window's shape: the same arch, inside the rim. */
+.home-hero-media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  object-fit: cover;
+}
+
+/* No room for a column beside the content: the window follows it, no
+   wider than it stood beside it. */
+@media (max-width: 60rem) {
+  .home-hero-body {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .home-hero-media {
+    max-width: 22rem;
+  }
+}
+
+/* The article's own padding has already set the sermons off from it. */
+.home-sermons h2 {
+  margin-top: 0;
+}
+
+.home-sermons .sermon-grid {
+  margin: var(--space-6) 0 0;
+}
+
 /* ---------- Motion — slow enough to feel like weather ---------------- */
 
 @media (prefers-reduced-motion: no-preference) {
-  .home-hero-content > * {
+  .home-hero-content > *,
+  .home-hero-media {
     animation: bbf-rise var(--duration-slow) var(--easing-enter) both;
   }
   .home-hero-content > *:nth-child(2) {
@@ -153,6 +184,9 @@ const hero = computed(() => page.value?.hero);
   }
   .home-hero-content > *:nth-child(3) {
     animation-delay: calc(var(--delay-step) * 3);
+  }
+  .home-hero-media {
+    animation-delay: calc(var(--delay-step) * 4.5);
   }
 }
 

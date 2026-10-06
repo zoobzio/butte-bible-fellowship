@@ -3,7 +3,7 @@ import { splitLocalePath } from "~/utils/locale";
 
 /**
  * The route decides the locale: before a page renders, the app is switched
- * to the locale its path names. So a prerendered page is in its own
+ * to the locale its path names. So a page the server renders is in its own
  * language, and following a link to another locale's page changes the
  * language with it.
  */

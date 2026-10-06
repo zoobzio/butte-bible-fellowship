@@ -18,5 +18,13 @@
   "all": {
     "defaultMessage": "See all sermons on YouTube",
     "description": "The link under the latest sermons, to the church's YouTube channel."
+  },
+  "recent": {
+    "defaultMessage": "Recent sermons",
+    "description": "The heading over the three newest sermons, at the bottom of the home page."
+  },
+  "more": {
+    "defaultMessage": "See more sermons",
+    "description": "The link under the home page's three newest sermons, to the sermons page, which lists the rest."
   }
 }

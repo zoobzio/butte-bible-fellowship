@@ -12,7 +12,7 @@ const FOOTER: FooterConfig = {
   columns: [
     {
       title: "site.name",
-      lines: [{ label: "footer.worship" }, { text: "Testville" }],
+      lines: [{ label: "site.tagline" }, { text: "Testville" }],
     },
     {
       title: "footer.contact",
@@ -55,11 +55,20 @@ describe("AppFooter", () => {
     ]);
   });
 
+  it("quotes the verse ahead of the columns, with its reference marked up as the prose marks one up", () => {
+    const quote = mountFooter().find(
+      ".site-footer-grid > blockquote.site-footer-verse:first-child > p",
+    );
+    expect(quote.text()).toBe(`${$t.footer.verse()} ${$t.footer.reference()}`);
+    expect(quote.find("em").text()).toBe($t.footer.reference());
+  });
+
   it("renders lines without an href as plain text, messages resolved", () => {
     const [first] = mountFooter().findAll(".site-footer-col");
-    expect(first!.findAll("p").map((line) => line.text())).toEqual([
+    const lines = first!.findAll(".site-footer-col > p");
+    expect(lines.map((line) => line.text())).toEqual([
       $t.site.name(),
-      $t.footer.worship(),
+      $t.site.tagline(),
       "Testville",
     ]);
     expect(first!.find("a").exists()).toBe(false);

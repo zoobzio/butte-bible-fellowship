@@ -14,6 +14,8 @@ import {
   pathOf,
   slugOf,
   toTime,
+  week,
+  weekOf,
 } from "~/utils/events";
 
 describe("churchDate", () => {
@@ -51,6 +53,29 @@ describe("monthOf", () => {
     // February 2026 is four whole weeks; August 2026 touches six.
     expect(monthOf("2026-02-10").length).toBe(28);
     expect(monthOf("2026-08-10").length).toBe(42);
+  });
+});
+
+describe("weekOf", () => {
+  it("gives a date's week, Sunday to Saturday, whichever of its days is asked", () => {
+    const dates = [
+      "2026-10-04",
+      "2026-10-05",
+      "2026-10-06",
+      "2026-10-07",
+      "2026-10-08",
+      "2026-10-09",
+      "2026-10-10",
+    ];
+    for (const date of dates) {
+      expect(weekOf(date), date).toEqual(dates);
+    }
+  });
+
+  it("runs a week across the end of a month and of a year", () => {
+    const dates = weekOf("2026-12-31");
+    expect(dates[0]).toBe("2026-12-27");
+    expect(dates[6]).toBe("2027-01-02");
   });
 });
 
@@ -144,6 +169,13 @@ describe("eventsOn", () => {
   it("leaves the list it was handed in the order it came", () => {
     eventsOn(EVENTS, "2026-10-04");
     expect(EVENTS[0]!.title).toBe("Worship");
+  });
+
+  it("gives each day of a date's week its events", () => {
+    const days = week(EVENTS, "2026-10-07");
+    expect(days.map((day) => day.date)).toEqual(weekOf("2026-10-07"));
+    expect(days.map((day) => day.events.length)).toEqual([4, 0, 0, 0, 0, 0, 0]);
+    expect(days[0]!.events).toEqual(eventsOn(EVENTS, "2026-10-04"));
   });
 
   it("gives each day of a date's month its events", () => {

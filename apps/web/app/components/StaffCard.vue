@@ -7,7 +7,12 @@ import { computed } from "#imports";
 <script setup lang="ts">
 defineOptions({ name: "StaffCard" });
 
-const { member } = defineProps<{ member: StaffMember }>();
+// A compact card is a line in a list of people: the window small and to
+// the left, the person's role and name beside it, and nothing more said.
+const { member, compact = false } = defineProps<{
+  member: StaffMember;
+  compact?: boolean;
+}>();
 
 // Without a photo the card shows the person's initials: the first letter of
 // their first and last names.
@@ -20,7 +25,7 @@ const initials = computed(() => {
 </script>
 
 <template>
-  <article class="staff-card">
+  <article class="staff-card" :class="{ 'staff-card-compact': compact }">
     <div class="staff-card-frame">
       <img
         v-if="member.photo"
@@ -36,8 +41,10 @@ const initials = computed(() => {
     <div class="staff-card-meta">
       <p class="staff-card-role">{{ member.role }}</p>
       <h3>{{ member.name }}</h3>
-      <p v-if="member.bio" class="staff-card-bio">{{ member.bio }}</p>
-      <a v-if="member.email" :href="`mailto:${member.email}`">
+      <p v-if="member.bio && !compact" class="staff-card-bio">
+        {{ member.bio }}
+      </p>
+      <a v-if="member.email && !compact" :href="`mailto:${member.email}`">
         {{ member.email }}
       </a>
     </div>
@@ -127,5 +134,26 @@ const initials = computed(() => {
 
 .staff-card a {
   font-size: var(--label-size);
+}
+
+.staff-card-compact {
+  flex-direction: row;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.staff-card-compact .staff-card-frame {
+  flex: none;
+  width: 4rem;
+  margin-bottom: 0;
+  padding: var(--space-1);
+}
+
+.staff-card-compact .staff-card-initials {
+  font-size: var(--title-size);
+}
+
+.staff-card-compact .staff-card-meta {
+  gap: 0;
 }
 </style>

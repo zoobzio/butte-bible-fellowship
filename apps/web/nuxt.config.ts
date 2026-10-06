@@ -8,16 +8,28 @@ import icons from "@bbf/icons/config";
 import sets from "@bbf/icons/sets";
 import untheme from "@bbf/theme/config";
 
-import { SERMONS_MAX_AGE } from "./shared/constants/sermons";
+import { PAGE_MAX_AGE } from "./shared/constants/pages";
 
 /** The locales the site is translated to: each has its pages under `/<locale>`. */
 const targets = locales.filter((locale) => locale !== source);
 
+/** A page's path in a locale: `/es/about-us`, and `/es` for the home page. */
+const localized = (locale: string, path: string) =>
+  path === "/" ? `/${locale}` : `/${locale}${path}`;
+
 /**
- * The pages rendered by the server when they are asked for, rather than once
- * at build: what they show changes without a deploy.
+ * The site's pages. Each is rendered by the server when it is asked for,
+ * rather than once at build: what a page shows — the week's events under
+ * every one, the sermons on some — changes without a deploy.
  */
-const live = ["/sermons"];
+const live = [
+  "/",
+  "/about-us",
+  "/connect",
+  "/events",
+  "/events/**",
+  "/sermons",
+];
 
 /** The pages that have moved: the path each was at, and where it is now. */
 const moved = { "/calendar": "/events" };
@@ -122,7 +134,7 @@ export default defineNuxtConfig({
           pages.push({
             ...page,
             name: `${page.name}___${locale}`,
-            path: page.path === "/" ? `/${locale}` : `/${locale}${page.path}`,
+            path: localized(locale, page.path),
           });
         }
       }
@@ -131,22 +143,18 @@ export default defineNuxtConfig({
 
   nitro: {
     publicAssets: [{ dir: assets }],
-    prerender: {
-      routes: ["/", ...targets.map((locale) => `/${locale}`)],
-      crawlLinks: true,
-    },
   },
 
   routeRules: {
-    // A live page, in every locale, is rendered on request and that render
-    // kept as long as the sermons are: the crawler must not prerender it.
+    // A page, in every locale, is rendered on request, and that render is
+    // kept: served to everyone who asks for a while, then made again.
     ...Object.fromEntries(
       live
         .flatMap((path) => [
           path,
-          ...targets.map((locale) => `/${locale}${path}`),
+          ...targets.map((locale) => localized(locale, path)),
         ])
-        .map((path) => [path, { prerender: false, swr: SERMONS_MAX_AGE }]),
+        .map((path) => [path, { swr: PAGE_MAX_AGE }]),
     ),
     // A moved page, in every locale, sends its old address to its new one.
     ...Object.fromEntries(

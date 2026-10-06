@@ -34,6 +34,15 @@ describe("SermonGrid", () => {
     expect(link.text()).toBe(useNuxtApp().$t.sermons.all());
   });
 
+  it("gives way to the link it is handed in place of the channel's", () => {
+    const wrapper = mount(SermonGrid, {
+      props: { sermons: SERMONS },
+      slots: { default: '<a class="more" href="/sermons">More</a>' },
+    });
+    expect(wrapper.find(".sermon-grid-list + a.more").exists()).toBe(true);
+    expect(wrapper.find("a.cta").exists()).toBe(false);
+  });
+
   it("keeps the link, and no list, when there are no sermons", () => {
     const wrapper = grid([]);
     expect(wrapper.find(".sermon-grid-list").exists()).toBe(false);

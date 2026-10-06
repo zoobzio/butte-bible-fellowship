@@ -33,6 +33,7 @@ const schema = z.object({
       tagline: z.string(),
       highlight: z.string().optional(),
       description: z.string().optional(),
+      image: z.string().optional().editor({ input: "media" }),
       cta: z
         .object({
           label: z.string(),

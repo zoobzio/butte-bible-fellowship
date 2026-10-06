@@ -1,5 +1,6 @@
 import type { FooterConfig } from "~/types/footer";
 import type { HeaderConfig } from "~/types/header";
+import type { InvitationConfig } from "~/types/invitation";
 
 import { defineAppConfig } from "#imports";
 
@@ -18,10 +19,6 @@ const header: HeaderConfig = {
 
 const footer: FooterConfig = {
   columns: [
-    {
-      title: "site.name",
-      lines: [{ label: "site.tagline" }, { label: "footer.worship" }],
-    },
     {
       title: "footer.contact",
       lines: [
@@ -52,4 +49,8 @@ const footer: FooterConfig = {
   ],
 };
 
-export default defineAppConfig({ header, footer });
+const invitation: InvitationConfig = {
+  address: "2255 Pillsbury Road, Chico",
+};
+
+export default defineAppConfig({ header, footer, invitation });

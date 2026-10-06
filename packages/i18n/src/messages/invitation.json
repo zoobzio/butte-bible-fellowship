@@ -1,0 +1,30 @@
+{
+  "title": {
+    "defaultMessage": "Join us Sundays at 10:00am",
+    "description": "The line in the bar above the footer of most pages, inviting the reader to the Sunday service. The church's address follows it, and the current week's events are listed beside it."
+  },
+  "events": {
+    "defaultMessage": "See all events",
+    "description": "The button under the invitation to the Sunday service, leading to the events page and its calendar."
+  },
+  "week": {
+    "defaultMessage": "This week",
+    "description": "The label over the list of the current week's events, beside the invitation to the Sunday service."
+  },
+  "meet": {
+    "defaultMessage": "We’d love to meet you",
+    "description": "The line in the bar above the footer of the events page, inviting the reader to get in touch with the church. The church's staff are listed beside it."
+  },
+  "people": {
+    "defaultMessage": "Here are the people to ask for.",
+    "description": "The line under “We’d love to meet you” in the bar above the events page's footer, pointing to the church's staff listed beside it."
+  },
+  "connect": {
+    "defaultMessage": "Connect with us",
+    "description": "The button under the invitation to get in touch, leading to the connect page: the church's staff and how to reach and find the church."
+  },
+  "staff": {
+    "defaultMessage": "Our staff",
+    "description": "The label over the list of the church's staff — their names and roles — beside the invitation to get in touch."
+  }
+}

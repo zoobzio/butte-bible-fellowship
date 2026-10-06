@@ -72,7 +72,9 @@ The site's interface text lives in [`@bbf/i18n`](packages/i18n) as
 footer's messages by key.
 
 English is at the routes as written (`/about-us`); every other locale has the
-same pages under its prefix (`/es/about-us`), all prerendered. The route
+same pages under its prefix (`/es/about-us`). No page is prerendered: each
+is rendered when it is asked for, and that render kept for fifteen minutes
+(`routeRules` in `nuxt.config.ts`). The route
 decides the language: a global middleware switches fibber to the locale the
 path names, `usePage` reads that locale's collection, and `useRouteLocale`
 keeps links inside it. The language button in the footer links to the page

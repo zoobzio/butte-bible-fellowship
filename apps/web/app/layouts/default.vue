@@ -6,12 +6,13 @@ import { useRouteLocale } from "~/composables/locale";
 import { useMediaQuery } from "~/composables/viewport";
 import AppHeader from "~/components/AppHeader.vue";
 import AppFooter from "~/components/AppFooter.vue";
+import AppInvitation from "~/components/AppInvitation.vue";
 import Orbs from "~/components/Orbs.vue";
 import Arches from "~/components/Arches.vue";
 </script>
 
 <script setup lang="ts">
-const { path } = useRouteLocale();
+const { path, locale: reading } = useRouteLocale();
 const { $t } = useNuxtApp();
 const { locale } = useLocale();
 
@@ -35,6 +36,9 @@ const decor = computed(() => !isMobile.value);
     <main class="site-main">
       <slot />
     </main>
+    <!-- The bar reads the events in the locale it is set up in: a visitor
+         who changes language is handed a new one. -->
+    <AppInvitation :key="reading" />
     <AppFooter />
     <Arches v-if="isHome && decor" />
   </Body>

@@ -21,8 +21,9 @@ const { localize } = useRouteLocale();
 
 // The header wraps and scales with the viewport, so its height is measured
 // and published as `--header-height`: what sticks under it reads where it
-// ends.
-const header$ = useTemplateRef<HTMLElement>("header");
+// ends. The ref is not named `header`: that is the config above, and a
+// production build would hand the element to it instead.
+const header$ = useTemplateRef<HTMLElement>("root");
 let observer: ResizeObserver | null = null;
 
 const publish = () => {
@@ -48,7 +49,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <header ref="header" class="site-header">
+  <header ref="root" class="site-header">
     <NuxtLink :to="localize('/')" class="site-brand">
       <Icon name="logo" class="site-brand-logo" aria-hidden="true" />
       <span class="site-brand-text">

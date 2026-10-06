@@ -1,7 +1,8 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { ContentRenderer } from "#components";
-import { setContentPages, useHead } from "#imports";
+import { setContentPages, setRoutePath, useHead, useNuxtApp } from "#imports";
+import SermonGrid from "~/components/SermonGrid.vue";
 import { MARKDOWN_COMPONENTS } from "~/constants/markdown";
 import Page from "~/pages/index.vue";
 import { mountSuspended } from "#test/support/mount";
@@ -13,10 +14,35 @@ const HERO = {
   cta: { label: "You're invited", to: "/youre-invited" },
 };
 
-const home = (hero?: Partial<typeof HERO>) => ({
+const home = (hero?: Partial<typeof HERO> & { image?: string }) => ({
   path: "/",
   title: "Home – Test Church",
   hero,
+});
+
+const sermon = (id: string) => ({
+  id,
+  title: `Sermon ${id}`,
+  published: "2026-10-04T18:16:28+00:00",
+  thumbnail: `https://i4.ytimg.com/vi/${id}/hqdefault.jpg`,
+});
+
+const SERMONS = ["abc123", "def456", "ghi789", "jkl012"].map(sermon);
+
+/** Has the site's API list these sermons. */
+const listSermons = (sermons = SERMONS) => {
+  vi.stubGlobal(
+    "$fetch",
+    vi.fn(async () => sermons),
+  );
+};
+
+beforeEach(() => {
+  listSermons();
+});
+
+afterEach(() => {
+  vi.unstubAllGlobals();
 });
 
 describe("home page", () => {
@@ -45,6 +71,24 @@ describe("home page", () => {
     expect(hero.find("a").exists()).toBe(false);
   });
 
+  it("shows the hero's image in the window beside the content", async () => {
+    setContentPages({ "/": home({ ...HERO, image: "/church.jpg" }) });
+    const { wrapper } = await mountSuspended(Page);
+
+    const image = wrapper.find(".home-hero-media img");
+    expect(image.attributes("src")).toBe("/church.jpg");
+    expect(image.attributes("alt")).toBe("");
+  });
+
+  it("leaves the window empty until the hero has an image", async () => {
+    setContentPages({ "/": home(HERO) });
+    const { wrapper } = await mountSuspended(Page);
+
+    const media = wrapper.find(".home-hero-media");
+    expect(media.exists()).toBe(true);
+    expect(media.find("img").exists()).toBe(false);
+  });
+
   it("renders no hero when the page has none", async () => {
     setContentPages({ "/": home() });
     const { wrapper } = await mountSuspended(Page);
@@ -62,6 +106,47 @@ describe("home page", () => {
     expect(renderer.props("value")).toEqual(page);
     expect(renderer.props("components")).toBe(MARKDOWN_COMPONENTS);
     expect(renderer.props("prose")).toBe(false);
+  });
+
+  it("keeps the site's measure around the hero, the body and the sermons", async () => {
+    setContentPages({ "/": home(HERO) });
+    const { wrapper } = await mountSuspended(Page);
+    expect(
+      wrapper
+        .find(".home > .home-hero + section.prose + section.home-sermons")
+        .exists(),
+    ).toBe(true);
+  });
+
+  it("closes with the three newest sermons, under their heading", async () => {
+    setContentPages({ "/": home(HERO) });
+    const { wrapper } = await mountSuspended(Page);
+
+    const sermons = wrapper.find(".home-sermons");
+    expect(sermons.find("h2").text()).toBe(useNuxtApp().$t.sermons.recent());
+    expect(sermons.findComponent(SermonGrid).props("sermons")).toEqual(
+      SERMONS.slice(0, 3),
+    );
+  });
+
+  it("links on to the sermons page, in the visitor's locale, in place of the channel", async () => {
+    setRoutePath("/es");
+    setContentPages({ "/": home(HERO) });
+    const { wrapper } = await mountSuspended(Page);
+
+    const links = wrapper.findAll(".home-sermons a.cta");
+    expect(links.map((link) => link.attributes("href"))).toEqual([
+      "/es/sermons",
+    ]);
+    expect(links[0]!.text()).toBe(useNuxtApp().$t.sermons.more());
+  });
+
+  it("leaves the sermons out when there are none to show", async () => {
+    listSermons([]);
+    setContentPages({ "/": home(HERO) });
+    const { wrapper } = await mountSuspended(Page);
+    expect(wrapper.find(".home-sermons").exists()).toBe(false);
+    expect(wrapper.find("section.prose").exists()).toBe(true);
   });
 
   it("titles the document after the page", async () => {

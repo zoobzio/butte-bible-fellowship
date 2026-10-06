@@ -3,8 +3,9 @@ import type { ChurchEvent } from "#shared/types/events";
 
 import { NuxtLink } from "#components";
 import { computed, useNuxtApp } from "#imports";
+import { useEventTime } from "~/composables/events";
 import { useRouteLocale } from "~/composables/locale";
-import { minutes, pathOf, toTime } from "~/utils/events";
+import { pathOf } from "~/utils/events";
 </script>
 
 <script setup lang="ts">
@@ -14,27 +15,8 @@ defineOptions({ name: "EventList" });
 const { events } = defineProps<{ events: ChurchEvent[] }>();
 
 const { $t } = useNuxtApp();
-const { locale, localize } = useRouteLocale();
-
-// When an event is held: its start, and its end when it has one. The time
-// is formatted as written — the church's own, whatever the visitor's zone.
-const timeFormat = computed(
-  () =>
-    new Intl.DateTimeFormat(locale.value, {
-      hour: "numeric",
-      minute: "2-digit",
-      timeZone: "UTC",
-    }),
-);
-
-const time = (event: ChurchEvent) => {
-  const start = minutes(event.start);
-  if (start === null) return undefined;
-  const end = minutes(event.end);
-  return end === null
-    ? timeFormat.value.format(toTime(start))
-    : timeFormat.value.formatRange(toTime(start), toTime(end));
-};
+const { localize } = useRouteLocale();
+const time = useEventTime();
 
 const listed = computed(() =>
   events.map((event) => ({

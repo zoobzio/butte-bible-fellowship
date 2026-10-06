@@ -5,6 +5,7 @@ hero:
   tagline: Discover God’s
   highlight: Love, Grace & Truth
   description: Join us in connecting people to the life changing presence of Jesus Christ, and in the pursuit of His character.
+  image: /images/church.jpg
   cta:
     label: You’re Invited
     to: /youre-invited
