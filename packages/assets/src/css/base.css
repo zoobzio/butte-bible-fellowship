@@ -7,12 +7,21 @@
    the property on the root, and until it has, nothing is under it.
    The site's width is one measure: every page, the header and the footer
    run to it, with the gutter — the room kept at the viewport's edges —
-   split between the two sides. */
+   split between the two sides.
+   The brand is the site's name over its tagline, with the logo beside them:
+   the name's size scales with the viewport, and the brand's height is the
+   two lines stacked — each at its line height, plus the gap between — so
+   the logo can be a square of it. */
 :root {
   --font-display: "Newsreader", Georgia, serif;
   --header-height: 0px;
   --site-width: 64rem;
   --site-gutter: clamp(var(--space-5), 8vw, var(--space-8));
+  --brand-name-size: clamp(var(--title-size), 2.4vw, var(--headline-size));
+  --brand-height: calc(
+    var(--brand-name-size) * var(--headline-line-height) + var(--label-size) *
+      var(--title-line-height) + var(--space-1)
+  );
 }
 
 /* Foundation's root colors the page loading bar with a token of its own

@@ -7,6 +7,7 @@ export default defineConfig({
     "chevron-left": "lucide:chevron-left",
     "chevron-right": "lucide:chevron-right",
     languages: "lucide:languages",
+    logo: "./src/logo.svg",
     menu: "lucide:menu",
     moon: "lucide:moon",
     palette: "lucide:palette",

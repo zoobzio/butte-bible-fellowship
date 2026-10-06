@@ -1,5 +1,5 @@
 <script lang="ts">
-import { NuxtLink } from "#components";
+import { Icon, NuxtLink } from "#components";
 import {
   onBeforeUnmount,
   onMounted,
@@ -50,8 +50,11 @@ onBeforeUnmount(() => {
 <template>
   <header ref="header" class="site-header">
     <NuxtLink :to="localize('/')" class="site-brand">
-      <span class="site-brand-name">{{ $t.site.name() }}</span>
-      <span class="site-brand-tag">{{ $t.site.tagline() }}</span>
+      <Icon name="logo" class="site-brand-logo" aria-hidden="true" />
+      <span class="site-brand-text">
+        <span class="site-brand-name">{{ $t.site.name() }}</span>
+        <span class="site-brand-tag">{{ $t.site.tagline() }}</span>
+      </span>
     </NuxtLink>
 
     <nav class="site-nav" :aria-label="$t.navigation.label()">
@@ -101,15 +104,32 @@ onBeforeUnmount(() => {
 }
 
 .site-brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  text-decoration: none;
+}
+
+/* The logo is drawn in currentColor, so it takes the theme's primary and
+   follows it as the theme changes. It is a square of the brand's height:
+   the name and tagline beside it, as the design system measures them. */
+.site-brand-logo {
+  flex: none;
+  display: block;
+  width: var(--brand-height);
+  height: var(--brand-height);
+  color: var(--primary);
+}
+
+.site-brand-text {
   display: grid;
   gap: var(--space-1);
-  text-decoration: none;
 }
 
 .site-brand-name {
   font: var(--type-headline);
   font-family: var(--font-display);
-  font-size: clamp(var(--title-size), 2.4vw, var(--headline-size));
+  font-size: var(--brand-name-size);
   letter-spacing: var(--type-headline-letter-spacing);
   color: var(--on-surface-high-contrast);
 }

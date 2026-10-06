@@ -29,6 +29,14 @@ describe("AppHeader", () => {
     expect(brand.find(".site-brand-tag").text()).toBe($t.site.tagline());
   });
 
+  it("leads the brand with the logo icon, hidden from assistive tech", () => {
+    const brand = mountHeader().find("a.site-brand");
+    const logo = brand.find(".site-brand-logo");
+    expect(logo.attributes("aria-hidden")).toBe("true");
+    expect(logo.find("use").attributes("href")).toBe("#logo");
+    expect(brand.element.firstElementChild).toBe(logo.element);
+  });
+
   it("renders the configured links in order in the primary navigation", () => {
     const nav = mountHeader().find(
       `nav[aria-label="${$t.navigation.label()}"]`,

@@ -7,6 +7,7 @@ the pages show, and the design system's stylesheet.
 
 ```
 src/                   the assets, served from the site's root
+src/favicon.ico        the mark, white on the brand blue, at 16 to 64px
 src/images/            the images the pages show
 src/css/               the design system's stylesheet
 src/css/index.css      the entry: imports the rest, in order
@@ -21,6 +22,20 @@ A file's path under `src/` is its URL: `src/images/tulips.jpg` is served at
 
 Nothing is built. The web app serves `src/` as public assets from
 `nuxt.config.ts`, and Nuxt Studio's media library reads and writes it.
+
+The favicon is `@bbf/icons`' `src/logo.svg` — the mark, drawn in
+`currentColor` — in the palette's `primary-500` (`#367eff`) over a white
+disc, so the cross and book read white rather than showing the tab behind
+them. To redo it, copy the SVG, add
+`<circle cx="705" cy="708" r="606" fill="#fff"/>` before its `<path>`, then:
+
+```sh
+for n in 16 32 48 64; do
+  rsvg-convert -w $n -h $n --stylesheet <(echo 'svg{color:#367eff}') \
+    mark.svg -o $n.png
+done
+magick 16.png 32.png 48.png 64.png src/favicon.ico
+```
 
 ## Styles
 
