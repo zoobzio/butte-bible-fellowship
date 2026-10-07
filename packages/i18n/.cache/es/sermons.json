@@ -3,5 +3,7 @@
   "description": "Los últimos mensajes de nuestros servicios de adoración dominicales.",
   "latest": "Último sermón",
   "play": "Reproducir «{title}»",
-  "all": "Ver todos los sermones en YouTube"
+  "all": "Ver todos los sermones en YouTube",
+  "recent": "Prédicas recientes",
+  "more": "Ver más prédicas"
 }

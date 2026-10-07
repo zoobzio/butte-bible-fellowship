@@ -5,9 +5,10 @@ hero:
   tagline: Descubre el
   highlight: amor, la gracia y la verdad de Dios
   description: Únete a nosotros para conectar a las personas con la presencia de Jesucristo, que transforma vidas, y en la búsqueda de Su carácter.
+  image: /images/church.jpg
   cta:
-    label: Estás invitado
-    to: /youre-invited
+    label: Más información
+    to: /about-us
 ---
 
 ## Bienvenido a Butte Bible Fellowship
@@ -30,8 +31,22 @@ Actualmente somos un pequeño grupo de creyentes experimentados que desean conve
 
 Esperamos que consideres unirte a nosotros.
 
-::visit-callout
-**Acompáñanos los domingos a las 10:00 a. m.**
+::invite-grid
+  :::invite-card
+  ### ¿Tienes curiosidad por el cristianismo?
 
-2255 Pillsbury Road, Chico · [consulta nuestros eventos](/events)
+  Si sientes curiosidad por las afirmaciones del cristianismo y te gustaría explorarla en un lugar seguro y acogedor, ¡estás invitado!
+  :::
+
+  :::invite-card
+  ### ¿Eres parte de una iglesia local?
+
+  Si actualmente participas en una iglesia local, te animamos a que sigas allí, ayudándola a llegar a ser todo lo que Dios quiere que sea.
+  :::
+
+  :::invite-card
+  ### ¿Eres nuevo en Chico?
+
+  Y si eres nuevo en Chico, o quizás de quienes han quedado con un vacío por las tendencias de las últimas décadas, nos encantaría que te unieras a nosotros y nos ayudaras a crecer de maneras espiritualmente sanas.
+  :::
 ::
