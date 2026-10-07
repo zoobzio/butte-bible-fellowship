@@ -1,0 +1,23 @@
+{
+  "title": "Événements",
+  "description": "Nos rassemblements au 2255 Pillsbury Road. Tout le monde est le bienvenu.",
+  "calendar": "Calendrier",
+  "previousMonth": "Mois précédent",
+  "nextMonth": "Mois suivant",
+  "today": "Aujourd’hui",
+  "day": "{date}, {count, plural, =0 {aucun événement} one {# événement} many {# d’événements} other {# événements}}",
+  "selected": "Événements du",
+  "thisWeek": "Cette semaine",
+  "all": "Tous les événements",
+  "weekly": "Tous les {day}s",
+  "monthly": "Les {weeks} {day}s de chaque mois",
+  "week": "Semaine",
+  "when": "Quand",
+  "where": "Où",
+  "questions": "Questions",
+  "none": "Rien de prévu",
+  "month": "Mois",
+  "next": "{view, select, week {Semaine suivante} other {Mois suivant}}",
+  "previous": "{view, select, week {Semaine précédente} other {Mois précédent}}",
+  "view": "Affichage du calendrier"
+}

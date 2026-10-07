@@ -20,6 +20,14 @@ describe("usePage", () => {
     expect(data.value).toBeNull();
   });
 
+  it("resolves the page a component names, whatever the route", async () => {
+    setContentPages({ "/about-us": ABOUT });
+    setRoutePath("/es/acerca");
+    const { data } = await usePage("/about-us");
+    expect(queriedCollections).toEqual(["pages_es"]);
+    expect(data.value).toEqual(ABOUT);
+  });
+
   it("asks the English collection for a path with no locale", async () => {
     setRoutePath("/about-us");
     await usePage();

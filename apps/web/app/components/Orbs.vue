@@ -45,9 +45,9 @@ watch(
 
 .orb {
   position: absolute;
-  filter: blur(90px);
+  filter: blur(var(--blur-lg));
   will-change: transform;
-  transition: transform 200ms linear;
+  transition: transform var(--duration-base) linear;
 }
 
 /* Aurora shapes: irregular radii plus layered elliptical washes, so the
@@ -120,21 +120,24 @@ watch(
   }
 }
 
+/* Light: the containers are too pale to show over a near-white surface, so
+   the washes are the accents themselves, thinned. Read from the roles, they
+   follow the vibrancy and contrast settings as the dark washes do. */
 [data-color="light"] .orb-left {
   background:
     radial-gradient(
       ellipse 62% 74% at 32% 30%,
-      color-mix(in oklab, var(--primary-300) 66%, transparent),
+      color-mix(in oklab, var(--primary) 42%, transparent),
       transparent 72%
     ),
     radial-gradient(
       ellipse 78% 44% at 68% 62%,
-      color-mix(in oklab, var(--primary-200) 72%, transparent),
+      color-mix(in oklab, var(--primary) 30%, transparent),
       transparent 74%
     ),
     radial-gradient(
       ellipse 40% 60% at 12% 74%,
-      color-mix(in oklab, var(--tertiary-300) 34%, transparent),
+      color-mix(in oklab, var(--tertiary) 22%, transparent),
       transparent 76%
     );
 }
@@ -143,25 +146,31 @@ watch(
   background:
     radial-gradient(
       ellipse 70% 56% at 64% 66%,
-      color-mix(in oklab, var(--secondary-300) 52%, transparent),
+      color-mix(in oklab, var(--secondary) 34%, transparent),
       transparent 74%
     ),
     radial-gradient(
       ellipse 46% 72% at 30% 40%,
-      color-mix(in oklab, var(--secondary-200) 62%, transparent),
+      color-mix(in oklab, var(--secondary) 26%, transparent),
       transparent 76%
     ),
     radial-gradient(
       ellipse 58% 40% at 84% 24%,
-      color-mix(in oklab, var(--tertiary-300) 30%, transparent),
+      color-mix(in oklab, var(--tertiary) 20%, transparent),
       transparent 76%
     );
 }
 
+/* Still, when the reader — or the system — has asked for less motion. */
 @media (prefers-reduced-motion: reduce) {
   .orb {
     transition: none;
     animation: none;
   }
+}
+
+[data-motion="reduced"] .orb {
+  transition: none;
+  animation: none;
 }
 </style>

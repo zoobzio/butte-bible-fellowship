@@ -1,9 +1,11 @@
 {
   "label": "Principal",
   "open": "Abrir navegación",
-  "home": "Inicio",
-  "invited": "Estás invitado",
   "about": "Quiénes somos",
+  "events": "Eventos",
+  "sermons": "Sermones",
+  "connect": "Conecta",
   "calendar": "Eventos semanales",
-  "connect": "Contacto y ubicación"
+  "home": "Inicio",
+  "invited": "Estás invitado"
 }

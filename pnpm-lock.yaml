@@ -19,11 +19,11 @@ catalogs:
       specifier: 0.0.1
       version: 0.0.1
     '@icon-sheets/kit':
-      specifier: 0.0.6
-      version: 0.0.6
+      specifier: 0.0.7
+      version: 0.0.7
     '@icon-sheets/nuxt':
-      specifier: 0.0.6
-      version: 0.0.6
+      specifier: 0.0.7
+      version: 0.0.7
     '@iconify-json/lucide':
       specifier: ^1.2.138
       version: 1.2.138
@@ -67,8 +67,8 @@ catalogs:
       specifier: ^20.11.6
       version: 20.11.6
     icon-sheets:
-      specifier: 0.0.6
-      version: 0.0.6
+      specifier: 0.0.7
+      version: 0.0.7
     nuxt:
       specifier: ^4.2.1
       version: 4.5.2
@@ -138,7 +138,7 @@ importers:
         version: 0.0.1(@fibber/kit@0.0.1(@fibber/translate@0.0.1))(magic-string@1.4.2)(magicast@0.5.4)(oxc-parser@0.139.0)(rolldown@1.2.5)(typescript@5.9.3)(unplugin@3.3.0(esbuild@0.28.2)(rolldown@1.2.5)(rollup@4.62.4)(vite@8.2.1(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(yaml@2.9.0)))
       '@icon-sheets/nuxt':
         specifier: 'catalog:'
-        version: 0.0.6(magic-string@1.4.2)(magicast@0.5.4)(oxc-parser@0.139.0)(rolldown@1.2.5)(typescript@5.9.3)(unplugin@3.3.0(esbuild@0.28.2)(rolldown@1.2.5)(rollup@4.62.4)(vite@8.2.1(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(yaml@2.9.0)))
+        version: 0.0.7(magic-string@1.4.2)(magicast@0.5.4)(oxc-parser@0.139.0)(rolldown@1.2.5)(typescript@5.9.3)(unplugin@3.3.0(esbuild@0.28.2)(rolldown@1.2.5)(rollup@4.62.4)(vite@8.2.1(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(yaml@2.9.0)))
       '@nuxt/content':
         specifier: 'catalog:'
         version: 3.15.2(@oxc-project/types@0.146.0)(esbuild@0.28.2)(magic-string@1.4.2)(magicast@0.5.4)(oxc-parser@0.139.0)(rolldown@1.2.5)(rollup@4.62.4)(vite@8.2.1(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(yaml@2.9.0))
@@ -226,11 +226,11 @@ importers:
     dependencies:
       icon-sheets:
         specifier: 'catalog:'
-        version: 0.0.6
+        version: 0.0.7
     devDependencies:
       '@icon-sheets/kit':
         specifier: 'catalog:'
-        version: 0.0.6
+        version: 0.0.7
       '@iconify-json/lucide':
         specifier: 'catalog:'
         version: 1.2.138
@@ -924,30 +924,30 @@ packages:
     resolution: {integrity: sha512-bV0Tgo9K4hfPCek+aMAn81RppFKv2ySDQeMoSZuvTASywNTnVJCArCZE2FWqpvIatKu7VMRLWlR1EazvVhDyhQ==}
     engines: {node: '>=18.18'}
 
-  '@icon-sheets/catalog@0.0.6':
-    resolution: {integrity: sha512-k5JvQIXbswo7s3BzJLuoFHAfkCUjMoGX5JwhtpREA1SzXI2u8PdVKZe8clybYwggMvk+Y9hIvN9HdtgMukmsNA==}
+  '@icon-sheets/catalog@0.0.7':
+    resolution: {integrity: sha512-NYyJ/kguVHEvDSnRsCiu38NmGeRdv7T1wEqu0+3PwOGBty/mUv2sUixGpJBulEqcrc5MZjy9dMELlRgSY4KmzQ==}
 
-  '@icon-sheets/core@0.0.6':
-    resolution: {integrity: sha512-zFcJE+GpkPBd8yQDIQ5Ce1RUw4pShWcbFYqjePr+xNTQ+SU4tk0rUZLvAhAmSYZUw/vSRD+tf0tuAEfuR8qeTg==}
+  '@icon-sheets/core@0.0.7':
+    resolution: {integrity: sha512-5Kta2uDQyA7/tc46iIrXqsJyk0zVtW5E9+bwdYrN685Cedt4EFqr2B+xNdWXiUkvWxS7woSR16Tg2eBliMGy+g==}
 
-  '@icon-sheets/iconify@0.0.6':
-    resolution: {integrity: sha512-El4AhYjHq/EluG0G8QcYQGNLrKxfol8p+CsBHGlXO0kRu+C4F8BBK4ATATqM6pfEw+J3xmcAp+aagSiCYNHL+A==}
+  '@icon-sheets/iconify@0.0.7':
+    resolution: {integrity: sha512-xFMrmBok+Oq9WQH4GV4HfIE1KyQR2CB3jxJiIavgEI59COeokWUAeeP1KwfaHHoo6IZCK6TAeQhmt8B3bvftyA==}
 
-  '@icon-sheets/kit@0.0.6':
-    resolution: {integrity: sha512-AYAs3b1EGHaxHH8e6YVDZlES8xQFUdLLSLU0Z51T9B/bV6qV0Q3RFXM1Ylgb8DE9xoJWdBCawPHCYvqwi0YVAA==}
+  '@icon-sheets/kit@0.0.7':
+    resolution: {integrity: sha512-gEJEJRV7gTrNE4YqZZSdOXcTWyxS94vDexJFjemxwld1b2G3tRqFphayFpoHcY917jQU73AyUZ8ODdkC/OLJ9A==}
     hasBin: true
 
-  '@icon-sheets/nuxt@0.0.6':
-    resolution: {integrity: sha512-UoPzLOWHb5X6a2GJDIS2y+412AkxT2eprd5TrrV3OUVU+yh2y40+J4em3+K2gCTXyymYE05fWQG7XfN7HiPyKw==}
+  '@icon-sheets/nuxt@0.0.7':
+    resolution: {integrity: sha512-TJaxYVfFUzZFfYb+vxRr+x/5geKlWnMsePKEWOPh65H0V1tOMxyalEvd1V0loXVERHMefI2d+BbnJFFQFznVGQ==}
 
-  '@icon-sheets/schema@0.0.6':
-    resolution: {integrity: sha512-NAQ+PDngUDu0mQMLjKd2uNJK6zSwjEBUeyG21aSiZRpottWUPwyPYlwRpeE59xvkyOdftraGTFISb2Hhgut0Rg==}
+  '@icon-sheets/schema@0.0.7':
+    resolution: {integrity: sha512-O6nT2awpRg9tlwullmAmxlQwGI5kxN5tMpbvkK7sn1qMxf7i/zxkJ6ZtD6FSnJSzed/cV1+eLTTpPNrG/zI5VQ==}
 
-  '@icon-sheets/svg@0.0.6':
-    resolution: {integrity: sha512-rNyWamfnSfKTE8eWJmIVRNEd7Yv6aWTFcZSH3y5J4P7A/E5b92UojF8UEOPULn+WFFOdRqf7CTdhp3r4oZxO2g==}
+  '@icon-sheets/svg@0.0.7':
+    resolution: {integrity: sha512-n8VIi2Y6sLLjYEvUgdiKY//4mGdIxowOq5H3sEj9c+yNJuFC1A/CJzloB8ub5Mko0iIwA0yPuDqDTZ1G1rIKHQ==}
 
-  '@icon-sheets/utils@0.0.6':
-    resolution: {integrity: sha512-LScB4elK8FafbLxa2F3a4iYLP4vzYMMNGMwmK7VBkGpCT+SX0veHuAhPDYN5yFQqVoFfadPVm1AkGIS4DALXYQ==}
+  '@icon-sheets/utils@0.0.7':
+    resolution: {integrity: sha512-BdOwaLu71k2l9Q7/msWXU+YYfIoVaXrdeO129ZoYZtbSA7UsJPx6xqDJZef13c9r5cAPCk1i8Q5cs6WvyWNQRw==}
 
   '@iconify-json/lucide@1.2.138':
     resolution: {integrity: sha512-+J5+/6HOZsN6sG5PGNxGLcB0UCJtKrH2TPTNeSeXukRzR1C9QRocHaFjLRhoc14zE+XS2ss1i7QWPfunKpYHaQ==}
@@ -3485,8 +3485,8 @@ packages:
     resolution: {integrity: sha512-AXcZb6vzzrFAUE61HnN4mpLqd/cSIwNQjtNWR0euPm6y0iqx3G4gOXaIDdtdDwZmhwe82LA6+zinmW4UBWVePQ==}
     engines: {node: '>=16.17.0'}
 
-  icon-sheets@0.0.6:
-    resolution: {integrity: sha512-pALJDKLtKlAbVQjcIE/bpoEVVxAo4WTPsgO+a0S+l0e4Kcag6bKROZj4ayh5Eh+R6Q6Pi7souTq4ZNDmKA+jgQ==}
+  icon-sheets@0.0.7:
+    resolution: {integrity: sha512-IFxWjz12DJqYoCGjgXac5u3/RTc2aIZ6OwzNapVIm6E2Nht5cCc9AKHahnVpte3XMWZxU2s8Ll34QhZF+W/7Cw==}
 
   ieee754@1.2.1:
     resolution: {integrity: sha512-dcyqhDvX1C46lXZcVqCpK+FtMRQVdIMN6/Df5js2zouUsqG7I6sFxitIC+7KYK29KdXOLHdu9zL4sFnoVQnqaA==}
@@ -6322,38 +6322,38 @@ snapshots:
   '@humanwhocodes/retry@0.4.3':
     optional: true
 
-  '@icon-sheets/catalog@0.0.6':
+  '@icon-sheets/catalog@0.0.7':
     dependencies:
-      '@icon-sheets/schema': 0.0.6
+      '@icon-sheets/schema': 0.0.7
       objectively: 0.1.1
 
-  '@icon-sheets/core@0.0.6':
+  '@icon-sheets/core@0.0.7':
     dependencies:
-      '@icon-sheets/schema': 0.0.6
-      '@icon-sheets/utils': 0.0.6
+      '@icon-sheets/schema': 0.0.7
+      '@icon-sheets/utils': 0.0.7
       objectively: 0.1.1
 
-  '@icon-sheets/iconify@0.0.6':
+  '@icon-sheets/iconify@0.0.7':
     dependencies:
-      '@icon-sheets/schema': 0.0.6
+      '@icon-sheets/schema': 0.0.7
       '@iconify/types': 2.0.0
       '@iconify/utils': 3.1.7
       objectively: 0.1.1
 
-  '@icon-sheets/kit@0.0.6':
+  '@icon-sheets/kit@0.0.7':
     dependencies:
-      '@icon-sheets/iconify': 0.0.6
-      '@icon-sheets/schema': 0.0.6
-      '@icon-sheets/svg': 0.0.6
-      '@icon-sheets/utils': 0.0.6
+      '@icon-sheets/iconify': 0.0.7
+      '@icon-sheets/schema': 0.0.7
+      '@icon-sheets/svg': 0.0.7
+      '@icon-sheets/utils': 0.0.7
       jiti: 2.7.0
 
-  '@icon-sheets/nuxt@0.0.6(magic-string@1.4.2)(magicast@0.5.4)(oxc-parser@0.139.0)(rolldown@1.2.5)(typescript@5.9.3)(unplugin@3.3.0(esbuild@0.28.2)(rolldown@1.2.5)(rollup@4.62.4)(vite@8.2.1(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(yaml@2.9.0)))':
+  '@icon-sheets/nuxt@0.0.7(magic-string@1.4.2)(magicast@0.5.4)(oxc-parser@0.139.0)(rolldown@1.2.5)(typescript@5.9.3)(unplugin@3.3.0(esbuild@0.28.2)(rolldown@1.2.5)(rollup@4.62.4)(vite@8.2.1(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(yaml@2.9.0)))':
     dependencies:
-      '@icon-sheets/kit': 0.0.6
+      '@icon-sheets/kit': 0.0.7
       '@nuxt/kit': 4.5.2(magic-string@1.4.2)(magicast@0.5.4)(oxc-parser@0.139.0)(rolldown@1.2.5)(unplugin@3.3.0(esbuild@0.28.2)(rolldown@1.2.5)(rollup@4.62.4)(vite@8.2.1(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(yaml@2.9.0)))
       h3: 1.15.11
-      icon-sheets: 0.0.6
+      icon-sheets: 0.0.7
       objectively: 0.1.1
       vue: 3.5.41(typescript@5.9.3)
     transitivePeerDependencies:
@@ -6364,19 +6364,19 @@ snapshots:
       - typescript
       - unplugin
 
-  '@icon-sheets/schema@0.0.6':
+  '@icon-sheets/schema@0.0.7':
     dependencies:
       '@iconify/types': 2.0.0
       objectively: 0.1.1
 
-  '@icon-sheets/svg@0.0.6':
+  '@icon-sheets/svg@0.0.7':
     dependencies:
-      '@icon-sheets/schema': 0.0.6
+      '@icon-sheets/schema': 0.0.7
       '@iconify/utils': 3.1.7
 
-  '@icon-sheets/utils@0.0.6':
+  '@icon-sheets/utils@0.0.7':
     dependencies:
-      '@icon-sheets/schema': 0.0.6
+      '@icon-sheets/schema': 0.0.7
       objectively: 0.1.1
 
   '@iconify-json/lucide@1.2.138':
@@ -9432,13 +9432,13 @@ snapshots:
 
   human-signals@5.0.0: {}
 
-  icon-sheets@0.0.6:
+  icon-sheets@0.0.7:
     dependencies:
-      '@icon-sheets/catalog': 0.0.6
-      '@icon-sheets/core': 0.0.6
-      '@icon-sheets/schema': 0.0.6
-      '@icon-sheets/svg': 0.0.6
-      '@icon-sheets/utils': 0.0.6
+      '@icon-sheets/catalog': 0.0.7
+      '@icon-sheets/core': 0.0.7
+      '@icon-sheets/schema': 0.0.7
+      '@icon-sheets/svg': 0.0.7
+      '@icon-sheets/utils': 0.0.7
 
   ieee754@1.2.1: {}
 

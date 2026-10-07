@@ -8,8 +8,31 @@ import icons from "@bbf/icons/config";
 import sets from "@bbf/icons/sets";
 import untheme from "@bbf/theme/config";
 
+import { PAGE_MAX_AGE } from "./shared/constants/pages";
+
 /** The locales the site is translated to: each has its pages under `/<locale>`. */
 const targets = locales.filter((locale) => locale !== source);
+
+/** A page's path in a locale: `/es/about-us`, and `/es` for the home page. */
+const localized = (locale: string, path: string) =>
+  path === "/" ? `/${locale}` : `/${locale}${path}`;
+
+/**
+ * The site's pages. Each is rendered by the server when it is asked for,
+ * rather than once at build: what a page shows — the week's events under
+ * every one, the sermons on some — changes without a deploy.
+ */
+const live = [
+  "/",
+  "/about-us",
+  "/connect",
+  "/events",
+  "/events/**",
+  "/sermons",
+];
+
+/** The pages that have moved: the path each was at, and where it is now. */
+const moved = { "/calendar": "/events" };
 
 /** The English pages, as authored: `@bbf/i18n`'s sources, beside its build. */
 const content = fileURLToPath(
@@ -44,6 +67,13 @@ export default defineNuxtConfig({
   untheme,
 
   fibber: { build: "@bbf/i18n" },
+
+  runtimeConfig: {
+    public: {
+      // The channel whose sermons `/sermons` lists, by its YouTube id.
+      youtube: { channel: "UCCVz4wFgCBmw-Iwyz61OPng" },
+    },
+  },
 
   studio: {
     route: "/admin",
@@ -104,7 +134,7 @@ export default defineNuxtConfig({
           pages.push({
             ...page,
             name: `${page.name}___${locale}`,
-            path: page.path === "/" ? `/${locale}` : `/${locale}${page.path}`,
+            path: localized(locale, page.path),
           });
         }
       }
@@ -113,13 +143,28 @@ export default defineNuxtConfig({
 
   nitro: {
     publicAssets: [{ dir: assets }],
-    prerender: {
-      routes: ["/", ...targets.map((locale) => `/${locale}`)],
-      crawlLinks: true,
-    },
   },
 
   routeRules: {
+    // A page, in every locale, is rendered on request, and that render is
+    // kept: served to everyone who asks for a while, then made again.
+    ...Object.fromEntries(
+      live
+        .flatMap((path) => [
+          path,
+          ...targets.map((locale) => localized(locale, path)),
+        ])
+        .map((path) => [path, { swr: PAGE_MAX_AGE }]),
+    ),
+    // A moved page, in every locale, sends its old address to its new one.
+    ...Object.fromEntries(
+      Object.entries(moved).flatMap(([from, to]) =>
+        ["", ...targets.map((locale) => `/${locale}`)].map((prefix) => [
+          `${prefix}${from}`,
+          { redirect: { to: `${prefix}${to}`, statusCode: 301 } },
+        ]),
+      ),
+    ),
     "/_nuxt/**": {
       headers: { "cache-control": "public, max-age=31536000, immutable" },
     },

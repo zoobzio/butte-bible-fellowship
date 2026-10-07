@@ -3,9 +3,13 @@
    Warm, typographic treatment of the semantic elements and of the
    classes every page shares.
    Every color, font, space, radius, shadow and transition comes from
-   @bbf/theme variables — aurora, with the site's tonal ramps; both schemes
-   are supported through color roles. The one value aurora has no token
-   for is declared in base.css.
+   @bbf/theme variables — aurora, with the site's tonal ramps. Color is
+   read through the roles (`--on-surface`, `--primary`, `--outline`), which
+   every axis rebinds — scheme, vibrancy and contrast alike — and never
+   through the channels behind them (`--primary-medium-contrast`), which
+   are fixed per scheme; the high channels are kept for emphasis only, as
+   the ceiling a hover or a heading rises to. The few values aurora has no
+   token for are declared in base.css.
    What only one page or component wears is styled in that component.
    ===================================================================== */
 

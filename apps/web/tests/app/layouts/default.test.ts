@@ -12,7 +12,13 @@ const mountLayout = async ({ mobile = false, path = "/" } = {}) => {
   const wrapper = mount(Layout, {
     slots: { default: '<p class="page">Page</p>' },
     global: {
-      stubs: { AppHeader: true, AppFooter: true, Orbs: true, Arches: true },
+      stubs: {
+        AppHeader: true,
+        AppInvitation: true,
+        AppFooter: true,
+        Orbs: true,
+        Arches: true,
+      },
     },
   });
   await nextTick();
@@ -28,6 +34,33 @@ describe("default layout", () => {
     expect(has(wrapper, "AppHeader")).toBe(true);
     expect(has(wrapper, "AppFooter")).toBe(true);
     expect(wrapper.find("main.site-main .page").text()).toBe("Page");
+  });
+
+  it("closes every page with the invitation, between the main and the footer", async () => {
+    for (const path of ["/", "/about-us", "/connect"]) {
+      const wrapper = await mountLayout({ path });
+      expect(
+        wrapper
+          .find("main.site-main + app-invitation-stub + app-footer-stub")
+          .exists(),
+        path,
+      ).toBe(true);
+    }
+  });
+
+  it("hands the visitor a new invitation when the language they read in changes", async () => {
+    const wrapper = await mountLayout({ path: "/about-us" });
+    const before = wrapper.findComponent({ name: "AppInvitation" }).vm;
+
+    setRoutePath("/connect");
+    await nextTick();
+    expect(wrapper.findComponent({ name: "AppInvitation" }).vm).toBe(before);
+
+    setRoutePath("/es/connect");
+    await nextTick();
+    expect(wrapper.findComponent({ name: "AppInvitation" }).vm).not.toBe(
+      before,
+    );
   });
 
   it("shows the orbs and the arches on the home page", async () => {

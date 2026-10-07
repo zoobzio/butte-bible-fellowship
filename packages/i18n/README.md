@@ -22,14 +22,18 @@ nest under its name: `home` in `navigation.json` is the message
 `navigation.home`, called as `$t.navigation.home()`. The `description` beside
 each message is the note a translator reads.
 
-| File              | Messages                                                  |
-| ----------------- | --------------------------------------------------------- |
-| `site.json`       | the church's name, its tagline and the meta description   |
-| `navigation.json` | the primary navigation: its links and accessible names    |
-| `footer.json`     | the footer's headings, service time and copyright line    |
-| `appearance.json` | the color scheme toggle and the appearance (theme) dialog |
-| `language.json`   | the language switcher                                     |
-| `page.json`       | page-level states: not found                              |
+| File              | Messages                                                 |
+| ----------------- | -------------------------------------------------------- |
+| `site.json`       | the church's name, its tagline and the meta description  |
+| `navigation.json` | the primary navigation: its links and accessible names   |
+| `footer.json`     | the footer's headings, service time and copyright line   |
+| `appearance.json` | the color scheme toggle, theme picker and theme settings |
+| `language.json`   | the language switcher                                    |
+| `page.json`       | page-level words: not found, contents, the way back      |
+| `about.json`      | the about page: its title                                |
+| `sermons.json`    | the sermons page: its header, play button, channel link  |
+| `events.json`     | the events pages, an event’s days, the home page’s week  |
+| `connect.json`    | the connect page: its header                             |
 
 Messages are ICU MessageFormat, where an ASCII apostrophe is the escape
 character — write a typographic one (`You’re`), as the pages already do.
@@ -89,10 +93,10 @@ fibber.format("navigation.home"); // "Home"
 ## In the app
 
 The web app hands the build to `@fibber/nuxt` in `nuxt.config.ts` —
-`fibber: { build: "@bbf/i18n" }` — which provides `useT`. A component
-calls a message it names (`t.navigation.open()`); data carries one by key,
+`fibber: { build: "@bbf/i18n" }` — which provides `$t` on the Nuxt app. A component
+calls a message it names (`$t.navigation.open()`); data carries one by key,
 typed as `AppFibberMessage`, and resolves it where it renders
-(`t(link.label)`). The header and footer in `app.config.ts` are data of that
+(`$t(link.label)`). The header and footer in `app.config.ts` are data of that
 kind. Nuxt reads the built output when it loads its config, so restart
 `pnpm dev` after rebuilding this package.
 

@@ -1,6 +1,8 @@
 {
-  "worship": "Culte dominical · 10 h 00",
+  "verse": "« Ils persévéraient dans l’enseignement des apôtres, dans la communion fraternelle … et dans les prières. »",
+  "reference": "Actes 2:42",
   "contact": "Contact",
   "online": "En ligne",
-  "copyright": "© {year} Butte Bible Fellowship"
+  "copyright": "© {year} Butte Bible Fellowship",
+  "worship": "Culte dominical · 10 h 00"
 }

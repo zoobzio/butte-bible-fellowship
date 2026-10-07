@@ -1,0 +1,10 @@
+{
+  "title": {
+    "defaultMessage": "About Us",
+    "description": "The title at the top of the page about the church's vision and core beliefs."
+  },
+  "description": {
+    "defaultMessage": "A clean canvas: passing the baton to a new generation of Christ followers.",
+    "description": "The line under the About Us page's title, saying what the church is becoming."
+  }
+}

@@ -1,7 +1,11 @@
 {
-  "worship": {
-    "defaultMessage": "Sunday worship · 10:00am",
-    "description": "When the Sunday service starts, under the church's name in the footer."
+  "verse": {
+    "defaultMessage": "“They devoted themselves to the apostles’ teaching and to fellowship … and to prayer.”",
+    "description": "Acts 2:42, abridged, quoted in the footer of every page. Quote the verse as an established Bible translation in the language has it, inside the language's own quotation marks."
+  },
+  "reference": {
+    "defaultMessage": "Acts 2:42",
+    "description": "The Bible reference under the quoted verse: the book, chapter and verse."
   },
   "contact": {
     "defaultMessage": "Contact",

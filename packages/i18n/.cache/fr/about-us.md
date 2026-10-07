@@ -5,8 +5,6 @@ description: Une nouvelle communauté pour la cause du Christ.
 
 # Notre vision
 
-![Tulipes en fleurs](/images/tulips.jpg){.prose-aside-image}
-
 La sagesse moderne veut que les meilleurs énoncés de vision soient des slogans astucieux, faciles à retenir et, surtout… brefs. Si c’est votre tasse de thé …
 
 > Notre intention est d’être l’Église ;

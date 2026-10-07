@@ -4,16 +4,16 @@ import { mount } from "@vue/test-utils";
 
 import type { NavigationLink } from "~/types/navigation";
 
-import { setAppConfig, useT } from "#imports";
+import { setAppConfig, useNuxtApp } from "#imports";
 import AppMobileNav from "~/components/AppMobileNav.vue";
 import Menu from "@zoobzio/foundation/components/core/menu";
 
 const LINKS: NavigationLink[] = [
-  { label: "navigation.home", to: "/" },
-  { label: "navigation.invited", to: "/visit" },
+  { label: "navigation.about", to: "/" },
+  { label: "navigation.events", to: "/visit" },
 ];
 
-const t = useT();
+const { $t } = useNuxtApp();
 
 beforeEach(() => {
   setAppConfig({ header: { links: LINKS } });
@@ -39,8 +39,8 @@ describe("AppMobileNav", () => {
       {
         key: "primary",
         items: [
-          { label: t.navigation.home(), link: { to: "/" } },
-          { label: t.navigation.invited(), link: { to: "/visit" } },
+          { label: $t.navigation.about(), link: { to: "/" } },
+          { label: $t.navigation.events(), link: { to: "/visit" } },
         ],
       },
     ]);
@@ -49,7 +49,7 @@ describe("AppMobileNav", () => {
 
   it("opens from a labelled icon button", () => {
     const trigger = mount(AppMobileNav).find("button");
-    expect(trigger.attributes("aria-label")).toBe(t.navigation.open());
+    expect(trigger.attributes("aria-label")).toBe($t.navigation.open());
     expect(trigger.attributes("aria-haspopup")).toBe("menu");
     expect(trigger.find("use").attributes("href")).toBe("#menu");
   });

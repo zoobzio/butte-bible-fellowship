@@ -1,0 +1,30 @@
+{
+  "title": {
+    "defaultMessage": "Sermons",
+    "description": "The title at the top of the sermons page."
+  },
+  "description": {
+    "defaultMessage": "The latest messages from our Sunday worship services.",
+    "description": "The line under the sermons page's title, saying what the page lists."
+  },
+  "latest": {
+    "defaultMessage": "Latest sermon",
+    "description": "The label over the newest sermon, which the sermons page shows larger than the rest."
+  },
+  "play": {
+    "defaultMessage": "Play “{title}”",
+    "description": "The accessible name of the button that starts a sermon. `title` is the sermon's title, as it is on YouTube."
+  },
+  "all": {
+    "defaultMessage": "See all sermons on YouTube",
+    "description": "The link under the latest sermons, to the church's YouTube channel."
+  },
+  "recent": {
+    "defaultMessage": "Recent sermons",
+    "description": "The heading over the three newest sermons, at the bottom of the home page."
+  },
+  "more": {
+    "defaultMessage": "See more sermons",
+    "description": "The link under the home page's three newest sermons, to the sermons page, which lists the rest."
+  }
+}

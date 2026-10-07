@@ -2,9 +2,93 @@
 
 /* The display serif. Aurora's type scale is set in its sans and carries no
    display face, and the face is the site's rather than the theme's, so it
-   lives here as a plain custom property beside the theme's tokens. */
+   lives here as a plain custom property beside the theme's tokens.
+   The header's height is the header's to say: it measures itself and sets
+   the property on the root, and until it has, nothing is under it.
+   The site's width is one measure: every page, the header and the footer
+   run to it, with the gutter — the room kept at the viewport's edges —
+   split between the two sides.
+   The brand is the site's name over its tagline, with the logo beside them:
+   the name's size scales with the viewport, and the brand's height is the
+   two lines stacked — each at its line height, plus the gap between — so
+   the logo can be a square of it. */
 :root {
   --font-display: "Newsreader", Georgia, serif;
+  --header-height: 0px;
+  --site-width: 64rem;
+  --site-gutter: clamp(var(--space-5), 8vw, var(--space-8));
+  --brand-name-size: clamp(var(--title-size), 2.4vw, var(--headline-size));
+  --brand-height: calc(
+    var(--brand-name-size) * var(--headline-line-height) + var(--label-size) *
+      var(--title-line-height) + var(--space-1)
+  );
+}
+
+/* Foundation's root colors the page loading bar with a token of its own
+   naming. The theme has none by that name, so the bar would paint nothing:
+   give it the theme's primary. */
+:root {
+  --sys-primary: var(--primary);
+}
+
+/* The rules: the hairlines between the parts of a thing, and the edges of
+   cards and controls. Aurora's contrast axis moves `--outline` and leaves
+   `--outline-muted` where it is, so a rule that read the muted outline
+   would never firm up. Every rule on the site reads this instead: the muted
+   outline by default, and the outline itself — the one the axis shifts —
+   once the reader asks for more contrast. */
+:root {
+  --rule: var(--outline-muted);
+}
+
+[data-contrast="medium"],
+[data-contrast="high"] {
+  --rule: var(--outline);
+}
+
+/* The arch: the window a portrait stands in — the hero's, a staff card's,
+   an aside image's. Round-topped, on the small radius below; and when the
+   corners are sharp, bevelled instead of rounded — two straight edges
+   meeting at a point, a gable — so the window keeps its arch with no curve
+   left in it. components.css draws it. */
+:root {
+  --arch: 50% 50% var(--shape-sm) var(--shape-sm) / 34% 34% var(--shape-sm)
+    var(--shape-sm);
+  --arch-corner: round;
+}
+
+[data-radius="sharp"] {
+  --arch-corner: bevel;
+}
+
+/* The lift: how far a card or a button rises when it is pointed at. It is
+   not a token of aurora's motion axis, so it follows the axis from here:
+   gone when motion is reduced — a jump with no transition is still a
+   jump — and higher when motion is expressive. */
+:root {
+  --lift: -2px;
+}
+
+[data-motion="reduced"] {
+  --lift: 0px;
+}
+
+[data-motion="expressive"] {
+  --lift: -4px;
+}
+
+/* The signature: the three accents run together in one stripe — the rule
+   under the header and over the footer, the bar under a title, the edge of
+   a callout. It is drawn from the accent roles, so it follows the scheme,
+   the vibrancy and the contrast as every other accent does; aurora's own
+   `--gradient-brand` runs from fixed ramp stops and would not. */
+:root {
+  --gradient-signature: linear-gradient(
+    108deg,
+    var(--primary),
+    var(--secondary) 52%,
+    var(--tertiary)
+  );
 }
 
 /* ---------- Reset & page shell ---------------------------------------- */
@@ -17,27 +101,33 @@
 
 html {
   -webkit-text-size-adjust: 100%;
+}
+
+/* A scroll the page makes itself glides, unless motion is set to reduced. */
+html:not([data-motion="reduced"]) {
   scroll-behavior: smooth;
+}
+
+/* An anchor — a heading the contents link to, a section a page links down
+   to — lands under the sticky header, not behind it, with room to breathe.
+   The router reads the margin when it scrolls to a hash, as the browser does
+   on a jump of its own. */
+[id] {
+  scroll-margin-top: calc(var(--header-height) + var(--space-5));
 }
 
 body {
   margin: 0;
   background: var(--surface);
-  color: var(--on-surface-medium-contrast);
+  color: var(--on-surface);
   font: var(--type-body);
   font-size: clamp(
     var(--body-size),
-    0.55vw + 0.95rem,
+    calc(var(--body-size) * 0.95 + 0.55vw),
     calc(var(--body-size) * 1.25)
   );
   letter-spacing: var(--type-body-letter-spacing);
   text-wrap: pretty;
-}
-
-/* Light mode: the surface is near-white, so the washes need deeper tints. */
-[data-color="light"] body,
-html[data-color="light"] body {
-  background: var(--surface);
 }
 
 img,
@@ -59,7 +149,7 @@ iframe {
 /* ---------- Links ----------------------------------------------------- */
 
 a {
-  color: var(--primary-high-contrast);
+  color: var(--primary);
   text-decoration: underline;
   text-decoration-color: color-mix(in oklab, var(--primary) 60%, transparent);
   text-decoration-thickness: 1px;

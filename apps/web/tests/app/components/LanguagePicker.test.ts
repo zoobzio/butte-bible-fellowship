@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { mount } from "@vue/test-utils";
 
-import { setRoutePath, useT } from "#imports";
+import { setRoutePath, useNuxtApp } from "#imports";
 import LanguagePicker from "~/components/LanguagePicker.vue";
 import Menu from "@zoobzio/foundation/components/core/menu";
 
@@ -15,7 +15,9 @@ const links = (wrapper: ReturnType<typeof mount>) =>
 describe("LanguagePicker", () => {
   it("opens from a labelled button naming the language being read", () => {
     const trigger = mount(LanguagePicker).find("button");
-    expect(trigger.attributes("aria-label")).toBe(useT().language.open());
+    expect(trigger.attributes("aria-label")).toBe(
+      useNuxtApp().$t.language.open(),
+    );
     expect(trigger.attributes("aria-haspopup")).toBe("menu");
     expect(trigger.find("use").attributes("href")).toBe("#languages");
     expect(trigger.text()).toBe("English");

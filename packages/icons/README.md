@@ -7,7 +7,8 @@ union, and SVG sprites.
 ## Layout
 
 ```
-icon-sheets.config.ts  each alias mapped to its Iconify ref
+icon-sheets.config.ts  each alias mapped to its Iconify ref or local file
+src/logo.svg           the site's mark, drawn in currentColor
 .output/               the kit's output (generated, not committed)
 ```
 
@@ -15,6 +16,17 @@ Aliases name an icon by role (`menu`, `sun`), and the ref behind each one
 (`lucide:menu`) resolves from the locally installed `@iconify-json/*`
 package. To draw from another collection, install its `@iconify-json/*`
 package here.
+
+A ref starting with `./` is a local SVG, relative to this package: `logo`
+points at `src/logo.svg`. The file is used as drawn, so keep it a plain
+export with a `viewBox` and no editor namespaces, and paint it with
+`currentColor` so the app can colour it with CSS (the header gives the
+logo `var(--primary)`).
+
+`src/logo.svg` is the mark alone — the disc with the cross and open book
+centred in it — cut from the traced logo, whose lettering does not survive
+icon sizes. Its `viewBox` is the disc's own bounds, so the disc fills
+whatever box it is given. `@bbf/assets` renders the favicon from it.
 
 Only icons the site actually uses are defined. Add an alias when you need it.
 

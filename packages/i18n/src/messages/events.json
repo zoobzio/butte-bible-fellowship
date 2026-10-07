@@ -1,0 +1,70 @@
+{
+  "title": {
+    "defaultMessage": "Events",
+    "description": "The title at the top of the events page."
+  },
+  "description": {
+    "defaultMessage": "Our gatherings at 2255 Pillsbury Road. Everyone is welcome.",
+    "description": "The line under the events page's title, saying what the page lists."
+  },
+  "calendar": {
+    "defaultMessage": "Calendar",
+    "description": "The accessible name of the calendar of events."
+  },
+  "previousMonth": {
+    "defaultMessage": "Previous month",
+    "description": "The accessible name of the button that moves the calendar back a month."
+  },
+  "nextMonth": {
+    "defaultMessage": "Next month",
+    "description": "The accessible name of the button that moves the calendar forward a month."
+  },
+  "today": {
+    "defaultMessage": "Today",
+    "description": "The button that brings the calendar back to the current month and selects today."
+  },
+  "day": {
+    "defaultMessage": "{date}, {count, plural, =0 {no events} one {# event} other {# events}}",
+    "description": "The accessible name of a day of the calendar, which is a button that selects it. `date` is the day's date in words, already in the reader's language; `count` is how many events are held on it."
+  },
+  "selected": {
+    "defaultMessage": "Events on",
+    "description": "The label over the selected day's date, above the list of the events held on that day. The date follows on its own line."
+  },
+  "thisWeek": {
+    "defaultMessage": "Happening this week",
+    "description": "The heading over the home page's list of the current week's events, day by day."
+  },
+  "all": {
+    "defaultMessage": "All events",
+    "description": "The button under the home page's list of the week's events, leading to the events page and its calendar."
+  },
+  "weekly": {
+    "defaultMessage": "Every {day}",
+    "description": "When an event that repeats every week is held, said under its name on its own page. `day` is the day of the week in words, already in the reader's language: “Every Sunday”."
+  },
+  "monthly": {
+    "defaultMessage": "Every {weeks} {day}",
+    "description": "When an event that repeats only in some weeks of each month is held, said under its name on its own page. `weeks` is those weeks as ordinal words, already joined in the reader's language — “first and third” — and `day` is the day of the week in words: “Every first and third Tuesday”."
+  },
+  "week": {
+    "defaultMessage": "{week, plural, =1 {first} =2 {second} =3 {third} =4 {fourth} other {fifth}}",
+    "description": "Which of a month's weeks an event is held in, as an ordinal word in lowercase. It is set before a day of the week, in a list of such words: “first and third Tuesday”. `week` is a number from 1 to 5."
+  },
+  "when": {
+    "defaultMessage": "When",
+    "description": "The label over the days and time an event is held, in the card beside the event's own page."
+  },
+  "where": {
+    "defaultMessage": "Where",
+    "description": "The label over the place an event is held, in the card beside the event's own page."
+  },
+  "questions": {
+    "defaultMessage": "Questions",
+    "description": "The label over the church's phone number and email address, in the card beside an event's own page: who to ask about the event."
+  },
+  "none": {
+    "defaultMessage": "Nothing scheduled",
+    "description": "What the events page says when the selected day has no events."
+  }
+}

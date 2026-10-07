@@ -68,11 +68,13 @@ the upstream fix is released; the three options have to be carried over.
 
 The site's interface text lives in [`@bbf/i18n`](packages/i18n) as
 [fibber](https://github.com/zoobzio/fibber) messages, not in components.
-`@fibber/nuxt` provides `useT`; `app.config.ts` names the header's and
+`@fibber/nuxt` provides `$t` on the Nuxt app; `app.config.ts` names the header's and
 footer's messages by key.
 
 English is at the routes as written (`/about-us`); every other locale has the
-same pages under its prefix (`/es/about-us`), all prerendered. The route
+same pages under its prefix (`/es/about-us`). No page is prerendered: each
+is rendered when it is asked for, and that render kept for fifteen minutes
+(`routeRules` in `nuxt.config.ts`). The route
 decides the language: a global middleware switches fibber to the locale the
 path names, `usePage` reads that locale's collection, and `useRouteLocale`
 keeps links inside it. The language button in the footer links to the page
@@ -108,17 +110,18 @@ from `nuxt.config.ts` as `@bbf/assets/css/index.css`: the semantic elements,
 the classes Markdown content wears, the shared controls and Foundation's
 unstyled parts. What only one page or component wears is in a `<style>` block
 of that component. The blocks are not scoped — Markdown is slotted in and
-Foundation's dialogs and menus portal to `<body>` — so a class is named for
+Foundation's popovers and menus portal to `<body>` — so a class is named for
 its component (`site-footer-*`, `theme-picker-*`).
 
 ### Themes
 
 The site's palette is a context of aurora's `theme` modifier — `bbf`, the
 default — beside every aurora theme, all built into the app's theme. The
-palette button in the footer opens a modal built from Foundation's `Dialog`:
-on the left a `Command` searches the themes the build's manifest lists, and
-on the right a `SegmentedControl` per remaining modifier — color scheme,
-vibrancy, contrast, text size, density, corner radius, depth and motion.
+palette button in the footer opens a Foundation `Popover` whose `Command`
+searches the themes the build's manifest lists, and the sliders button
+beside it opens another with a `SegmentedControl` per remaining modifier —
+color scheme, vibrancy, contrast, text size, density, corner radius, depth
+and motion. The two are separate controls over the one untheme service.
 Each choice is `useUntheme().swap(modifier, context)`; the untheme module
 keeps the selection in its cookie and renders it on the server. There is no theme route and nothing to regenerate after upgrading
 `@untheme/aurora`.

@@ -5,9 +5,10 @@ hero:
   tagline: Discover God’s
   highlight: Love, Grace & Truth
   description: Join us in connecting people to the life changing presence of Jesus Christ, and in the pursuit of His character.
+  image: /images/church.jpg
   cta:
-    label: You’re Invited
-    to: /youre-invited
+    label: Learn More
+    to: /about-us
 ---
 
 ## Welcome to Butte Bible Fellowship
@@ -30,8 +31,22 @@ We are currently a small gathering of seasoned believers who desire to transitio
 
 We hope you’ll consider joining us.
 
-::visit-callout
-**Join us Sundays at 10:00am**
+::invite-grid
+  :::invite-card
+  ### Curious about Christianity?
 
-2255 Pillsbury Road, Chico · [see the weekly schedule](/calendar)
+  If you are curious about the claims of Christianity and would like to pursue that curiosity in a safe and welcoming place, you’re invited!
+  :::
+
+  :::invite-card
+  ### Part of a local church?
+
+  If you are currently participating in a local church, we’d encourage you to continue there, helping it become all God intends it to be.
+  :::
+
+  :::invite-card
+  ### New to Chico?
+
+  If, however, you’re new to Chico, or perhaps among those left wanting by the trends of recent decades, we’d love to have you join us and help us to grow in spiritually healthy ways.
+  :::
 ::

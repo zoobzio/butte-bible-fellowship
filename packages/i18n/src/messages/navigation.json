@@ -7,24 +7,20 @@
     "defaultMessage": "Open navigation",
     "description": "The accessible name of the button that opens the navigation menu on small screens."
   },
-  "home": {
-    "defaultMessage": "Home",
-    "description": "Navigation link to the home page."
-  },
-  "invited": {
-    "defaultMessage": "You’re Invited",
-    "description": "Navigation link to the page inviting newcomers to visit."
-  },
   "about": {
     "defaultMessage": "About Us",
     "description": "Navigation link to the church's vision and core beliefs."
   },
-  "calendar": {
-    "defaultMessage": "Weekly Events",
-    "description": "Navigation link to the weekly schedule of gatherings."
+  "events": {
+    "defaultMessage": "Events",
+    "description": "Navigation link to the calendar of the church's events."
+  },
+  "sermons": {
+    "defaultMessage": "Sermons",
+    "description": "Navigation link to the latest sermons from the church's YouTube channel."
   },
   "connect": {
-    "defaultMessage": "Contact & Find Us",
-    "description": "Navigation link to the contact details, office hours and map."
+    "defaultMessage": "Connect",
+    "description": "Navigation link to the page with the church's elders, contact details, office hours and map."
   }
 }

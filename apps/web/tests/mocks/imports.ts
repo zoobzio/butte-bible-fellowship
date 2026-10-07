@@ -5,10 +5,10 @@
 // Vue APIs and stub the Nuxt-runtime composables. Type-only imports are erased
 // by esbuild before this module loads, so only value exports matter here.
 
-import { computed, reactive, ref, type Ref } from "vue";
+import { computed, reactive, ref, toRaw, type Ref } from "vue";
 import { vi } from "vitest";
 import { makeFibber } from "fibber-lang";
-import { makeUntheme } from "untheme";
+import { copy, makeUntheme } from "untheme";
 import { useUnthemeConfig } from "untheme/config";
 import { contract, locale } from "@bbf/i18n";
 import { bundles } from "@bbf/i18n/bundles";
@@ -32,30 +32,40 @@ export const useState = (key: string, init?: () => unknown): Ref<unknown> => {
 };
 
 // useUntheme: the real service over the app's built theme, in a reactive
-// container held like the module holds it — in useState, so the registry
-// reset between tests gives each test a fresh selection.
-const services = new WeakMap<object, ReturnType<typeof makeUntheme>>();
+// container held like the module holds it. The service is built once per
+// file, on first use, rather than once per test: building it walks the whole
+// theme to derive its schema, and through Vue's proxy that walk costs a
+// quarter of a second. The schema reads the raw theme instead — no test
+// changes the theme — and only the selection and the override, which tests
+// do move, are read through the proxy. clearUntheme, run before each test,
+// puts the selection back at boot and drops any override, so each test
+// starts clean.
+let untheme: ReturnType<typeof makeUntheme> | undefined;
+let container: ReturnType<typeof useUnthemeConfig> | undefined;
 
 export const useUntheme = () => {
-  const container = useState("untheme:config", () =>
-    reactive(useUnthemeConfig(theme)),
-  ).value as object;
-  let service = services.get(container);
-  if (!service) {
-    service = makeUntheme(container as ReturnType<typeof useUnthemeConfig>);
-    services.set(container, service);
+  if (!untheme) {
+    container = reactive(useUnthemeConfig(theme)) as typeof container;
+    untheme = makeUntheme(container!, { get: { config: { theme: toRaw } } });
   }
-  return service;
+  return untheme;
 };
 
-// useT: the real resolver over the site's built messages, in the source
-// locale — what the module provides as `$t`.
+export const clearUntheme = () => {
+  if (container) {
+    container.input = copy(theme.input);
+    container.override = {};
+  }
+};
+
+// useNuxtApp: the app, as far as the tests reach into it — `$t`, the real
+// resolver over the site's built messages, in the source locale.
 const fibber = makeFibber(
   contract,
   reactive({ locale, messages: await bundles[locale]() }),
 );
 
-export const useT = () => fibber.createResolver();
+export const useNuxtApp = () => ({ $t: fibber.createResolver() });
 
 // useLocale: the service's one locale, as the module exposes it.
 type Locale = (typeof contract.locales)[number];
@@ -87,6 +97,11 @@ export const clearAppConfig = () => setAppConfig({});
 
 export const useAppConfig = () => appConfig;
 
+// useRuntimeConfig: the public config the app reads.
+export const useRuntimeConfig = () => ({
+  public: { youtube: { channel: "UCtest" } },
+});
+
 // useRoute: one reactive route, moved with setRoutePath.
 const route = reactive({ path: "/" });
 
@@ -96,14 +111,32 @@ export const setRoutePath = (path: string) => {
 
 export const useRoute = () => route;
 
+// useRouter: a router that records where it was sent. What its history
+// holds of the page before this one is set with setRouteBack.
+const router = {
+  back: vi.fn(),
+  push: vi.fn(),
+  options: { history: { state: { back: null as string | null } } },
+};
+
+export const setRouteBack = (path: string | null) => {
+  router.options.history.state.back = path;
+};
+
+export const clearRouter = () => {
+  router.back.mockClear();
+  router.push.mockClear();
+  setRouteBack(null);
+};
+
+export const useRouter = () => router;
+
 // useHead: records what it was given.
 export const useHead = vi.fn();
 
-// createError: an Error carrying the status fields.
-export const createError = (input: {
-  statusCode: number;
-  statusMessage: string;
-}) => Object.assign(new Error(input.statusMessage), input);
+// createError: an Error carrying the status code.
+export const createError = (input: { statusCode: number; message: string }) =>
+  Object.assign(new Error(input.message), input);
 
 // definePageMeta is compiled away by Nuxt; here it is a no-op.
 export const definePageMeta = () => {};

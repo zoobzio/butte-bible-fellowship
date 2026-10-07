@@ -5,24 +5,17 @@ import { mount } from "@vue/test-utils";
 import { useUntheme } from "#imports";
 import ThemePicker from "~/components/ThemePicker.vue";
 import Command from "@zoobzio/foundation/components/core/command";
-import Dialog from "@zoobzio/foundation/components/core/dialog";
-import SegmentedControl from "@zoobzio/foundation/components/core/segmented-control";
 
-// The dialog content is portalled to the body, so it is queried from there.
+// The popover content is portalled to the body, so it is queried from there.
 const all = (selector: string) => [
   ...document.body.querySelectorAll<HTMLElement>(selector),
 ];
 
-const dialog = () => document.body.querySelector('[role="dialog"]');
+const popover = () => document.body.querySelector('[role="dialog"]');
 
 const themes = () => all('[role="option"]');
 
 const names = () => themes().map((item) => item.textContent!.trim());
-
-const groups = () => all(".theme-picker-setting .f-caption");
-
-const segments = (setting: string) =>
-  all(`[aria-labelledby="theme-picker-${setting}"] button`);
 
 const open = async () => {
   const wrapper = mount(ThemePicker, { attachTo: document.body });
@@ -32,25 +25,32 @@ const open = async () => {
 };
 
 describe("ThemePicker", () => {
-  it("opens a dialog from a labelled palette button", async () => {
+  it("opens a popover from a labelled palette button", async () => {
     const wrapper = mount(ThemePicker, { attachTo: document.body });
     const trigger = wrapper.find("button");
     expect(trigger.attributes("aria-label")).toBe("Choose a theme");
     expect(trigger.attributes("aria-haspopup")).toBe("dialog");
     expect(trigger.find("use").attributes("href")).toBe("#palette");
-    expect(dialog()).toBeNull();
+    expect(popover()).toBeNull();
 
     await trigger.trigger("click");
-    await vi.waitFor(() => expect(dialog()).not.toBeNull());
-    expect(wrapper.findComponent(Dialog).props("title")).toBe("Appearance");
+    await vi.waitFor(() => expect(popover()).not.toBeNull());
+    expect(
+      popover()!.querySelector(".theme-picker")!.getAttribute("aria-label"),
+    ).toBe("Themes");
+    expect(popover()!.classList).toContain("f-popover-content");
   });
 
-  it("closes from its close button", async () => {
+  it("is not a modal, and offers the themes alone", async () => {
     await open();
-    document.body
-      .querySelector<HTMLElement>('button[aria-label="Close"]')!
-      .click();
-    await vi.waitFor(() => expect(dialog()).toBeNull());
+    expect(document.body.querySelector(".f-dialog-overlay")).toBeNull();
+    expect(all(".f-toggle-group-root")).toEqual([]);
+  });
+
+  it("closes from its button", async () => {
+    const wrapper = await open();
+    await wrapper.find("button").trigger("click");
+    await vi.waitFor(() => expect(popover()).toBeNull());
   });
 
   it("lists every theme by name, the site's among them", async () => {
@@ -87,7 +87,7 @@ describe("ThemePicker", () => {
     await vi.waitFor(() =>
       expect(useUntheme().config.input.theme).toBe("nord"),
     );
-    expect(dialog()).not.toBeNull();
+    expect(popover()).not.toBeNull();
   });
 
   it("keeps the active theme when it is picked again", async () => {
@@ -97,57 +97,5 @@ describe("ThemePicker", () => {
       .click();
     await nextTick();
     expect(useUntheme().config.input.theme).toBe("bbf");
-  });
-
-  it("offers every other modifier as a button group", async () => {
-    const wrapper = await open();
-    expect(groups().map((group) => group.textContent!.trim())).toEqual([
-      "Color scheme",
-      "Vibrancy",
-      "Contrast",
-      "Text size",
-      "Density",
-      "Corner radius",
-      "Depth",
-      "Motion",
-    ]);
-    expect(wrapper.findAllComponents(SegmentedControl).length).toBe(8);
-    expect(segments("density").map((item) => item.textContent!.trim())).toEqual(
-      ["Compact", "Comfortable", "Spacious"],
-    );
-  });
-
-  it("presses each group's selected context", async () => {
-    useUntheme().swap("contrast", "high");
-    await open();
-    const pressed = (setting: string) =>
-      segments(setting)
-        .filter((item) => item.getAttribute("data-state") === "on")
-        .map((item) => item.textContent!.trim());
-    expect(pressed("color")).toEqual(["Light"]);
-    expect(pressed("contrast")).toEqual(["High"]);
-    expect(pressed("density")).toEqual(["Comfortable"]);
-  });
-
-  it("applies the context pressed", async () => {
-    await open();
-    segments("density")
-      .find((item) => item.textContent!.trim() === "Spacious")!
-      .click();
-    await vi.waitFor(() =>
-      expect(useUntheme().config.input.density).toBe("spacious"),
-    );
-  });
-
-  it("keeps a group's selection when its pressed button is pressed again", async () => {
-    await open();
-    segments("color")
-      .find((item) => item.textContent!.trim() === "Light")!
-      .click();
-    await nextTick();
-    expect(useUntheme().config.input.color).toBe("light");
-    expect(
-      segments("color").map((item) => item.getAttribute("data-state")),
-    ).toEqual(["on", "off"]);
   });
 });

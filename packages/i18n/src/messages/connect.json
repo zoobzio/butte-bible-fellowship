@@ -1,0 +1,10 @@
+{
+  "title": {
+    "defaultMessage": "Connect",
+    "description": "The title at the top of the connect page: the church's elders, and how to reach and find the church."
+  },
+  "description": {
+    "defaultMessage": "We’d love to meet you. Here are the people to ask for, and how to reach us.",
+    "description": "The line under the connect page's title, inviting the reader to get in touch with the church."
+  }
+}

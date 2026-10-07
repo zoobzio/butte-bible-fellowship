@@ -12,9 +12,12 @@ type Descriptors = Record<string, { defaultMessage: string }>;
 const root = fileURLToPath(new URL("..", import.meta.url));
 const read = (file: string) => readFileSync(`${root}${file}`, "utf8");
 
-/** The files under a source directory with an extension, sorted. */
+/**
+ * The files under a source directory with an extension, sorted: those in
+ * its own directories among them, by their path from it.
+ */
 const list = (directory: string, extension: string) =>
-  readdirSync(`${root}${directory}`)
+  readdirSync(`${root}${directory}`, { recursive: true, encoding: "utf8" })
     .filter((file) => file.endsWith(extension))
     .sort();
 
@@ -84,8 +87,16 @@ describe("bundles", () => {
       locale: index.locale,
       messages: await bundles.bundles[index.locale](),
     });
-    // The two messages that take a value are formatted with one below.
-    const taking = ["appearance.scheme", "footer.copyright"];
+    // The messages that take a value are formatted with one below.
+    const taking = [
+      "appearance.scheme",
+      "footer.copyright",
+      "sermons.play",
+      "events.day",
+      "events.weekly",
+      "events.monthly",
+      "events.week",
+    ];
     for (const [key, message] of Object.entries(source)) {
       if (!taking.includes(key)) {
         expect(fibber.format(key as never), key).toBe(message);
@@ -100,6 +111,24 @@ describe("bundles", () => {
     expect(fibber.format("footer.copyright", { year: "2026" })).toBe(
       "© 2026 Butte Bible Fellowship",
     );
+    expect(fibber.format("sermons.play", { title: "Faith & Works" })).toBe(
+      "Play “Faith & Works”",
+    );
+    expect(
+      fibber.format("events.day", { date: "Sunday, October 4", count: 3 }),
+    ).toBe("Sunday, October 4, 3 events");
+    expect(fibber.format("events.weekly", { day: "Sunday" })).toBe(
+      "Every Sunday",
+    );
+    expect(
+      fibber.format("events.monthly", {
+        weeks: "first and third",
+        day: "Tuesday",
+      }),
+    ).toBe("Every first and third Tuesday");
+    expect(
+      [1, 2, 3, 4, 5].map((week) => fibber.format("events.week", { week })),
+    ).toEqual(["first", "second", "third", "fourth", "fifth"]);
   });
 });
 
