@@ -5,10 +5,10 @@
 // Vue APIs and stub the Nuxt-runtime composables. Type-only imports are erased
 // by esbuild before this module loads, so only value exports matter here.
 
-import { computed, reactive, ref, type Ref } from "vue";
+import { computed, reactive, ref, toRaw, type Ref } from "vue";
 import { vi } from "vitest";
 import { makeFibber } from "fibber-lang";
-import { makeUntheme } from "untheme";
+import { copy, makeUntheme } from "untheme";
 import { useUnthemeConfig } from "untheme/config";
 import { contract, locale } from "@bbf/i18n";
 import { bundles } from "@bbf/i18n/bundles";
@@ -32,20 +32,30 @@ export const useState = (key: string, init?: () => unknown): Ref<unknown> => {
 };
 
 // useUntheme: the real service over the app's built theme, in a reactive
-// container held like the module holds it — in useState, so the registry
-// reset between tests gives each test a fresh selection.
-const services = new WeakMap<object, ReturnType<typeof makeUntheme>>();
+// container held like the module holds it. The service is built once per
+// file, on first use, rather than once per test: building it walks the whole
+// theme to derive its schema, and through Vue's proxy that walk costs a
+// quarter of a second. The schema reads the raw theme instead — no test
+// changes the theme — and only the selection and the override, which tests
+// do move, are read through the proxy. clearUntheme, run before each test,
+// puts the selection back at boot and drops any override, so each test
+// starts clean.
+let untheme: ReturnType<typeof makeUntheme> | undefined;
+let container: ReturnType<typeof useUnthemeConfig> | undefined;
 
 export const useUntheme = () => {
-  const container = useState("untheme:config", () =>
-    reactive(useUnthemeConfig(theme)),
-  ).value as object;
-  let service = services.get(container);
-  if (!service) {
-    service = makeUntheme(container as ReturnType<typeof useUnthemeConfig>);
-    services.set(container, service);
+  if (!untheme) {
+    container = reactive(useUnthemeConfig(theme)) as typeof container;
+    untheme = makeUntheme(container!, { get: { config: { theme: toRaw } } });
   }
-  return service;
+  return untheme;
+};
+
+export const clearUntheme = () => {
+  if (container) {
+    container.input = copy(theme.input);
+    container.override = {};
+  }
 };
 
 // useNuxtApp: the app, as far as the tests reach into it — `$t`, the real
