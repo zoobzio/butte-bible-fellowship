@@ -4,6 +4,7 @@ import {
   computed,
   createError,
   definePageMeta,
+  useAppConfig,
   useHead,
   useNuxtApp,
 } from "#imports";
@@ -23,6 +24,7 @@ definePageMeta({
 });
 
 const { $t } = useNuxtApp();
+const { events: defaults } = useAppConfig();
 const { path } = useRouteLocale();
 
 // An event is one of the events page's, found by the slug its address ends
@@ -48,6 +50,10 @@ const { data: page } = await usePage(path.value);
 
 useHead(() => ({ title: page.value?.title ?? event.value?.title }));
 
+// The event's picture: its page's, and the church's until the page names
+// one.
+const image = computed(() => page.value?.image ?? defaults.image);
+
 const days = useEventDays();
 const time = useEventTime();
 
@@ -70,7 +76,7 @@ const description = computed(() => {
     />
     <div class="event-body">
       <div class="event-media">
-        <img v-if="page?.image" :src="page.image" alt="" />
+        <img :src="image" alt="" />
       </div>
       <article v-if="page" class="prose">
         <ContentRenderer
@@ -108,8 +114,7 @@ const description = computed(() => {
   padding-block: var(--space-7) clamp(var(--space-7), 7vw, var(--space-9));
 }
 
-/* The picture's frame, holding its shape with or without a picture: until
-   the page names one, it stands empty in its place. */
+/* The picture's frame: the page's own picture, or the church's. */
 .event-media {
   overflow: hidden;
   aspect-ratio: 16 / 9;

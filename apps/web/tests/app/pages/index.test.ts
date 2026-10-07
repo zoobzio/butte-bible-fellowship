@@ -12,7 +12,7 @@ const HERO = {
   tagline: "Discover",
   highlight: "Grace",
   description: "Join us on Sundays.",
-  cta: { label: "You're invited", to: "/youre-invited" },
+  cta: { label: "You're invited", to: "/#youre-invited" },
 };
 
 const home = (hero?: Partial<typeof HERO> & { image?: string }) => ({
@@ -75,7 +75,7 @@ describe("home page", () => {
 
     const cta = hero.find("a.cta");
     expect(cta.text()).toBe("You're invited");
-    expect(cta.attributes("href")).toBe("/youre-invited");
+    expect(cta.attributes("href")).toBe("/#youre-invited");
   });
 
   it("leaves out the optional hero parts that are not set", async () => {

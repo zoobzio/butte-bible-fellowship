@@ -48,6 +48,14 @@ html:not([data-motion="reduced"]) {
   scroll-behavior: smooth;
 }
 
+/* An anchor — a heading the contents link to, a section a page links down
+   to — lands under the sticky header, not behind it, with room to breathe.
+   The router reads the margin when it scrolls to a hash, as the browser does
+   on a jump of its own. */
+[id] {
+  scroll-margin-top: calc(var(--header-height) + var(--space-5));
+}
+
 body {
   margin: 0;
   background: var(--surface);

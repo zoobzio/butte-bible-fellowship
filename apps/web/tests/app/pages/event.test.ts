@@ -49,6 +49,7 @@ const mountPage = async (path: string, written: object = WORSHIP_PAGE) => {
       phone: "555-010-0199",
       email: "office@example.org",
     },
+    events: { image: "/images/church.jpg" },
   });
   setContentPages({
     "/events": EVENTS_PAGE,
@@ -140,15 +141,18 @@ describe("event page", () => {
     expect(picture.attributes("alt")).toBe("");
   });
 
-  it("keeps the picture's place until its page names one", async () => {
+  it("shows the church's picture until its page names one", async () => {
     const { wrapper } = await mountPage("/events/worship-service");
-    expect(wrapper.find(".event-media").exists()).toBe(true);
-    expect(wrapper.find(".event-media > img").exists()).toBe(false);
+    expect(wrapper.find(".event-media > img").attributes("src")).toBe(
+      "/images/church.jpg",
+    );
   });
 
-  it("has no article for an event nothing is written about", async () => {
+  it("has no article for an event nothing is written about, but the church's picture", async () => {
     const { wrapper } = await mountPage("/events/harvest-dinner");
-    expect(wrapper.find(".event-body > .event-media").exists()).toBe(true);
+    expect(
+      wrapper.find(".event-body > .event-media > img").attributes("src"),
+    ).toBe("/images/church.jpg");
     expect(wrapper.find(".prose").exists()).toBe(false);
     expect(wrapper.findComponent(ContentRenderer).exists()).toBe(false);
   });

@@ -56,12 +56,12 @@ describe("AppInvitation", () => {
     );
   });
 
-  it("lists what happens on a Sunday beside the words, from the earliest start", async () => {
+  it("lists what happens on a Sunday beside the words, unlabelled, from the earliest start", async () => {
     const wrapper = await mountAt();
     const schedule = wrapper.find(
       ".site-invitation-words + .site-invitation-schedule",
     );
-    expect(schedule.find("p").text()).toBe($t.invitation.sundays());
+    expect(schedule.find("p").exists()).toBe(false);
     expect(schedule.findComponent(EventSchedule).props("events")).toEqual([
       SCHOOL,
       WORSHIP,

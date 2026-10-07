@@ -6,3 +6,9 @@ export interface CalendarDay {
   date: string;
   events: ChurchEvent[];
 }
+
+/** The events: what an event's page shows until it says otherwise. */
+export interface EventsConfig {
+  /** The picture over an event nothing is written about yet, or whose page names none. */
+  image: string;
+}

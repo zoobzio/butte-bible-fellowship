@@ -27,14 +27,21 @@ const text = (line: FooterLine) => {
 <template>
   <footer class="site-footer">
     <div class="site-footer-grid">
-      <!-- The reference is marked up as Markdown marks one up in a page's
-           own quotes, so the verse reads here as it would in the prose. -->
-      <blockquote class="site-footer-verse">
+      <!-- The verse's column is headed by the church's name, as the others
+           are by their titles. The reference is marked up as Markdown marks
+           one up in a page's own quotes, so the verse reads here as it would
+           in the prose. -->
+      <div class="site-footer-verse">
         <p>
-          {{ $t.footer.verse() }}
-          <em>{{ $t.footer.reference() }}</em>
+          <strong>{{ $t.site.name() }}</strong>
         </p>
-      </blockquote>
+        <blockquote>
+          <p>
+            {{ $t.footer.verse() }}
+            <em>{{ $t.footer.reference() }}</em>
+          </p>
+        </blockquote>
+      </div>
       <div
         v-for="(column, index) in footer.columns"
         :key="index"
@@ -112,6 +119,17 @@ const text = (line: FooterLine) => {
   margin: 0 auto 0 0;
 }
 
+/* The quote mark the prose hangs over a blockquote rises above it, so the
+   verse stands further under its heading than a column's lines do under
+   theirs: the mark clears the name. */
+.site-footer-verse > p {
+  margin: 0;
+}
+
+.site-footer-verse > blockquote {
+  margin: var(--space-6) 0 0;
+}
+
 /* A column's lines: the verse's words are the quote's to set. */
 .site-footer-col > p {
   margin: 0 0 var(--space-2);
@@ -120,7 +138,8 @@ const text = (line: FooterLine) => {
   max-width: none;
 }
 
-.site-footer-col strong {
+.site-footer-col strong,
+.site-footer-verse strong {
   display: block;
   margin-bottom: var(--space-3);
   font: var(--type-title);

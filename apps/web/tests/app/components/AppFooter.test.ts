@@ -55,12 +55,22 @@ describe("AppFooter", () => {
     ]);
   });
 
-  it("quotes the verse ahead of the columns, with its reference marked up as the prose marks one up", () => {
-    const quote = mountFooter().find(
-      ".site-footer-grid > blockquote.site-footer-verse:first-child > p",
+  it("quotes the verse ahead of the columns, under the church's name, with its reference marked up as the prose marks one up", () => {
+    const verse = mountFooter().find(
+      ".site-footer-grid > .site-footer-verse:first-child",
     );
+    expect(verse.find("p > strong").text()).toBe($t.site.name());
+    const quote = verse.find("p + blockquote > p");
     expect(quote.text()).toBe(`${$t.footer.verse()} ${$t.footer.reference()}`);
     expect(quote.find("em").text()).toBe($t.footer.reference());
+  });
+
+  it("does not count the verse among the columns", () => {
+    const wrapper = mountFooter();
+    expect(wrapper.find(".site-footer-verse.site-footer-col").exists()).toBe(
+      false,
+    );
+    expect(wrapper.findAll(".site-footer-col")).toHaveLength(2);
   });
 
   it("renders lines without an href as plain text, messages resolved", () => {

@@ -29,7 +29,6 @@ const sunday = computed(() => heldOn(events.value?.events ?? [], "sunday"));
         {{ invitation.address }}
       </p>
       <div class="site-invitation-schedule">
-        <p class="site-invitation-label">{{ $t.invitation.sundays() }}</p>
         <EventSchedule :events="sunday" />
       </div>
     </div>
@@ -91,18 +90,6 @@ const sunday = computed(() => heldOn(events.value?.events ?? [], "sunday"));
   font-weight: var(--weight-regular);
   margin-bottom: var(--space-2);
   color: var(--on-surface-high-contrast);
-}
-
-/* What is listed beside the invitation, said over it like the label over
-   a page's contents. */
-.site-invitation-label {
-  margin: 0 0 var(--space-4);
-  font: var(--type-title);
-  font-family: var(--font-display);
-  font-size: var(--body-size);
-  font-variant-caps: all-small-caps;
-  letter-spacing: calc(var(--type-label-letter-spacing) * 2);
-  color: var(--primary-medium-contrast);
 }
 
 /* No room for the Sunday beside the invitation: it follows it. */

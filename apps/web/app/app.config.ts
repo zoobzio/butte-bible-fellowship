@@ -1,4 +1,5 @@
 import type { ContactConfig } from "~/types/contact";
+import type { EventsConfig } from "~/types/events";
 import type { FooterConfig } from "~/types/footer";
 import type { HeaderConfig } from "~/types/header";
 import type { InvitationConfig } from "~/types/invitation";
@@ -58,4 +59,16 @@ const invitation: InvitationConfig = {
   address: contact.address,
 };
 
-export default defineAppConfig({ header, contact, footer, invitation });
+// Until an event's page has a picture of its own, it is pictured by the
+// church — the home page's picture.
+const events: EventsConfig = {
+  image: "/images/church.jpg",
+};
+
+export default defineAppConfig({
+  header,
+  contact,
+  footer,
+  invitation,
+  events,
+});

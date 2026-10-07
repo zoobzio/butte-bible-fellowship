@@ -2,9 +2,5 @@
   "title": {
     "defaultMessage": "Join us Sundays at 10:00am",
     "description": "The line in the bar above the footer of every page, inviting the reader to the Sunday service. The church's address follows it, and what happens on a Sunday is listed beside it."
-  },
-  "sundays": {
-    "defaultMessage": "Sundays",
-    "description": "The label over the list of what happens on a Sunday — Sunday school, the worship service — and when, beside the invitation to the Sunday service."
   }
 }
