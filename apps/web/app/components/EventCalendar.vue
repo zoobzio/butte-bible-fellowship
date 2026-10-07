@@ -200,10 +200,10 @@ const period = computed(() => monthFormat.value.format(toDate(shown.value)));
   align-items: center;
   height: calc(var(--space-4) + var(--space-2) * 2 + 2px);
   padding: 0 var(--space-3);
-  border: 1px var(--stroke-solid) var(--outline-muted);
+  border: 1px var(--stroke-solid) var(--rule);
   border-radius: var(--shape-md);
   background: transparent;
-  color: var(--on-surface-muted-medium-contrast);
+  color: var(--on-surface-muted);
   font: var(--type-label);
   letter-spacing: var(--type-label-letter-spacing);
   cursor: pointer;
@@ -255,12 +255,13 @@ const period = computed(() => monthFormat.value.format(toDate(shown.value)));
    wash the day's card is painted with, and the days under them. */
 .event-calendar-grid {
   overflow: hidden;
-  border: 1px var(--stroke-solid) var(--outline-muted);
+  border: 1px var(--stroke-solid) var(--rule);
   border-radius: var(--shape-lg);
+  box-shadow: var(--elevation-low);
 }
 
 .event-calendar-weekdays {
-  border-bottom: 1px var(--stroke-solid) var(--outline-muted);
+  border-bottom: 1px var(--stroke-solid) var(--rule);
   background: color-mix(
     in oklab,
     var(--secondary-container) 40%,
@@ -273,13 +274,13 @@ const period = computed(() => monthFormat.value.format(toDate(shown.value)));
   font: var(--type-label);
   font-variant-caps: all-small-caps;
   letter-spacing: calc(var(--type-label-letter-spacing) * 2);
-  color: var(--on-surface-muted-medium-contrast);
+  color: var(--on-surface-muted);
 }
 
 /* One line between every two days: each day rules its right and bottom,
    and the frame takes the last of each. */
 .event-calendar-days > li {
-  border: 1px var(--stroke-solid) var(--outline-muted);
+  border: 1px var(--stroke-solid) var(--rule);
   border-width: 0 1px 1px 0;
 }
 
@@ -343,7 +344,7 @@ const period = computed(() => monthFormat.value.format(toDate(shown.value)));
   border: 0;
   border-radius: var(--shape-full);
   background: transparent;
-  color: var(--on-surface-medium-contrast);
+  color: var(--on-surface);
   font: var(--type-label);
   cursor: pointer;
 }
@@ -361,7 +362,7 @@ const period = computed(() => monthFormat.value.format(toDate(shown.value)));
 /* Today is ringed, and filled once it is the day selected. */
 .event-calendar-date[aria-current] {
   box-shadow: inset 0 0 0 1px var(--primary);
-  color: var(--primary-medium-contrast);
+  color: var(--primary);
   font-weight: var(--weight-medium);
 }
 
@@ -375,7 +376,7 @@ const period = computed(() => monthFormat.value.format(toDate(shown.value)));
 .event-calendar-events {
   position: relative;
   display: grid;
-  gap: 2px;
+  gap: calc(var(--space-1) / 2);
   margin: 0;
   padding: 0;
   list-style: none;
@@ -403,7 +404,7 @@ const period = computed(() => monthFormat.value.format(toDate(shown.value)));
 }
 
 .event-calendar-event-time {
-  color: var(--primary-medium-contrast);
+  color: var(--primary);
   font-variant-numeric: tabular-nums;
 }
 

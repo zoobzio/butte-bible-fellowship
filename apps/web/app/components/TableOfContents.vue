@@ -106,7 +106,7 @@ onBeforeUnmount(() => {
   font-size: var(--label-size);
   font-variant-caps: all-small-caps;
   letter-spacing: calc(var(--type-label-letter-spacing) * 2);
-  color: var(--primary-medium-contrast);
+  color: var(--primary);
 }
 
 /* The list's left edge is a rail, and the marker rides it. */
@@ -120,7 +120,7 @@ onBeforeUnmount(() => {
   position: absolute;
   inset: 0 auto 0 0;
   width: 1px;
-  background: var(--outline-muted);
+  background: var(--rule);
 }
 
 /* The bar under the header's tabs, stood on end. */
@@ -179,7 +179,7 @@ onBeforeUnmount(() => {
 }
 
 .toc-link {
-  color: var(--on-surface-muted-medium-contrast);
+  color: var(--on-surface-muted);
   text-decoration: none;
   transition: color var(--transition-fast);
 }
@@ -193,6 +193,6 @@ onBeforeUnmount(() => {
 }
 
 .toc-item[data-active] .toc-link {
-  color: var(--primary-medium-contrast);
+  color: var(--primary);
 }
 </style>

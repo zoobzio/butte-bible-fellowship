@@ -65,7 +65,7 @@ const recent = computed(() => sermons.value?.slice(0, 3) ?? []);
             {{ hero.cta.label }}
           </NuxtLink>
         </div>
-        <div class="home-hero-media">
+        <div class="home-hero-media arch">
           <img v-if="hero.image" :src="hero.image" alt="" />
         </div>
       </section>
@@ -134,7 +134,7 @@ const recent = computed(() => sermons.value?.slice(0, 3) ?? []);
 
 .home-hero h1 em {
   display: block;
-  color: var(--primary-medium-contrast);
+  color: var(--primary);
 }
 
 .home-hero p {
@@ -142,7 +142,7 @@ const recent = computed(() => sermons.value?.slice(0, 3) ?? []);
   font-family: var(--font-display);
   font-size: clamp(var(--title-size), 2.2vw, calc(var(--title-size) * 1.35));
   line-height: 1.6;
-  color: var(--on-surface-medium-contrast);
+  color: var(--on-surface);
   max-width: 44ch;
   margin: 0;
 }
@@ -154,18 +154,16 @@ const recent = computed(() => sermons.value?.slice(0, 3) ?? []);
   aspect-ratio: 4 / 5;
   padding: var(--space-2);
   border: 1px var(--stroke-solid)
-    color-mix(in oklab, var(--primary) 45%, var(--outline-muted));
-  border-radius: 50% 50% var(--shape-sm) var(--shape-sm) / 34% 34%
-    var(--shape-sm) var(--shape-sm);
+    color-mix(in oklab, var(--primary) 45%, var(--rule));
   background: var(--surface-container);
+  box-shadow: var(--elevation-low);
 }
 
-/* The picture takes the window's shape: the same arch, inside the rim. */
+/* The picture fills the window; the arch gives it the window's shape. */
 .home-hero-media img {
   display: block;
   width: 100%;
   height: 100%;
-  border-radius: inherit;
   object-fit: cover;
 }
 
@@ -205,10 +203,14 @@ const recent = computed(() => sermons.value?.slice(0, 3) ?? []);
 
 /* ---------- Motion — slow enough to feel like weather ---------------- */
 
+/* The hero rises in, each part a step after the last, unless the reader —
+   or the system — has asked for less motion. The pace, the step and the
+   easing are the axis's: expressive motion spreads the steps and lets each
+   part overshoot its place before it settles. */
 @media (prefers-reduced-motion: no-preference) {
-  .home-hero-content > *,
-  .home-hero-media {
-    animation: bbf-rise var(--duration-slow) var(--easing-enter) both;
+  html:not([data-motion="reduced"]) .home-hero-content > *,
+  html:not([data-motion="reduced"]) .home-hero-media {
+    animation: bbf-rise var(--duration-slow) var(--easing-standard) both;
   }
   .home-hero-content > *:nth-child(2) {
     animation-delay: calc(var(--delay-step) * 1.5);

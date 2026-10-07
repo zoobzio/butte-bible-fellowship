@@ -52,8 +52,13 @@ It styles what any page of the site shares: the semantic elements, the
 classes Markdown content wears (`.prose`, `.prose-figure`,
 `.prose-aside-image`, `.events-table`), the controls more than one component
 uses (`.cta`, `.theme-toggle`) and Foundation's unstyled parts (menu, popover,
-listbox, toggle group). Every value is a `@bbf/theme` variable, but for
-`--font-display`, which `base.css` declares.
+listbox, toggle group). Every value is a `@bbf/theme` variable, read
+through the roles each modifier axis rebinds, but for the site properties
+`base.css` declares: the display face, the site's measure, and the few
+things aurora has no token for — the rule (`--rule`), the signature stripe
+(`--gradient-signature`), the arch (`--arch`) and the hover lift
+(`--lift`) — each bound per axis context there so that every setting the
+footer offers shows.
 
 What only one page or component wears is not here: it is in a `<style>`
 block of that component, in the app.

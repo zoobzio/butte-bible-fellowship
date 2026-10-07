@@ -26,7 +26,7 @@ const initials = computed(() => {
 
 <template>
   <article class="staff-card" :class="{ 'staff-card-compact': compact }">
-    <div class="staff-card-frame">
+    <div class="staff-card-frame arch">
       <img
         v-if="member.photo"
         :src="member.photo"
@@ -66,34 +66,35 @@ const initials = computed(() => {
   margin-bottom: var(--space-2);
   padding: var(--space-2);
   border: 1px var(--stroke-solid)
-    color-mix(in oklab, var(--primary) 45%, var(--outline-muted));
-  border-radius: 50% 50% var(--shape-sm) var(--shape-sm) / 34% 34%
-    var(--shape-sm) var(--shape-sm);
+    color-mix(in oklab, var(--primary) 45%, var(--rule));
   background: var(--surface-container);
+  box-shadow: var(--elevation-low);
   transition:
     border-color var(--transition-base),
-    transform var(--transition-base);
+    transform var(--transition-base),
+    box-shadow var(--transition-base);
 }
 
 .staff-card:hover .staff-card-frame {
   border-color: color-mix(in oklab, var(--primary) 80%, transparent);
-  transform: translateY(-2px);
+  transform: translateY(var(--lift));
+  box-shadow: var(--elevation-mid);
 }
 
-/* What is in the window takes its shape: the same arch, inside the rim. */
+/* What is in the window takes its shape — the arch does that — and fills
+   it. */
 .staff-card-photo,
 .staff-card-initials {
   display: grid;
   place-items: center;
   width: 100%;
   height: 100%;
-  border-radius: inherit;
   object-fit: cover;
 }
 
 .staff-card-initials {
   background: color-mix(in oklab, var(--primary-container) 60%, transparent);
-  color: var(--primary-medium-contrast);
+  color: var(--primary);
   font: var(--type-headline);
   font-family: var(--font-display);
   font-size: clamp(var(--headline-size), 4vw, var(--display-size));
@@ -113,7 +114,7 @@ const initials = computed(() => {
   font-size: var(--label-size);
   font-variant-caps: all-small-caps;
   letter-spacing: calc(var(--type-label-letter-spacing) * 2);
-  color: var(--primary-medium-contrast);
+  color: var(--primary);
 }
 
 .staff-card h3 {
@@ -129,7 +130,7 @@ const initials = computed(() => {
   margin: 0;
   font-size: var(--label-size);
   line-height: 1.7;
-  color: var(--on-surface-medium-contrast);
+  color: var(--on-surface);
 }
 
 .staff-card a {

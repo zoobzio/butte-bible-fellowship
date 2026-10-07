@@ -90,6 +90,7 @@ onBeforeUnmount(() => {
   padding: var(--space-5) calc(var(--site-gutter) / 2) var(--space-4);
   background: color-mix(in oklab, var(--surface) 88%, transparent);
   backdrop-filter: blur(var(--blur-sm)) saturate(1.2);
+  box-shadow: var(--elevation-low);
 }
 
 .site-header::after {
@@ -97,12 +98,7 @@ onBeforeUnmount(() => {
   position: absolute;
   inset: auto 0 0 0;
   height: 1px;
-  background: linear-gradient(
-    108deg,
-    var(--primary-500),
-    var(--secondary-400) 52%,
-    var(--tertiary-400)
-  );
+  background: var(--gradient-signature);
   opacity: 0.85;
 }
 
@@ -143,7 +139,7 @@ onBeforeUnmount(() => {
   font-size: var(--label-size);
   font-style: italic;
   letter-spacing: var(--type-title-letter-spacing);
-  color: var(--primary-medium-contrast);
+  color: var(--primary);
 }
 
 .site-brand:hover .site-brand-name {
@@ -162,9 +158,13 @@ onBeforeUnmount(() => {
 .site-nav-link {
   position: relative;
   padding: var(--space-2) 0;
-  font-size: clamp(var(--label-size), 0.4vw + 0.8rem, var(--body-size));
+  font-size: clamp(
+    var(--label-size),
+    calc(var(--label-size) * 0.9 + 0.4vw),
+    var(--body-size)
+  );
   letter-spacing: var(--type-label-letter-spacing);
-  color: var(--on-surface-muted-medium-contrast);
+  color: var(--on-surface-muted);
   text-decoration: none;
   transition: color var(--transition-fast);
 }

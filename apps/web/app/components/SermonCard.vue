@@ -91,17 +91,20 @@ const published = computed(() => {
   overflow: hidden;
   aspect-ratio: 16 / 9;
   margin-bottom: var(--space-2);
-  border: 1px var(--stroke-solid) var(--outline-muted);
+  border: 1px var(--stroke-solid) var(--rule);
   border-radius: var(--shape-lg);
   background: var(--surface-container);
+  box-shadow: var(--elevation-low);
   transition:
     border-color var(--transition-base),
-    transform var(--transition-base);
+    transform var(--transition-base),
+    box-shadow var(--transition-base);
 }
 
 .sermon-card-frame:has(button:hover) {
   border-color: color-mix(in oklab, var(--primary) 50%, transparent);
-  transform: translateY(-2px);
+  transform: translateY(var(--lift));
+  box-shadow: var(--elevation-mid);
 }
 
 .sermon-card-frame iframe,
@@ -132,9 +135,9 @@ const published = computed(() => {
   place-items: center;
   width: var(--space-8);
   aspect-ratio: 1;
-  border-radius: 50%;
+  border-radius: var(--shape-full);
   background: color-mix(in oklab, var(--surface) 82%, transparent);
-  color: var(--primary-medium-contrast);
+  color: var(--primary);
   transform: translate(-50%, -50%);
   transition: background var(--transition-base);
 }
@@ -156,7 +159,7 @@ const published = computed(() => {
   font-size: var(--label-size);
   font-variant-caps: all-small-caps;
   letter-spacing: calc(var(--type-label-letter-spacing) * 2);
-  color: var(--primary-medium-contrast);
+  color: var(--primary);
 }
 
 .sermon-card h2 {
@@ -174,7 +177,7 @@ const published = computed(() => {
 .sermon-card time {
   font: var(--type-label);
   letter-spacing: var(--type-label-letter-spacing);
-  color: var(--on-surface-medium-contrast);
+  color: var(--on-surface);
 }
 
 /* ---------- Featured — picture left, words right ---------------------- */

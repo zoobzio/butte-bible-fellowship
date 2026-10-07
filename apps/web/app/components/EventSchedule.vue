@@ -77,11 +77,11 @@ const listed = computed(() =>
 .event-schedule-time {
   font-size: var(--label-size);
   font-variant-numeric: tabular-nums;
-  color: var(--on-surface-medium-contrast);
+  color: var(--on-surface);
 }
 
 .event-schedule-none {
   margin: 0;
-  color: var(--on-surface-muted-medium-contrast);
+  color: var(--on-surface-muted);
 }
 </style>

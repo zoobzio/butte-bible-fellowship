@@ -89,6 +89,6 @@ const controls = settings.map(({ id, name, contexts }) => {
   font: var(--type-label);
   font-variant-caps: all-small-caps;
   letter-spacing: calc(var(--type-label-letter-spacing) * 2);
-  color: var(--on-surface-muted-medium-contrast);
+  color: var(--on-surface-muted);
 }
 </style>

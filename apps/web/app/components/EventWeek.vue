@@ -96,11 +96,11 @@ const listed = computed(() =>
 .event-week time {
   display: block;
   padding-bottom: var(--space-2);
-  border-bottom: 1px var(--stroke-solid) var(--outline-muted);
+  border-bottom: 1px var(--stroke-solid) var(--rule);
   font-size: var(--label-size);
   font-variant-caps: all-small-caps;
   letter-spacing: calc(var(--type-label-letter-spacing) * 2);
-  color: var(--primary-medium-contrast);
+  color: var(--primary);
 }
 
 .event-week ul {
@@ -129,11 +129,11 @@ const listed = computed(() =>
 .event-week-time {
   font-size: var(--label-size);
   font-variant-numeric: tabular-nums;
-  color: var(--on-surface-medium-contrast);
+  color: var(--on-surface);
 }
 
 .event-week-none {
   margin: 0;
-  color: var(--on-surface-muted-medium-contrast);
+  color: var(--on-surface-muted);
 }
 </style>

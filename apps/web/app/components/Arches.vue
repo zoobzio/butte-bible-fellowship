@@ -57,10 +57,10 @@ useArchLines({ track, svg, pathA, pathB });
 }
 
 [data-color="light"] .arch-line-a {
-  stroke: color-mix(in oklab, var(--primary-600) 52%, transparent);
+  stroke: color-mix(in oklab, var(--primary) 52%, transparent);
 }
 [data-color="light"] .arch-line-b {
-  stroke: color-mix(in oklab, var(--secondary-600) 40%, transparent);
+  stroke: color-mix(in oklab, var(--secondary) 40%, transparent);
 }
 
 /* The track is absolutely positioned against the document. */

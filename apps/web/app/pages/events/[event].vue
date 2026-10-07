@@ -118,9 +118,10 @@ const description = computed(() => {
 .event-media {
   overflow: hidden;
   aspect-ratio: 16 / 9;
-  border: 1px var(--stroke-solid) var(--outline-muted);
+  border: 1px var(--stroke-solid) var(--rule);
   border-radius: var(--shape-lg);
   background: var(--surface-container);
+  box-shadow: var(--elevation-low);
 }
 
 .event-media img {

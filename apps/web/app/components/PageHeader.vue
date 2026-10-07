@@ -69,9 +69,13 @@ const leave = () => {
   align-items: center;
   gap: var(--space-1);
   margin-bottom: var(--space-4);
-  font-size: clamp(var(--label-size), 0.4vw + 0.8rem, var(--body-size));
+  font-size: clamp(
+    var(--label-size),
+    calc(var(--label-size) * 0.9 + 0.4vw),
+    var(--body-size)
+  );
   letter-spacing: var(--type-label-letter-spacing);
-  color: var(--on-surface-muted-medium-contrast);
+  color: var(--on-surface-muted);
   text-decoration: none;
   transition: color var(--transition-fast);
 }
@@ -95,12 +99,7 @@ const leave = () => {
   height: 2px;
   margin: var(--space-5) 0 0;
   border: 0;
-  background: linear-gradient(
-    108deg,
-    var(--primary-500),
-    var(--secondary-400) 52%,
-    var(--tertiary-400)
-  );
+  background: var(--gradient-signature);
 }
 
 .page-header > p {
@@ -108,7 +107,7 @@ const leave = () => {
   font-family: var(--font-display);
   font-size: clamp(var(--title-size), 2.2vw, calc(var(--title-size) * 1.35));
   line-height: 1.6;
-  color: var(--on-surface-medium-contrast);
+  color: var(--on-surface);
   max-width: 44ch;
   margin: var(--space-5) 0 0;
 }

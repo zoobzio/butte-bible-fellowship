@@ -56,7 +56,7 @@ const where = computed(() => event.location ?? contact.address);
   margin: 0;
   padding: var(--space-5) var(--space-5) var(--space-5) var(--space-6);
   border: 1px var(--stroke-solid)
-    color-mix(in oklab, var(--primary) 40%, var(--outline-muted));
+    color-mix(in oklab, var(--primary) 40%, var(--rule));
   border-radius: var(--shape-lg);
   background:
     linear-gradient(
@@ -65,6 +65,7 @@ const where = computed(() => event.location ?? contact.address);
       transparent 70%
     ),
     var(--surface-container);
+  box-shadow: var(--elevation-low);
 }
 
 .event-details::before {
@@ -72,19 +73,14 @@ const where = computed(() => event.location ?? contact.address);
   position: absolute;
   inset: 0 auto 0 0;
   width: 3px;
-  background: linear-gradient(
-    108deg,
-    var(--primary-500),
-    var(--secondary-400) 52%,
-    var(--tertiary-400)
-  );
+  background: var(--gradient-signature);
 }
 
 /* Each answer is ruled off from the one before it, as the events of a day
    are. */
 .event-details > div {
   padding: var(--space-4) 0;
-  border-top: 1px var(--stroke-solid) var(--outline-muted);
+  border-top: 1px var(--stroke-solid) var(--rule);
 }
 
 .event-details > div:first-child {
@@ -104,7 +100,7 @@ const where = computed(() => event.location ?? contact.address);
   font-size: var(--label-size);
   font-variant-caps: all-small-caps;
   letter-spacing: calc(var(--type-label-letter-spacing) * 2);
-  color: var(--primary-medium-contrast);
+  color: var(--primary);
 }
 
 /* An address is one long word: it breaks where the card ends. */

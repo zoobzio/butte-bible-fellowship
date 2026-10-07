@@ -50,7 +50,7 @@ const listed = computed(() =>
   overflow: hidden;
   padding: var(--space-5) var(--space-5) var(--space-5) var(--space-6);
   border: 1px var(--stroke-solid)
-    color-mix(in oklab, var(--primary) 40%, var(--outline-muted));
+    color-mix(in oklab, var(--primary) 40%, var(--rule));
   border-radius: var(--shape-lg);
   background:
     linear-gradient(
@@ -59,6 +59,7 @@ const listed = computed(() =>
       transparent 70%
     ),
     var(--surface-container);
+  box-shadow: var(--elevation-low);
 }
 
 .event-list::before {
@@ -66,12 +67,7 @@ const listed = computed(() =>
   position: absolute;
   inset: 0 auto 0 0;
   width: 3px;
-  background: linear-gradient(
-    108deg,
-    var(--primary-500),
-    var(--secondary-400) 52%,
-    var(--tertiary-400)
-  );
+  background: var(--gradient-signature);
 }
 
 .event-list ol {
@@ -84,7 +80,7 @@ const listed = computed(() =>
    off from one another instead. */
 .event-list li {
   padding: var(--space-4) 0;
-  border-top: 1px var(--stroke-solid) var(--outline-muted);
+  border-top: 1px var(--stroke-solid) var(--rule);
   line-height: inherit;
 }
 
@@ -134,6 +130,6 @@ const listed = computed(() =>
 
 .event-list-note,
 .event-list-none {
-  color: var(--on-surface-muted-medium-contrast);
+  color: var(--on-surface-muted);
 }
 </style>

@@ -16,8 +16,9 @@ const { src, title } = defineProps<{
   aspect-ratio: 16 / 9;
   min-height: 18rem;
   border: 1px var(--stroke-solid)
-    color-mix(in oklab, var(--primary) 40%, var(--outline-muted));
+    color-mix(in oklab, var(--primary) 40%, var(--rule));
   border-radius: var(--shape-lg);
   background: var(--surface-container);
+  box-shadow: var(--elevation-low);
 }
 </style>

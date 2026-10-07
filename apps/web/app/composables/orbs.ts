@@ -1,20 +1,26 @@
 import type { OrbDriftOptions } from "~/types/orbs";
 
-import { onMounted, watch } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 
+import { useUntheme } from "#imports";
 import { MOTION_REDUCED_QUERY } from "~/constants/motion";
 import { orbDrift } from "~/utils/orbs";
 import { useFrame, useScrollProgress } from "~/composables/motion";
 
 /**
  * Drives the two drifting background orbs: they move in opposite directions
- * with scroll progress, and hold still against scroll under
+ * with scroll progress, and hold still against scroll when motion is
+ * reduced — by the theme's motion setting, or by the system's
  * prefers-reduced-motion. Returns `schedule` so the caller can request a
  * repaint (e.g. after navigation changes page height).
  */
 export const useOrbDrift = ({ left, right }: OrbDriftOptions) => {
   const { progress, refresh } = useScrollProgress();
-  let reduce = false;
+  const untheme = useUntheme();
+  const system = ref(false);
+  const reduced = computed(
+    () => system.value || untheme.config.input.motion === "reduced",
+  );
 
   const paint = () => {
     const drift = orbDrift(progress.value);
@@ -35,11 +41,11 @@ export const useOrbDrift = ({ left, right }: OrbDriftOptions) => {
   const { schedule } = useFrame(repaint);
 
   watch(progress, () => {
-    if (!reduce) paint();
+    if (!reduced.value) paint();
   });
 
   onMounted(() => {
-    reduce = window.matchMedia(MOTION_REDUCED_QUERY).matches;
+    system.value = window.matchMedia(MOTION_REDUCED_QUERY).matches;
     repaint();
   });
 

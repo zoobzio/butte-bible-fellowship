@@ -17,10 +17,12 @@ defineOptions({ name: "ConnectCard" });
   padding: var(--space-6);
   border-radius: var(--shape-lg);
   background: var(--surface-container);
-  border: 1px var(--stroke-solid) var(--outline-muted);
+  border: 1px var(--stroke-solid) var(--rule);
+  box-shadow: var(--elevation-low);
   transition:
     border-color var(--transition-base),
-    transform var(--transition-base);
+    transform var(--transition-base),
+    box-shadow var(--transition-base);
 }
 
 .connect-card::before {
@@ -28,17 +30,13 @@ defineOptions({ name: "ConnectCard" });
   position: absolute;
   inset: 0 auto 0 0;
   width: 3px;
-  background: linear-gradient(
-    108deg,
-    var(--primary-500),
-    var(--secondary-400) 52%,
-    var(--tertiary-400)
-  );
+  background: var(--gradient-signature);
 }
 
 .connect-card:hover {
   border-color: color-mix(in oklab, var(--primary) 50%, transparent);
-  transform: translateY(-2px);
+  transform: translateY(var(--lift));
+  box-shadow: var(--elevation-mid);
 }
 
 .connect-card h2 {
@@ -60,12 +58,12 @@ defineOptions({ name: "ConnectCard" });
   padding-block: var(--space-3);
   line-height: 1.7;
   max-width: none;
-  border-top: 1px var(--stroke-solid) var(--outline-muted);
+  border-top: 1px var(--stroke-solid) var(--rule);
 }
 
 .connect-card p:has(strong) {
   display: grid;
-  grid-template-columns: minmax(4.5rem, auto) 1fr;
+  grid-template-columns: minmax(4.5em, auto) 1fr;
   align-items: baseline;
   column-gap: var(--space-4);
 }
@@ -86,7 +84,7 @@ defineOptions({ name: "ConnectCard" });
 }
 
 .connect-card strong {
-  color: var(--primary-medium-contrast);
+  color: var(--primary);
   font: var(--type-label);
   font-variant-caps: all-small-caps;
   font-size: var(--body-size);

@@ -128,7 +128,7 @@ const date = computed(() =>
   font-size: var(--label-size);
   font-variant-caps: all-small-caps;
   letter-spacing: calc(var(--type-label-letter-spacing) * 2);
-  color: var(--primary-medium-contrast);
+  color: var(--primary);
 }
 
 /* No room for a column beside the calendar: the day's events follow it. */

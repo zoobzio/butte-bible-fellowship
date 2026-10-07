@@ -95,9 +95,9 @@ const command = defineCommand(() => ({
   align-items: center;
   gap: var(--space-2);
   padding: var(--space-2) var(--space-3);
-  border: 1px var(--stroke-solid) var(--outline-muted);
+  border: 1px var(--stroke-solid) var(--rule);
   border-radius: var(--shape-md);
-  color: var(--on-surface-muted-medium-contrast);
+  color: var(--on-surface-muted);
   transition: border-color var(--transition-fast);
 }
 
@@ -119,7 +119,7 @@ const command = defineCommand(() => ({
 .theme-picker .f-scroll-area-scrollbar {
   display: flex;
   width: var(--space-2);
-  padding: 2px;
+  padding: calc(var(--space-1) / 2);
   touch-action: none;
   user-select: none;
 }
@@ -127,7 +127,7 @@ const command = defineCommand(() => ({
 .theme-picker .f-scroll-area-thumb {
   flex: 1;
   border-radius: var(--shape-full);
-  background: var(--outline-muted);
+  background: var(--rule);
 }
 
 /* The list is short enough to scroll back by hand. */

@@ -27,9 +27,9 @@
 }
 
 .cta:hover {
-  background: var(--primary-medium-contrast);
+  background: var(--primary);
   color: var(--on-primary);
-  transform: translateY(-2px);
+  transform: translateY(var(--lift));
   box-shadow: var(--elevation-mid);
 }
 
@@ -39,6 +39,31 @@
 
 .cta:active {
   transform: translateY(0);
+}
+
+/* ---------- Arched window --------------------------------------------- */
+
+/* The window and what it holds take the arch (base.css), and its corner
+   shape with it: `corner-shape` bevels the same border on the same radius.
+   Where a browser does not know it, the gable is cut with a clip-path
+   instead, and the window's hairline goes with the cut. */
+.arch,
+.prose-aside-image {
+  border-radius: var(--arch);
+  corner-shape: var(--arch-corner);
+}
+
+.arch > * {
+  border-radius: inherit;
+  corner-shape: inherit;
+}
+
+@supports not (corner-shape: bevel) {
+  [data-radius="sharp"] :is(.arch, .prose-aside-image),
+  [data-radius="sharp"] .arch > * {
+    border-radius: 0;
+    clip-path: polygon(0 34%, 50% 0, 100% 34%, 100% 100%, 0 100%);
+  }
 }
 
 /* ---------- Toggle button — the footer's controls --------------------- */
@@ -51,9 +76,9 @@
   padding: var(--space-2);
   border-radius: var(--shape-full);
   border: 1px var(--stroke-solid)
-    color-mix(in oklab, var(--primary) 35%, var(--outline-muted));
+    color-mix(in oklab, var(--primary) 35%, var(--rule));
   background: transparent;
-  color: var(--on-surface-muted-medium-contrast);
+  color: var(--on-surface-muted);
   font-family: var(--font-sans);
   font-size: var(--label-size);
   letter-spacing: var(--type-label-letter-spacing);
@@ -83,7 +108,7 @@
   min-width: 13rem;
   padding: var(--space-2);
   background: var(--surface-container);
-  border: 1px var(--stroke-solid) var(--outline-muted);
+  border: 1px var(--stroke-solid) var(--rule);
   border-radius: var(--shape-md);
   box-shadow: var(--elevation-mid);
   z-index: 60;
@@ -93,7 +118,7 @@
   display: block;
   padding: var(--space-2) var(--space-3);
   border-radius: var(--shape-sm);
-  color: var(--on-surface-medium-contrast);
+  color: var(--on-surface);
   text-decoration: none;
   cursor: pointer;
   outline: none;
@@ -120,10 +145,10 @@
   padding: var(--space-3);
   overflow: hidden auto;
   background: var(--surface-container);
-  border: 1px var(--stroke-solid) var(--outline-muted);
+  border: 1px var(--stroke-solid) var(--rule);
   border-radius: var(--shape-md);
   box-shadow: var(--elevation-mid);
-  color: var(--on-surface-medium-contrast);
+  color: var(--on-surface);
   font: var(--type-body);
   z-index: 60;
 }
@@ -156,7 +181,7 @@
   margin-right: var(--space-3);
   padding: var(--space-2) var(--space-3);
   border-radius: var(--shape-sm);
-  color: var(--on-surface-medium-contrast);
+  color: var(--on-surface);
   cursor: pointer;
   outline: none;
 }
@@ -167,7 +192,7 @@
 }
 
 .f-listbox-item[data-state="checked"] {
-  color: var(--primary-high-contrast);
+  color: var(--primary);
   font-weight: var(--weight-medium);
 }
 
@@ -175,8 +200,8 @@
 
 .f-toggle-group-root {
   display: flex;
-  padding: 2px;
-  border: 1px var(--stroke-solid) var(--outline-muted);
+  padding: calc(var(--space-1) / 2);
+  border: 1px var(--stroke-solid) var(--rule);
   border-radius: var(--shape-md);
 }
 
@@ -187,7 +212,7 @@
   border: 0;
   border-radius: var(--shape-sm);
   background: transparent;
-  color: var(--on-surface-muted-medium-contrast);
+  color: var(--on-surface-muted);
   font: var(--type-label);
   cursor: pointer;
   transition:

@@ -89,12 +89,7 @@ const text = (line: FooterLine) => {
   position: absolute;
   inset: 0 0 auto 0;
   height: 1px;
-  background: linear-gradient(
-    108deg,
-    var(--primary-500),
-    var(--secondary-400) 52%,
-    var(--tertiary-400)
-  );
+  background: var(--gradient-signature);
   opacity: 0.85;
 }
 
@@ -134,7 +129,7 @@ const text = (line: FooterLine) => {
 .site-footer-col > p {
   margin: 0 0 var(--space-2);
   line-height: 1.7;
-  color: var(--on-surface-muted-medium-contrast);
+  color: var(--on-surface-muted);
   max-width: none;
 }
 
@@ -147,7 +142,7 @@ const text = (line: FooterLine) => {
   font-size: var(--body-size);
   font-variant-caps: all-small-caps;
   letter-spacing: calc(var(--type-label-letter-spacing) * 2);
-  color: var(--primary-medium-contrast);
+  color: var(--primary);
 }
 
 /* No room for the verse beside the columns: it leads them, and they stand
@@ -179,7 +174,7 @@ const text = (line: FooterLine) => {
   max-width: none;
   margin: var(--space-7) auto 0;
   padding-top: var(--space-4);
-  border-top: 1px var(--stroke-solid) var(--outline-muted);
+  border-top: 1px var(--stroke-solid) var(--rule);
   font: var(--type-label);
   font-size: var(--label-size);
   font-variant-caps: all-small-caps;

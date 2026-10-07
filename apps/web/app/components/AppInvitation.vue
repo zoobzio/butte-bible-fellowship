@@ -42,7 +42,7 @@ const sunday = computed(() => heldOn(events.value?.events ?? [], "sunday"));
 .site-invitation {
   padding-block: clamp(var(--space-7), 7vw, var(--space-8));
   border-top: 1px var(--stroke-solid)
-    color-mix(in oklab, var(--primary) 40%, var(--outline-muted));
+    color-mix(in oklab, var(--primary) 40%, var(--rule));
   background:
     linear-gradient(
       150deg,

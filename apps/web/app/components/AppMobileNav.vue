@@ -53,10 +53,10 @@ const menu = defineMenu(() => ({
   align-items: center;
   justify-content: center;
   padding: var(--space-2);
-  border: 1px var(--stroke-solid) var(--outline-muted);
+  border: 1px var(--stroke-solid) var(--rule);
   border-radius: var(--shape-md);
   background: transparent;
-  color: var(--on-surface-medium-contrast);
+  color: var(--on-surface);
   cursor: pointer;
   transition:
     color var(--transition-fast),
