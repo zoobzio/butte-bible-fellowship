@@ -1,7 +1,9 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
+import type { ChurchEvent } from "#shared/types/events";
+
 import { setRoutePath, useState } from "#imports";
-import { useEventTime, useToday } from "~/composables/events";
+import { useEventDays, useEventTime, useToday } from "~/composables/events";
 import { withSetup } from "#test/support/mount";
 
 afterEach(() => {
@@ -70,5 +72,57 @@ describe("useEventTime", () => {
         .format(new Date(17.5 * 60 * 60 * 1000))
         .replace(/\s/g, " "),
     );
+  });
+});
+
+describe("useEventDays", () => {
+  const said = (event: Partial<ChurchEvent>) =>
+    withSetup(useEventDays).result({
+      title: "Event",
+      start: "10:00",
+      ...event,
+    });
+
+  it("says the one date of an event held once", () => {
+    expect(said({ date: "2026-10-14" })).toBe("Wednesday, October 14");
+  });
+
+  it("says the day of the week an event repeats on", () => {
+    expect(said({ day: "sunday" })).toBe("Every Sunday");
+    expect(said({ day: "saturday" })).toBe("Every Saturday");
+  });
+
+  it("says which of the month's weeks an event is held in, in their order", () => {
+    expect(said({ day: "tuesday", weeks: [3, 1] })).toBe(
+      "Every first and third Tuesday",
+    );
+    expect(said({ day: "friday", weeks: [2] })).toBe("Every second Friday");
+  });
+
+  it("says an event with no weeks named is held every week", () => {
+    expect(said({ day: "thursday", weeks: [] })).toBe("Every Thursday");
+  });
+
+  it("says the date of an event that has a day as well", () => {
+    expect(said({ date: "2026-10-14", day: "sunday" })).toBe(
+      "Wednesday, October 14",
+    );
+  });
+
+  it("has nothing to say of an event with neither a date nor a day", () => {
+    expect(said({})).toBeUndefined();
+  });
+
+  it("names the date and the day as the route's locale does", () => {
+    setRoutePath("/es/events");
+    expect(said({ date: "2026-10-14" })).toBe(
+      new Intl.DateTimeFormat("es", {
+        weekday: "long",
+        month: "long",
+        day: "numeric",
+        timeZone: "UTC",
+      }).format(new Date("2026-10-14T00:00:00Z")),
+    );
+    expect(said({ day: "sunday" })).toContain("domingo");
   });
 });

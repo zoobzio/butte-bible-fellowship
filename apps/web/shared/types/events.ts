@@ -18,6 +18,8 @@ export interface ChurchEvent {
   slug?: string;
   /** A few words more about it, shown under its title. */
   note?: string;
+  /** Where it is held, when that is not at the church. */
+  location?: string;
   /** The one date it happens on, as `YYYY-MM-DD`. */
   date?: string;
   /** The day of the week it repeats on. */

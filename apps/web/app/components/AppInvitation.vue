@@ -1,13 +1,9 @@
 <script lang="ts">
-import { NuxtLink } from "#components";
 import { computed, useAppConfig, useNuxtApp } from "#imports";
 
-import EventWeek from "~/components/EventWeek.vue";
-import StaffCard from "~/components/StaffCard.vue";
-import { useToday } from "~/composables/events";
-import { useRouteLocale } from "~/composables/locale";
+import EventSchedule from "~/components/EventSchedule.vue";
 import { usePage } from "~/composables/page";
-import { week } from "~/utils/events";
+import { heldOn } from "~/utils/events";
 </script>
 
 <script setup lang="ts">
@@ -15,64 +11,26 @@ defineOptions({ name: "AppInvitation" });
 
 const { invitation } = useAppConfig();
 const { $t } = useNuxtApp();
-const { path, localize } = useRouteLocale();
 
-// The events page's front matter is the calendar, and the connect page's
-// lists the staff: both are read whichever page the bar is under.
+// The events page's front matter is the calendar: it is read whichever
+// page the bar is under.
 const { data: events } = await usePage("/events");
-const { data: connect } = await usePage("/connect");
 
-const today = useToday();
-const days = computed(() => week(events.value?.events ?? [], today.value));
-const staff = computed(() => connect.value?.staff ?? []);
-
-// Under the events page, which is the calendar itself, the bar turns from
-// the week to the people: who to ask for, and the way to the connect page.
-const meeting = computed(() => path.value === "/events");
-
-const words = computed(() =>
-  meeting.value
-    ? {
-        title: $t.invitation.meet(),
-        text: $t.invitation.people(),
-        to: "/connect",
-        label: $t.invitation.connect(),
-      }
-    : {
-        title: $t.invitation.title(),
-        text: invitation.address,
-        to: "/events",
-        label: $t.invitation.events(),
-      },
-);
+// The bar invites the reader to a Sunday: what happens on one is listed
+// beside the invitation.
+const sunday = computed(() => heldOn(events.value?.events ?? [], "sunday"));
 </script>
 
 <template>
   <aside class="site-invitation">
     <div class="site-invitation-body">
-      <div class="site-invitation-words">
-        <p>
-          <strong>{{ words.title }}</strong>
-          {{ words.text }}
-        </p>
-        <NuxtLink :to="localize(words.to)" class="cta">
-          {{ words.label }}
-        </NuxtLink>
-      </div>
-      <div v-if="!meeting" class="site-invitation-week">
-        <p class="site-invitation-label">{{ $t.invitation.week() }}</p>
-        <EventWeek :days="days" />
-      </div>
-      <div v-else-if="staff.length" class="site-invitation-staff">
-        <p class="site-invitation-label">{{ $t.invitation.staff() }}</p>
-        <div class="site-invitation-staff-list">
-          <StaffCard
-            v-for="(member, index) in staff"
-            :key="index"
-            :member="member"
-            compact
-          />
-        </div>
+      <p class="site-invitation-words">
+        <strong>{{ $t.invitation.title() }}</strong>
+        {{ invitation.address }}
+      </p>
+      <div class="site-invitation-schedule">
+        <p class="site-invitation-label">{{ $t.invitation.sundays() }}</p>
+        <EventSchedule :events="sunday" />
       </div>
     </div>
   </aside>
@@ -101,7 +59,7 @@ const words = computed(() =>
 }
 
 /* The invitation, and to its right what it invites the reader to — the
-   week, or the people — at the site's width. */
+   Sunday — at the site's width. */
 .site-invitation-body {
   display: grid;
   grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
@@ -111,16 +69,9 @@ const words = computed(() =>
   margin-inline: auto;
 }
 
-/* The invitation's words, and under them the way to every event. */
-.site-invitation-words {
-  display: grid;
-  justify-items: start;
-  gap: var(--space-5);
-}
-
 /* The callout's words, set as it sets them: the invitation in the display
    face, and where to come under it. */
-.site-invitation-words p {
+.site-invitation-words {
   margin: 0;
   font-size: clamp(
     calc(var(--body-size) * 1.05),
@@ -142,10 +93,6 @@ const words = computed(() =>
   color: var(--on-surface-high-contrast);
 }
 
-.site-invitation .cta {
-  margin: 0;
-}
-
 /* What is listed beside the invitation, said over it like the label over
    a page's contents. */
 .site-invitation-label {
@@ -158,14 +105,7 @@ const words = computed(() =>
   color: var(--primary-medium-contrast);
 }
 
-/* The people, side by side while there is room for them. */
-.site-invitation-staff-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 12rem), 1fr));
-  gap: var(--space-5) var(--space-6);
-}
-
-/* No room for the list beside the invitation: it follows it. */
+/* No room for the Sunday beside the invitation: it follows it. */
 @media (max-width: 60rem) {
   .site-invitation-body {
     grid-template-columns: minmax(0, 1fr);

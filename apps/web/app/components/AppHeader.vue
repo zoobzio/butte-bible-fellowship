@@ -10,6 +10,7 @@ import {
 
 import AppMobileNav from "~/components/AppMobileNav.vue";
 import { useRouteLocale } from "~/composables/locale";
+import { isWithin } from "~/utils/navigation";
 </script>
 
 <script setup lang="ts">
@@ -17,7 +18,7 @@ defineOptions({ name: "AppHeader" });
 
 const { header } = useAppConfig();
 const { $t } = useNuxtApp();
-const { localize } = useRouteLocale();
+const { path, localize } = useRouteLocale();
 
 // The header wraps and scales with the viewport, so its height is measured
 // and published as `--header-height`: what sticks under it reads where it
@@ -64,6 +65,7 @@ onBeforeUnmount(() => {
         :key="link.to"
         :to="localize(link.to)"
         class="site-nav-link"
+        :data-active="isWithin(path, link.to) ? '' : undefined"
       >
         {{ $t(link.label) }}
       </NuxtLink>
@@ -186,12 +188,14 @@ onBeforeUnmount(() => {
   transform: scaleX(1);
 }
 
-.site-nav-link.router-link-exact-active {
+/* The tab of the page being read, or of the page that one is under: an
+   event's page keeps the events tab marked. */
+.site-nav-link[data-active] {
   color: var(--on-surface-high-contrast);
   font-weight: var(--weight-medium);
 }
 
-.site-nav-link.router-link-exact-active::after {
+.site-nav-link[data-active]::after {
   transform: scaleX(1);
 }
 

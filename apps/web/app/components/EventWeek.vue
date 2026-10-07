@@ -64,15 +64,18 @@ const listed = computed(() =>
 </template>
 
 <style>
-/* A week at a glance: each day's date, and beside it what is held then. */
+/* A week at a glance: the days something is held on, side by side across
+   the room there is, as many to a row as fit, each headed by its date. */
 .event-week {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+  gap: var(--space-6) var(--space-5);
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-/* The design system rules every list item with a dash: the days are ruled
-   off from one another instead, and their events not at all. */
+/* The design system rules every list item with a dash: these are not. */
 .event-week li {
   padding: 0;
   line-height: 1.6;
@@ -82,25 +85,18 @@ const listed = computed(() =>
   content: none;
 }
 
+/* A day's date, and under it what is held then, ruled off from the date
+   as the days were from one another. */
 .event-week > li {
   display: grid;
-  grid-template-columns: 6.5rem minmax(0, 1fr);
-  align-items: baseline;
-  gap: var(--space-1) var(--space-4);
-  padding-block: var(--space-3);
-  border-top: 1px var(--stroke-solid) var(--outline-muted);
-}
-
-.event-week > li:first-child {
-  padding-top: 0;
-  border-top: 0;
-}
-
-.event-week > li:last-child {
-  padding-bottom: 0;
+  gap: var(--space-3);
+  align-content: start;
 }
 
 .event-week time {
+  display: block;
+  padding-bottom: var(--space-2);
+  border-bottom: 1px var(--stroke-solid) var(--outline-muted);
   font-size: var(--label-size);
   font-variant-caps: all-small-caps;
   letter-spacing: calc(var(--type-label-letter-spacing) * 2);
@@ -108,18 +104,14 @@ const listed = computed(() =>
 }
 
 .event-week ul {
-  gap: var(--space-1);
+  gap: var(--space-3);
   margin: 0;
   padding: 0;
 }
 
-/* An event's title, and when it is held at the row's far end. */
+/* An event's title, and under it when it is held. */
 .event-week ul li {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 0 var(--space-4);
+  display: grid;
 }
 
 /* The title is the way to the event's page: it reads as a title until it
@@ -143,12 +135,5 @@ const listed = computed(() =>
 .event-week-none {
   margin: 0;
   color: var(--on-surface-muted-medium-contrast);
-}
-
-/* No room for the date beside its events: it heads them. */
-@media (max-width: 30rem) {
-  .event-week > li {
-    grid-template-columns: minmax(0, 1fr);
-  }
 }
 </style>

@@ -6,5 +6,9 @@
   "contents": {
     "defaultMessage": "On this page",
     "description": "The heading and accessible name of a page's table of contents: the list of links to its sections."
+  },
+  "back": {
+    "defaultMessage": "Back",
+    "description": "The link over a page's title that returns the reader to the page they came from."
   }
 }

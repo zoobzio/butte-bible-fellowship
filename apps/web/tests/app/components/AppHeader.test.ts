@@ -3,7 +3,7 @@ import { mount } from "@vue/test-utils";
 
 import type { NavigationLink } from "~/types/navigation";
 
-import { setAppConfig, useNuxtApp } from "#imports";
+import { setAppConfig, setRoutePath, useNuxtApp } from "#imports";
 import AppHeader from "~/components/AppHeader.vue";
 
 const LINKS: NavigationLink[] = [
@@ -47,6 +47,26 @@ describe("AppHeader", () => {
         to: link.attributes("href"),
       })),
     ).toEqual(LINKS.map(({ label, to }) => ({ label: $t(label), to })));
+  });
+
+  it("marks the tab of the page being read, and no other", () => {
+    setRoutePath("/visit");
+    const links = mountHeader().findAll("a.site-nav-link");
+    expect(links.map((link) => link.attributes("data-active"))).toEqual([
+      undefined,
+      "",
+      undefined,
+    ]);
+  });
+
+  it("keeps a tab marked on the pages under its own, in any locale", () => {
+    setRoutePath("/es/visit/sunday");
+    const links = mountHeader().findAll("a.site-nav-link");
+    expect(links.map((link) => link.attributes("data-active"))).toEqual([
+      undefined,
+      "",
+      undefined,
+    ]);
   });
 
   it("publishes its height to the root while it is mounted", () => {

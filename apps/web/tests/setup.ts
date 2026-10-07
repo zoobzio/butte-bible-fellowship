@@ -5,6 +5,7 @@ import {
   clearContentPages,
   clearLocale,
   clearNuxtStateRegistry,
+  clearRouter,
   setRoutePath,
   useHead,
 } from "#test/mocks/imports";
@@ -21,6 +22,7 @@ beforeEach(() => {
   clearContentPages();
   clearLocale();
   setRoutePath("/");
+  clearRouter();
   useHead.mockClear();
 });
 

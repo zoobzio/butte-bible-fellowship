@@ -50,6 +50,7 @@ const schema = z.object({
         title: z.string(),
         slug: z.string().optional(),
         note: z.string().optional(),
+        location: z.string().optional(),
         date: z.string().date().optional(),
         day: z.enum(EVENT_DAYS).optional(),
         weeks: z.array(z.number().int().min(1).max(5)).optional(),
@@ -58,6 +59,8 @@ const schema = z.object({
       }),
     )
     .optional(),
+  // An event's own page, `/events/<slug>`: the picture over its words.
+  image: z.string().optional().editor({ input: "media" }),
   // The contact page's staff: see `StaffMember`.
   staff: z
     .array(

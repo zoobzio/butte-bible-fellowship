@@ -8,11 +8,14 @@ import {
   definePageMeta,
 } from "#imports";
 
+import EventWeek from "~/components/EventWeek.vue";
 import SermonGrid from "~/components/SermonGrid.vue";
+import { useToday } from "~/composables/events";
 import { useRouteLocale } from "~/composables/locale";
 import { usePage } from "~/composables/page";
 import { useSermons } from "~/composables/sermons";
 import { MARKDOWN_COMPONENTS } from "~/constants/markdown";
+import { week } from "~/utils/events";
 </script>
 
 <script setup lang="ts">
@@ -35,6 +38,12 @@ if (!page.value) {
 useHead(() => ({ title: page.value?.title }));
 
 const hero = computed(() => page.value?.hero);
+
+// The week's events, day by day: the events page's front matter is the
+// calendar they are read from.
+const { data: events } = await usePage("/events");
+const today = useToday();
+const days = computed(() => week(events.value?.events ?? [], today.value));
 
 const { data: sermons } = await useSermons();
 
@@ -68,6 +77,14 @@ const recent = computed(() => sermons.value?.slice(0, 3) ?? []);
         :components="MARKDOWN_COMPONENTS"
         :prose="false"
       />
+    </section>
+
+    <section class="home-week">
+      <h2>{{ $t.events.thisWeek() }}</h2>
+      <EventWeek :days="days" />
+      <NuxtLink :to="localize('/events')" class="cta">
+        {{ $t.events.all() }}
+      </NuxtLink>
     </section>
 
     <section v-if="recent.length" class="home-sermons">
@@ -163,9 +180,23 @@ const recent = computed(() => sermons.value?.slice(0, 3) ?? []);
   }
 }
 
-/* The article's own padding has already set the sermons off from it. */
+/* The article's own padding has already set the week off from it, and the
+   week's own margin the sermons. */
+.home-week h2,
 .home-sermons h2 {
   margin-top: 0;
+}
+
+.home-week .event-week {
+  margin-top: var(--space-6);
+}
+
+.home-week .cta {
+  margin-top: var(--space-7);
+}
+
+.home-sermons {
+  margin-top: clamp(var(--space-8), 8vw, var(--space-9));
 }
 
 .home-sermons .sermon-grid {

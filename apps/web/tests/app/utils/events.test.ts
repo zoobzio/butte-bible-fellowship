@@ -7,7 +7,9 @@ import {
   addMonths,
   calendar,
   churchDate,
+  dateOfDay,
   eventsOn,
+  heldOn,
   minutes,
   monthOf,
   occursOn,
@@ -76,6 +78,15 @@ describe("weekOf", () => {
     const dates = weekOf("2026-12-31");
     expect(dates[0]).toBe("2026-12-27");
     expect(dates[6]).toBe("2027-01-02");
+  });
+});
+
+describe("dateOfDay", () => {
+  it("is a date that falls on the day of the week", () => {
+    const days = ["sunday", "wednesday", "saturday"] as const;
+    expect(
+      days.map((day) => new Date(`${dateOfDay(day)}T00:00:00Z`).getUTCDay()),
+    ).toEqual([0, 3, 6]);
   });
 });
 
@@ -169,6 +180,16 @@ describe("eventsOn", () => {
   it("leaves the list it was handed in the order it came", () => {
     eventsOn(EVENTS, "2026-10-04");
     expect(EVENTS[0]!.title).toBe("Worship");
+  });
+
+  it("gives a day of the week the events that repeat on it, from the earliest start", () => {
+    // The potluck is held on a Sunday, but once: not what Sundays hold.
+    expect(heldOn(EVENTS, "sunday").map((event) => event.title)).toEqual([
+      "Open House",
+      "Sunday School",
+      "Worship",
+    ]);
+    expect(heldOn(EVENTS, "monday")).toEqual([]);
   });
 
   it("gives each day of a date's week its events", () => {

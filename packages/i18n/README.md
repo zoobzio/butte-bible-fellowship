@@ -29,10 +29,10 @@ each message is the note a translator reads.
 | `footer.json`     | the footer's headings, service time and copyright line   |
 | `appearance.json` | the color scheme toggle, theme picker and theme settings |
 | `language.json`   | the language switcher                                    |
-| `page.json`       | page-level states: not found                             |
+| `page.json`       | page-level words: not found, contents, the way back      |
 | `about.json`      | the about page: its title                                |
 | `sermons.json`    | the sermons page: its header, play button, channel link  |
-| `events.json`     | the events page: its header, calendar and selected day   |
+| `events.json`     | the events pages, an event’s days, the home page’s week  |
 | `connect.json`    | the connect page: its header                             |
 
 Messages are ICU MessageFormat, where an ASCII apostrophe is the escape

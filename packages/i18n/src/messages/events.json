@@ -31,9 +31,37 @@
     "defaultMessage": "Events on",
     "description": "The label over the selected day's date, above the list of the events held on that day. The date follows on its own line."
   },
+  "thisWeek": {
+    "defaultMessage": "Happening this week",
+    "description": "The heading over the home page's list of the current week's events, day by day."
+  },
   "all": {
     "defaultMessage": "All events",
-    "description": "The link on an event's own page that goes back to the calendar of every event."
+    "description": "The button under the home page's list of the week's events, leading to the events page and its calendar."
+  },
+  "weekly": {
+    "defaultMessage": "Every {day}",
+    "description": "When an event that repeats every week is held, said under its name on its own page. `day` is the day of the week in words, already in the reader's language: “Every Sunday”."
+  },
+  "monthly": {
+    "defaultMessage": "Every {weeks} {day}",
+    "description": "When an event that repeats only in some weeks of each month is held, said under its name on its own page. `weeks` is those weeks as ordinal words, already joined in the reader's language — “first and third” — and `day` is the day of the week in words: “Every first and third Tuesday”."
+  },
+  "week": {
+    "defaultMessage": "{week, plural, =1 {first} =2 {second} =3 {third} =4 {fourth} other {fifth}}",
+    "description": "Which of a month's weeks an event is held in, as an ordinal word in lowercase. It is set before a day of the week, in a list of such words: “first and third Tuesday”. `week` is a number from 1 to 5."
+  },
+  "when": {
+    "defaultMessage": "When",
+    "description": "The label over the days and time an event is held, in the card beside the event's own page."
+  },
+  "where": {
+    "defaultMessage": "Where",
+    "description": "The label over the place an event is held, in the card beside the event's own page."
+  },
+  "questions": {
+    "defaultMessage": "Questions",
+    "description": "The label over the church's phone number and email address, in the card beside an event's own page: who to ask about the event."
   },
   "none": {
     "defaultMessage": "Nothing scheduled",

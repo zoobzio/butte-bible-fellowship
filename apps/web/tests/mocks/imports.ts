@@ -101,6 +101,26 @@ export const setRoutePath = (path: string) => {
 
 export const useRoute = () => route;
 
+// useRouter: a router that records where it was sent. What its history
+// holds of the page before this one is set with setRouteBack.
+const router = {
+  back: vi.fn(),
+  push: vi.fn(),
+  options: { history: { state: { back: null as string | null } } },
+};
+
+export const setRouteBack = (path: string | null) => {
+  router.options.history.state.back = path;
+};
+
+export const clearRouter = () => {
+  router.back.mockClear();
+  router.push.mockClear();
+  setRouteBack(null);
+};
+
+export const useRouter = () => router;
+
 // useHead: records what it was given.
 export const useHead = vi.fn();
 

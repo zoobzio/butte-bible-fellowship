@@ -1,4 +1,4 @@
-import type { ChurchEvent } from "#shared/types/events";
+import type { ChurchEvent, EventDay } from "#shared/types/events";
 
 import type { CalendarDay } from "~/types/events";
 
@@ -64,6 +64,10 @@ export const weekOf = (date: string): string[] => {
   return Array.from({ length: 7 }, (_, days) => addDays(start, days));
 };
 
+/** A date that falls on a day of the week: what a formatter names the day by. */
+export const dateOfDay = (day: EventDay) =>
+  addDays("1970-01-04", EVENT_DAYS.indexOf(day));
+
 /** A time of day written `HH:MM`, in minutes — `null` when it is not one. */
 export const minutes = (time: string | undefined): number | null => {
   const match = /^(\d{1,2}):(\d{2})$/.exec(time?.trim() ?? "");
@@ -107,16 +111,23 @@ export const occursOn = (event: ChurchEvent, date: string): boolean => {
   return event.weeks.includes(Math.ceil(day.getUTCDate() / 7));
 };
 
-/**
- * The events held on a date, from the earliest start. An event whose start
- * cannot be read leads the day.
- */
-export const eventsOn = (events: ChurchEvent[], date: string) => {
+/** Events from the earliest start: one whose start cannot be read leads. */
+const byStart = (events: ChurchEvent[]) => {
   const start = (event: ChurchEvent) => minutes(event.start) ?? -1;
-  return events
-    .filter((event) => occursOn(event, date))
-    .sort((a, b) => start(a) - start(b));
+  return events.toSorted((a, b) => start(a) - start(b));
 };
+
+/** The events held on a date, from the earliest start. */
+export const eventsOn = (events: ChurchEvent[], date: string) =>
+  byStart(events.filter((event) => occursOn(event, date)));
+
+/**
+ * The events that repeat on a day of the week, from the earliest start:
+ * what happens on a Sunday. One held in some weeks of the month only is
+ * among them.
+ */
+export const heldOn = (events: ChurchEvent[], day: EventDay) =>
+  byStart(events.filter((event) => !event.date && event.day === day));
 
 /** The days the calendar shows for a date's month, each with its events. */
 export const calendar = (events: ChurchEvent[], date: string): CalendarDay[] =>

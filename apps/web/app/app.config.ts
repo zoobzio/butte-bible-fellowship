@@ -1,8 +1,10 @@
+import type { ContactConfig } from "~/types/contact";
 import type { FooterConfig } from "~/types/footer";
 import type { HeaderConfig } from "~/types/header";
 import type { InvitationConfig } from "~/types/invitation";
 
 import { defineAppConfig } from "#imports";
+import { emailHref, phoneHref } from "~/utils/contact";
 
 // The site's words live in `@bbf/i18n`: a `label` or `title` here is the
 // key of a message there, checked against its contract and resolved with
@@ -17,6 +19,12 @@ const header: HeaderConfig = {
   ],
 };
 
+const contact: ContactConfig = {
+  address: "2255 Pillsbury Road, Chico",
+  phone: "530-892-0521",
+  email: "office@bbfchurchchico.org",
+};
+
 const footer: FooterConfig = {
   columns: [
     {
@@ -24,11 +32,8 @@ const footer: FooterConfig = {
       lines: [
         { text: "2255 Pillsbury Road" },
         { text: "Chico, California 95926" },
-        { text: "530-892-0521", href: "tel:5308920521" },
-        {
-          text: "office@bbfchurchchico.org",
-          href: "mailto:office@bbfchurchchico.org",
-        },
+        { text: contact.phone, href: phoneHref(contact.phone) },
+        { text: contact.email, href: emailHref(contact.email) },
       ],
     },
     {
@@ -50,7 +55,7 @@ const footer: FooterConfig = {
 };
 
 const invitation: InvitationConfig = {
-  address: "2255 Pillsbury Road, Chico",
+  address: contact.address,
 };
 
-export default defineAppConfig({ header, footer, invitation });
+export default defineAppConfig({ header, contact, footer, invitation });

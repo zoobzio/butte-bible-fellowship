@@ -41,6 +41,10 @@
 
 html {
   -webkit-text-size-adjust: 100%;
+}
+
+/* A scroll the page makes itself glides, unless motion is set to reduced. */
+html:not([data-motion="reduced"]) {
   scroll-behavior: smooth;
 }
 
