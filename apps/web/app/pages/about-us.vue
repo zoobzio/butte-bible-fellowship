@@ -38,7 +38,10 @@ const entries = computed(() => (page.value ? outline(page.value.body) : []));
 
 <template>
   <div v-if="page" class="about">
-    <PageHeader :title="$t.about.title()" />
+    <PageHeader
+      :title="$t.about.title()"
+      :description="$t.about.description()"
+    />
     <aside class="about-contents">
       <TableOfContents :entries="entries" />
     </aside>

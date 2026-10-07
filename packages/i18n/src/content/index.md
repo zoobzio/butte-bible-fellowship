@@ -7,8 +7,8 @@ hero:
   description: Join us in connecting people to the life changing presence of Jesus Christ, and in the pursuit of His character.
   image: /images/church.jpg
   cta:
-    label: You’re Invited
-    to: /#youre-invited
+    label: Learn More
+    to: /about-us
 ---
 
 ## Welcome to Butte Bible Fellowship
@@ -31,12 +31,22 @@ We are currently a small gathering of seasoned believers who desire to transitio
 
 We hope you’ll consider joining us.
 
-## You’re Invited
+::invite-grid
+  :::invite-card
+  ### Curious about Christianity?
 
-> Our desire is to live simply in the Kingdom that’s come near in the person of Jesus―living lives worthy of our calling (Eph. 4:1-16)―and in the process, know the kind of joy Oswald Chambers described when he said, “joy is the perfect fulfillment of that for which we’ve been created.”
+  If you are curious about the claims of Christianity and would like to pursue that curiosity in a safe and welcoming place, you’re invited!
+  :::
 
-- If you are curious about the claims of Christianity and would like to pursue that curiosity in a safe and welcoming place, you’re invited!
-- If you are currently participating in a local church, we’d encourage you to continue there, helping it become all God intends it to be.
-- If, however, you’re new to Chico, or perhaps among those left wanting by the trends of recent decades, we’d love to have you join us and help us to grow in spiritually healthy ways.
+  :::invite-card
+  ### Part of a local church?
 
-In many ways, BBF is a clean canvas. Many in our congregation who have served the Church faithfully for decades are excited about passing the baton to a new generation of Christ followers who desire to build, serve and lead a vibrant and healthy Christian community.
+  If you are currently participating in a local church, we’d encourage you to continue there, helping it become all God intends it to be.
+  :::
+
+  :::invite-card
+  ### New to Chico?
+
+  If, however, you’re new to Chico, or perhaps among those left wanting by the trends of recent decades, we’d love to have you join us and help us to grow in spiritually healthy ways.
+  :::
+::

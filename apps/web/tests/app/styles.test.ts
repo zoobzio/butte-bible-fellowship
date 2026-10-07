@@ -28,10 +28,14 @@ const blocks = files("app", ".vue")
   .join("\n");
 const app = `${system}\n${blocks}`;
 
-/** The custom properties a stylesheet declares at its root. */
+/** The custom properties a stylesheet declares at its root, across every
+    `:root` block it has: the design system keeps each property beside its
+    own commentary, so one sheet may open the root more than once. */
 const declared = (css: string) => {
-  const root = /^:root \{\n([\s\S]*?)\n\}/m.exec(css)?.[1] ?? "";
-  return new Set([...root.matchAll(/^\s*(--[\w-]+):/gm)].map((m) => m[1]!));
+  const roots = [...css.matchAll(/^:root \{\n([\s\S]*?)\n\}/gm)]
+    .map((match) => match[1]!)
+    .join("\n");
+  return new Set([...roots.matchAll(/^\s*(--[\w-]+):/gm)].map((m) => m[1]!));
 };
 
 /** The custom properties a stylesheet reads. */

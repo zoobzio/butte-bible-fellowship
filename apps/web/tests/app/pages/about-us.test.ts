@@ -35,7 +35,7 @@ describe("about us page", () => {
     expect(renderer.props("prose")).toBe(false);
   });
 
-  it("heads the page with its title alone", async () => {
+  it("heads the page with its title and description", async () => {
     setContentPages({ "/about-us": ABOUT });
     const { wrapper } = await mountSuspended(Page);
 
@@ -44,7 +44,7 @@ describe("about us page", () => {
     expect(header.element).toBe(wrapper.find(".about > :first-child").element);
     expect(header.props()).toEqual({
       title: $t.about.title(),
-      description: undefined,
+      description: $t.about.description(),
     });
     expect(header.find(".page-header-slot").exists()).toBe(false);
   });

@@ -12,7 +12,7 @@ const HERO = {
   tagline: "Discover",
   highlight: "Grace",
   description: "Join us on Sundays.",
-  cta: { label: "You're invited", to: "/#youre-invited" },
+  cta: { label: "Learn more", to: "/about-us" },
 };
 
 const home = (hero?: Partial<typeof HERO> & { image?: string }) => ({
@@ -74,8 +74,17 @@ describe("home page", () => {
     expect(hero.find("p").text()).toBe("Join us on Sundays.");
 
     const cta = hero.find("a.cta");
-    expect(cta.text()).toBe("You're invited");
-    expect(cta.attributes("href")).toBe("/#youre-invited");
+    expect(cta.text()).toBe("Learn more");
+    expect(cta.attributes("href")).toBe("/about-us");
+  });
+
+  it("keeps the hero's link in the visitor's locale", async () => {
+    setRoutePath("/es");
+    setContentPages({ "/": home(HERO) });
+    const { wrapper } = await mountSuspended(Page);
+    expect(wrapper.find(".home-hero a.cta").attributes("href")).toBe(
+      "/es/about-us",
+    );
   });
 
   it("leaves out the optional hero parts that are not set", async () => {
