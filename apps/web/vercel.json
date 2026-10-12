@@ -4,7 +4,7 @@
   "ignoreCommand": "npx turbo-ignore --fallback=HEAD^1",
   "git": {
     "deploymentEnabled": {
-      "*": false,
+      "**": false,
       "main": true
     }
   }
