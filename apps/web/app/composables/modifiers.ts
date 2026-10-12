@@ -6,17 +6,15 @@ import { modifiers as contexts } from "@bbf/theme";
 import { manifest } from "@bbf/theme/manifest";
 import { transition } from "~/utils/theme";
 
-/** The settings the build carries: every modifier but `theme`, in order. */
-const settings = manifest.filter(
-  (modifier): modifier is SettingEntry => modifier.id !== "theme",
-);
+/** The settings the build carries: every modifier, in order. */
+const settings: readonly SettingEntry[] = manifest;
 
 /**
- * The settings beside the theme, and each one's selection: untheme's other
+ * The settings beside the theme, and each one's selection: untheme's
  * modifiers — color scheme, vibrancy, contrast, text size, density, corner
- * radius, depth and motion. Like the theme, each selection is held app-wide,
- * persisted in a cookie so SSR renders the visitor's choice, and mirrored
- * onto <html> as `data-<modifier>`.
+ * radius, depth and motion. Each applies to every theme. Each selection is
+ * held app-wide, persisted in a cookie so SSR renders the visitor's choice,
+ * and mirrored onto <html> as `data-<modifier>`.
  */
 export const useModifiers = () => {
   const untheme = useUntheme();

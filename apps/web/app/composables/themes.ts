@@ -1,30 +1,36 @@
 import type { Theme, ThemeEntry } from "~/types/theme";
 
 import { computed, useUntheme } from "#imports";
-import { manifest } from "@bbf/theme/manifest";
+import { layers } from "@bbf/theme/layers";
 import { transition } from "~/utils/theme";
 
-/** The themes the build carries: the `theme` modifier's contexts, by name. */
-const themes: ThemeEntry[] = [
-  ...manifest.find((modifier) => modifier.id === "theme")!.contexts,
-].sort((a, b) => a.name.localeCompare(b.name));
+/** The themes the build carries: the site's palette and every aurora theme, by name. */
+const themes: ThemeEntry[] = [...layers].sort((a, b) =>
+  a.name.localeCompare(b.name),
+);
 
 /**
- * The themes on offer, and the one active: untheme's `theme` modifier, whose
- * contexts are the site's palette and every aurora theme. Like the color
- * scheme, the selection is held app-wide, persisted in a cookie so SSR
- * renders the visitor's choice, and mirrored onto <html> as `data-theme`.
+ * The themes on offer, and the one active: the layers of the build, of which
+ * the site's palette is the base. Choosing one loads its layer on demand and
+ * applies it; the module persists the applied layer's id in a cookie so SSR
+ * renders the visitor's choice. The color scheme and the other settings are
+ * modifiers beside it, and apply to every theme.
  */
 export const useThemes = () => {
   const untheme = useUntheme();
 
-  const active = computed<Theme>(() => untheme.config.input.theme);
+  // The applied layer, or the base — the site's own palette — when none is.
+  const active = computed<Theme>(
+    () => (untheme.config.patch.id ?? untheme.schema.base.id) as Theme,
+  );
 
-  const choose = (id: Theme) => {
+  const choose = async (id: Theme) => {
     if (id === active.value) {
       return;
     }
-    transition(() => untheme.swap("theme", id));
+    await transition(async () => {
+      await untheme.select(id);
+    });
   };
 
   return { themes, active, choose };

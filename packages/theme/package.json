@@ -14,11 +14,21 @@
     "./manifest": {
       "types": "./.output/manifest.d.mts",
       "default": "./.output/manifest.mjs"
-    }
+    },
+    "./layers": {
+      "types": "./.output/layers.d.mts",
+      "default": "./.output/layers.mjs"
+    },
+    "./layers/*": "./.output/layers/*",
+    "./preset.json": "./.output/preset.json",
+    "./resolver.json": "./.output/resolver.json",
+    "./src/*": "./src/*",
+    "./package.json": "./package.json"
   },
   "scripts": {
     "build": "untheme build",
     "prepare": "untheme build",
+    "generate": "node scripts/generate.mjs",
     "test": "vitest run"
   },
   "dependencies": {

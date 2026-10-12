@@ -5,6 +5,12 @@ import { useThemes } from "~/composables/themes";
 
 const primary = () => useUntheme().resolve("primary-600");
 
+/** A browser's view transition, as far as the helper reaches into it. */
+const viewTransition = () =>
+  vi.fn((change: () => void | Promise<void>) => ({
+    updateCallbackDone: Promise.resolve(change()),
+  }));
+
 afterEach(() => {
   delete (document as { startViewTransition?: unknown }).startViewTransition;
 });
@@ -25,41 +31,42 @@ describe("useThemes", () => {
     expect(names).toEqual([...names].sort((a, b) => a.localeCompare(b)));
   });
 
-  it("applies a chosen theme's ramps", () => {
+  it("applies a chosen theme's ramps", async () => {
     const { active, choose } = useThemes();
     const before = primary();
-    choose("nord");
+    await choose("nord");
     expect(active.value).toBe("nord");
-    expect(useUntheme().config.input.theme).toBe("nord");
+    expect(useUntheme().theme().id).toBe("nord");
+    expect(useUntheme().config.patch.id).toBe("nord");
     expect(primary()).not.toEqual(before);
   });
 
-  it("returns to the site's colors through the site's own entry", () => {
+  it("returns to the site's colors through the site's own entry", async () => {
     const { active, choose } = useThemes();
     const before = primary();
-    choose("nord");
-    choose("bbf");
+    await choose("nord");
+    await choose("bbf");
     expect(active.value).toBe("bbf");
     expect(primary()).toEqual(before);
   });
 
-  it("shares one selection across callers", () => {
-    useThemes().choose("nord");
+  it("shares one selection across callers", async () => {
+    await useThemes().choose("nord");
     expect(useThemes().active.value).toBe("nord");
   });
 
-  it("cross-fades through a view transition where the browser has one", () => {
-    const start = vi.fn((change: () => void) => change());
+  it("cross-fades through a view transition where the browser has one", async () => {
+    const start = viewTransition();
     Object.assign(document, { startViewTransition: start });
-    useThemes().choose("nord");
+    await useThemes().choose("nord");
     expect(start).toHaveBeenCalledOnce();
     expect(useThemes().active.value).toBe("nord");
   });
 
-  it("changes nothing when the chosen theme is already active", () => {
-    const start = vi.fn((change: () => void) => change());
+  it("changes nothing when the chosen theme is already active", async () => {
+    const start = viewTransition();
     Object.assign(document, { startViewTransition: start });
-    useThemes().choose("bbf");
+    await useThemes().choose("bbf");
     expect(start).not.toHaveBeenCalled();
   });
 });

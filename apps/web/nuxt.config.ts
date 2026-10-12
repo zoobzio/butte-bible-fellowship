@@ -6,7 +6,6 @@ import { locale as source, locales } from "@bbf/i18n";
 import { prefix } from "@bbf/icons";
 import icons from "@bbf/icons/config";
 import sets from "@bbf/icons/sets";
-import untheme from "@bbf/theme/config";
 
 import { PAGE_MAX_AGE } from "./shared/constants/pages";
 
@@ -64,7 +63,9 @@ export default defineNuxtConfig({
 
   iconSheets: { ...icons, sets, prefix },
 
-  untheme,
+  // The theme is a preset: its base, its boot selection and its layers —
+  // the site's palette and every aurora theme — are the package's own build.
+  untheme: { preset: "@bbf/theme" },
 
   fibber: { build: "@bbf/i18n" },
 

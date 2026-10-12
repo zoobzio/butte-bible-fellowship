@@ -3,12 +3,18 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { useUntheme } from "#imports";
 import { useModifiers } from "~/composables/modifiers";
 
+/** A browser's view transition, as far as the helper reaches into it. */
+const viewTransition = () =>
+  vi.fn((change: () => void | Promise<void>) => ({
+    updateCallbackDone: Promise.resolve(change()),
+  }));
+
 afterEach(() => {
   delete (document as { startViewTransition?: unknown }).startViewTransition;
 });
 
 describe("useModifiers", () => {
-  it("lists every modifier but the theme, with its contexts", () => {
+  it("lists every modifier, with its contexts", () => {
     const { settings } = useModifiers();
     expect(settings.map((setting) => setting.id)).toEqual([
       "color",
@@ -48,7 +54,7 @@ describe("useModifiers", () => {
   });
 
   it("cross-fades through a view transition where the browser has one", () => {
-    const start = vi.fn((change: () => void) => change());
+    const start = viewTransition();
     Object.assign(document, { startViewTransition: start });
     useModifiers().set("radius", "sharp");
     expect(start).toHaveBeenCalledOnce();
@@ -56,7 +62,7 @@ describe("useModifiers", () => {
   });
 
   it("changes nothing when the context is already selected", () => {
-    const start = vi.fn((change: () => void) => change());
+    const start = viewTransition();
     Object.assign(document, { startViewTransition: start });
     useModifiers().set("color", "light");
     expect(start).not.toHaveBeenCalled();

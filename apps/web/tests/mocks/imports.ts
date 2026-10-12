@@ -5,14 +5,18 @@
 // Vue APIs and stub the Nuxt-runtime composables. Type-only imports are erased
 // by esbuild before this module loads, so only value exports matter here.
 
-import { computed, reactive, ref, toRaw, type Ref } from "vue";
+import { readFileSync } from "node:fs";
+import { createRequire } from "node:module";
+import { resolve } from "node:path";
+
+import { computed, reactive, ref, type Ref } from "vue";
 import { vi } from "vitest";
 import { makeFibber } from "fibber-lang";
-import { copy, makeUntheme } from "untheme";
-import { useUnthemeConfig } from "untheme/config";
+import { makeUntheme } from "untheme";
 import { contract, locale } from "@bbf/i18n";
 import { bundles } from "@bbf/i18n/bundles";
 import theme from "@bbf/theme/config";
+import { layers } from "@bbf/theme/layers";
 
 // Real Vue APIs (ref, computed, watch, onMounted, useTemplateRef, useId, …).
 export * from "vue";
@@ -32,29 +36,49 @@ export const useState = (key: string, init?: () => unknown): Ref<unknown> => {
 };
 
 // useUntheme: the real service over the app's built theme, in a reactive
-// container held like the module holds it. The service is built once per
-// file, on first use, rather than once per test: building it walks the whole
-// theme to derive its schema, and through Vue's proxy that walk costs a
-// quarter of a second. The schema reads the raw theme instead — no test
-// changes the theme — and only the selection and the override, which tests
-// do move, are read through the proxy. clearUntheme, run before each test,
-// puts the selection back at boot and drops any override, so each test
-// starts clean.
-let untheme: ReturnType<typeof makeUntheme> | undefined;
-let container: ReturnType<typeof useUnthemeConfig> | undefined;
+// container held like the module holds it: the selection and the patch, with
+// the base theme outside it. The service is built once per file, on first
+// use, rather than once per test: building it copies and checks the whole
+// theme. clearUntheme, run before each test, puts the selection back at boot
+// and drops the patch, so each test starts clean.
+//
+// The module adds `layers` and `select` to the service: the layers of the
+// build, and a load of one by id that applies it. Here a layer is read from
+// the package's build directly, as the module's catalog imports it. Vitest
+// runs from the app root; the happy-dom environment gives modules a non-file
+// URL, so the resolution anchors on the working directory.
+type Service = ReturnType<typeof makeUntheme<typeof theme.theme>>;
+type Layer = Parameters<Service["apply"]>[0];
+type Container = Service["config"];
+
+const require = createRequire(resolve(process.cwd(), "package.json"));
+
+let untheme: (Service & { layers: typeof layers; select: unknown }) | undefined;
+let container: Container | undefined;
 
 export const useUntheme = () => {
   if (!untheme) {
-    container = reactive(useUnthemeConfig(theme)) as typeof container;
-    untheme = makeUntheme(container!, { get: { config: { theme: toRaw } } });
+    container = reactive({ patch: {}, input: { ...theme.input } }) as Container;
+    const service = makeUntheme(theme.theme, container);
+    const select = async (id: string): Promise<Layer | undefined> => {
+      if (!layers.some((entry) => entry.id === id)) {
+        return undefined;
+      }
+      const layer = JSON.parse(
+        readFileSync(require.resolve(`@bbf/theme/layers/${id}.json`), "utf8"),
+      ) as Layer;
+      service.apply(layer);
+      return layer;
+    };
+    untheme = Object.assign(service, { layers, select });
   }
   return untheme;
 };
 
 export const clearUntheme = () => {
   if (container) {
-    container.input = copy(theme.input);
-    container.override = {};
+    container.input = { ...theme.input };
+    container.patch = {};
   }
 };
 

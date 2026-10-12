@@ -84,9 +84,7 @@ describe("ThemePicker", () => {
     themes()
       .find((item) => item.textContent!.trim() === "Nord")!
       .click();
-    await vi.waitFor(() =>
-      expect(useUntheme().config.input.theme).toBe("nord"),
-    );
+    await vi.waitFor(() => expect(useUntheme().theme().id).toBe("nord"));
     expect(popover()).not.toBeNull();
   });
 
@@ -96,6 +94,7 @@ describe("ThemePicker", () => {
       .find((item) => item.textContent!.trim() === "Butte Bible Fellowship")!
       .click();
     await nextTick();
-    expect(useUntheme().config.input.theme).toBe("bbf");
+    expect(useUntheme().theme().id).toBe("bbf");
+    expect(useUntheme().config.patch).toEqual({});
   });
 });

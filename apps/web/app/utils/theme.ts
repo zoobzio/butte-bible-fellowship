@@ -1,8 +1,11 @@
-/** Runs a change as a view-transition cross-fade where the browser can. */
-export const transition = (change: () => void) => {
+/**
+ * Runs a change as a view-transition cross-fade where the browser can. The
+ * fade waits for an async change, such as a theme loaded on demand.
+ */
+export const transition = async (change: () => void | Promise<void>) => {
   if (typeof document !== "undefined" && "startViewTransition" in document) {
-    document.startViewTransition(change);
+    await document.startViewTransition(change).updateCallbackDone;
     return;
   }
-  change();
+  await change();
 };

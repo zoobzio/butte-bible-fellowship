@@ -3,12 +3,14 @@ import { join, resolve } from "node:path";
 
 import { describe, expect, it } from "vitest";
 import { makeUntheme } from "untheme";
-import { useUnthemeConfig } from "untheme/config";
 import { defineRenderer } from "untheme/css";
 import config from "@bbf/theme/config";
 
-// The static cascade @untheme/nuxt links into the app, rendered the same way.
-const theme = defineRenderer(makeUntheme(useUnthemeConfig(config))).sheet();
+// The base cascade @untheme/nuxt links into the app, rendered the same way:
+// the base theme at its boot selection, with no layer applied.
+const theme = defineRenderer(
+  makeUntheme(config.theme, { patch: {}, input: config.input }),
+).sheet();
 // Vitest runs from the app root; the happy-dom environment gives modules a
 // non-file URL, so the paths anchor on the working directory.
 const root = (path: string) => resolve(process.cwd(), path);
