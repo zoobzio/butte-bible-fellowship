@@ -8,13 +8,24 @@ jobs:
   coverage:
     name: Coverage Report
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: "22.22.0"
+          # The version Vercel deploys on: `engines.node` of the app, the Root Directory.
+          node-version-file: apps/web/package.json
           cache: pnpm
+      # Short-lived token for the Vercel Remote Cache, so CI shares one cache
+      # with Vercel deployments. Without a token (a fork's PR, no OIDC policy
+      # yet) turbo still runs, with the local cache only.
+      - uses: vercel/setup-turborepo-remote-cache-action@v1.1.0
+        continue-on-error: true
+        with:
+          team: ${{ vars.TURBO_TEAM }}
       - run: pnpm install --frozen-lockfile
       - run: pnpm test:coverage
       - uses: codecov/codecov-action@v4

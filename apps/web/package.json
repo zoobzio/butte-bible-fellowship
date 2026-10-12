@@ -42,5 +42,8 @@
     "typescript": "catalog:",
     "vitest": "catalog:",
     "vue-tsc": "catalog:"
+  },
+  "engines": {
+    "node": "24.x"
   }
 }

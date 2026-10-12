@@ -9,6 +9,9 @@
 # Vercel CLI
 .vercel
 
+# Turborepo
+.turbo
+
 # Dependencies
 node_modules
 

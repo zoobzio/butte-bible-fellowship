@@ -50,3 +50,4 @@ clean: ## Remove generated files
 	rm -rf node_modules/.cache apps/*/node_modules/.cache
 	rm -rf apps/*/.coverage
 	rm -rf apps/*/.nuxt apps/*/.output
+	rm -rf .turbo apps/*/.turbo packages/*/.turbo

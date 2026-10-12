@@ -1,0 +1,42 @@
+{
+  "$schema": "https://turborepo.dev/schema.json",
+  "agentGuidance": false,
+  "globalEnv": ["NODE_ENV"],
+  "globalPassThroughEnv": ["CI", "GITHUB_ACTIONS"],
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": [".output/**", ".nuxt/**"],
+      "env": ["NUXT_*", "NITRO_*", "STUDIO_*", "VERCEL"],
+      "passThroughEnv": ["VERCEL_*"]
+    },
+    "generate": {
+      "dependsOn": ["^build"],
+      "outputs": [".output/**", ".nuxt/**", "dist/**"],
+      "env": ["NUXT_*", "NITRO_*", "STUDIO_*", "VERCEL"],
+      "passThroughEnv": ["VERCEL_*"]
+    },
+    "typecheck": {
+      "dependsOn": ["^build"],
+      "outputs": []
+    },
+    "test": {
+      "dependsOn": ["^build"],
+      "outputs": []
+    },
+    "test:coverage": {
+      "dependsOn": ["^build"],
+      "outputs": [".coverage/**"]
+    },
+    "dev": {
+      "dependsOn": ["^build"],
+      "cache": false,
+      "persistent": true
+    },
+    "preview": {
+      "dependsOn": ["build"],
+      "cache": false,
+      "persistent": true
+    }
+  }
+}

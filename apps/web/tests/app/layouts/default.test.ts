@@ -50,17 +50,17 @@ describe("default layout", () => {
 
   it("hands the visitor a new invitation when the language they read in changes", async () => {
     const wrapper = await mountLayout({ path: "/about-us" });
-    const before = wrapper.findComponent({ name: "AppInvitation" }).vm;
+    const invitation = () =>
+      wrapper.findComponent({ name: "AppInvitation" }).vm.$.uid;
+    const before = invitation();
 
     setRoutePath("/connect");
     await nextTick();
-    expect(wrapper.findComponent({ name: "AppInvitation" }).vm).toBe(before);
+    expect(invitation()).toBe(before);
 
     setRoutePath("/es/connect");
     await nextTick();
-    expect(wrapper.findComponent({ name: "AppInvitation" }).vm).not.toBe(
-      before,
-    );
+    expect(invitation()).not.toBe(before);
   });
 
   it("shows the orbs and the arches on the home page", async () => {
