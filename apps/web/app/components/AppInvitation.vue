@@ -1,9 +1,8 @@
 <script lang="ts">
-import { computed, useAppConfig, useNuxtApp } from "#imports";
+import { useAppConfig, useNuxtApp } from "#imports";
 
 import EventSchedule from "~/components/EventSchedule.vue";
-import { usePage } from "~/composables/page";
-import { heldOn } from "~/utils/events";
+import { useEvents, useEventsHeldOn } from "~/composables/events";
 </script>
 
 <script setup lang="ts">
@@ -12,13 +11,10 @@ defineOptions({ name: "AppInvitation" });
 const { invitation } = useAppConfig();
 const { $t } = useNuxtApp();
 
-// The events page's front matter is the calendar: it is read whichever
-// page the bar is under.
-const { data: events } = await usePage("/events");
-
 // The bar invites the reader to a Sunday: what happens on one is listed
 // beside the invitation.
-const sunday = computed(() => heldOn(events.value?.events ?? [], "sunday"));
+const events = await useEvents();
+const sunday = useEventsHeldOn(events, "sunday");
 </script>
 
 <template>

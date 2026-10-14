@@ -1,5 +1,5 @@
 <script lang="ts">
-import type { StaffMember } from "#shared/types/staff";
+import type { StaffMember } from "@bbf/validators/types";
 
 import { computed } from "#imports";
 </script>

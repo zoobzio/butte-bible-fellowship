@@ -1,4 +1,4 @@
-import type { Sermon } from "#shared/types/sermons";
+import type { Sermon } from "@bbf/validators/types";
 
 /** A channel's feed: its latest fifteen sermons, newest first, as Atom. */
 export const sermonFeedUrl = (channel: string): string => {

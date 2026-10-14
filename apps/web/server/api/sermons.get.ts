@@ -1,6 +1,6 @@
 import { defineCachedEventHandler, useRuntimeConfig } from "nitropack/runtime";
 
-import { SERMONS_MAX_AGE } from "#shared/constants/sermons";
+import { SERMONS_MAX_AGE } from "../constants/sermons";
 import { parseSermonFeed, sermonFeedUrl } from "../utils/sermons";
 
 /**

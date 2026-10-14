@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import type { ChurchEvent } from "#shared/types/events";
+import type { ChurchEvent } from "@bbf/validators/types";
 
 import {
   addDays,

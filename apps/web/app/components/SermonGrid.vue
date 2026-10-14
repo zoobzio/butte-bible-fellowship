@@ -1,5 +1,5 @@
 <script lang="ts">
-import type { Sermon } from "#shared/types/sermons";
+import type { Sermon } from "@bbf/validators/types";
 
 import { NuxtLink } from "#components";
 import { useNuxtApp, useRuntimeConfig } from "#imports";

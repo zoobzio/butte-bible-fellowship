@@ -1,11 +1,9 @@
 <script lang="ts">
-import type { ChurchEvent } from "#shared/types/events";
+import type { ChurchEvent } from "@bbf/validators/types";
 
 import { NuxtLink } from "#components";
-import { computed, useNuxtApp } from "#imports";
-import { useEventTime } from "~/composables/events";
-import { useRouteLocale } from "~/composables/locale";
-import { pathOf } from "~/utils/events";
+import { useNuxtApp } from "#imports";
+import { useEventListing } from "~/composables/events";
 </script>
 
 <script setup lang="ts">
@@ -15,17 +13,7 @@ defineOptions({ name: "EventList" });
 const { events } = defineProps<{ events: ChurchEvent[] }>();
 
 const { $t } = useNuxtApp();
-const { localize } = useRouteLocale();
-const time = useEventTime();
-
-const listed = computed(() =>
-  events.map((event) => ({
-    title: event.title,
-    note: event.note,
-    time: time(event),
-    to: localize(pathOf(event)),
-  })),
-);
+const listed = useEventListing(() => events);
 </script>
 
 <template>

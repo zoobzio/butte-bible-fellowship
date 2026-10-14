@@ -1,8 +1,10 @@
-import type { MaybeRefOrGetter, Ref } from "vue";
+import type { ComputedRef, MaybeRefOrGetter, Ref } from "vue";
 
 import type { OutlineEntry } from "~/types/outline";
+import type { PageItem } from "~/types/page";
 
 import {
+  computed,
   onBeforeUnmount,
   onMounted,
   readonly,
@@ -11,7 +13,19 @@ import {
   watch,
 } from "#imports";
 import { useFrame } from "~/composables/motion";
-import { sectionsOnScreen } from "~/utils/outline";
+import { outline, sectionsOnScreen } from "~/utils/outline";
+
+/**
+ * A page's outline, for its table of contents: its headings, in the order
+ * it sets them, read from its body. A page that is not there has none.
+ */
+export const useOutline = (
+  page: MaybeRefOrGetter<Pick<PageItem, "body"> | null | undefined>,
+): ComputedRef<OutlineEntry[]> =>
+  computed(() => {
+    const item = toValue(page);
+    return item ? outline(item.body) : [];
+  });
 
 /** How much of the viewport's top the sticky header covers. */
 const headerHeight = () =>

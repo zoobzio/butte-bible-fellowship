@@ -5,3 +5,12 @@ export interface NavigationLink {
   label: AppFibberMessage;
   to: string;
 }
+
+/** A link as the navigation sets it: its words, where it leads, and whether the reader is there. */
+export interface NavigationItem {
+  label: string;
+  /** Where the link leads, in the reader's locale. */
+  to: string;
+  /** Whether the page being read is the link's own page or one under it. */
+  active: boolean;
+}

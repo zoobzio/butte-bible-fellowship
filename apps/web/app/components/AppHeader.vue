@@ -1,57 +1,26 @@
 <script lang="ts">
 import { Icon, NuxtLink } from "#components";
-import {
-  onBeforeUnmount,
-  onMounted,
-  useAppConfig,
-  useNuxtApp,
-  useTemplateRef,
-} from "#imports";
+import { useNuxtApp, useTemplateRef } from "#imports";
 
 import AppMobileNav from "~/components/AppMobileNav.vue";
-import { useRouteLocale } from "~/composables/locale";
-import { isWithin } from "~/utils/navigation";
+import { useHeaderHeight, useNavigation } from "~/composables/navigation";
 </script>
 
 <script setup lang="ts">
 defineOptions({ name: "AppHeader" });
 
-const { header } = useAppConfig();
 const { $t } = useNuxtApp();
-const { path, localize } = useRouteLocale();
+const { home, links } = useNavigation();
 
-// The header wraps and scales with the viewport, so its height is measured
-// and published as `--header-height`: what sticks under it reads where it
-// ends. The ref is not named `header`: that is the config above, and a
-// production build would hand the element to it instead.
-const header$ = useTemplateRef<HTMLElement>("root");
-let observer: ResizeObserver | null = null;
-
-const publish = () => {
-  if (!header$.value) return;
-  document.documentElement.style.setProperty(
-    "--header-height",
-    `${header$.value.offsetHeight}px`,
-  );
-};
-
-onMounted(() => {
-  publish();
-  if (!header$.value) return;
-  observer = new ResizeObserver(publish);
-  observer.observe(header$.value);
-});
-
-onBeforeUnmount(() => {
-  observer?.disconnect();
-  observer = null;
-  document.documentElement.style.removeProperty("--header-height");
-});
+// The header wraps and scales with the viewport, so its height is published
+// for what sticks under it. The ref is not named `header`: a production
+// build would hand the element to the config of that name instead.
+useHeaderHeight(useTemplateRef<HTMLElement>("root"));
 </script>
 
 <template>
   <header ref="root" class="site-header">
-    <NuxtLink :to="localize('/')" class="site-brand">
+    <NuxtLink :to="home" class="site-brand">
       <Icon name="logo" class="site-brand-logo" aria-hidden="true" />
       <span class="site-brand-text">
         <span class="site-brand-name">{{ $t.site.name() }}</span>
@@ -61,13 +30,13 @@ onBeforeUnmount(() => {
 
     <nav class="site-nav" :aria-label="$t.navigation.label()">
       <NuxtLink
-        v-for="link in header.links"
+        v-for="link in links"
         :key="link.to"
-        :to="localize(link.to)"
+        :to="link.to"
         class="site-nav-link"
-        :data-active="isWithin(path, link.to) ? '' : undefined"
+        :data-active="link.active ? '' : undefined"
       >
-        {{ $t(link.label) }}
+        {{ link.label }}
       </NuxtLink>
     </nav>
 

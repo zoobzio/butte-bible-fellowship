@@ -2,24 +2,20 @@
 import Menu from "@zoobzio/foundation/components/core/menu.vue";
 
 import { Icon } from "#components";
-import { useAppConfig, useNuxtApp } from "#imports";
+import { useNuxtApp } from "#imports";
 import { defineMenu } from "@zoobzio/foundation/definitions/menu";
-import { useRouteLocale } from "~/composables/locale";
+import { useNavigation } from "~/composables/navigation";
 </script>
 
 <script setup lang="ts">
-const { header } = useAppConfig();
 const { $t } = useNuxtApp();
-const { localize } = useRouteLocale();
+const { links } = useNavigation();
 
 const menu = defineMenu(() => ({
   groups: [
     {
       key: "primary",
-      items: header.links.map(({ label, to }) => ({
-        label: $t(label),
-        link: { to: localize(to) },
-      })),
+      items: links.value.map(({ label, to }) => ({ label, link: { to } })),
     },
   ],
   align: "end" as const,

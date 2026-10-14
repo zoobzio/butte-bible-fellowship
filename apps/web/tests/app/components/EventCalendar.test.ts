@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { nextTick } from "vue";
 import { mount } from "@vue/test-utils";
 
-import type { ChurchEvent } from "#shared/types/events";
+import type { ChurchEvent } from "@bbf/validators/types";
 
 import { setRoutePath, useNuxtApp } from "#imports";
 import EventCalendar from "~/components/EventCalendar.vue";

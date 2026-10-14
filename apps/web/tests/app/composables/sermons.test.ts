@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { useSermons } from "~/composables/sermons";
+import { useRecentSermons, useSermons } from "~/composables/sermons";
 
 const SERMON = {
   id: "abc123",
@@ -22,6 +22,15 @@ describe("useSermons", () => {
     expect(data.value).toEqual([SERMON]);
   });
 
+  it("resolves a list that is not sermons to an empty one", async () => {
+    vi.stubGlobal(
+      "$fetch",
+      vi.fn(async () => [{ ...SERMON, thumbnail: "not a url" }]),
+    );
+    const { data } = await useSermons();
+    expect(data.value).toEqual([]);
+  });
+
   it("resolves a list that cannot be read to an empty one", async () => {
     vi.stubGlobal(
       "$fetch",
@@ -31,5 +40,51 @@ describe("useSermons", () => {
     );
     const { data } = await useSermons();
     expect(data.value).toEqual([]);
+  });
+});
+
+describe("useRecentSermons", () => {
+  const sermons = ["a", "b", "c", "d"].map((id) => ({ ...SERMON, id }));
+
+  it("resolves the newest sermons, three unless told otherwise", async () => {
+    vi.stubGlobal(
+      "$fetch",
+      vi.fn(async () => sermons),
+    );
+    expect((await useRecentSermons()).value).toEqual(sermons.slice(0, 3));
+    expect((await useRecentSermons(2)).value).toEqual(sermons.slice(0, 2));
+  });
+
+  it("resolves to none when none can be read", async () => {
+    vi.stubGlobal(
+      "$fetch",
+      vi.fn(async () => {
+        throw new Error("feed unavailable");
+      }),
+    );
+    expect((await useRecentSermons()).value).toEqual([]);
+  });
+});
+
+describe("useRecentSermons", () => {
+  const sermons = ["a", "b", "c", "d"].map((id) => ({ ...SERMON, id }));
+
+  it("resolves the newest sermons, three unless told otherwise", async () => {
+    vi.stubGlobal(
+      "$fetch",
+      vi.fn(async () => sermons),
+    );
+    expect((await useRecentSermons()).value).toEqual(sermons.slice(0, 3));
+    expect((await useRecentSermons(2)).value).toEqual(sermons.slice(0, 2));
+  });
+
+  it("resolves to none when none can be read", async () => {
+    vi.stubGlobal(
+      "$fetch",
+      vi.fn(async () => {
+        throw new Error("feed unavailable");
+      }),
+    );
+    expect((await useRecentSermons()).value).toEqual([]);
   });
 });

@@ -1,0 +1,277 @@
+{
+  "$schema": "../../node_modules/oxlint/configuration_schema.json",
+  "extends": ["../../.oxlintrc.json"],
+  "rules": {
+    "import/no-cycle": "error"
+  },
+  "overrides": [
+    {
+      "files": ["app/**"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": ["./**", "../**", "@/**", "@@/**", "~~/**"],
+                "message": "Import by alias — ~/<layer>/… — so the layer is in the specifier."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["app/types/**"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "paths": [
+              {
+                "name": "#imports",
+                "allowTypeImports": true,
+                "message": "types: only `import type` from #imports."
+              }
+            ],
+            "patterns": [
+              {
+                "group": ["./**", "../**", "@/**", "@@/**", "~~/**"],
+                "message": "Import by alias."
+              },
+              {
+                "group": [
+                  "~/constants/**",
+                  "~/utils/**",
+                  "~/stores/**",
+                  "~/composables/**",
+                  "~/components/**",
+                  "~/pages/**",
+                  "~/layouts/**",
+                  "~/middleware/**",
+                  "~/plugins/**",
+                  "#components"
+                ],
+                "message": "types: the top of the DAG — import only other types and external packages."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["app/constants/**"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "paths": [
+              {
+                "name": "#imports",
+                "allowTypeImports": true,
+                "message": "constants: only `import type` from #imports."
+              }
+            ],
+            "patterns": [
+              {
+                "group": ["./**", "../**", "@/**", "@@/**", "~~/**"],
+                "message": "Import by alias."
+              },
+              {
+                "group": [
+                  "~/utils/**",
+                  "~/stores/**",
+                  "~/composables/**",
+                  "~/components/**",
+                  "~/pages/**",
+                  "~/layouts/**",
+                  "~/middleware/**",
+                  "~/plugins/**",
+                  "#components"
+                ],
+                "message": "constants: import only types, constants and external packages."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["app/utils/**"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "paths": [
+              {
+                "name": "#imports",
+                "allowTypeImports": true,
+                "message": "utils: pure functions — no Nuxt runtime; only `import type` from #imports."
+              },
+              {
+                "name": "vue",
+                "allowTypeImports": true,
+                "message": "utils: pure functions — no reactivity; only `import type` from vue."
+              }
+            ],
+            "patterns": [
+              {
+                "group": ["./**", "../**", "@/**", "@@/**", "~~/**"],
+                "message": "Import by alias."
+              },
+              {
+                "group": [
+                  "~/stores/**",
+                  "~/composables/**",
+                  "~/components/**",
+                  "~/pages/**",
+                  "~/layouts/**",
+                  "~/middleware/**",
+                  "~/plugins/**",
+                  "#components"
+                ],
+                "message": "utils: import only types, constants, utils and external packages."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["app/stores/**"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": ["./**", "../**", "@/**", "@@/**", "~~/**"],
+                "message": "Import by alias."
+              },
+              {
+                "group": [
+                  "~/composables/**",
+                  "~/components/**",
+                  "~/pages/**",
+                  "~/layouts/**",
+                  "~/middleware/**",
+                  "~/plugins/**",
+                  "#components"
+                ],
+                "message": "stores: own state over types, constants, utils and stores — never composables or components."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["app/composables/**"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": ["./**", "../**", "@/**", "@@/**", "~~/**"],
+                "message": "Import by alias."
+              },
+              {
+                "group": [
+                  "~/components/**",
+                  "~/pages/**",
+                  "~/layouts/**",
+                  "~/middleware/**",
+                  "~/plugins/**",
+                  "#components"
+                ],
+                "message": "composables: wire reactivity over types, constants, utils and stores — never components."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["app/components/**"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": ["./**", "../**", "@/**", "@@/**", "~~/**"],
+                "message": "Import by alias."
+              },
+              {
+                "group": [
+                  "~/pages/**",
+                  "~/layouts/**",
+                  "~/middleware/**",
+                  "~/plugins/**"
+                ],
+                "message": "components: never import pages, layouts, middleware or plugins."
+              },
+              {
+                "group": ["~/utils/**"],
+                "message": "components: template and style only — put the logic in a composable."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": [
+        "app/pages/**",
+        "app/layouts/**",
+        "app/middleware/**",
+        "app/plugins/**",
+        "app/app.vue",
+        "app/error.vue"
+      ],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": ["./**", "../**", "@/**", "@@/**", "~~/**"],
+                "message": "Import by alias."
+              },
+              {
+                "group": [
+                  "~/pages/**",
+                  "~/layouts/**",
+                  "~/middleware/**",
+                  "~/plugins/**"
+                ],
+                "message": "pages, layouts, middleware, plugins: the bottom of the DAG — never import one another."
+              },
+              {
+                "group": ["~/utils/**"],
+                "message": "pages, layouts, middleware, plugins: put the logic in a composable."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["server/**"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": ["~/**", "@/**", "#imports", "#components", "vue"],
+                "message": "server: the app layer is out of reach — use server/utils."
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

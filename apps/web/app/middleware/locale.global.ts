@@ -1,16 +1,10 @@
-import { defineNuxtRouteMiddleware, useLocale } from "#imports";
-import { splitLocalePath } from "~/utils/locale";
+import { defineNuxtRouteMiddleware } from "#imports";
+import { useSelectedLocale } from "~/composables/locale";
 
 /**
  * The route decides the locale: before a page renders, the app is switched
- * to the locale its path names. So a page the server renders is in its own
- * language, and following a link to another locale's page changes the
- * language with it.
+ * to the locale its path names.
  */
 export default defineNuxtRouteMiddleware(async (to) => {
-  const { locale, setLocale } = useLocale();
-  const wanted = splitLocalePath(to.path).locale;
-  if (wanted !== locale.value) {
-    await setLocale(wanted);
-  }
+  await useSelectedLocale().select(to.path);
 });

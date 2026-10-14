@@ -1,18 +1,9 @@
 <script lang="ts">
-import type { ChurchEvent } from "#shared/types/events";
+import type { ChurchEvent } from "@bbf/validators/types";
 
 import { Icon, NuxtLink } from "#components";
-import { computed, ref, useNuxtApp } from "#imports";
-import { useToday } from "~/composables/events";
-import { useRouteLocale } from "~/composables/locale";
-import {
-  addMonths,
-  calendar,
-  minutes,
-  pathOf,
-  toDate,
-  toTime,
-} from "~/utils/events";
+import { useNuxtApp } from "#imports";
+import { useEventCalendar } from "~/composables/events";
 </script>
 
 <script setup lang="ts">
@@ -28,74 +19,12 @@ const { events, selected } = defineProps<{
 const emit = defineEmits<{ "update:selected": [date: string] }>();
 
 const { $t } = useNuxtApp();
-const { locale, localize } = useRouteLocale();
-const today = useToday();
 
-// The month the calendar is showing, by a date in it. Until the visitor
-// moves it, that is today's, whenever today is.
-const moved = ref<string | null>(null);
-const shown = computed(() => moved.value ?? today.value);
-
-const move = (months: number) => {
-  moved.value = addMonths(shown.value, months);
-};
-
-// A day of a month beside the one shown brings its month with it.
-const select = (date: string) => {
-  if (date.slice(0, 7) !== shown.value.slice(0, 7)) moved.value = date;
-  emit("update:selected", date);
-};
-
-const reset = () => {
-  moved.value = null;
-  emit("update:selected", today.value);
-};
-
-// Every date is formatted in UTC, where the calendar's dates are kept.
-const format = (options: Intl.DateTimeFormatOptions) =>
-  computed(
-    () =>
-      new Intl.DateTimeFormat(locale.value, { ...options, timeZone: "UTC" }),
-  );
-
-const monthFormat = format({ month: "long", year: "numeric" });
-const weekdayFormat = format({ weekday: "short" });
-const dayFormat = format({ weekday: "long", month: "long", day: "numeric" });
-const timeFormat = format({ hour: "numeric", minute: "2-digit" });
-
-/** When an event starts, as written: the church's own time. */
-const startOf = (event: ChurchEvent) => {
-  const start = minutes(event.start);
-  return start === null ? undefined : timeFormat.value.format(toTime(start));
-};
-
-const days = computed(() =>
-  calendar(events, shown.value).map((day) => ({
-    date: day.date,
-    number: Number(day.date.slice(8)),
-    label: $t.events.day({
-      date: dayFormat.value.format(toDate(day.date)),
-      count: day.events.length,
-    }),
-    events: day.events.map((event) => ({
-      title: event.title,
-      time: startOf(event),
-      to: localize(pathOf(event)),
-    })),
-    today: day.date === today.value,
-    selected: day.date === selected,
-    // The month's weeks open and close with days of the months beside it.
-    outside: day.date.slice(0, 7) !== shown.value.slice(0, 7),
-  })),
+const { period, weekdays, days, move, select, reset } = useEventCalendar(
+  () => events,
+  () => selected,
+  (date) => emit("update:selected", date),
 );
-
-const weekdays = computed(() =>
-  days.value
-    .slice(0, 7)
-    .map((day) => weekdayFormat.value.format(toDate(day.date))),
-);
-
-const period = computed(() => monthFormat.value.format(toDate(shown.value)));
 </script>
 
 <template>

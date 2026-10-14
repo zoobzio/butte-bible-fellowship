@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { mount } from "@vue/test-utils";
 
-import type { ChurchEvent } from "#shared/types/events";
+import type { ChurchEvent } from "@bbf/validators/types";
 
 import { setAppConfig, setRoutePath, useNuxtApp } from "#imports";
 import EventDetails from "~/components/EventDetails.vue";

@@ -1,9 +1,8 @@
 <script lang="ts">
-import type { ChurchEvent } from "#shared/types/events";
+import type { ChurchEvent } from "@bbf/validators/types";
 
-import { computed, useAppConfig, useNuxtApp } from "#imports";
-import { useEventDays, useEventTime } from "~/composables/events";
-import { emailHref, phoneHref } from "~/utils/contact";
+import { useNuxtApp } from "#imports";
+import { useEventDetails } from "~/composables/events";
 </script>
 
 <script setup lang="ts">
@@ -11,18 +10,8 @@ defineOptions({ name: "EventDetails" });
 
 const { event } = defineProps<{ event: ChurchEvent }>();
 
-const { contact } = useAppConfig();
 const { $t } = useNuxtApp();
-const days = useEventDays();
-const time = useEventTime();
-
-// When the event is held: its days, then its time — whichever it says.
-const when = computed(() =>
-  [days(event), time(event)].filter((line) => line !== undefined),
-);
-
-// An event that names no place of its own is held at the church.
-const where = computed(() => event.location ?? contact.address);
+const { when, where, questions } = useEventDetails(() => event);
 </script>
 
 <template>
@@ -37,11 +26,8 @@ const where = computed(() => event.location ?? contact.address);
     </div>
     <div class="event-details-questions">
       <dt>{{ $t.events.questions() }}</dt>
-      <dd>
-        <a :href="phoneHref(contact.phone)">{{ contact.phone }}</a>
-      </dd>
-      <dd>
-        <a :href="emailHref(contact.email)">{{ contact.email }}</a>
+      <dd v-for="link in questions" :key="link.href">
+        <a :href="link.href">{{ link.text }}</a>
       </dd>
     </div>
   </dl>

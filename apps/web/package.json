@@ -18,6 +18,7 @@
     "@bbf/i18n": "workspace:*",
     "@bbf/icons": "workspace:*",
     "@bbf/theme": "workspace:*",
+    "@bbf/validators": "workspace:*",
     "@fibber/nuxt": "catalog:",
     "@icon-sheets/nuxt": "catalog:",
     "@nuxt/content": "catalog:",

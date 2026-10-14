@@ -1,9 +1,7 @@
 <script lang="ts">
 import { Icon } from "#components";
-import { computed, useRouter } from "#imports";
 
-import { useRouteLocale } from "~/composables/locale";
-import { parentPath } from "~/utils/navigation";
+import { usePageBack } from "~/composables/navigation";
 </script>
 
 <script setup lang="ts">
@@ -16,23 +14,7 @@ const { title, description, back } = defineProps<{
   back?: string;
 }>();
 
-const router = useRouter();
-const { path, localize } = useRouteLocale();
-
-// Where the link leads when no page of the site brought the reader here —
-// they followed a link from elsewhere, or opened the address itself: the
-// page this one is under.
-const up = computed(() => localize(parentPath(path.value)));
-
-// A page of the site brought the reader here: the link steps back to it as
-// the browser's own button would, so that page is found as it was left.
-const leave = () => {
-  if (router.options.history.state.back) {
-    router.back();
-  } else {
-    router.push(up.value);
-  }
-};
+const { up, leave } = usePageBack();
 </script>
 
 <template>

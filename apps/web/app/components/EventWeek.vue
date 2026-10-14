@@ -2,10 +2,8 @@
 import type { CalendarDay } from "~/types/events";
 
 import { NuxtLink } from "#components";
-import { computed, useNuxtApp } from "#imports";
-import { useEventTime } from "~/composables/events";
-import { useRouteLocale } from "~/composables/locale";
-import { pathOf, toDate } from "~/utils/events";
+import { useNuxtApp } from "#imports";
+import { useEventWeek } from "~/composables/events";
 </script>
 
 <script setup lang="ts">
@@ -15,35 +13,7 @@ defineOptions({ name: "EventWeek" });
 const { days } = defineProps<{ days: CalendarDay[] }>();
 
 const { $t } = useNuxtApp();
-const { locale, localize } = useRouteLocale();
-const time = useEventTime();
-
-// A day's date in a few words: `Sun, Oct 4`. A date is a day on the
-// calendar and not a moment, so it is read where it was written, in UTC.
-const dateFormat = computed(
-  () =>
-    new Intl.DateTimeFormat(locale.value, {
-      weekday: "short",
-      month: "short",
-      day: "numeric",
-      timeZone: "UTC",
-    }),
-);
-
-// A day nothing is held on has nothing to say, and is left out.
-const listed = computed(() =>
-  days
-    .filter((day) => day.events.length)
-    .map((day) => ({
-      date: day.date,
-      label: dateFormat.value.format(toDate(day.date)),
-      events: day.events.map((event) => ({
-        title: event.title,
-        time: time(event),
-        to: localize(pathOf(event)),
-      })),
-    })),
-);
+const listed = useEventWeek(() => days);
 </script>
 
 <template>

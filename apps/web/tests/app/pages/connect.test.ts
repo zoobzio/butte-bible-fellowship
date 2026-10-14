@@ -1,10 +1,9 @@
 import { describe, expect, it } from "vitest";
 
-import { ContentRenderer } from "#components";
 import { setContentPages, setRoutePath, useHead, useNuxtApp } from "#imports";
+import MarkdownBody from "~/components/MarkdownBody.vue";
 import PageHeader from "~/components/PageHeader.vue";
 import StaffCard from "~/components/StaffCard.vue";
-import { MARKDOWN_COMPONENTS } from "~/constants/markdown";
 import Page from "~/pages/connect.vue";
 import { mountSuspended } from "#test/support/mount";
 
@@ -53,12 +52,12 @@ describe("connect page", () => {
   it("renders its own page after the staff, whatever locale the route is in", async () => {
     setRoutePath("/es/connect");
     const { wrapper } = await mountPage();
-    const renderer = wrapper
-      .find(".connect > .connect-staff + article.prose")
-      .findComponent(ContentRenderer);
-    expect(renderer.props("value")).toEqual(CONNECT);
-    expect(renderer.props("components")).toBe(MARKDOWN_COMPONENTS);
-    expect(renderer.props("prose")).toBe(false);
+    expect(
+      wrapper
+        .find(".connect > .connect-staff + article.prose")
+        .findComponent(MarkdownBody)
+        .props("page"),
+    ).toEqual(CONNECT);
   });
 
   it("puts the article straight under the header when the page lists no one", async () => {

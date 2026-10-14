@@ -2,8 +2,9 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { ref } from "vue";
 
 import type { OutlineEntry } from "~/types/outline";
+import type { PageItem } from "~/types/page";
 
-import { useOutlineSpy } from "~/composables/outline";
+import { useOutline, useOutlineSpy } from "~/composables/outline";
 import { withSetup } from "#test/support/mount";
 import { stubPage } from "#test/support/page";
 
@@ -136,5 +137,36 @@ describe("useOutlineSpy", () => {
     scroll(1000);
     expect(pending()).toBe(0);
     await frame();
+  });
+});
+
+describe("useOutline", () => {
+  const ABOUT = {
+    body: {
+      type: "minimark",
+      value: [
+        ["h1", { id: "our-vision" }, "Our Vision"],
+        ["p", {}, "Modern wisdom…"],
+        ["h2", { id: "dreams" }, "Dreams"],
+      ],
+    },
+  } as unknown as PageItem;
+
+  it("lists the page's headings, in order, with their levels", () => {
+    expect(useOutline(ABOUT).value).toEqual([
+      { id: "our-vision", depth: 1, text: "Our Vision" },
+      { id: "dreams", depth: 2, text: "Dreams" },
+    ]);
+  });
+
+  it("has no entries for a page that is not there, and follows one that comes", async () => {
+    const page = ref<PageItem | null>(null);
+    const entries = useOutline(page);
+    expect(entries.value).toEqual([]);
+    page.value = ABOUT;
+    expect(entries.value.map((entry) => entry.id)).toEqual([
+      "our-vision",
+      "dreams",
+    ]);
   });
 });

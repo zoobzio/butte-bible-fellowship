@@ -105,6 +105,9 @@ catalogs:
     vue-tsc:
       specifier: ^2.1.10
       version: 2.2.12
+    zod:
+      specifier: ^4.6.5
+      version: 4.6.5
 
 patchedDependencies:
   nuxt-studio@1.7.0:
@@ -139,6 +142,9 @@ importers:
       '@bbf/theme':
         specifier: workspace:*
         version: link:../../packages/theme
+      '@bbf/validators':
+        specifier: workspace:*
+        version: link:../../packages/validators
       '@fibber/nuxt':
         specifier: 'catalog:'
         version: 0.0.1(@fibber/kit@0.0.1(@fibber/translate@0.0.1))(magic-string@1.4.2)(magicast@0.5.4)(oxc-parser@0.139.0)(rolldown@1.2.5)(typescript@5.9.3)(unplugin@3.3.0(esbuild@0.28.2)(rolldown@1.2.5)(rollup@4.62.4)(vite@8.2.1(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(yaml@2.9.0)))
@@ -256,6 +262,16 @@ importers:
       '@untheme/kit':
         specifier: 'catalog:'
         version: 0.6.0(yaml-to-momoa@0.1.0)
+      vitest:
+        specifier: 'catalog:'
+        version: 5.0.3(@opentelemetry/api@1.9.1)(@types/node@26.2.0)(@vitest/coverage-v8@5.0.3)(happy-dom@20.11.6)(vite@8.2.1(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(yaml@2.9.0))
+
+  packages/validators:
+    dependencies:
+      zod:
+        specifier: 'catalog:'
+        version: 4.6.5
+    devDependencies:
       vitest:
         specifier: 'catalog:'
         version: 5.0.3(@opentelemetry/api@1.9.1)(@types/node@26.2.0)(@vitest/coverage-v8@5.0.3)(happy-dom@20.11.6)(vite@8.2.1(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(yaml@2.9.0))

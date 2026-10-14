@@ -1,5 +1,4 @@
 <script lang="ts">
-import { ContentRenderer } from "#components";
 import {
   computed,
   createError,
@@ -8,10 +7,10 @@ import {
   useNuxtApp,
 } from "#imports";
 
+import MarkdownBody from "~/components/MarkdownBody.vue";
 import PageHeader from "~/components/PageHeader.vue";
 import StaffCard from "~/components/StaffCard.vue";
 import { usePage } from "~/composables/page";
-import { MARKDOWN_COMPONENTS } from "~/constants/markdown";
 </script>
 
 <script setup lang="ts">
@@ -51,11 +50,7 @@ const staff = computed(() => page.value?.staff ?? []);
       />
     </section>
     <article class="prose">
-      <ContentRenderer
-        :value="page"
-        :components="MARKDOWN_COMPONENTS"
-        :prose="false"
-      />
+      <MarkdownBody :page="page" />
     </article>
   </div>
 </template>
