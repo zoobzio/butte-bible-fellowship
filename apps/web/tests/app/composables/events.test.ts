@@ -8,7 +8,7 @@ import type { PageItem } from "~/types/page";
 import type { ChurchEvent } from "@bbf/validators/types";
 
 import {
-  queriedCollections,
+  requestedDocuments,
   setAppConfig,
   setContentPages,
   setRoutePath,
@@ -32,6 +32,7 @@ import {
   useEventWeek,
   useToday,
 } from "~/composables/events";
+import { document } from "#test/support/content";
 import { withSetup } from "#test/support/mount";
 
 /** Every space a plain one: a formatter sets narrow ones about a time. */
@@ -533,7 +534,7 @@ describe("useEventCalendar", () => {
 });
 
 describe("useEvents", () => {
-  const EVENTS_PAGE = { path: "/events", title: "Events", events: [WORSHIP] };
+  const EVENTS_PAGE = document({ title: "Events", events: [WORSHIP] });
 
   it("reads the events off the events page, whichever page asks", async () => {
     setContentPages({ "/events": EVENTS_PAGE });
@@ -546,13 +547,13 @@ describe("useEvents", () => {
     setContentPages({ "/events": EVENTS_PAGE });
     setRoutePath("/es/connect");
     await useEvents();
-    expect(queriedCollections).toEqual(["pages_es"]);
+    expect(requestedDocuments).toEqual(["es/events.json"]);
   });
 
   it("has none when the events page cannot be read, or lists none", async () => {
     setRoutePath("/");
     expect((await useEvents()).value).toEqual([]);
-    setContentPages({ "/events": { path: "/events", title: "Events" } });
+    setContentPages({ "/events": document({ title: "Events" }) });
     expect((await useEvents()).value).toEqual([]);
   });
 });
@@ -681,11 +682,10 @@ describe("useEvent", () => {
     day: "thursday",
     start: "10:00",
   };
-  const EVENTS_PAGE = {
-    path: "/events",
+  const EVENTS_PAGE = document({
     title: "Events",
     events: [WORSHIP, PRAYER, DINNER],
-  };
+  });
 
   it("is the event the address names, by its title's slug or its own", async () => {
     setContentPages({ "/events": EVENTS_PAGE });
@@ -758,11 +758,11 @@ describe("useSelectedDay", () => {
 });
 
 describe("useEventArticle", () => {
-  const PAGE = {
-    path: "/events/worship-service",
+  const PAGE: PageItem = {
     title: "Worship Service",
     image: "/images/worship.jpg",
-  } as unknown as PageItem;
+    body: document({ title: "Worship Service", image: "/images/worship.jpg" }),
+  };
 
   const article = (event: ChurchEvent, page: PageItem | null = null) => {
     setAppConfig({ events: { image: "/images/church.jpg" } });

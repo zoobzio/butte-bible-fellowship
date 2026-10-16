@@ -20,10 +20,13 @@ export const hero = z.object({
 });
 
 /**
- * A page's front matter, beyond what every page carries: the fields the
- * site's pages write, each optional, as one page uses some and another none.
+ * A page's front matter: what every page carries — its title, and the
+ * description search engines show — and the fields the site's pages write,
+ * each optional, as one page uses some and another none.
  */
 export const page = z.object({
+  title: z.string(),
+  description: z.string().optional(),
   hero: hero.optional(),
   /** The events page's calendar. */
   events: z.array(churchEvent).optional(),

@@ -1,7 +1,19 @@
-import type { PageCollections } from "@nuxt/content";
+import type { Root } from "hast";
+
+import type { Page } from "@bbf/validators/types";
 
 /**
- * A page of the site, as its locale's collection hands it: its front matter
- * and its body. Every locale's collection holds the same pages.
+ * A page of the site, in one locale: its front matter, as the site's pages
+ * write it, and its body — the tree `@bbf/i18n` built the page to. Every
+ * locale has the same pages.
  */
-export type PageItem = PageCollections[keyof PageCollections];
+export interface PageItem extends Page {
+  body: Root;
+}
+
+declare module "hast" {
+  interface RootData {
+    /** A page's front matter, as the build's `matter` preset left it on the root. */
+    matter?: Record<string, unknown>;
+  }
+}

@@ -1,4 +1,4 @@
-import type { MinimarkNode, MinimarkTree } from "@nuxt/content";
+import type { Root, RootContent } from "hast";
 
 import type { OutlineEntry } from "~/types/outline";
 
@@ -6,25 +6,24 @@ import type { OutlineEntry } from "~/types/outline";
 const DEPTHS: Record<string, number> = { h1: 1, h2: 2, h3: 3 };
 
 /** A node's words, without the markup around them. */
-const text = (node: MinimarkNode): string => {
-  if (typeof node === "string") return node;
-  const [, , ...children] = node;
-  return children.map(text).join("");
+const text = (node: RootContent): string => {
+  if (node.type === "text") return node.value;
+  if (node.type === "element") return node.children.map(text).join("");
+  return "";
 };
 
 /**
  * A page's outline: its headings, in the order it sets them, read from the
- * page's own body. Nuxt Content's `body.toc` starts at `h2`, and a page here
- * opens each of its parts with an `h1`, so the body is read instead. Only a
- * heading the page sets at its top level counts — not one inside a quote or
- * a component — and only one with an id, since that is what a link names.
+ * page's own body. A page here opens each of its parts with an `h1`, so the
+ * outline starts there. Only a heading the page sets at its top level
+ * counts — not one inside a quote or a component — and only one with an
+ * id, since that is what a link names; the build gives every heading one.
  */
-export const outline = (body: MinimarkTree): OutlineEntry[] => {
-  return body.value.flatMap((node) => {
-    if (typeof node === "string") return [];
-    const [tag, props] = node;
-    const depth = DEPTHS[tag];
-    const id = props.id;
+export const outline = (body: Root): OutlineEntry[] => {
+  return body.children.flatMap((node) => {
+    if (node.type !== "element") return [];
+    const depth = DEPTHS[node.tagName];
+    const id = node.properties.id;
     if (depth === undefined || typeof id !== "string") return [];
     return [{ id, depth, text: text(node) }];
   });

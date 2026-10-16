@@ -1,11 +1,11 @@
 import { describe, expect, it } from "vitest";
 import { mount } from "@vue/test-utils";
 
-import MarkdownAnchor from "~/components/markdown/MarkdownAnchor.vue";
+import A from "~/components/prose/A.vue";
 
-describe("MarkdownAnchor", () => {
+describe("A", () => {
   it("renders a link to its href around its content", () => {
-    const link = mount(MarkdownAnchor, {
+    const link = mount(A, {
       props: { href: "/calendar" },
       slots: { default: "the weekly schedule" },
     });
@@ -15,7 +15,7 @@ describe("MarkdownAnchor", () => {
   });
 
   it("passes the target through", () => {
-    const link = mount(MarkdownAnchor, {
+    const link = mount(A, {
       props: { href: "https://example.com", target: "_blank" },
     });
     expect(link.attributes("target")).toBe("_blank");

@@ -1,3 +1,5 @@
+import type { Root } from "hast";
+
 import { describe, expect, it } from "vitest";
 
 import { setContentPages, setRoutePath, useHead, useNuxtApp } from "#imports";
@@ -5,6 +7,7 @@ import MarkdownBody from "~/components/MarkdownBody.vue";
 import PageHeader from "~/components/PageHeader.vue";
 import StaffCard from "~/components/StaffCard.vue";
 import Page from "~/pages/connect.vue";
+import { document, element } from "#test/support/content";
 import { mountSuspended } from "#test/support/mount";
 
 const STAFF = [
@@ -12,14 +15,12 @@ const STAFF = [
   { name: "John Roe", role: "Elder" },
 ];
 
-const CONNECT = {
-  path: "/connect",
-  title: "Connect – Test Church",
-  staff: STAFF,
-  body: { type: "minimark", value: [["p", {}, "Visit us."]] },
-};
+const CONNECT = document(
+  { title: "Connect – Test Church", staff: STAFF },
+  element("p", {}, "Visit us."),
+);
 
-const mountPage = async (page: object = CONNECT) => {
+const mountPage = async (page: Root = CONNECT) => {
   setContentPages({ "/connect": page });
   return mountSuspended(Page);
 };
@@ -57,11 +58,16 @@ describe("connect page", () => {
         .find(".connect > .connect-staff + article.prose")
         .findComponent(MarkdownBody)
         .props("page"),
-    ).toEqual(CONNECT);
+    ).toEqual({ title: "Connect – Test Church", staff: STAFF, body: CONNECT });
   });
 
   it("puts the article straight under the header when the page lists no one", async () => {
-    const { wrapper } = await mountPage({ ...CONNECT, staff: undefined });
+    const { wrapper } = await mountPage(
+      document(
+        { title: "Connect – Test Church" },
+        element("p", {}, "Visit us."),
+      ),
+    );
     expect(wrapper.find(".connect-staff").exists()).toBe(false);
     expect(
       wrapper.find(".connect > .page-header + article.prose").exists(),

@@ -4,13 +4,13 @@ description: Visítenos en 2255 Pillsbury Road, Chico, California.
 staff:
   - name: Nombre del anciano
     role: Anciano
-    bio: Unas palabras sobre este anciano: cuánto tiempo lleva sirviendo y qué le importa en Butte Bible Fellowship.
+    bio: "Unas palabras sobre este anciano: cuánto tiempo lleva sirviendo y qué le importa en Butte Bible Fellowship."
   - name: Nombre del anciano
     role: Anciano
-    bio: Unas palabras sobre este anciano: cuánto tiempo lleva sirviendo y qué le importa en Butte Bible Fellowship.
+    bio: "Unas palabras sobre este anciano: cuánto tiempo lleva sirviendo y qué le importa en Butte Bible Fellowship."
   - name: Nombre del anciano
     role: Anciano
-    bio: Unas palabras sobre este anciano: cuánto tiempo lleva sirviendo y qué le importa en Butte Bible Fellowship.
+    bio: "Unas palabras sobre este anciano: cuánto tiempo lleva sirviendo y qué le importa en Butte Bible Fellowship."
 ---
 
 ::connect-grid

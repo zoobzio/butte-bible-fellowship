@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { setAppConfig, setContentPages, setRoutePath, useHead } from "#imports";
 import EventArticle from "~/components/EventArticle.vue";
 import Page from "~/pages/events/[event].vue";
+import { document, element } from "#test/support/content";
 import { mountSuspended } from "#test/support/mount";
 
 const WORSHIP = { title: "Worship Service", day: "sunday", start: "10:00" };
@@ -14,18 +15,16 @@ const PRAYER = {
 };
 const DINNER = { title: "Harvest Dinner", date: "2026-10-14", start: "17:30" };
 
-const EVENTS_PAGE = {
-  path: "/events",
+const EVENTS_PAGE = document({
   title: "Events – Test Church",
   events: [WORSHIP, PRAYER, DINNER],
-};
+});
 
 // What is written about the worship service: the other events have no page.
-const WORSHIP_PAGE = {
-  path: "/events/worship-service",
-  title: "Worship Service – Test Church",
-  body: { type: "minimark", value: [["p", {}, "We gather to worship."]] },
-};
+const WORSHIP_PAGE = document(
+  { title: "Worship Service – Test Church" },
+  element("p", {}, "We gather to worship."),
+);
 
 const mountPage = async (path: string) => {
   setContentPages({
@@ -48,7 +47,7 @@ describe("event page", () => {
     const { wrapper } = await mountPage("/events/worship-service");
     expect(wrapper.findComponent(EventArticle).props()).toEqual({
       event: WORSHIP,
-      page: WORSHIP_PAGE,
+      page: { title: "Worship Service – Test Church", body: WORSHIP_PAGE },
     });
   });
 

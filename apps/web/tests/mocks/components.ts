@@ -29,15 +29,12 @@ export const Body = defineComponent({
   },
 });
 
-// ContentRenderer: a placeholder that keeps the props it was given.
-export const ContentRenderer = defineComponent({
-  name: "ContentRenderer",
-  props: {
-    value: { type: Object, required: true },
-    components: { type: Object, default: undefined },
-    prose: { type: Boolean, default: true },
-  },
+// Prose: a placeholder for the prosary module's document renderer that
+// keeps the tree it was given.
+export const Prose = defineComponent({
+  name: "Prose",
+  props: { tree: { type: Object, required: true } },
   setup() {
-    return () => h("div", { class: "content-renderer" });
+    return () => h("div", { class: "prose-document" });
   },
 });

@@ -1,4 +1,4 @@
-import type { AppFibberMessage } from "#imports";
+import type { AppProsaryMessage } from "#imports";
 
 interface FooterLink {
   /** Makes the line a link: a URL, or a `tel:` / `mailto:` address. */
@@ -8,7 +8,7 @@ interface FooterLink {
 
 /** A line of the site's own words: a message of `@bbf/i18n`, by key. */
 export interface FooterMessageLine extends FooterLink {
-  label: AppFibberMessage;
+  label: AppProsaryMessage;
 }
 
 /** A line that reads the same in every language: an address, a number, a name. */
@@ -19,7 +19,7 @@ export interface FooterTextLine extends FooterLink {
 export type FooterLine = FooterMessageLine | FooterTextLine;
 
 export interface FooterColumn {
-  title: AppFibberMessage;
+  title: AppProsaryMessage;
   lines: FooterLine[];
 }
 

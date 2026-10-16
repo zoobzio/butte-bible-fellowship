@@ -12,6 +12,7 @@ import EventArticle from "~/components/EventArticle.vue";
 import EventDetails from "~/components/EventDetails.vue";
 import MarkdownBody from "~/components/MarkdownBody.vue";
 import PageHeader from "~/components/PageHeader.vue";
+import { document, element } from "#test/support/content";
 
 const WORSHIP: ChurchEvent = {
   title: "Worship Service",
@@ -42,11 +43,13 @@ const OPEN_HOUSE: ChurchEvent = {
 };
 
 // What is written about the worship service.
-const WORSHIP_PAGE = {
-  path: "/events/worship-service",
+const WORSHIP_PAGE: PageItem = {
   title: "Worship Service – Test Church",
-  body: { type: "minimark", value: [["p", {}, "We gather to worship."]] },
-} as unknown as PageItem;
+  body: document(
+    { title: "Worship Service – Test Church" },
+    element("p", {}, "We gather to worship."),
+  ),
+};
 
 const { $t } = useNuxtApp();
 

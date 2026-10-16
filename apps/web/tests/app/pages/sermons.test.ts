@@ -5,9 +5,10 @@ import PageHeader from "~/components/PageHeader.vue";
 import SermonCard from "~/components/SermonCard.vue";
 import SermonGrid from "~/components/SermonGrid.vue";
 import Page from "~/pages/sermons.vue";
+import { document } from "#test/support/content";
 import { mountSuspended } from "#test/support/mount";
 
-const SERMONS_PAGE = { path: "/sermons", title: "Sermons – Test Church" };
+const SERMONS_PAGE = document({ title: "Sermons – Test Church" });
 
 const sermon = (id: string) => ({
   id,

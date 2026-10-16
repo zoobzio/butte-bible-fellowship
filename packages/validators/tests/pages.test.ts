@@ -20,25 +20,31 @@ describe("hero", () => {
 });
 
 describe("page", () => {
-  it("accepts a page with no front matter of its own", () => {
-    expect(page.parse({})).toEqual({});
+  it("needs only a title", () => {
+    expect(page.parse({ title: "Home" })).toEqual({ title: "Home" });
+    expect(page.safeParse({}).success).toBe(false);
   });
 
   it("accepts the events page's calendar", () => {
     const value = {
+      title: "Events",
       events: [{ title: "Worship Service", day: "sunday", start: "10:00" }],
     };
     expect(page.parse(value)).toEqual(value);
   });
 
   it("accepts the contact page's staff", () => {
-    const value = { staff: [{ name: "Jane Doe", role: "Elder" }] };
+    const value = {
+      title: "Connect",
+      staff: [{ name: "Jane Doe", role: "Elder" }],
+    };
     expect(page.parse(value)).toEqual(value);
   });
 
   it("rejects a staff member without a role", () => {
-    expect(page.safeParse({ staff: [{ name: "Jane Doe" }] }).success).toBe(
-      false,
-    );
+    expect(
+      page.safeParse({ title: "Connect", staff: [{ name: "Jane Doe" }] })
+        .success,
+    ).toBe(false);
   });
 });

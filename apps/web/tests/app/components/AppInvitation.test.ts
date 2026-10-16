@@ -3,7 +3,7 @@ import type { InvitationConfig } from "~/types/invitation";
 import { beforeEach, describe, expect, it } from "vitest";
 
 import {
-  queriedCollections,
+  requestedDocuments,
   setAppConfig,
   setContentPages,
   setRoutePath,
@@ -11,6 +11,7 @@ import {
 } from "#imports";
 import AppInvitation from "~/components/AppInvitation.vue";
 import EventSchedule from "~/components/EventSchedule.vue";
+import { document } from "#test/support/content";
 import { mountSuspended } from "#test/support/mount";
 
 const INVITATION: InvitationConfig = {
@@ -23,11 +24,10 @@ const PRAYER = { title: "Prayer Meeting", day: "thursday", start: "10:00" };
 // Held once, on a Sunday.
 const DINNER = { title: "Harvest Dinner", date: "2026-10-18", start: "17:30" };
 
-const EVENTS_PAGE = {
-  path: "/events",
+const EVENTS_PAGE = document({
   title: "Events – Test Church",
   events: [PRAYER, DINNER, WORSHIP, SCHOOL],
-};
+});
 
 const { $t } = useNuxtApp();
 
@@ -81,7 +81,7 @@ describe("AppInvitation", () => {
 
   it("reads the events in the visitor's locale", async () => {
     await mountAt("/es/connect");
-    expect(queriedCollections).toEqual(["pages_es"]);
+    expect(requestedDocuments).toEqual(["es/events.json"]);
   });
 
   it("has an empty Sunday when the events cannot be read", async () => {

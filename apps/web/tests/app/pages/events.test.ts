@@ -1,8 +1,11 @@
+import type { Root } from "hast";
+
 import { describe, expect, it } from "vitest";
 
 import { setContentPages, setRoutePath, useHead } from "#imports";
 import EventsBrowser from "~/components/EventsBrowser.vue";
 import Page from "~/pages/events/index.vue";
+import { document } from "#test/support/content";
 import { mountSuspended } from "#test/support/mount";
 
 const EVENTS = [
@@ -10,13 +13,9 @@ const EVENTS = [
   { title: "Harvest Dinner", date: "2026-10-24", start: "17:30" },
 ];
 
-const EVENTS_PAGE = {
-  path: "/events",
-  title: "Events – Test Church",
-  events: EVENTS,
-};
+const EVENTS_PAGE = document({ title: "Events – Test Church", events: EVENTS });
 
-const mountPage = async (page: object = EVENTS_PAGE) => {
+const mountPage = async (page: Root = EVENTS_PAGE) => {
   setContentPages({ "/events": page });
   return mountSuspended(Page);
 };
@@ -30,7 +29,9 @@ describe("events page", () => {
   });
 
   it("hands the browser no events when the page lists none", async () => {
-    const { wrapper } = await mountPage({ ...EVENTS_PAGE, events: undefined });
+    const { wrapper } = await mountPage(
+      document({ title: "Events – Test Church" }),
+    );
     expect(wrapper.findComponent(EventsBrowser).props("events")).toEqual([]);
   });
 

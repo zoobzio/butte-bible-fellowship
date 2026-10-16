@@ -6,6 +6,7 @@ import HomeSermons from "~/components/HomeSermons.vue";
 import HomeWeek from "~/components/HomeWeek.vue";
 import MarkdownBody from "~/components/MarkdownBody.vue";
 import Page from "~/pages/index.vue";
+import { document } from "#test/support/content";
 import { mountSuspended } from "#test/support/mount";
 
 const HERO = {
@@ -15,11 +16,8 @@ const HERO = {
   cta: { label: "Learn more", to: "/about-us" },
 };
 
-const home = (hero?: typeof HERO) => ({
-  path: "/",
-  title: "Home – Test Church",
-  hero,
-});
+const home = (hero?: typeof HERO) =>
+  document({ title: "Home – Test Church", ...(hero ? { hero } : {}) });
 
 const SERMON = {
   id: "abc123",
@@ -58,7 +56,7 @@ describe("home page", () => {
     const { wrapper } = await mountSuspended(Page);
     expect(
       wrapper.find("section.prose").findComponent(MarkdownBody).props("page"),
-    ).toEqual(page);
+    ).toEqual({ title: "Home – Test Church", hero: HERO, body: page });
   });
 
   it("keeps the site's measure around the hero, the body, the week and the sermons, in that order", async () => {

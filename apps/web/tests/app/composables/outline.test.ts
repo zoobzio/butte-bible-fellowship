@@ -5,6 +5,7 @@ import type { OutlineEntry } from "~/types/outline";
 import type { PageItem } from "~/types/page";
 
 import { useOutline, useOutlineSpy } from "~/composables/outline";
+import { document as page, element } from "#test/support/content";
 import { withSetup } from "#test/support/mount";
 import { stubPage } from "#test/support/page";
 
@@ -141,16 +142,15 @@ describe("useOutlineSpy", () => {
 });
 
 describe("useOutline", () => {
-  const ABOUT = {
-    body: {
-      type: "minimark",
-      value: [
-        ["h1", { id: "our-vision" }, "Our Vision"],
-        ["p", {}, "Modern wisdom…"],
-        ["h2", { id: "dreams" }, "Dreams"],
-      ],
-    },
-  } as unknown as PageItem;
+  const ABOUT: PageItem = {
+    title: "About",
+    body: page(
+      { title: "About" },
+      element("h1", { id: "our-vision" }, "Our Vision"),
+      element("p", {}, "Modern wisdom…"),
+      element("h2", { id: "dreams" }, "Dreams"),
+    ),
+  };
 
   it("lists the page's headings, in order, with their levels", () => {
     expect(useOutline(ABOUT).value).toEqual([

@@ -17,11 +17,6 @@ const localized = (locale: string, path: string) =>
 /** The pages that have moved: the path each was at, and where it is now. */
 const moved = { "/calendar": "/events" };
 
-/** The English pages, as authored: `@bbf/i18n`'s sources, beside its build. */
-const content = fileURLToPath(
-  new URL("../src/content", import.meta.resolve("@bbf/i18n")),
-);
-
 /** The static assets: `@bbf/assets`'s sources, served from the site's root. */
 const assets = fileURLToPath(
   new URL("src", import.meta.resolve("@bbf/assets/package.json")),
@@ -33,12 +28,10 @@ export default defineNuxtConfig({
   extends: ["@zoobzio/foundation"],
 
   modules: [
-    "@nuxt/content",
     "@nuxt/fonts",
     "@icon-sheets/nuxt",
     "@untheme/nuxt",
-    "@fibber/nuxt",
-    "nuxt-studio",
+    "@prosary/nuxt",
   ],
 
   imports: { autoImport: false },
@@ -51,33 +44,15 @@ export default defineNuxtConfig({
   // the site's palette and every aurora theme — are the package's own build.
   untheme: { preset: "@bbf/theme" },
 
-  fibber: { build: "@bbf/i18n" },
+  // The words and the pages are `@bbf/i18n`'s build: the module provides
+  // `$t` over its messages and serves its pages, every locale's, to `usePage`.
+  prosary: { build: "@bbf/i18n" },
 
   runtimeConfig: {
     public: {
       // The channel whose sermons `/sermons` lists, by its YouTube id.
       youtube: { channel: "UCCVz4wFgCBmw-Iwyz61OPng" },
     },
-  },
-
-  studio: {
-    route: "/admin",
-    repository: {
-      provider: "github",
-      owner: "zoobzio",
-      repo: "butte-bible-fellowship",
-      branch: "main",
-      rootDir: "apps/web",
-      // Where Studio commits: the pages and the media each have a package.
-      paths: {
-        content: "packages/i18n/src/content",
-        public: "packages/assets/src",
-      },
-    },
-    // The same two directories on disk, for a local Studio.
-    source: { content, public: assets },
-    // Only English is authored: the translations are generated from it.
-    collections: { exclude: targets.map((locale) => `pages_${locale}`) },
   },
 
   fonts: {
@@ -102,12 +77,6 @@ export default defineNuxtConfig({
   },
 
   css: ["@bbf/assets/css/index.css"],
-
-  content: {
-    experimental: {
-      nativeSqlite: true,
-    },
-  },
 
   hooks: {
     // English keeps the routes as the pages declare them; every other

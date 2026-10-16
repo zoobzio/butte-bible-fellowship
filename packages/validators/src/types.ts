@@ -17,7 +17,7 @@ export type StaffMember = z.infer<typeof staffMember>;
 /** The words and picture a page opens with, over its body. */
 export type Hero = z.infer<typeof hero>;
 
-/** A page's front matter, beyond what every page carries. */
+/** A page's front matter: its title and description, and what the site's pages add. */
 export type Page = z.infer<typeof page>;
 
 /** A sermon on the church's YouTube channel, as its feed lists it. */

@@ -8,19 +8,17 @@ import AboutArticle from "~/components/AboutArticle.vue";
 import MarkdownBody from "~/components/MarkdownBody.vue";
 import PageHeader from "~/components/PageHeader.vue";
 import TableOfContents from "~/components/TableOfContents.vue";
+import { document, element } from "#test/support/content";
 
-const ABOUT = {
-  path: "/about-us",
+const ABOUT: PageItem = {
   title: "About – Test Church",
-  body: {
-    type: "minimark",
-    value: [
-      ["h1", { id: "our-vision" }, "Our Vision"],
-      ["p", {}, "Modern wisdom…"],
-      ["h2", { id: "dreams" }, "Dreams"],
-    ],
-  },
-} as unknown as PageItem;
+  body: document(
+    { title: "About – Test Church" },
+    element("h1", { id: "our-vision" }, "Our Vision"),
+    element("p", {}, "Modern wisdom…"),
+    element("h2", { id: "dreams" }, "Dreams"),
+  ),
+};
 
 const { $t } = useNuxtApp();
 

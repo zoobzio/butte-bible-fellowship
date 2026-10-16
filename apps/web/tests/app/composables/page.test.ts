@@ -1,16 +1,20 @@
 import { describe, expect, it } from "vitest";
 
-import { queriedCollections, setContentPages, setRoutePath } from "#imports";
+import { requestedDocuments, setContentPages, setRoutePath } from "#imports";
 import { usePage } from "~/composables/page";
+import { document, element } from "#test/support/content";
 
-const ABOUT = { title: "About", path: "/about-us" };
+const ABOUT = document({ title: "About" }, element("p", {}, "Modern wisdom…"));
+
+// The page as `usePage` hands it: its front matter over its body.
+const PAGE = { title: "About", body: ABOUT };
 
 describe("usePage", () => {
-  it("resolves the page at a path", async () => {
+  it("resolves the page at a path: its front matter, and its body", async () => {
     setContentPages({ "/about-us": ABOUT });
     setRoutePath("/about-us");
     const { data } = await usePage();
-    expect(data.value).toEqual(ABOUT);
+    expect(data.value).toEqual(PAGE);
   });
 
   it("resolves a path with no page to null", async () => {
@@ -24,27 +28,33 @@ describe("usePage", () => {
     setContentPages({ "/about-us": ABOUT });
     setRoutePath("/es/acerca");
     const { data } = await usePage("/about-us");
-    expect(queriedCollections).toEqual(["pages_es"]);
-    expect(data.value).toEqual(ABOUT);
+    expect(requestedDocuments).toEqual(["es/about-us.json"]);
+    expect(data.value).toEqual(PAGE);
   });
 
-  it("asks the English collection for a path with no locale", async () => {
+  it("asks for the English page for a path with no locale", async () => {
     setRoutePath("/about-us");
     await usePage();
-    expect(queriedCollections).toEqual(["pages_en"]);
+    expect(requestedDocuments).toEqual(["en/about-us.json"]);
   });
 
-  it("asks the collection of the locale the path leads with, for the same page", async () => {
+  it("asks for the page in the locale the path leads with", async () => {
     setContentPages({ "/about-us": ABOUT });
     setRoutePath("/es/about-us");
     const { data } = await usePage();
-    expect(queriedCollections).toEqual(["pages_es"]);
-    expect(data.value).toEqual(ABOUT);
+    expect(requestedDocuments).toEqual(["es/about-us.json"]);
+    expect(data.value).toEqual(PAGE);
   });
 
-  it("asks a locale's collection for its home page", async () => {
+  it("asks for a locale's home page", async () => {
     setRoutePath("/fr");
     await usePage();
-    expect(queriedCollections).toEqual(["pages_fr"]);
+    expect(requestedDocuments).toEqual(["fr/index.json"]);
+  });
+
+  it("refuses a page whose front matter is not a page's", async () => {
+    setContentPages({ "/about-us": document({}) });
+    setRoutePath("/about-us");
+    await expect(usePage()).rejects.toThrow();
   });
 });

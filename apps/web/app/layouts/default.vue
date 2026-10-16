@@ -17,7 +17,7 @@ const { $t } = useNuxtApp();
 const { locale } = useLocale();
 
 // The defaults a page overrides with its own title. The language is set
-// here as well as by the fibber module, since Foundation's root sets "en".
+// here as well as by the prosary module, since Foundation's root sets "en".
 useHead(() => ({
   htmlAttrs: { lang: locale.value },
   title: $t.site.name(),

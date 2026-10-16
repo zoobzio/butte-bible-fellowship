@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { mount } from "@vue/test-utils";
 
-import MapEmbed from "~/components/markdown/MapEmbed.vue";
+import MapEmbed from "~/components/prose/MapEmbed.vue";
 
 describe("MapEmbed", () => {
   it("renders a lazily loaded frame for the map, with its title", () => {

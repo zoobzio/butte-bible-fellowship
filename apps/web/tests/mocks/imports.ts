@@ -9,9 +9,12 @@ import { readFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import { resolve } from "node:path";
 
+import type { Root } from "hast";
+
 import { computed, reactive, ref, type Ref } from "vue";
 import { vi } from "vitest";
-import { makeFibber } from "fibber-lang";
+import { makeProsary } from "prosary";
+import { CONTENT_URL } from "@prosary/nuxt/constant";
 import { makeUntheme } from "untheme";
 import { contract, locale } from "@bbf/i18n";
 import { bundles } from "@bbf/i18n/bundles";
@@ -84,27 +87,27 @@ export const clearUntheme = () => {
 
 // useNuxtApp: the app, as far as the tests reach into it — `$t`, the real
 // resolver over the site's built messages, in the source locale.
-const fibber = makeFibber(
+const prosary = makeProsary(
   contract,
   reactive({ locale, messages: await bundles[locale]() }),
 );
 
-export const useNuxtApp = () => ({ $t: fibber.createResolver() });
+export const useNuxtApp = () => ({ $t: prosary.createResolver() });
 
 // useLocale: the service's one locale, as the module exposes it.
 type Locale = (typeof contract.locales)[number];
 
-const source = fibber.config.messages;
+const source = prosary.config.messages;
 
 export const useLocale = () => ({
-  locale: computed(() => fibber.config.locale),
-  locales: fibber.locales(),
+  locale: computed(() => prosary.config.locale),
+  locales: prosary.locales(),
   setLocale: async (next: Locale) => {
-    fibber.apply(next, await bundles[next]());
+    prosary.apply(next, await bundles[next]());
   },
 });
 
-export const clearLocale = () => fibber.apply(locale, source);
+export const clearLocale = () => prosary.apply(locale, source);
 
 // defineNuxtRouteMiddleware hands the middleware back as it is.
 export const defineNuxtRouteMiddleware = <T>(middleware: T) => middleware;
@@ -165,32 +168,38 @@ export const createError = (input: { statusCode: number; message: string }) =>
 // definePageMeta is compiled away by Nuxt; here it is a no-op.
 export const definePageMeta = () => {};
 
-// queryCollection: resolves pages by path from a registry filled with
-// setContentPages. A path with no page resolves to null, as in Nuxt Content.
-const contentPages = new Map<string, unknown>();
+// useRequestFetch: a fetch of the pages the prosary module serves, from a
+// registry filled with setContentPages by each page's path. A page not
+// there is a 404, as a document the build does not hold is.
+const contentPages = new Map<string, Root>();
 
-export const setContentPages = (pages: Record<string, unknown>) => {
+export const setContentPages = (pages: Record<string, Root>) => {
   contentPages.clear();
   for (const [path, page] of Object.entries(pages)) {
     contentPages.set(path, page);
   }
 };
 
-// The collection each query asked, in order.
-export const queriedCollections: string[] = [];
+// Each document asked for, in order, by its locale and file: `es/events.json`.
+export const requestedDocuments: string[] = [];
 
 export const clearContentPages = () => {
   contentPages.clear();
-  queriedCollections.length = 0;
+  requestedDocuments.length = 0;
 };
 
-export const queryCollection = (collection: string) => {
-  queriedCollections.push(collection);
-  return {
-    path: (path: string) => ({
-      first: async () => contentPages.get(path) ?? null,
-    }),
-  };
+/** The path of the page a document file is built from. */
+const pathOf = (file: string) => {
+  const page = file.replace(/^[^/]+\//, "").replace(/\.json$/, "");
+  return page === "index" ? "/" : `/${page}`;
+};
+
+export const useRequestFetch = () => async (url: string) => {
+  const file = url.slice(`${CONTENT_URL}/`.length);
+  requestedDocuments.push(file);
+  const page = contentPages.get(pathOf(file));
+  if (!page) throw Object.assign(new Error(`404 ${url}`), { status: 404 });
+  return page;
 };
 
 // useAsyncData: awaits the handler and hands back its result as `data`.

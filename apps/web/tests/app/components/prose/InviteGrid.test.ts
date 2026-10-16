@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { mount } from "@vue/test-utils";
 
-import InviteGrid from "~/components/markdown/InviteGrid.vue";
+import InviteGrid from "~/components/prose/InviteGrid.vue";
 
 describe("InviteGrid", () => {
   it("lays what it is given out as a grid of invitations", () => {

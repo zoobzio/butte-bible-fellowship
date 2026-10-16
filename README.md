@@ -23,62 +23,34 @@ pnpm dev          # start the dev server at http://localhost:3000
 
 ## Content
 
-The pages are Markdown in [`@bbf/i18n`](packages/i18n), which builds them for
-every locale. `apps/web/content.config.ts` gives each locale a Nuxt Content
-collection (`pages_en`, …) and `usePage` queries the one the route names.
-English is read from the package's sources, so an edit shows at once; the
-translations are read from its build. The images the pages show are in
+The pages are Markdown in [`@bbf/i18n`](packages/i18n), which builds every
+one for every locale as the tree the app renders, its front matter on the
+root. `@prosary/nuxt` serves them, and `usePage` fetches the one the route
+names in the route's locale, checking its front matter against
+[`@bbf/validators`](packages/validators). A page's body renders through the
+module's `<Prose>`, with the components under `app/components/prose/` in
+place of the elements and blocks they are named for: `A.vue` renders every
+link as a NuxtLink in the reader's locale, `InviteCard.vue` every
+`:::invite-card` block. The images the pages show are in
 [`@bbf/assets`](packages/assets), served from the site's root.
 
-### Nuxt Studio
-
-English pages and the media are edited through Nuxt Studio at `/admin`. Studio
-expects both inside the app, at `content/` and `public/`, so
-`patches/nuxt-studio@1.7.0.patch` adds three options, set in `nuxt.config.ts`:
-
-- `repository.paths` — where each of those two folders is in the repository:
-  the pages in `packages/i18n/src/content`, the media in
-  `packages/assets/src`. This is where Studio commits.
-- `source` — the same two directories on disk, for Studio run locally.
-- `collections.exclude` — the collections Studio leaves out: every
-  translation, since those are generated from the English.
-
-An edit made in Studio changes the English only. Run
-`pnpm --filter @bbf/i18n translate` afterwards to bring the translations up to
-date.
-
-The patch also works around Studio 1.7.0 being unable to serialize the hard
-break that Shift+Enter inserts — it writes `--- Unknown node: hardBreak ---`
-instead (upstream issue #265, fixed after 1.7.0):
-
-- Shift+Enter is saved as `:br`, and `:br` or backslash line breaks load back
-  into the editor as line breaks.
-- A paragraph hard-wrapped across several lines is joined onto one line when it
-  is edited in Studio, instead of gaining a line break at every wrap.
-
-The Studio app is served from `/_studio-app/1.7.0-bbf.1/`. The bundle is
-cached as immutable, so browsers would otherwise keep an older copy; bump that
-suffix (`version` in the patched `module.mjs`) whenever the patch changes the
-app bundle.
-
-When upgrading `nuxt-studio`, the hard-break part of the patch can go once
-the upstream fix is released; the three options have to be carried over.
+Pages are edited in the repository, under `packages/i18n/src/content`. Run
+`pnpm --filter @bbf/i18n translate` afterwards to bring the translations up
+to date, or let CI do it on the pull request.
 
 ## Language
 
 The site's interface text lives in [`@bbf/i18n`](packages/i18n) as
-[fibber](https://github.com/zoobzio/fibber) messages, not in components.
-`@fibber/nuxt` provides `$t` on the Nuxt app; `app.config.ts` names the header's and
-footer's messages by key.
+[prosary](https://github.com/zoobzio/prosary) messages, not in components.
+`@prosary/nuxt` provides `$t` on the Nuxt app; `app.config.ts` names the
+header's and footer's messages by key.
 
 English is at the routes as written (`/about-us`); every other locale has the
-same pages under its prefix (`/es/about-us`). No page is prerendered: each
-is rendered when it is asked for, and that render kept for fifteen minutes
-(`routeRules` in `nuxt.config.ts`). The route
-decides the language: a global middleware switches fibber to the locale the
-path names, `usePage` reads that locale's collection, and `useRouteLocale`
-keeps links inside it. The language button in the footer links to the page
-being read in each language.
+same pages under its prefix (`/es/about-us`). The route decides the
+language: a global middleware switches prosary to the locale the path names,
+`usePage` fetches that locale's page, and `useRouteLocale` keeps links inside
+it. The language button in the footer links to the page being read in each
+language.
 
 ## Architecture
 

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { mount } from "@vue/test-utils";
 
-import InviteCard from "~/components/markdown/InviteCard.vue";
+import InviteCard from "~/components/prose/InviteCard.vue";
 
 describe("InviteCard", () => {
   it("holds an invitation's heading and words", () => {

@@ -1,24 +1,19 @@
-import type { MinimarkTree } from "@nuxt/content";
-
 import { describe, expect, it } from "vitest";
 
 import { outline, sectionsOnScreen } from "~/utils/outline";
-
-const body = (...value: MinimarkTree["value"]): MinimarkTree => ({
-  type: "minimark",
-  value,
-});
+import { document, element } from "#test/support/content";
 
 describe("outline", () => {
   it("lists the page's headings in order, with their level", () => {
     expect(
       outline(
-        body(
-          ["h1", { id: "our-vision" }, "Our Vision"],
-          ["p", {}, "Modern wisdom…"],
-          ["h2", { id: "dreams" }, "Dreams"],
-          ["h1", { id: "core-beliefs" }, "Core Beliefs"],
-          ["h3", { id: "god-the-father" }, "God the Father"],
+        document(
+          {},
+          element("h1", { id: "our-vision" }, "Our Vision"),
+          element("p", {}, "Modern wisdom…"),
+          element("h2", { id: "dreams" }, "Dreams"),
+          element("h1", { id: "core-beliefs" }, "Core Beliefs"),
+          element("h3", { id: "god-the-father" }, "God the Father"),
         ),
       ),
     ).toEqual([
@@ -32,13 +27,16 @@ describe("outline", () => {
   it("reads a heading's words through its markup", () => {
     expect(
       outline(
-        body([
-          "h2",
-          { id: "the-church" },
-          "The ",
-          ["em", {}, "one"],
-          " Church",
-        ]),
+        document(
+          {},
+          element(
+            "h2",
+            { id: "the-church" },
+            "The ",
+            element("em", {}, "one"),
+            " Church",
+          ),
+        ),
       ),
     ).toEqual([{ id: "the-church", depth: 2, text: "The one Church" }]);
   });
@@ -46,14 +44,24 @@ describe("outline", () => {
   it("leaves out headings below the third level and ones with no id", () => {
     expect(
       outline(
-        body(["h4", { id: "aside" }, "Aside"], ["h2", {}, "Unnamed"], "text"),
+        document(
+          {},
+          element("h4", { id: "aside" }, "Aside"),
+          element("h2", {}, "Unnamed"),
+          { type: "text", value: "text" },
+        ),
       ),
     ).toEqual([]);
   });
 
   it("leaves out a heading that is not the page's own", () => {
     expect(
-      outline(body(["blockquote", {}, ["h2", { id: "quoted" }, "Quoted"]])),
+      outline(
+        document(
+          {},
+          element("blockquote", {}, element("h2", { id: "quoted" }, "Quoted")),
+        ),
+      ),
     ).toEqual([]);
   });
 });

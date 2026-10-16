@@ -11,23 +11,24 @@
     "./bundles": {
       "types": "./.output/bundles.d.mts",
       "import": "./.output/bundles.mjs"
-    },
-    "./content/*": "./.output/content/*"
+    }
   },
   "scripts": {
-    "build": "fibber build",
-    "prepare": "fibber build",
-    "translate": "fibber translate",
-    "translate:check": "fibber translate --check",
+    "build": "prosary build",
+    "prepare": "prosary build",
+    "translate": "prosary translate",
+    "translate:check": "prosary translate --check",
     "test": "vitest run"
   },
   "dependencies": {
-    "fibber-lang": "catalog:"
+    "prosary": "catalog:"
   },
   "devDependencies": {
     "@ai-sdk/anthropic": "catalog:",
-    "@fibber/kit": "catalog:",
-    "@fibber/translate": "catalog:",
+    "@prosary/kit": "catalog:",
+    "@prosary/parse": "catalog:",
+    "@prosary/translate": "catalog:",
+    "rehype-slug": "catalog:",
     "vitest": "catalog:"
   }
 }
