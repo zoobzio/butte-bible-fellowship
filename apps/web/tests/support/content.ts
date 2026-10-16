@@ -1,7 +1,7 @@
 import type { Element, ElementContent, Root } from "hast";
 
 /**
- * A page as `@bbf/i18n` builds it and the prosary module serves it: the
+ * A page as `@bbf/prose` builds it and the prosary module serves it: the
  * tree of its body, with its front matter on the root.
  */
 export const document = (

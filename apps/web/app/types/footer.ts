@@ -6,7 +6,7 @@ interface FooterLink {
   target?: "_blank";
 }
 
-/** A line of the site's own words: a message of `@bbf/i18n`, by key. */
+/** A line of the site's own words: a message of `@bbf/prose`, by key. */
 export interface FooterMessageLine extends FooterLink {
   label: AppProsaryMessage;
 }

@@ -23,7 +23,7 @@ pnpm dev          # start the dev server at http://localhost:3000
 
 ## Content
 
-The pages are Markdown in [`@bbf/i18n`](packages/i18n), which builds every
+The pages are Markdown in [`@bbf/prose`](packages/prose), which builds every
 one for every locale as the tree the app renders, its front matter on the
 root. `@prosary/nuxt` serves them, and `usePage` fetches the one the route
 names in the route's locale, checking its front matter against
@@ -34,13 +34,13 @@ link as a NuxtLink in the reader's locale, `InviteCard.vue` every
 `:::invite-card` block. The images the pages show are in
 [`@bbf/assets`](packages/assets), served from the site's root.
 
-Pages are edited in the repository, under `packages/i18n/src/content`. Run
-`pnpm --filter @bbf/i18n translate` afterwards to bring the translations up
+Pages are edited in the repository, under `packages/prose/src/content`. Run
+`pnpm --filter @bbf/prose translate` afterwards to bring the translations up
 to date, or let CI do it on the pull request.
 
 ## Language
 
-The site's interface text lives in [`@bbf/i18n`](packages/i18n) as
+The site's interface text lives in [`@bbf/prose`](packages/prose) as
 [prosary](https://github.com/zoobzio/prosary) messages, not in components.
 `@prosary/nuxt` provides `$t` on the Nuxt app; `app.config.ts` names the
 header's and footer's messages by key.

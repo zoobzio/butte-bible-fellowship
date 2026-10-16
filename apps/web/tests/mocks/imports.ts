@@ -16,8 +16,8 @@ import { vi } from "vitest";
 import { makeProsary } from "prosary";
 import { CONTENT_URL } from "@prosary/nuxt/constant";
 import { makeUntheme } from "untheme";
-import { contract, locale } from "@bbf/i18n";
-import { bundles } from "@bbf/i18n/bundles";
+import { contract, locale } from "@bbf/prose";
+import { bundles } from "@bbf/prose/bundles";
 import theme from "@bbf/theme/config";
 import { layers } from "@bbf/theme/layers";
 

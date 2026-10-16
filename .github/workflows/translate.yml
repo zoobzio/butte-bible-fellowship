@@ -34,12 +34,12 @@ jobs:
           node-version-file: apps/web/package.json
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm --filter @bbf/i18n translate
+      - run: pnpm --filter @bbf/prose translate
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
       - name: Commit translations
         run: |
-          git add packages/i18n/.cache
+          git add packages/prose/.cache
           if git diff --cached --quiet; then
             echo "Translations are up to date"
             exit 0

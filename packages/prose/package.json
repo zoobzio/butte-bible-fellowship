@@ -1,5 +1,5 @@
 {
-  "name": "@bbf/i18n",
+  "name": "@bbf/prose",
   "private": true,
   "type": "module",
   "sideEffects": false,

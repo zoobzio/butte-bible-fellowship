@@ -7,7 +7,7 @@ import type { InvitationConfig } from "~/types/invitation";
 import { defineAppConfig } from "#imports";
 import { emailHref, phoneHref } from "~/utils/contact";
 
-// The site's words live in `@bbf/i18n`: a `label` or `title` here is the
+// The site's words live in `@bbf/prose`: a `label` or `title` here is the
 // key of a message there, checked against its contract and resolved with
 // `$t(message)` where it is rendered.
 

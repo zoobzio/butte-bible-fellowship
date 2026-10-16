@@ -25,17 +25,17 @@ catalogs:
       specifier: ^4.5.2
       version: 4.6.1
     '@prosary/kit':
-      specifier: 0.0.4
-      version: 0.0.4
+      specifier: 0.0.5
+      version: 0.0.5
     '@prosary/nuxt':
-      specifier: 0.0.4
-      version: 0.0.4
+      specifier: 0.0.5
+      version: 0.0.5
     '@prosary/parse':
-      specifier: 0.0.4
-      version: 0.0.4
+      specifier: 0.0.5
+      version: 0.0.5
     '@prosary/translate':
-      specifier: 0.0.4
-      version: 0.0.4
+      specifier: 0.0.5
+      version: 0.0.5
     '@types/hast':
       specifier: ^3.0.5
       version: 3.0.5
@@ -79,8 +79,8 @@ catalogs:
       specifier: ^1.86.0
       version: 1.86.0
     prosary:
-      specifier: 0.0.4
-      version: 0.0.4
+      specifier: 0.0.5
+      version: 0.0.5
     rehype-slug:
       specifier: ^6.0.0
       version: 6.0.0
@@ -128,12 +128,12 @@ importers:
       '@bbf/assets':
         specifier: workspace:*
         version: link:../../packages/assets
-      '@bbf/i18n':
-        specifier: workspace:*
-        version: link:../../packages/i18n
       '@bbf/icons':
         specifier: workspace:*
         version: link:../../packages/icons
+      '@bbf/prose':
+        specifier: workspace:*
+        version: link:../../packages/prose
       '@bbf/theme':
         specifier: workspace:*
         version: link:../../packages/theme
@@ -145,7 +145,7 @@ importers:
         version: 0.0.7(@nuxt/schema@4.6.1)(confbox@0.3.1)(dotenv@17.4.2)(giget@3.3.1)(jiti@2.7.0)(magic-string@1.4.3)(mlly@1.8.2)(rolldown@1.2.14)(typescript@5.9.3)(unplugin@3.4.0(esbuild@0.28.2)(rolldown@1.2.14)(rollup@4.62.4)(vite@8.3.4(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(yaml@2.9.1)))
       '@prosary/nuxt':
         specifier: 'catalog:'
-        version: 0.0.4(@nuxt/schema@4.6.1)(@prosary/kit@0.0.4(@prosary/translate@0.0.4))(confbox@0.3.1)(dotenv@17.4.2)(giget@3.3.1)(jiti@2.7.0)(magic-string@1.4.3)(mlly@1.8.2)(rolldown@1.2.14)(typescript@5.9.3)(unplugin@3.4.0(esbuild@0.28.2)(rolldown@1.2.14)(rollup@4.62.4)(vite@8.3.4(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(yaml@2.9.1)))
+        version: 0.0.5(@nuxt/schema@4.6.1)(@prosary/kit@0.0.5(@prosary/translate@0.0.5))(confbox@0.3.1)(dotenv@17.4.2)(giget@3.3.1)(jiti@2.7.0)(magic-string@1.4.3)(mlly@1.8.2)(rolldown@1.2.14)(typescript@5.9.3)(unplugin@3.4.0(esbuild@0.28.2)(rolldown@1.2.14)(rollup@4.62.4)(vite@8.3.4(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(yaml@2.9.1)))
       '@untheme/nuxt':
         specifier: 'catalog:'
         version: 0.6.0(@nuxt/schema@4.6.1)(confbox@0.3.1)(dotenv@17.4.2)(giget@3.3.1)(jiti@2.7.0)(magic-string@1.4.3)(mlly@1.8.2)(rolldown@1.2.14)(typescript@5.9.3)(unplugin@3.4.0(esbuild@0.28.2)(rolldown@1.2.14)(rollup@4.62.4)(vite@8.3.4(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(yaml@2.9.1)))
@@ -157,7 +157,7 @@ importers:
         version: 4.6.1(@babel/plugin-syntax-jsx@7.29.7(@babel/core@7.29.7))(@babel/plugin-syntax-typescript@7.29.7(@babel/core@7.29.7))(@oxc-project/types@0.154.0)(@types/node@26.2.0)(@vue/compiler-sfc@3.5.44)(acorn@8.18.0)(confbox@0.3.1)(db0@0.3.4)(dotenv@17.4.2)(esbuild@0.28.2)(eslint@9.39.5(jiti@2.7.0))(giget@3.3.1)(ioredis@5.11.1)(lightningcss@1.33.0)(mlly@1.8.2)(optionator@0.9.4)(oxlint@1.86.0)(rolldown@1.2.14)(rollup-plugin-visualizer@7.1.1(rolldown@1.2.14)(rollup@4.62.4))(rollup@4.62.4)(srvx@1.0.5)(terser@5.50.0)(typescript@5.9.3)(vite@8.3.4(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(yaml@2.9.1))(vue-tsc@2.2.12(typescript@5.9.3))(yaml@2.9.1)
       prosary:
         specifier: 'catalog:'
-        version: 0.0.4
+        version: 0.0.5
       untheme:
         specifier: 'catalog:'
         version: 0.6.0
@@ -204,31 +204,6 @@ importers:
 
   packages/assets: {}
 
-  packages/i18n:
-    dependencies:
-      prosary:
-        specifier: 'catalog:'
-        version: 0.0.4
-    devDependencies:
-      '@ai-sdk/anthropic':
-        specifier: 'catalog:'
-        version: 4.0.71(zod@4.6.5)
-      '@prosary/kit':
-        specifier: 'catalog:'
-        version: 0.0.4(@prosary/translate@0.0.4)
-      '@prosary/parse':
-        specifier: 'catalog:'
-        version: 0.0.4
-      '@prosary/translate':
-        specifier: 'catalog:'
-        version: 0.0.4
-      rehype-slug:
-        specifier: 'catalog:'
-        version: 6.0.0
-      vitest:
-        specifier: 'catalog:'
-        version: 5.0.3(@opentelemetry/api@1.9.1)(@types/node@26.2.0)(@vitest/coverage-v8@5.0.3)(happy-dom@20.11.6)(vite@8.3.4(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(yaml@2.9.1))
-
   packages/icons:
     dependencies:
       icon-sheets:
@@ -241,6 +216,31 @@ importers:
       '@iconify-json/lucide':
         specifier: 'catalog:'
         version: 1.2.138
+      vitest:
+        specifier: 'catalog:'
+        version: 5.0.3(@opentelemetry/api@1.9.1)(@types/node@26.2.0)(@vitest/coverage-v8@5.0.3)(happy-dom@20.11.6)(vite@8.3.4(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(yaml@2.9.1))
+
+  packages/prose:
+    dependencies:
+      prosary:
+        specifier: 'catalog:'
+        version: 0.0.5
+    devDependencies:
+      '@ai-sdk/anthropic':
+        specifier: 'catalog:'
+        version: 4.0.71(zod@4.6.5)
+      '@prosary/kit':
+        specifier: 'catalog:'
+        version: 0.0.5(@prosary/translate@0.0.5)
+      '@prosary/parse':
+        specifier: 'catalog:'
+        version: 0.0.5
+      '@prosary/translate':
+        specifier: 'catalog:'
+        version: 0.0.5
+      rehype-slug:
+        specifier: 'catalog:'
+        version: 6.0.0
       vitest:
         specifier: 'catalog:'
         version: 5.0.3(@opentelemetry/api@1.9.1)(@types/node@26.2.0)(@vitest/coverage-v8@5.0.3)(happy-dom@20.11.6)(vite@8.3.4(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(yaml@2.9.1))
@@ -1357,37 +1357,37 @@ packages:
   '@poppinss/exception@1.2.3':
     resolution: {integrity: sha512-dCED+QRChTVatE9ibtoaxc+WkdzOSjYTKi/+uacHWIsfodVfpsueo3+DKpgU5Px8qXjgmXkSvhXvSCz3fnP9lw==}
 
-  '@prosary/core@0.0.4':
-    resolution: {integrity: sha512-LoSAEwveZVnFns0zEKD0eVGjkohfps21t1soiFFSkZBEPrCpB5HMOhy9CdqaD9jzZYgrz9Nzf+s3KUlsJz3K7A==}
+  '@prosary/core@0.0.5':
+    resolution: {integrity: sha512-eG+QN7xw8suWkO7XCOF7IWSBphzrCrI/NJ8jBg/xLv8BfpX78qHf0Bqf8kKbrV2uJAWoPnOtbJW6DVMvc240dw==}
 
-  '@prosary/kit@0.0.4':
-    resolution: {integrity: sha512-K4w2wDqkoIm2VEkrRkt6RFeUZgfBL3MPPDL1ngk3DAJZbmWaUQkRJ+j1i2pQcBg/hXQ80oPuBUzwtIuDhkpnKA==}
+  '@prosary/kit@0.0.5':
+    resolution: {integrity: sha512-8/yHSH6403q8lnULbINr68tW8kSB1t4TJG5NPUV6hvEVHt1ewrriVQ7qkcHlE05HniYKYT+Yia0ev5j0dMg9bA==}
     hasBin: true
     peerDependencies:
-      '@prosary/translate': 0.0.4
+      '@prosary/translate': 0.0.5
     peerDependenciesMeta:
       '@prosary/translate':
         optional: true
 
-  '@prosary/nuxt@0.0.4':
-    resolution: {integrity: sha512-df9gdpAektk0s0pYLMgKXap36al/Wh03TPJNwA3L5H3H6Ckzz2ACKJMKb50xTt9iOwn8ftEzTz44ftC5ISTyeg==}
+  '@prosary/nuxt@0.0.5':
+    resolution: {integrity: sha512-/Y3ry/lj8mRNGGRzVNejeHCN60pk7aq6DFnR/+Sejk2N80OJxWbMY3inZ/tEKSUk/MCQeArLdcDVtCqwPlbvSA==}
     peerDependencies:
-      '@prosary/kit': 0.0.4
+      '@prosary/kit': 0.0.5
     peerDependenciesMeta:
       '@prosary/kit':
         optional: true
 
-  '@prosary/parse@0.0.4':
-    resolution: {integrity: sha512-g94BFEsxaT/Sf0M9ROITK8a5zDdJeaS4Y1hT115B6Xrjnywii7TmFRrPJvKkkkqXL5mw4PTJWbjAJPZRXRyk3w==}
+  '@prosary/parse@0.0.5':
+    resolution: {integrity: sha512-OfD1vQAc1dSXgzSYFczcs0HdM4bCnNiwnw73BbEhVn8y4zDxd6RG+5XS3bZ/i2BNiad9vzjslsqc/PCuC6qZeA==}
 
-  '@prosary/schema@0.0.4':
-    resolution: {integrity: sha512-1mJnAhAz7IyygwC0KZ1jsZEjzOPrPVJumeHwSulZoZLs6PQHCQE50VI8HS79G2/54RHxNhka+0wR43FAvS/IeQ==}
+  '@prosary/schema@0.0.5':
+    resolution: {integrity: sha512-4n5xdy9gxTUdPcWEiCnihHg6GX+0N8okifxGnptWnpE2OaIHiQTP+ZPrsznPKBGXs5fSDTkNN7Cf4WpJOq298Q==}
 
-  '@prosary/translate@0.0.4':
-    resolution: {integrity: sha512-v6SANHJlTrOK2rInGOaR1jVqm5Ap17XSFiWUQoGUx77zXX4i4zRz7ztbxE0RIA8QwX33iAp63EpBxub67elv9g==}
+  '@prosary/translate@0.0.5':
+    resolution: {integrity: sha512-DfIrn0xG1FB+qVh82XcfDUYJznLnCtXUlYFwas/beGZISH75SdOCrpADj1KqdAtf5w7aboIsJp6UtYP67ZYH5w==}
 
-  '@prosary/vue@0.0.4':
-    resolution: {integrity: sha512-RfZCT96lVYtbz20QYcrbsgtoyi0LoY6puDd/mDSVxfexs+olCxELoJcsLCL+umGk1kLOcNjzSP0qsMTMfbqJSA==}
+  '@prosary/vue@0.0.5':
+    resolution: {integrity: sha512-0VggjqcEtchJ6iqbyfLu1mUuysRovpQqBnCh8eeWkyPlLnnhJhjzX5yAnwO9/f0ebpK62ZqsSP/fHL1CUTgxPw==}
     peerDependencies:
       vue: ^3.5.35
 
@@ -4033,8 +4033,8 @@ packages:
   property-information@7.2.0:
     resolution: {integrity: sha512-IAtzIB6sUiWaJYrX9smp3V46pBGbBeLFRGdh25kg1334VcBlD8HzhPeNIWQH9zhGmo2itIe25EHt9dQP7G5hmg==}
 
-  prosary@0.0.4:
-    resolution: {integrity: sha512-JEJjmVNRY0cgHvSo/re0VFfjOrPToqTCuvmDYAwnF72LSpZajybB6k3gAEJLKuv7vo2foWxw8MsCohGFnLZtbA==}
+  prosary@0.0.5:
+    resolution: {integrity: sha512-3eXpy9NZWqEJ52WzcCEsgw7+UPeg4Tz8cWbVKmfOvluAxwevAdj7EiPrz0RdXJZtyiL23Xh+33iSPfOBdFd3TQ==}
 
   proto-list@1.2.4:
     resolution: {integrity: sha512-vtK/94akxsTMhe0/cbfpR+syPuszcuwhqVjJq26CuNDgFGj682oRBXOP5MJpv2r7JtE8MsiepGIqvvOTBwn2vA==}
@@ -6386,34 +6386,34 @@ snapshots:
 
   '@poppinss/exception@1.2.3': {}
 
-  '@prosary/core@0.0.4':
+  '@prosary/core@0.0.5':
     dependencies:
-      '@prosary/schema': 0.0.4
+      '@prosary/schema': 0.0.5
 
-  '@prosary/kit@0.0.4(@prosary/translate@0.0.4)':
+  '@prosary/kit@0.0.5(@prosary/translate@0.0.5)':
     dependencies:
       '@formatjs/icu-messageformat-parser': 3.5.20
-      '@prosary/parse': 0.0.4
-      '@prosary/schema': 0.0.4
+      '@prosary/parse': 0.0.5
+      '@prosary/schema': 0.0.5
       hast-util-to-html: 9.0.5
       jiti: 2.7.0
       objectively: 0.3.0
       unist-util-visit: 5.1.0
       vfile-message: 4.0.3
     optionalDependencies:
-      '@prosary/translate': 0.0.4
+      '@prosary/translate': 0.0.5
     transitivePeerDependencies:
       - supports-color
 
-  '@prosary/nuxt@0.0.4(@nuxt/schema@4.6.1)(@prosary/kit@0.0.4(@prosary/translate@0.0.4))(confbox@0.3.1)(dotenv@17.4.2)(giget@3.3.1)(jiti@2.7.0)(magic-string@1.4.3)(mlly@1.8.2)(rolldown@1.2.14)(typescript@5.9.3)(unplugin@3.4.0(esbuild@0.28.2)(rolldown@1.2.14)(rollup@4.62.4)(vite@8.3.4(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(yaml@2.9.1)))':
+  '@prosary/nuxt@0.0.5(@nuxt/schema@4.6.1)(@prosary/kit@0.0.5(@prosary/translate@0.0.5))(confbox@0.3.1)(dotenv@17.4.2)(giget@3.3.1)(jiti@2.7.0)(magic-string@1.4.3)(mlly@1.8.2)(rolldown@1.2.14)(typescript@5.9.3)(unplugin@3.4.0(esbuild@0.28.2)(rolldown@1.2.14)(rollup@4.62.4)(vite@8.3.4(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(yaml@2.9.1)))':
     dependencies:
       '@nuxt/kit': 4.6.1(@nuxt/schema@4.6.1)(confbox@0.3.1)(dotenv@17.4.2)(giget@3.3.1)(jiti@2.7.0)(magic-string@1.4.3)(mlly@1.8.2)(rolldown@1.2.14)(unplugin@3.4.0(esbuild@0.28.2)(rolldown@1.2.14)(rollup@4.62.4)(vite@8.3.4(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(yaml@2.9.1)))
-      '@prosary/vue': 0.0.4(vue@3.5.44(typescript@5.9.3))
+      '@prosary/vue': 0.0.5(vue@3.5.44(typescript@5.9.3))
       '@types/hast': 3.0.5
-      prosary: 0.0.4
+      prosary: 0.0.5
       vue: 3.5.44(typescript@5.9.3)
     optionalDependencies:
-      '@prosary/kit': 0.0.4(@prosary/translate@0.0.4)
+      '@prosary/kit': 0.0.5(@prosary/translate@0.0.5)
     transitivePeerDependencies:
       - '@nuxt/schema'
       - confbox
@@ -6427,7 +6427,7 @@ snapshots:
       - typescript
       - unplugin
 
-  '@prosary/parse@0.0.4':
+  '@prosary/parse@0.0.5':
     dependencies:
       '@types/hast': 3.0.5
       '@types/mdast': 4.0.4
@@ -6447,17 +6447,17 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@prosary/schema@0.0.4':
+  '@prosary/schema@0.0.5':
     dependencies:
       '@formatjs/icu-messageformat-parser': 3.5.20
       objectively: 0.3.0
 
-  '@prosary/translate@0.0.4':
+  '@prosary/translate@0.0.5':
     dependencies:
       ai: 7.0.127(zod@4.6.5)
       zod: 4.6.5
 
-  '@prosary/vue@0.0.4(vue@3.5.44(typescript@5.9.3))':
+  '@prosary/vue@0.0.5(vue@3.5.44(typescript@5.9.3))':
     dependencies:
       '@types/hast': 3.0.5
       property-information: 7.2.0
@@ -9637,10 +9637,10 @@ snapshots:
 
   property-information@7.2.0: {}
 
-  prosary@0.0.4:
+  prosary@0.0.5:
     dependencies:
-      '@prosary/core': 0.0.4
-      '@prosary/schema': 0.0.4
+      '@prosary/core': 0.0.5
+      '@prosary/schema': 0.0.5
 
   proto-list@1.2.4: {}
 

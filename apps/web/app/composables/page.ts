@@ -19,7 +19,7 @@ const isNotFound = (error: unknown) =>
   (error as { status?: unknown }).status === 404;
 
 /**
- * A page, in the locale the route names. `@bbf/i18n` builds every page for
+ * A page, in the locale the route names. `@bbf/prose` builds every page for
  * every locale as the tree it renders to, its front matter on the root, and
  * the prosary module serves them all; the route's locale picks which, and a
  * page's path is the same in all of them. A page component asks for its own

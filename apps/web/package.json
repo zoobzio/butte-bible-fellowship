@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "@bbf/assets": "workspace:*",
-    "@bbf/i18n": "workspace:*",
+    "@bbf/prose": "workspace:*",
     "@bbf/icons": "workspace:*",
     "@bbf/theme": "workspace:*",
     "@bbf/validators": "workspace:*",

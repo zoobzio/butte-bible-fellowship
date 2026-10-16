@@ -4,7 +4,7 @@ import type { Page } from "@bbf/validators/types";
 
 /**
  * A page of the site, in one locale: its front matter, as the site's pages
- * write it, and its body — the tree `@bbf/i18n` built the page to. Every
+ * write it, and its body — the tree `@bbf/prose` built the page to. Every
  * locale has the same pages.
  */
 export interface PageItem extends Page {

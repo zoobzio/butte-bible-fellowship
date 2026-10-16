@@ -1,4 +1,4 @@
-# @bbf/i18n
+# @bbf/prose
 
 The site's words: its interface messages and its pages, built by
 [`@prosary/kit`](https://github.com/zoobzio/prosary/tree/main/packages/kit)
@@ -96,11 +96,11 @@ quoted — the translations of the connect page's `bio` lines are.
 
 ## Exports
 
-- `@bbf/i18n`: the `contract` a prosary service is made from, the
+- `@bbf/prose`: the `contract` a prosary service is made from, the
   `locale`, `locales`, `messages` and `documents` lists, the `isLocale` /
   `isKey` guards, and the `Locale`, `Key`, `Document`, `Element`,
   `Directive` and `Arguments` types. Carries no message text.
-- `@bbf/i18n/bundles`: a lazy loader per locale, each resolving to that
+- `@bbf/prose/bundles`: a lazy loader per locale, each resolving to that
   locale's compiled messages.
 
 The pages have no export: the app's prosary module serves them from this
@@ -108,8 +108,8 @@ package's build, as `/_prosary/content/<locale>/<page>.json`.
 
 ```ts
 import { makeProsary } from "prosary";
-import { contract, locale } from "@bbf/i18n";
-import { bundles } from "@bbf/i18n/bundles";
+import { contract, locale } from "@bbf/prose";
+import { bundles } from "@bbf/prose/bundles";
 
 const prosary = makeProsary(contract, {
   locale,
@@ -121,7 +121,7 @@ prosary.format("navigation.home"); // "Home"
 ## In the app
 
 The web app hands the build to `@prosary/nuxt` in `nuxt.config.ts` —
-`prosary: { build: "@bbf/i18n" }` — which provides `$t` on the Nuxt app and
+`prosary: { build: "@bbf/prose" }` — which provides `$t` on the Nuxt app and
 serves the pages. A component calls a message it names
 (`$t.navigation.open()`); data carries one by key, typed as
 `AppProsaryMessage`, and resolves it where it renders (`$t(link.label)`).

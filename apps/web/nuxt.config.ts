@@ -2,7 +2,7 @@ import { fileURLToPath } from "node:url";
 
 import { defineNuxtConfig } from "nuxt/config";
 
-import { locale as source, locales } from "@bbf/i18n";
+import { locale as source, locales } from "@bbf/prose";
 import { prefix } from "@bbf/icons";
 import icons from "@bbf/icons/config";
 import sets from "@bbf/icons/sets";
@@ -44,9 +44,9 @@ export default defineNuxtConfig({
   // the site's palette and every aurora theme — are the package's own build.
   untheme: { preset: "@bbf/theme" },
 
-  // The words and the pages are `@bbf/i18n`'s build: the module provides
+  // The words and the pages are `@bbf/prose`'s build: the module provides
   // `$t` over its messages and serves its pages, every locale's, to `usePage`.
-  prosary: { build: "@bbf/i18n" },
+  prosary: { build: "@bbf/prose" },
 
   runtimeConfig: {
     public: {

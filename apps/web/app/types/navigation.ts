@@ -1,7 +1,7 @@
 import type { AppProsaryMessage } from "#imports";
 
 export interface NavigationLink {
-  /** The link's text: a message of `@bbf/i18n`, by key. */
+  /** The link's text: a message of `@bbf/prose`, by key. */
   label: AppProsaryMessage;
   to: string;
 }

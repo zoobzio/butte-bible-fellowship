@@ -1,6 +1,6 @@
-import type { Locale } from "@bbf/i18n";
+import type { Locale } from "@bbf/prose";
 
-import { isLocale, locale as source } from "@bbf/i18n";
+import { isLocale, locale as source } from "@bbf/prose";
 
 /** A route's path taken apart: its locale, and the page's own path. */
 export interface LocalePath {
