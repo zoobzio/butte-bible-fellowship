@@ -1,0 +1,40 @@
+{
+  "name": "@bbf/database",
+  "private": true,
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./.output/index.d.mts",
+      "import": "./.output/index.mjs"
+    },
+    "./queries": {
+      "types": "./.output/queries.d.mts",
+      "import": "./.output/queries.mjs"
+    },
+    "./migrations": {
+      "types": "./.output/migrations.d.mts",
+      "import": "./.output/migrations.mjs"
+    },
+    "./seeds": {
+      "types": "./.output/seeds.d.mts",
+      "import": "./.output/seeds.mjs"
+    }
+  },
+  "scripts": {
+    "build": "bezoar build",
+    "prepare": "bezoar build",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "bezoar": "catalog:"
+  },
+  "devDependencies": {
+    "@bezoar/kit": "catalog:",
+    "@bezoar/testing": "catalog:",
+    "@types/node": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

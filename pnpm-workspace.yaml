@@ -4,6 +4,8 @@ packages:
 
 catalog:
   "@ai-sdk/anthropic": "^4.0.71"
+  "@bezoar/kit": "0.0.3"
+  "@bezoar/testing": "0.0.3"
   "@icon-sheets/kit": "0.0.7"
   "@icon-sheets/nuxt": "0.0.7"
   "@iconify-json/lucide": "^1.2.138"
@@ -14,6 +16,7 @@ catalog:
   "@prosary/parse": "0.0.5"
   "@prosary/translate": "0.0.5"
   "@types/hast": "^3.0.5"
+  "@types/node": "^26.2.0"
   "@untheme/aurora": "^0.6.0"
   "@untheme/kit": "^0.6.0"
   "@untheme/nuxt": "^0.6.0"
@@ -21,6 +24,7 @@ catalog:
   "@vitest/coverage-v8": "^5.0.3"
   "@vue/test-utils": "^2.4.11"
   "@zoobzio/foundation": "^1.0.6"
+  bezoar: "0.0.3"
   happy-dom: "^20.11.6"
   icon-sheets: "0.0.7"
   nuxt: "^4.5.2"
