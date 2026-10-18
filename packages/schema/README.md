@@ -11,9 +11,9 @@ reads them.
 
 A schema here is what crosses the wire, not what is stored. A row of
 [`@bbf/database`](../database) is the database's shape, named by its
-columns; a server util turns it into the shape declared here before an
-endpoint answers with it, and an input here is turned into a query's
-arguments before it runs.
+columns; a transform of [`@bbf/utils`](../utils) turns it into the shape
+declared here before an endpoint answers with it, and turns an input here
+into a query's arguments before it runs.
 
 ## Layout
 

@@ -113,7 +113,7 @@ app/
 server/
   types/            — the shapes the server speaks in
   constants/
-  utils/            — pure, single-purpose functions: most often a row into the shape the API serves
+  utils/            — pure, single-purpose functions of this app alone; the shared ones are @bbf/utils
   composables/      — the services an endpoint needs, over the request and the Nitro runtime
   api/              — endpoints: each names a composable and runs it
 nuxt.config.ts      — extends @zoobzio/foundation
@@ -147,10 +147,13 @@ the policy it runs under — caching, say — and nothing else, so what it does
 can be read in a line. A composable is a function of the request's
 `H3Event` that gathers what the endpoint needs — the runtime config, the
 database, another service — and hands back the operations to run. A util is
-a pure function, most often turning a row of [`@bbf/database`](packages/database)
-into the shape [`@bbf/schema`](packages/schema) says the API serves. The
-database is a service: only a composable builds it, and only a composable
-hands a connection on.
+a pure function. The ones every app shares — a row of
+[`@bbf/database`](packages/database) into the shape
+[`@bbf/schema`](packages/schema) says the API serves, and an input back into
+a query's arguments — are in [`@bbf/utils`](packages/utils), and a
+composable runs them over what the database returns. The database is a
+service: only a composable builds it, and only a composable hands a
+connection on.
 
 ```ts
 // server/composables/sermons.ts
