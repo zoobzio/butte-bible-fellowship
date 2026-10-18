@@ -1,12 +1,16 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { useRecentSermons, useSermons } from "~/composables/sermons";
+import {
+  useRecentSermons,
+  useSermonImage,
+  useSermons,
+} from "~/composables/sermons";
 
 const SERMON = {
-  id: "abc123",
+  slug: "faith-and-works",
   title: "Faith & Works",
-  published: "2026-10-04T18:16:28+00:00",
-  thumbnail: "https://i4.ytimg.com/vi/abc123/hqdefault.jpg",
+  video: "abc123",
+  date: "2026-10-04",
 };
 
 afterEach(() => {
@@ -25,7 +29,7 @@ describe("useSermons", () => {
   it("resolves a list that is not sermons to an empty one", async () => {
     vi.stubGlobal(
       "$fetch",
-      vi.fn(async () => [{ ...SERMON, thumbnail: "not a url" }]),
+      vi.fn(async () => [{ ...SERMON, date: "not a day" }]),
     );
     const { data } = await useSermons();
     expect(data.value).toEqual([]);
@@ -35,7 +39,7 @@ describe("useSermons", () => {
     vi.stubGlobal(
       "$fetch",
       vi.fn(async () => {
-        throw new Error("feed unavailable");
+        throw new Error("database unavailable");
       }),
     );
     const { data } = await useSermons();
@@ -44,7 +48,7 @@ describe("useSermons", () => {
 });
 
 describe("useRecentSermons", () => {
-  const sermons = ["a", "b", "c", "d"].map((id) => ({ ...SERMON, id }));
+  const sermons = ["a", "b", "c", "d"].map((slug) => ({ ...SERMON, slug }));
 
   it("resolves the newest sermons, three unless told otherwise", async () => {
     vi.stubGlobal(
@@ -59,32 +63,27 @@ describe("useRecentSermons", () => {
     vi.stubGlobal(
       "$fetch",
       vi.fn(async () => {
-        throw new Error("feed unavailable");
+        throw new Error("database unavailable");
       }),
     );
     expect((await useRecentSermons()).value).toEqual([]);
   });
 });
 
-describe("useRecentSermons", () => {
-  const sermons = ["a", "b", "c", "d"].map((id) => ({ ...SERMON, id }));
+describe("useSermonImage", () => {
+  const image = useSermonImage();
 
-  it("resolves the newest sermons, three unless told otherwise", async () => {
-    vi.stubGlobal(
-      "$fetch",
-      vi.fn(async () => sermons),
-    );
-    expect((await useRecentSermons()).value).toEqual(sermons.slice(0, 3));
-    expect((await useRecentSermons(2)).value).toEqual(sermons.slice(0, 2));
+  it("is the sermon's own picture when it names one", () => {
+    expect(
+      image({ ...SERMON, image: "https://cdn.example.com/sermons/faith.jpg" }),
+    ).toBe("https://cdn.example.com/sermons/faith.jpg");
   });
 
-  it("resolves to none when none can be read", async () => {
-    vi.stubGlobal(
-      "$fetch",
-      vi.fn(async () => {
-        throw new Error("feed unavailable");
-      }),
-    );
-    expect((await useRecentSermons()).value).toEqual([]);
+  it("is the video's thumbnail on YouTube when it names none", () => {
+    expect(image(SERMON)).toBe("https://i.ytimg.com/vi/abc123/hqdefault.jpg");
+  });
+
+  it("is nothing for a sermon with neither a picture nor a video", () => {
+    expect(image({ ...SERMON, video: undefined })).toBeUndefined();
   });
 });

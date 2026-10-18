@@ -1,33 +1,70 @@
 import { z } from "zod";
 
-/** A sermon on the church's YouTube channel, as its feed lists it. */
+import { hast } from "./hast";
+import { slug } from "./slug";
+
+/**
+ * A sermon preached at the church, as the API serves it. Its `date` is the
+ * day it was preached, its `video` YouTube's id for its recording when it
+ * has one. What is written about it, its `body`, is its own page's: a list
+ * leaves it out.
+ */
 export const sermon = z
   .object({
-    id: z
+    slug: slug.meta({
+      description:
+        "What the sermon's own page is called in its address: /sermons/<slug>.",
+      examples: ["faith-and-works"],
+    }),
+    title: z.string().meta({ examples: ["Faith & Works"] }),
+    speaker: z
       .string()
-      .min(1)
+      .optional()
+      .meta({
+        description: "Who preached it, by name.",
+        examples: ["Pastor Name"],
+      }),
+    summary: z
+      .string()
+      .optional()
       .meta({
         description:
-          "YouTube's id for the sermon: what its watch and embed URLs carry.",
+          "A line or two about it, as a card shows and search engines list.",
+        examples: ["James 2, and what faith does."],
+      }),
+    body: hast.optional().meta({
+      description:
+        "What is written about it, for its own page: the tree the app renders, built from the Markdown it was written as. A list leaves it out.",
+    }),
+    image: z
+      .url()
+      .optional()
+      .meta({
+        description:
+          "The URL of its picture. Left out, it is pictured by its video's thumbnail.",
+        examples: ["https://cdn.example.com/sermons/faith-and-works.jpg"],
+      }),
+    video: z
+      .string()
+      .min(1)
+      .optional()
+      .meta({
+        description:
+          "YouTube's id for its recording: what its watch and embed URLs carry. Left out, it is not recorded, or not yet.",
         examples: ["dQw4w9WgXcQ"],
       }),
-    title: z.string().meta({ examples: ["Faith & Works"] }),
-    published: z.iso.datetime({ offset: true }).meta({
-      description: "When it was published, as an ISO 8601 timestamp.",
-      examples: ["2026-10-04T18:16:28+00:00"],
-    }),
-    thumbnail: z.url().meta({
-      description: "The URL of its thumbnail image.",
-      examples: ["https://i4.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg"],
+    date: z.iso.date().meta({
+      description: "The day it was preached, as YYYY-MM-DD.",
+      examples: ["2026-10-04"],
     }),
   })
   .meta({
     id: "Sermon",
     description:
-      "A sermon on the church's YouTube channel, as its feed lists it.",
+      "A sermon preached at the church: the day it was preached, who preached it, and its recording on the church's YouTube channel.",
   });
 
-/** The sermons the site's API lists, newest first. */
+/** The sermons the site lists, newest first. */
 export const sermons = z.array(sermon).meta({
   description: "The sermons the site lists, newest first.",
 });

@@ -9,6 +9,7 @@ import {
   eventsQuery,
   page,
   sermon,
+  sermonBody,
   sermonPath,
   sermons,
   sermonsQuery,
@@ -53,8 +54,14 @@ const document = createDocument({
         requestParams: { query: sermonsQuery },
         responses: { 200: json(sermons) },
       },
+      post: {
+        requestBody: {
+          content: { "application/json": { schema: sermonBody } },
+        },
+        responses: { 201: json(sermon) },
+      },
     },
-    "/api/sermons/{id}": {
+    "/api/sermons/{slug}": {
       get: {
         requestParams: { path: sermonPath },
         responses: { 200: json(sermon) },
@@ -110,6 +117,7 @@ describe("the components", () => {
       "Hero",
       "Page",
       "Sermon",
+      "SermonBody",
       "StaffBody",
       "StaffMember",
     ]);
@@ -154,11 +162,19 @@ describe("the components", () => {
   it("carry each model's description and the formats of its fields", () => {
     expect(schemas.Sermon).toMatchObject({
       description:
-        "A sermon on the church's YouTube channel, as its feed lists it.",
-      required: ["id", "title", "published", "thumbnail"],
+        "A sermon preached at the church: the day it was preached, who preached it, and its recording on the church's YouTube channel.",
+      required: ["slug", "title", "date"],
       properties: {
-        published: { format: "date-time" },
-        thumbnail: { format: "uri" },
+        date: { format: "date" },
+        image: { format: "uri" },
+        body: { $ref: "#/components/schemas/Hast" },
+      },
+    });
+    expect(schemas.SermonBody).toMatchObject({
+      required: ["slug", "title", "date"],
+      properties: {
+        body: { type: "string" },
+        status: { $ref: "#/components/schemas/ContentStatus" },
       },
     });
     expect(schemas.ChurchEvent).toMatchObject({

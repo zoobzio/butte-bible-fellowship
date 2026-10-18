@@ -5,29 +5,39 @@ import { setRoutePath, useNuxtApp } from "#imports";
 import SermonCard from "~/components/SermonCard.vue";
 
 const SERMON = {
-  id: "abc123",
+  slug: "faith-and-works",
   title: "Faith & Works",
-  // Monday in UTC, still Sunday evening at the church.
-  published: "2026-10-05T03:16:28+00:00",
-  thumbnail: "https://i4.ytimg.com/vi/abc123/hqdefault.jpg",
+  video: "abc123",
+  date: "2026-10-04",
 };
 
-const card = () => mount(SermonCard, { props: { sermon: SERMON } });
+const THUMBNAIL = "https://i.ytimg.com/vi/abc123/hqdefault.jpg";
+
+const card = (sermon = SERMON) => mount(SermonCard, { props: { sermon } });
 
 describe("SermonCard", () => {
-  it("shows the sermon's thumbnail behind a labelled play button, and no player", () => {
+  it("shows the video's thumbnail behind a labelled play button, and no player", () => {
     const wrapper = card();
     const button = wrapper.find("button");
     expect(button.attributes("aria-label")).toBe(
       useNuxtApp().$t.sermons.play({ title: "Faith & Works" }),
     );
     expect(button.find("img").attributes()).toMatchObject({
-      src: SERMON.thumbnail,
+      src: THUMBNAIL,
       alt: "",
       loading: "lazy",
     });
     expect(button.find("use").attributes("href")).toBe("#play");
     expect(wrapper.find("iframe").exists()).toBe(false);
+  });
+
+  it("shows the sermon's own picture over the video's when it has one", () => {
+    const image = "https://cdn.example.com/sermons/faith-and-works.jpg";
+    expect(
+      card({ ...SERMON, image })
+        .find("img")
+        .attributes("src"),
+    ).toBe(image);
   });
 
   it("swaps the thumbnail for the playing sermon when the button is pressed", async () => {
@@ -44,12 +54,35 @@ describe("SermonCard", () => {
     expect(wrapper.find("button").exists()).toBe(false);
   });
 
-  it("titles the sermon and dates it by the church's day", () => {
+  it("offers no player for a sermon not recorded, only its picture if any", () => {
+    const image = "https://cdn.example.com/sermons/faith-and-works.jpg";
+    const unrecorded = card({ ...SERMON, video: undefined, image });
+    expect(unrecorded.find("button").exists()).toBe(false);
+    expect(unrecorded.find("iframe").exists()).toBe(false);
+    expect(unrecorded.find(".sermon-card-frame img").attributes("src")).toBe(
+      image,
+    );
+
+    const bare = card({ ...SERMON, video: undefined });
+    expect(bare.find(".sermon-card-frame").exists()).toBe(true);
+    expect(bare.find("img").exists()).toBe(false);
+  });
+
+  it("titles the sermon and dates it by the day it was preached", () => {
     const wrapper = card();
     expect(wrapper.find("h2").text()).toBe("Faith & Works");
     const time = wrapper.find("time");
-    expect(time.attributes("datetime")).toBe(SERMON.published);
+    expect(time.attributes("datetime")).toBe("2026-10-04");
     expect(time.text()).toBe("October 4, 2026");
+  });
+
+  it("names the speaker when the sermon does", () => {
+    expect(card().find(".sermon-card-speaker").exists()).toBe(false);
+    expect(
+      card({ ...SERMON, speaker: "Pastor Name" })
+        .find(".sermon-card-speaker")
+        .text(),
+    ).toBe("Pastor Name");
   });
 
   it("is not featured unless it is asked to be", () => {

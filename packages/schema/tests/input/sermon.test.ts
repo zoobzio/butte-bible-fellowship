@@ -2,14 +2,18 @@ import { describe, expect, it } from "vitest";
 
 import {
   SERMONS_LIMIT,
+  sermonBody,
   sermonPath,
   sermonsQuery,
 } from "../../src/input/sermon";
 
 describe("sermonPath", () => {
-  it("names a sermon by YouTube's id for it", () => {
-    expect(sermonPath.parse({ id: "abc123" })).toEqual({ id: "abc123" });
-    expect(sermonPath.safeParse({ id: "" }).success).toBe(false);
+  it("names a sermon by the slug of its page", () => {
+    expect(sermonPath.parse({ slug: "faith-and-works" })).toEqual({
+      slug: "faith-and-works",
+    });
+    expect(sermonPath.safeParse({ slug: "Faith Works" }).success).toBe(false);
+    expect(sermonPath.safeParse({ id: "abc123" }).success).toBe(false);
   });
 });
 
@@ -29,5 +33,51 @@ describe("sermonsQuery", () => {
     expect(
       sermonsQuery.safeParse({ limit: String(SERMONS_LIMIT + 1) }).success,
     ).toBe(false);
+  });
+});
+
+describe("sermonBody", () => {
+  const BODY = {
+    slug: "faith-and-works",
+    title: "Faith & Works",
+    date: "2026-10-04",
+  };
+
+  it("takes a slug, a title and a date, and is a draft until told otherwise", () => {
+    expect(sermonBody.parse(BODY)).toEqual({ ...BODY, status: "draft" });
+  });
+
+  it("carries every field a sermon is written with", () => {
+    const full = {
+      ...BODY,
+      speaker: "Pastor Name",
+      summary: "James 2, and what faith does.",
+      body: "## James 2\n\nWhat faith does.",
+      image: "https://cdn.example.com/sermons/faith-and-works.jpg",
+      video: "dQw4w9WgXcQ",
+      status: "published",
+    };
+    expect(sermonBody.parse(full)).toEqual(full);
+  });
+
+  it("takes the body as Markdown, not as a tree", () => {
+    expect(
+      sermonBody.safeParse({ ...BODY, body: { type: "root", children: [] } })
+        .success,
+    ).toBe(false);
+  });
+
+  it("rejects what is not a sermon", () => {
+    expect(sermonBody.safeParse({ ...BODY, title: "" }).success).toBe(false);
+    expect(sermonBody.safeParse({ ...BODY, date: undefined }).success).toBe(
+      false,
+    );
+    expect(sermonBody.safeParse({ ...BODY, date: "October 4" }).success).toBe(
+      false,
+    );
+    expect(sermonBody.safeParse({ ...BODY, video: "" }).success).toBe(false);
+    expect(sermonBody.safeParse({ ...BODY, status: "hidden" }).success).toBe(
+      false,
+    );
   });
 });

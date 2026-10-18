@@ -5,11 +5,11 @@ import { useNuxtApp } from "#imports";
 import SermonCard from "~/components/SermonCard.vue";
 import SermonGrid from "~/components/SermonGrid.vue";
 
-const sermon = (id: string) => ({
-  id,
-  title: `Sermon ${id}`,
-  published: "2026-10-04T18:16:28+00:00",
-  thumbnail: `https://i4.ytimg.com/vi/${id}/hqdefault.jpg`,
+const sermon = (slug: string) => ({
+  slug,
+  title: `Sermon ${slug}`,
+  video: slug,
+  date: "2026-10-04",
 });
 
 const SERMONS = [sermon("abc123"), sermon("def456")];

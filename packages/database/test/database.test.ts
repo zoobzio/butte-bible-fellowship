@@ -63,13 +63,13 @@ describe("the build", () => {
       "web.events.list",
       "web.events.upcoming",
       "web.events.weekly",
-      "web.sermons.byId",
-      "web.sermons.latest",
+      "web.sermons.fetch",
+      "web.sermons.list",
       "web.staff.fetch",
       "web.staff.list",
     ]);
-    expect(names.filter((name) => name.startsWith("admin."))).toHaveLength(14);
-    expect(names).toHaveLength(22);
+    expect(names.filter((name) => name.startsWith("admin."))).toHaveLength(15);
+    expect(names).toHaveLength(23);
   });
 });
 
@@ -143,8 +143,8 @@ describe("web", () => {
 
   it("has no upcoming one-offs and no sermons until admin adds them", async () => {
     expect(await db.web.events.upcoming({ from: "2026-01-01" })).toEqual([]);
-    expect(await db.web.sermons.latest({ limit: 3 })).toEqual([]);
-    expect(await db.web.sermons.byId.first({ id: "nope" })).toBeNull();
+    expect(await db.web.sermons.list({ limit: 3 })).toEqual([]);
+    expect(await db.web.sermons.fetch.first({ slug: "nope" })).toBeNull();
   });
 });
 
@@ -484,44 +484,151 @@ describe("admin.events", () => {
 });
 
 describe("admin.sermons", () => {
-  it("upserts what the feed lists, and the web reads the newest first", async () => {
-    const first = await db.admin.sermons.upsert.first({
-      id: "abc123",
-      title: "Sermon One",
-      published: new Date("2026-10-04T18:00:00Z"),
-      thumbnail: "https://i.ytimg.com/vi/abc123/hqdefault.jpg",
-    });
-    await db.admin.sermons.upsert({
-      id: "def456",
-      title: "Sermon Two",
-      published: new Date("2026-10-11T18:00:00Z"),
-      thumbnail: "https://i.ytimg.com/vi/def456/hqdefault.jpg",
+  const sermon = {
+    slug: "faith-and-works",
+    title: "Faith & Works",
+    speaker: "Pastor Name",
+    video: "abc123",
+    date: "2026-10-04",
+    status: "published" as const,
+  };
+
+  it("creates, reads, updates and deletes a sermon", async () => {
+    const created = await db.admin.sermons.create.first(sermon);
+    expect(created?.slug).toBe("faith-and-works");
+    expect(created?.created_at).toBeInstanceOf(Date);
+    const id = created!.id;
+
+    // What is left out is none; the date is a day, not a moment.
+    expect(await db.admin.sermons.fetch.first({ id })).toMatchObject({
+      speaker: "Pastor Name",
+      summary: null,
+      body: null,
+      image: null,
+      video: "abc123",
+      date: "2026-10-04",
+      status: "published",
     });
 
-    // The same id again brings the row up to date rather than failing.
-    const again = await db.admin.sermons.upsert.first({
-      id: "abc123",
-      title: "Sermon One, Retitled",
-      published: new Date("2026-10-04T18:00:00Z"),
-      thumbnail: "https://i.ytimg.com/vi/abc123/hqdefault.jpg",
+    const updated = await db.admin.sermons.update.first({
+      ...sermon,
+      id,
+      title: "Faith and Works",
+      speaker: null,
+      summary: "James 2, and what faith does.",
+      body: "## James 2\n\nWhat faith does.",
+      image: "https://cdn.example.com/sermons/faith-and-works.jpg",
+      video: null,
+      date: "2026-10-11",
     });
-    expect(again?.created_at).toEqual(first?.created_at);
+    expect(updated?.updated_at).toBeInstanceOf(Date);
+    expect(await db.admin.sermons.fetch.first({ id })).toMatchObject({
+      title: "Faith and Works",
+      speaker: null,
+      summary: "James 2, and what faith does.",
+      body: "## James 2\n\nWhat faith does.",
+      image: "https://cdn.example.com/sermons/faith-and-works.jpg",
+      video: null,
+      date: "2026-10-11",
+    });
 
-    expect(
-      (await db.web.sermons.latest({ limit: 5 })).map((sermon) => sermon.title),
-    ).toEqual(["Sermon Two", "Sermon One, Retitled"]);
-    expect(await db.web.sermons.latest({ limit: 1 })).toHaveLength(1);
-    expect(await db.web.sermons.byId.first({ id: "abc123" })).toMatchObject({
-      title: "Sermon One, Retitled",
-      published_at: new Date("2026-10-04T18:00:00Z"),
+    expect(await db.admin.sermons.delete({ id })).toBe(1);
+    expect(await db.admin.sermons.fetch.first({ id })).toBeNull();
+    expect(await db.admin.sermons.delete({ id })).toBe(0);
+  });
+
+  it("lists the newest first, and the web as many as asked with no body", async () => {
+    const older = await db.admin.sermons.create.first({
+      ...sermon,
+      slug: "older",
+      video: "older1",
+      body: "Older.",
+      date: "2026-09-27",
     });
+    const newer = await db.admin.sermons.create.first({
+      ...sermon,
+      slug: "newer",
+      video: "newer1",
+      date: "2026-10-04",
+    });
+    const later = await db.admin.sermons.create.first({
+      ...sermon,
+      slug: "later",
+      video: null,
+      date: "2026-10-11",
+    });
+
+    expect((await db.admin.sermons.list()).map((row) => row.slug)).toEqual([
+      "later",
+      "newer",
+      "older",
+    ]);
+    const listed = await db.web.sermons.list({ limit: 5 });
+    expect(listed.map((row) => row.slug)).toEqual(["later", "newer", "older"]);
+    expect(listed[0]).not.toHaveProperty("body");
+    expect(listed[0]).not.toHaveProperty("status");
+    expect(listed[0]).toMatchObject({ video: null, date: "2026-10-11" });
+    expect(await db.web.sermons.list({ limit: 2 })).toHaveLength(2);
+
+    expect(await db.web.sermons.fetch.first({ slug: "older" })).toMatchObject({
+      title: "Faith & Works",
+      body: "Older.",
+      video: "older1",
+    });
+
+    for (const row of [older, newer, later]) {
+      expect(await db.admin.sermons.delete({ id: row!.id })).toBe(1);
+    }
+  });
+
+  it("keeps a draft or an archived sermon off the site", async () => {
+    const draft = await db.admin.sermons.create.first({
+      ...sermon,
+      slug: "draft",
+      video: null,
+      status: "draft",
+    });
+    const archived = await db.admin.sermons.create.first({
+      ...sermon,
+      slug: "archived",
+      video: null,
+      status: "archived",
+    });
+
     expect(await db.admin.sermons.list()).toHaveLength(2);
-    expect(await db.admin.sermons.byId.first({ id: "def456" })).toMatchObject({
-      title: "Sermon Two",
+    expect(await db.web.sermons.list({ limit: 5 })).toEqual([]);
+    expect(await db.web.sermons.fetch.first({ slug: "draft" })).toBeNull();
+
+    await db.admin.sermons.update({
+      ...sermon,
+      id: draft!.id,
+      slug: "draft",
+      video: null,
+    });
+    expect(await db.web.sermons.fetch.first({ slug: "draft" })).toMatchObject({
+      title: "Faith & Works",
     });
 
-    expect(await db.admin.sermons.delete({ id: "abc123" })).toBe(1);
-    expect(await db.admin.sermons.delete({ id: "def456" })).toBe(1);
-    expect(await db.admin.sermons.list()).toEqual([]);
+    expect(await db.admin.sermons.delete({ id: draft!.id })).toBe(1);
+    expect(await db.admin.sermons.delete({ id: archived!.id })).toBe(1);
+  });
+
+  it("refuses a slug or a video already taken", async () => {
+    const created = await db.admin.sermons.create.first(sermon);
+    expect(
+      await refusal(db.admin.sermons.create({ ...sermon, video: "other" })),
+    ).toMatch(/sermons_slug_key/);
+    expect(
+      await refusal(db.admin.sermons.create({ ...sermon, slug: "other" })),
+    ).toMatch(/sermons_video_key/);
+    // A sermon without a recording takes no video, and any number may.
+    const unrecorded = await db.admin.sermons.create.first({
+      ...sermon,
+      slug: "unrecorded",
+      video: null,
+    });
+    expect(unrecorded?.slug).toBe("unrecorded");
+    expect(await db.admin.sermons.delete({ id: created!.id })).toBe(1);
+    expect(await db.admin.sermons.delete({ id: unrecorded!.id })).toBe(1);
   });
 });

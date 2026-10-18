@@ -5,6 +5,7 @@ import { Icon } from "#components";
 import { computed, ref, useNuxtApp } from "#imports";
 
 import { useRouteLocale } from "~/composables/locale";
+import { useSermonImage } from "~/composables/sermons";
 
 /** The frame's permissions: what YouTube's own embed code asks for. */
 const ALLOW =
@@ -23,23 +24,28 @@ const { sermon, featured = false } = defineProps<{
 
 const { $t } = useNuxtApp();
 const { locale } = useRouteLocale();
+const image = useSermonImage();
 
 // The player is only loaded once the visitor asks for it: until then the
-// card is the sermon's thumbnail, and nothing is requested from YouTube's
-// player or set in the visitor's browser.
+// card is the sermon's picture, and nothing is requested from YouTube's
+// player or set in the visitor's browser. A sermon not recorded has no
+// player to ask for.
 const playing = ref(false);
 
 const src = computed(() => {
-  return `https://www.youtube-nocookie.com/embed/${sermon.id}?autoplay=1`;
+  return `https://www.youtube-nocookie.com/embed/${sermon.video}?autoplay=1`;
 });
 
-// The date in the church's own time zone, so the server and every visitor's
+const picture = computed(() => image(sermon));
+
+// The day it was preached is a day on the calendar, not a moment: it is
+// read where it was written, in UTC, so the server and every visitor's
 // browser write the same day.
-const published = computed(() => {
+const preached = computed(() => {
   return new Intl.DateTimeFormat(locale.value, {
     dateStyle: "long",
-    timeZone: "America/Los_Angeles",
-  }).format(new Date(sermon.published));
+    timeZone: "UTC",
+  }).format(new Date(`${sermon.date}T00:00:00Z`));
 });
 </script>
 
@@ -54,13 +60,14 @@ const published = computed(() => {
         allowfullscreen
       />
       <button
-        v-else
+        v-else-if="sermon.video"
         type="button"
         :aria-label="$t.sermons.play({ title: sermon.title })"
         @click="playing = true"
       >
         <img
-          :src="sermon.thumbnail"
+          v-if="picture"
+          :src="picture"
           alt=""
           :loading="featured ? 'eager' : 'lazy'"
         />
@@ -68,13 +75,22 @@ const published = computed(() => {
           <Icon name="play" class="icon" />
         </span>
       </button>
+      <img
+        v-else-if="picture"
+        :src="picture"
+        alt=""
+        :loading="featured ? 'eager' : 'lazy'"
+      />
     </div>
     <div class="sermon-card-meta">
       <p v-if="featured" class="sermon-card-label">
         {{ $t.sermons.latest() }}
       </p>
       <h2>{{ sermon.title }}</h2>
-      <time :datetime="sermon.published">{{ published }}</time>
+      <p v-if="sermon.speaker" class="sermon-card-speaker">
+        {{ sermon.speaker }}
+      </p>
+      <time :datetime="sermon.date">{{ preached }}</time>
     </div>
   </article>
 </template>
@@ -122,7 +138,7 @@ const published = computed(() => {
   cursor: pointer;
 }
 
-/* The feed's thumbnails are 4:3 with the picture letterboxed: covering a
+/* YouTube's thumbnails are 4:3 with the picture letterboxed: covering a
    16:9 frame crops the bars away. */
 .sermon-card-frame img {
   object-fit: cover;
@@ -172,6 +188,12 @@ const published = computed(() => {
 
 .sermon-card h2::before {
   content: none;
+}
+
+.sermon-card-speaker {
+  margin: 0;
+  font: var(--type-body);
+  color: var(--on-surface-muted);
 }
 
 .sermon-card time {

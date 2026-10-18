@@ -7,10 +7,10 @@ import { sermons } from "@bbf/schema";
 import { computed, useAsyncData } from "#imports";
 
 /**
- * The channel's latest sermons, newest first, from the site's own
- * `/api/sermons`, checked against what a sermon is. A list that cannot be
- * read, or is not what was asked for, is an empty one: the page still
- * renders, and still links to the channel.
+ * The newest sermons the site lists, from its own `/api/sermons`, checked
+ * against what a sermon is. A list that cannot be read, or is not what was
+ * asked for, is an empty one: the page still renders, and still links to
+ * the channel.
  */
 export const useSermons = () => {
   return useAsyncData("sermons", () =>
@@ -30,4 +30,16 @@ export const useRecentSermons = async (
   const { data } = await useSermons();
 
   return computed(() => data.value?.slice(0, count) ?? []);
+};
+
+/**
+ * A sermon's picture: its own, or its video's thumbnail on YouTube when it
+ * names none. A sermon with neither has nothing to show.
+ */
+export const useSermonImage = () => {
+  return (sermon: Sermon): string | undefined =>
+    sermon.image ??
+    (sermon.video === undefined
+      ? undefined
+      : `https://i.ytimg.com/vi/${sermon.video}/hqdefault.jpg`);
 };

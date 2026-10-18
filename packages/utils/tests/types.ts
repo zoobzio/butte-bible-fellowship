@@ -1,7 +1,11 @@
 import type { Contract } from "@bbf/database";
 import type { Arguments, Row } from "bezoar";
 
-import type { toEventArguments, toStaffArguments } from "../src/dao";
+import type {
+  toEventArguments,
+  toSermonArguments,
+  toStaffArguments,
+} from "../src/dao";
 import { toChurchEvent, toSermon, toStaffMember } from "../src/dto";
 
 /**
@@ -17,22 +21,27 @@ declare const adminEvent: Row<Contract, "admin.events.fetch">;
 declare const webStaff: Row<Contract, "web.staff.list">;
 declare const webOne: Row<Contract, "web.staff.fetch">;
 declare const adminStaff: Row<Contract, "admin.staff.fetch">;
-declare const latest: Row<Contract, "web.sermons.latest">;
-declare const adminSermon: Row<Contract, "admin.sermons.byId">;
+declare const listedSermon: Row<Contract, "web.sermons.list">;
+declare const fetchedSermon: Row<Contract, "web.sermons.fetch">;
+declare const adminSermon: Row<Contract, "admin.sermons.fetch">;
 
 // Every query of a kind returns a row its transform takes.
 export const events = [listed, weekly, upcoming, fetched, adminEvent].map(
   toChurchEvent,
 );
 export const staff = [webStaff, webOne, adminStaff].map(toStaffMember);
-export const sermons = [latest, adminSermon].map(toSermon);
+export const sermons = [listedSermon, fetchedSermon, adminSermon].map(toSermon);
 
 // @ts-expect-error A row without a start is no event.
 export const noStart = toChurchEvent({ slug: "x", title: "x" });
 
+// @ts-expect-error A row without a date is no sermon.
+export const noDate = toSermon({ slug: "x", title: "x" });
+
 // What a create takes, an update takes with the id of the row it replaces.
 declare const eventArguments: ReturnType<typeof toEventArguments>;
 declare const staffArguments: ReturnType<typeof toStaffArguments>;
+declare const sermonArguments: ReturnType<typeof toSermonArguments>;
 export const createEvent: Arguments<Contract, "admin.events.create"> =
   eventArguments;
 export const updateEvent: Arguments<Contract, "admin.events.update"> = {
@@ -43,6 +52,12 @@ export const createStaff: Arguments<Contract, "admin.staff.create"> =
   staffArguments;
 export const updateStaff: Arguments<Contract, "admin.staff.update"> = {
   ...staffArguments,
+  id: 1,
+};
+export const createSermon: Arguments<Contract, "admin.sermons.create"> =
+  sermonArguments;
+export const updateSermon: Arguments<Contract, "admin.sermons.update"> = {
+  ...sermonArguments,
   id: 1,
 };
 

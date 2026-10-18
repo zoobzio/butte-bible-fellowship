@@ -6,6 +6,7 @@ import {
   churchEvent,
   eventBody,
   sermon,
+  sermonBody,
   staffBody,
   staffMember,
 } from "@bbf/schema";
@@ -229,24 +230,94 @@ describe("staff", () => {
 });
 
 describe("sermons", () => {
-  it("writes a sermon as the feed lists it, and reads it back as served", async () => {
-    const listed = sermon.parse({
-      id: "abc123",
-      title: "Sermon One",
-      published: "2026-10-04T18:16:28+00:00",
-      thumbnail: "https://i.ytimg.com/vi/abc123/hqdefault.jpg",
+  it("writes a sermon from its body, and reads it back as served", async () => {
+    const body = sermonBody.parse({
+      slug: "faith-and-works",
+      title: "Faith & Works",
+      speaker: "Pastor Name",
+      summary: "James 2, and what faith does.",
+      body: "What **faith** does.",
+      video: "abc123",
+      date: "2026-10-04",
+      status: "published",
     });
-    await db.admin.sermons.upsert(toSermonArguments(listed));
+    const created = await db.admin.sermons.create.first(
+      toSermonArguments(body),
+    );
+    const id = created!.id;
 
-    const row = await db.web.sermons.byId.first({ id: "abc123" });
-    const served = toSermon(row!);
-    expect(served).toEqual({
+    // The body is stored as it was written, and the list leaves it out.
+    expect(await db.admin.sermons.fetch.first({ id })).toMatchObject({
+      body: "What **faith** does.",
+    });
+    const [listed] = (await db.web.sermons.list({ limit: 3 })).map(toSermon);
+    expect(listed).toEqual({
+      slug: "faith-and-works",
+      title: "Faith & Works",
+      speaker: "Pastor Name",
+      summary: "James 2, and what faith does.",
+      video: "abc123",
+      date: "2026-10-04",
+    });
+    expect(sermon.safeParse(listed).success).toBe(true);
+
+    // Its own page carries the body, as the tree.
+    const page = await db.web.sermons.fetch.first({ slug: "faith-and-works" });
+    expect(toSermon(page!)).toEqual({
       ...listed,
-      published: "2026-10-04T18:16:28.000Z",
+      body: {
+        type: "root",
+        children: [
+          {
+            type: "element",
+            tagName: "p",
+            properties: {},
+            children: [
+              { type: "text", value: "What " },
+              {
+                type: "element",
+                tagName: "strong",
+                properties: {},
+                children: [{ type: "text", value: "faith" }],
+              },
+              { type: "text", value: " does." },
+            ],
+          },
+        ],
+      },
     });
-    expect(new Date(served.published)).toEqual(new Date(listed.published));
-    expect(sermon.safeParse(served).success).toBe(true);
+    const row = await db.admin.sermons.fetch.first({ id });
+    expect(toSermon(row!)).toEqual(toSermon(page!));
 
-    expect(await db.admin.sermons.delete({ id: "abc123" })).toBe(1);
+    // Updated from a body that names no video: the video goes.
+    const unrecorded = sermonBody.parse({
+      slug: "faith-and-works",
+      title: "Faith and Works",
+      date: "2026-10-11",
+      status: "published",
+    });
+    await db.admin.sermons.update({ ...toSermonArguments(unrecorded), id });
+    const found = await db.web.sermons.fetch.first({ slug: "faith-and-works" });
+    expect(toSermon(found!)).toEqual({
+      slug: "faith-and-works",
+      title: "Faith and Works",
+      date: "2026-10-11",
+    });
+
+    expect(await db.admin.sermons.delete({ id })).toBe(1);
+  });
+
+  it("writes a draft the site does not list", async () => {
+    const body = sermonBody.parse({
+      slug: "draft",
+      title: "Draft",
+      date: "2026-10-04",
+    });
+    const created = await db.admin.sermons.create.first(
+      toSermonArguments(body),
+    );
+    expect(await db.web.sermons.list({ limit: 3 })).toEqual([]);
+    expect(await db.web.sermons.fetch.first({ slug: "draft" })).toBeNull();
+    expect(await db.admin.sermons.delete({ id: created!.id })).toBe(1);
   });
 });

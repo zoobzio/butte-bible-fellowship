@@ -20,10 +20,10 @@ const home = (hero?: typeof HERO) =>
   document({ title: "Home – Test Church", ...(hero ? { hero } : {}) });
 
 const SERMON = {
-  id: "abc123",
+  slug: "abc123",
   title: "Sermon abc123",
-  published: "2026-10-04T18:16:28+00:00",
-  thumbnail: "https://i4.ytimg.com/vi/abc123/hqdefault.jpg",
+  video: "abc123",
+  date: "2026-10-04",
 };
 
 beforeEach(() => {

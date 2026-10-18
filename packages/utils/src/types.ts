@@ -27,8 +27,16 @@ export type EventRow = Omit<EventColumns, EventSpare> &
  */
 export type StaffRow = Row<Contract, "web.staff.list">;
 
-/** A sermon as a query returns it: its `published_at` is a `Date`. */
-export type SermonRow = Row<Contract, "web.sermons.byId">;
+/** Every column a sermon's row can carry, as `web.sermons.fetch` reads them. */
+type SermonColumns = Row<Contract, "web.sermons.fetch">;
+
+/**
+ * A sermon as a query returns it. `web.sermons.list` leaves out `body`,
+ * which is the sermon's own page's to carry, so a row may do without it;
+ * the admin's rows carry more, and pass as they are.
+ */
+export type SermonRow = Omit<SermonColumns, "body"> &
+  Partial<Pick<SermonColumns, "body">>;
 
 // Arguments: what a query of `@bbf/database` takes, named by its slots. A
 // transform under `dao/` builds one from an input of `@bbf/schema`.
@@ -45,5 +53,8 @@ export type EventArguments = Arguments<Contract, "admin.events.create">;
  */
 export type StaffArguments = Arguments<Contract, "admin.staff.create">;
 
-/** What `admin.sermons.upsert` takes: a sermon as the feed lists it. */
-export type SermonArguments = Arguments<Contract, "admin.sermons.upsert">;
+/**
+ * What writing a sermon takes. `admin.sermons.create` takes exactly this,
+ * and `admin.sermons.update` this and the `id` of the row it replaces.
+ */
+export type SermonArguments = Arguments<Contract, "admin.sermons.create">;

@@ -19,7 +19,11 @@ const { channel } = useRuntimeConfig().public.youtube;
 <template>
   <section class="sermon-grid">
     <div v-if="sermons.length" class="sermon-grid-list">
-      <SermonCard v-for="sermon in sermons" :key="sermon.id" :sermon="sermon" />
+      <SermonCard
+        v-for="sermon in sermons"
+        :key="sermon.slug"
+        :sermon="sermon"
+      />
     </div>
     <!-- The way on from the list: the channel, unless what holds the grid
          hands it another. -->

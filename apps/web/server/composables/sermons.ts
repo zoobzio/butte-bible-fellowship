@@ -1,25 +1,27 @@
-import type { H3Event } from "h3";
-
 import type { Sermon } from "@bbf/schema/types";
 
-import { useRuntimeConfig } from "nitropack/runtime";
+import { toSermon } from "@bbf/utils";
 
-import { parseSermonFeed, sermonFeedUrl } from "~~/server/utils/sermons";
+import { useDatabase } from "~~/server/composables/database";
 
 /**
- * The channel's sermons, as its YouTube feed lists them, for the request
- * being answered: the channel is the one the runtime config names, and
- * `read` asks YouTube for its feed and hands back the sermons in it. A feed
- * that cannot be read is an error, for the endpoint to decide about.
+ * The sermons the site lists: the published ones, as the database holds
+ * them, each in the shape the API serves. `list` is the newest, as many as
+ * asked; `fetch` is one sermon by slug, with what is written about it, or
+ * `null` when no published sermon has it.
  */
-export const useSermonFeed = (event: H3Event) => {
-  const { channel } = useRuntimeConfig(event).public.youtube;
-  const url = sermonFeedUrl(channel);
+export const useSermons = () => {
+  const db = useDatabase();
 
-  const read = async (): Promise<Sermon[]> => {
-    const xml = await $fetch<string>(url, { responseType: "text" });
-    return parseSermonFeed(xml);
+  const list = async (limit: number): Promise<Sermon[]> => {
+    const rows = await db.web.sermons.list({ limit });
+    return rows.map(toSermon);
   };
 
-  return { read };
+  const fetch = async (slug: string): Promise<Sermon | null> => {
+    const row = await db.web.sermons.fetch.first({ slug });
+    return row === null ? null : toSermon(row);
+  };
+
+  return { list, fetch };
 };

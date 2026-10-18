@@ -9,9 +9,10 @@ the kit and the sources never reach it.
 
 The tables are the site's three kinds of data: `staff`, who serve the
 church; `events`, each held once on a date or weekly on a day, with the page
-written about it; and `sermons`, as the church's YouTube feed lists them.
-Content the admin app edits carries a `content_status` — draft, published,
-archived — and only the published reaches the site.
+written about it; and `sermons`, each preached on a day, with the page
+written about it and its recording on the church's YouTube channel. Content
+the admin app edits carries a `content_status` — draft, published, archived —
+and only the published reaches the site.
 
 The queries are grouped by the app that runs them. `web` is the reads the
 site needs and nothing else; `admin` is the full set of reads and writes
@@ -44,21 +45,25 @@ is one of them by slug. The events the web reads are the published ones:
 first, then the one-offs on or after a date — and `web.events.weekly` and
 `web.events.upcoming` are its two halves on their own; `web.events.fetch`
 is an event's own page by slug, and alone carries the event's `body`, the
-Markdown written about it, which the lists leave out. `web.sermons.latest`
-takes the newest as many as asked, and `web.sermons.byId` one of them.
+Markdown written about it, which the lists leave out. `web.sermons.list`
+takes the newest published sermons, as many as asked, and
+`web.sermons.fetch` is a sermon's own page by slug, which alone carries its
+`body`, as an event's does.
 
 `admin.staff` has `list`, `fetch`, `create`, `update` and `delete`, over
-every member whatever their status. `admin.events` has the same, by `id`.
-`admin.sermons` has `list`, `byId`, `upsert`, which writes a sermon as the
-feed lists it or brings it up to date, and `delete`.
+every member whatever their status. `admin.events` and `admin.sermons` have
+the same, by `id`.
 
 An argument written into a column the schema lets be null — a summary, a
-bio, a body, an image, a note, a location, an end time, an event's `date`
-or `day` or `weeks` — is optional, and takes `null`; left out, it is null.
-Every other argument is required, a member's or an event's `status` among
-them. An event is created with its `date` or its `day`, never both, and the
-schema refuses anything else. An `update` replaces every field, so one that
-passes a `date` and no `day` makes the event a one-off.
+bio, a body, an image, a note, a location, an end time, a sermon's
+`speaker` or `video`, an event's `date` or `day` or `weeks` — is optional,
+and takes `null`; left out, it is null. Every other argument is required, a
+member's, an event's or a sermon's `status` among them. An event is created
+with its `date` or its `day`, never both, and the schema refuses anything
+else. An `update` replaces every field, so one that passes a `date` and no
+`day` makes the event a one-off. A sermon's `slug` and its `video`,
+YouTube's id for its recording, are each taken once; a sermon not yet
+recorded has no video, and any number may.
 
 ## Exports
 

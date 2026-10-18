@@ -21,11 +21,11 @@ src/dto/        a row into the model the API answers with, one file per kind
   event.ts      toChurchEvent: any row of the events into a ChurchEvent
   hast.ts       toHast: a column of Markdown into the Hast the API answers with
   staff.ts      toStaffMember: a row of the staff into a StaffMember
-  sermon.ts     toSermon: a row of the sermons into a Sermon
+  sermon.ts     toSermon: any row of the sermons into a Sermon
 src/dao/        an input into the arguments a query takes, one file per kind
   event.ts      toEventArguments: an EventBody into what admin.events.create takes
   staff.ts      toStaffArguments: a StaffBody into what admin.staff.create takes
-  sermon.ts     toSermonArguments: a Sermon into what admin.sermons.upsert takes
+  sermon.ts     toSermonArguments: a SermonBody into what admin.sermons.create takes
 src/types.ts    the rows and the arguments the transforms speak, from the contract
 src/index.ts    every transform
 tests/dto/      what each model is built as, from each shape of row
@@ -45,20 +45,21 @@ arguments type it speaks goes in `types.ts`.
 The database and the schema were drawn to the same shapes, so most of a
 transform is the difference between a column and a field. What a row has
 null in, a model leaves out: a `summary`, a `note`, a `location`, an
-event's `end`. What a body leaves out, the arguments write as null, so an
-update that passes no `date` clears one; what a body defaults, a member's
-`position` and `status` and an event's `status`, is written as the body
-parsed it. A time comes out of Postgres as `HH:MM:SS` and the
-API says `HH:MM`; a `timestamptz` comes out as a `Date` and the API says an
-ISO 8601 timestamp, and `admin.sermons.upsert` takes the `Date` back.
+event's `end`, a sermon's `speaker` or `video`. What a body leaves out, the
+arguments write as null, so an update that passes no `date` clears one; what
+a body defaults, a member's `position` and `status` and an event's or a
+sermon's `status`, is written as the body parsed it. A time comes out of
+Postgres as `HH:MM:SS` and the API says `HH:MM`; a `date` comes out as
+`YYYY-MM-DD`, as the API says it.
 
 A row's columns differ by query. `web.events.weekly` has no `date` and
 `web.events.upcoming` no `day` or `weeks`, each knowing its kind of event
 has none, and every list of the events has no `body`, which is the event's
 own page's to carry, so `EventRow` lets a row do without those four and
 `toChurchEvent` takes any query's row of the events, the admin's included.
-Columns a model has no field for go nowhere: an admin row's `id`,
-`position`, `status` and timestamps.
+`web.sermons.list` leaves out a sermon's `body` the same way, and
+`SermonRow` lets it. Columns a model has no field for go nowhere: an admin
+row's `id`, `position`, `status` and timestamps.
 
 A column that holds Markdown — a bio, an event's body — reaches the wire
 as the HTML tree the app renders, not as the string. `toHast` reads it
@@ -68,12 +69,12 @@ tag, its attributes and what it holds, or a run of text. The position the
 parser kept is not built, nor is an attribute left `undefined`, nor a node
 Markdown never makes. Nothing is cast: the parser's shape goes in, the
 wire's comes out, as with any row. `toStaffMember` runs a member's `bio`
-through it and `toChurchEvent` an event's `body`; the body a request
-carries, and the column, stay Markdown.
+through it, `toChurchEvent` an event's `body` and `toSermon` a sermon's;
+the body a request carries, and the column, stay Markdown.
 
-`toEventArguments` and `toStaffArguments` build what `create` takes; an
-`update` takes the same and the `id` of the row it replaces, so it is
-spread with one. `tests/types.ts` proves both fit, and that a row from
+`toEventArguments`, `toStaffArguments` and `toSermonArguments` build what
+`create` takes; an `update` takes the same and the `id` of the row it
+replaces, so it is spread with one. `tests/types.ts` proves both fit, and that a row from
 every query of a kind is taken, so a column renamed or a field added on
 either side fails `pnpm typecheck` here, before it reaches an app.
 

@@ -1,15 +1,22 @@
 import type { Sermon } from "@bbf/schema/types";
 
+import { toHast } from "./hast";
 import type { SermonRow } from "../types";
 
 /**
- * A sermon as the API serves it, from a row of the sermons. The row's
- * `published_at` is a `Date`; the model's `published` is that moment as an
- * ISO 8601 timestamp, in UTC.
+ * A sermon as the API serves it, from a row of the sermons. A column the
+ * row has null in, or a list's row has not, the sermon leaves out; the body,
+ * written as Markdown, goes out as the tree the app renders. An admin row's
+ * `id`, `status` and timestamps keep it, and are not what the site shows:
+ * the model carries none of them.
  */
 export const toSermon = (row: SermonRow): Sermon => ({
-  id: row.id,
+  slug: row.slug,
   title: row.title,
-  published: row.published_at.toISOString(),
-  thumbnail: row.thumbnail,
+  speaker: row.speaker ?? undefined,
+  summary: row.summary ?? undefined,
+  body: row.body == null ? undefined : toHast(row.body),
+  image: row.image ?? undefined,
+  video: row.video ?? undefined,
+  date: row.date,
 });

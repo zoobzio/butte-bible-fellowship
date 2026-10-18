@@ -1,7 +1,7 @@
 import type { z } from "zod";
 
 import type { eventBody, eventPath, eventsQuery } from "./input/event";
-import type { sermonPath, sermonsQuery } from "./input/sermon";
+import type { sermonBody, sermonPath, sermonsQuery } from "./input/sermon";
 import type { staffBody, staffPath } from "./input/staff";
 import type {
   churchEvent,
@@ -11,7 +11,7 @@ import type {
 } from "./models/event";
 import type { hast, hastElement, hastText } from "./models/hast";
 import type { hero, page } from "./models/page";
-import type { sermon } from "./models/sermon";
+import type { sermon, sermons } from "./models/sermon";
 import type { slug } from "./models/slug";
 import type { contentStatus, staffMember, staffMembers } from "./models/staff";
 
@@ -50,8 +50,11 @@ export type StaffMember = z.infer<typeof staffMember>;
 /** The staff the site lists, in their order. */
 export type StaffMembers = z.infer<typeof staffMembers>;
 
-/** A sermon on the church's YouTube channel, as its feed lists it. */
+/** A sermon preached at the church: the day it was preached, who preached it, and its recording. */
 export type Sermon = z.infer<typeof sermon>;
+
+/** The sermons the site lists, newest first. */
+export type Sermons = z.infer<typeof sermons>;
 
 /** The words and picture a page opens with, over its body. */
 export type Hero = z.infer<typeof hero>;
@@ -76,8 +79,11 @@ export type StaffPath = z.infer<typeof staffPath>;
 /** A staff member as they are written: what creating one takes, and what updating one replaces. */
 export type StaffBody = z.infer<typeof staffBody>;
 
-/** The path of one sermon: `/sermons/{id}`. */
+/** The path of a sermon's own page: `/sermons/{slug}`. */
 export type SermonPath = z.infer<typeof sermonPath>;
 
 /** The query of the sermons list: how many of the newest to take. */
 export type SermonsQuery = z.infer<typeof sermonsQuery>;
+
+/** A sermon as it is written: what creating one takes, and what updating one replaces. */
+export type SermonBody = z.infer<typeof sermonBody>;

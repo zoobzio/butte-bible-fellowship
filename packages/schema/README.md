@@ -22,13 +22,13 @@ src/models/      what the API answers with: one file per kind of thing
   event.ts       an event of the church, the list of them, and the days and times it names
   hast.ts        rich text as the API serves it: an HTML syntax tree of elements and text
   staff.ts       someone who serves the church, the list of them, and the statuses content passes through
-  sermon.ts      a sermon, as the YouTube feed lists it, and the list of them
+  sermon.ts      a sermon preached at the church, and the list of them
   page.ts        a page's front matter: its hero, events and image
   slug.ts        what names a thing in an address
 src/input/       what a request carries, one file per group of endpoints
   event.ts       the events: the path of one, the query of the list, the body of a write
   staff.ts       the staff: the path of one, the body of a write
-  sermon.ts      the sermons: the path of one, the query of the list
+  sermon.ts      the sermons: the path of one, the query of the list, the body of a write
 src/index.ts     every schema, models and inputs
 src/types.ts     the type each schema infers, and nothing else
 tests/models/    what each model accepts and rejects
@@ -48,19 +48,25 @@ A model is the response: `churchEvent`, `staffMember`, `sermon`, `hero`,
 API answers with, and the primitives they are built from — `eventDay`,
 `eventTime`, `slug`, `contentStatus`, and `hast`, rich text as an HTML
 syntax tree. A column written as Markdown — a member's `bio`, an event's
-`body` — goes over the wire as `hast`: the tree the site's pages are built
-to, which the app renders with its own components, so the wire never
-carries Markdown and the app never parses it. `@bbf/utils`'s `toHast`
-builds it, through the same presets as the pages. A body still takes the
-Markdown: `staffBody.bio` and `eventBody.body` are the string as written.
-An input is one part of a request, named for the group and the part:
-`eventPath` is the path parameters of one event, `eventsQuery` the query of
-the events list, `eventBody` what a write carries. A body says what a model
-cannot: an event is written with a date or a day, never both, only a
-repeating one picks its weeks, and an end comes after its start — the rules
-the database's constraints keep, checked before a query runs. A body also
-carries what the site never shows: the `status` that decides whether a
-member or an event reaches it, a draft until the body says otherwise.
+or a sermon's `body` — goes over the wire as `hast`: the tree the site's
+pages are built to, which the app renders with its own components, so the
+wire never carries Markdown and the app never parses it. `@bbf/utils`'s
+`toHast` builds it, through the same presets as the pages. A body still
+takes the Markdown: `staffBody.bio`, `eventBody.body` and `sermonBody.body`
+are the string as written. An input is one part of a request, named for the
+group and the part: `eventPath` is the path parameters of one event,
+`eventsQuery` the query of the events list, `eventBody` what a write
+carries. A body says what a model cannot: an event is written with a date
+or a day, never both, only a repeating one picks its weeks, and an end comes
+after its start — the rules the database's constraints keep, checked before
+a query runs. A body also carries what the site never shows: the `status`
+that decides whether a member, an event or a sermon reaches it, a draft
+until the body says otherwise.
+
+A sermon is what the church preached, not what YouTube lists: its `date` is
+the day it was preached, its `speaker` who preached it, and its `video`
+YouTube's id for its recording, when it has one. Its picture is its `image`
+or, left out, the video's thumbnail, which the app derives from the id.
 
 The package exports its sources: there is nothing to build. Every consumer
 here reads TypeScript from a workspace package as it is.
@@ -71,7 +77,7 @@ Every schema is documented where it is declared. A model or a body is
 `.meta({ id, description })`, so the document names it once under
 `components.schemas` and refers to it from every operation that uses it:
 `ChurchEvent`, `StaffMember`, `Sermon`, `Hero`, `Page`, `EventBody`,
-`StaffBody`. A primitive used by both — `EventDay`, `EventTime`,
+`StaffBody`, `SermonBody`. A primitive used by both — `EventDay`, `EventTime`,
 `ContentStatus` — is one component too, and so is `Hast`, with
 `HastElement` and `HastText`, which refer to each other as a tree does; rendered the same in a request and a response. A field is
 `.meta({ description, examples })`, and its format comes from its zod type:
@@ -118,8 +124,9 @@ what it renders: the components, their references, the parameters.
 - `@bbf/schema/types`: the type each schema infers, under its `PascalCase`
   name — `ChurchEvent`, `ChurchEvents`, `EventDay`, `EventTime`, `Hast`, `HastElement`,
   `HastText`, `ContentStatus`, `StaffMember`, `StaffMembers`, `Hero`,
-  `Page`, `Sermon`, `Slug`, `EventPath`, `EventsQuery`, `EventBody`,
-  `StaffPath`, `StaffBody`, `SermonPath`, `SermonsQuery`. Nothing here
+  `Page`, `Sermon`, `Sermons`, `Slug`, `EventPath`, `EventsQuery`,
+  `EventBody`, `StaffPath`, `StaffBody`, `SermonPath`, `SermonsQuery`,
+  `SermonBody`. Nothing here
   reaches a bundle: a file that only needs the shape imports from here and
   carries no zod.
 
@@ -135,8 +142,7 @@ const found: ChurchEvent = churchEvent.parse(row);
 
 `usePage` checks a page's front matter against `page` as it reads it, so a
 page is typed where it is queried. `useStaff` parses the API's answer with
-`staffMembers` and `useSermons` with `sermons`, rather than trusting it, and the server's `parseSermonFeed` builds
-each `Sermon` from the feed.
+`staffMembers` and `useSermons` with `sermons`, rather than trusting it.
 
 ## Scripts
 

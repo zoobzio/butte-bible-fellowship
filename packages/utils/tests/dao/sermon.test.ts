@@ -1,29 +1,50 @@
+import { sermonBody } from "@bbf/schema";
 import { describe, expect, it } from "vitest";
 
 import { toSermonArguments } from "../../src/dao/sermon";
 
-const SERMON = {
-  id: "dQw4w9WgXcQ",
-  title: "Faith & Works",
-  published: "2026-10-04T18:16:28+00:00",
-  thumbnail: "https://i4.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg",
-};
-
 describe("toSermonArguments", () => {
-  it("takes the moment it was published as a Date", () => {
-    expect(toSermonArguments(SERMON)).toEqual({
-      id: "dQw4w9WgXcQ",
+  it("writes what a body leaves out as null, a draft", () => {
+    const body = sermonBody.parse({
+      slug: "faith-and-works",
       title: "Faith & Works",
-      published: new Date("2026-10-04T18:16:28Z"),
-      thumbnail: "https://i4.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg",
+      date: "2026-10-04",
+    });
+    expect(toSermonArguments(body)).toEqual({
+      slug: "faith-and-works",
+      title: "Faith & Works",
+      speaker: null,
+      summary: null,
+      body: null,
+      image: null,
+      video: null,
+      date: "2026-10-04",
+      status: "draft",
     });
   });
 
-  it("keeps the moment whatever offset the feed wrote it in", () => {
-    const { published } = toSermonArguments({
-      ...SERMON,
-      published: "2026-10-04T11:16:28-07:00",
+  it("carries every field a body says", () => {
+    const body = sermonBody.parse({
+      slug: "faith-and-works",
+      title: "Faith & Works",
+      speaker: "Pastor Name",
+      summary: "James 2, and what faith does.",
+      body: "## James 2\n\nWhat faith does.",
+      image: "https://cdn.example.com/sermons/faith-and-works.jpg",
+      video: "dQw4w9WgXcQ",
+      date: "2026-10-04",
+      status: "published",
     });
-    expect(published.toISOString()).toBe("2026-10-04T18:16:28.000Z");
+    expect(toSermonArguments(body)).toEqual({
+      slug: "faith-and-works",
+      title: "Faith & Works",
+      speaker: "Pastor Name",
+      summary: "James 2, and what faith does.",
+      body: "## James 2\n\nWhat faith does.",
+      image: "https://cdn.example.com/sermons/faith-and-works.jpg",
+      video: "dQw4w9WgXcQ",
+      date: "2026-10-04",
+      status: "published",
+    });
   });
 });

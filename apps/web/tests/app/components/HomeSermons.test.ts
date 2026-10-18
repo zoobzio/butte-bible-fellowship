@@ -5,11 +5,11 @@ import HomeSermons from "~/components/HomeSermons.vue";
 import SermonGrid from "~/components/SermonGrid.vue";
 import { mountSuspended } from "#test/support/mount";
 
-const sermon = (id: string) => ({
-  id,
-  title: `Sermon ${id}`,
-  published: "2026-10-04T18:16:28+00:00",
-  thumbnail: `https://i4.ytimg.com/vi/${id}/hqdefault.jpg`,
+const sermon = (slug: string) => ({
+  slug,
+  title: `Sermon ${slug}`,
+  video: slug,
+  date: "2026-10-04",
 });
 
 const SERMONS = ["abc123", "def456", "ghi789", "jkl012"].map(sermon);

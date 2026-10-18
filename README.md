@@ -157,16 +157,16 @@ connection on.
 
 ```ts
 // server/composables/sermons.ts
-export const useSermonFeed = (event: H3Event) => {
-  const { channel } = useRuntimeConfig(event).public.youtube;
-  const read = () =>
-    $fetch<string>(sermonFeedUrl(channel)).then(parseSermonFeed);
-  return { read };
+export const useSermons = () => {
+  const db = useDatabase();
+  const list = (limit: number) =>
+    db.web.sermons.list({ limit }).then((rows) => rows.map(toSermon));
+  return { list };
 };
 
-// server/api/sermons.get.ts
-export default defineCachedEventHandler(
-  (event) => useSermonFeed(event).read(),
-  { name: "sermons", maxAge: SERMONS_MAX_AGE, swr: true },
-);
+// server/api/sermons/index.get.ts
+export default defineEventHandler((event) => {
+  const { limit } = sermonsQuery.parse(getQuery(event));
+  return useSermons().list(limit);
+});
 ```

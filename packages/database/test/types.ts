@@ -50,9 +50,19 @@ export type Checks = [
     >
   >,
   // A timestamp is a Date; a time or a date is a string.
-  Assert<Equal<Row<Contract, "web.sermons.latest">["published_at"], Date>>,
+  Assert<Equal<Row<Contract, "admin.sermons.fetch">["created_at"], Date>>,
+  Assert<Equal<Row<Contract, "web.sermons.list">["date"], string>>,
   Assert<Equal<Row<Contract, "web.events.weekly">["start_time"], string>>,
-  Assert<Equal<Arguments<Contract, "web.sermons.latest">, { limit: number }>>,
+  Assert<Equal<Arguments<Contract, "web.sermons.list">, { limit: number }>>,
+  // A sermon not yet recorded has no video; a list carries no body.
+  Assert<Equal<Row<Contract, "web.sermons.list">["video"], string | null>>,
+  Assert<
+    Equal<
+      "body" extends keyof Row<Contract, "web.sermons.list"> ? true : false,
+      false
+    >
+  >,
+  Assert<Equal<Row<Contract, "web.sermons.fetch">["body"], string | null>>,
   Assert<Equal<Arguments<Contract, "web.events.upcoming">, { from: string }>>,
   // A write without RETURNING answers with the count of rows it changed.
   Assert<Equal<Returns<Contract, "admin.staff.delete">, number>>,
