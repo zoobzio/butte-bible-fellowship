@@ -102,24 +102,39 @@ describe("staff", () => {
       slug: "pastor",
       name: "Pastor Name",
       role: "Pastor",
-      bio: "Serving since 2010.",
+      summary: "Serving since 2010.",
+      phone: "530-555-0100",
       position: 0,
+      status: "published",
     });
     const created = await db.admin.staff.create.first(toStaffArguments(body));
     const id = created!.id;
 
     const [first] = (await db.web.staff.list()).map(toStaffMember);
     expect(first).toEqual({
+      slug: "pastor",
       name: "Pastor Name",
       role: "Pastor",
-      bio: "Serving since 2010.",
+      summary: "Serving since 2010.",
+      phone: "530-555-0100",
     });
     expect(staffMember.safeParse(first).success).toBe(true);
 
-    const row = await db.admin.staff.byId.first({ id });
+    const one = await db.web.staff.fetch.first({ slug: "pastor" });
+    expect(toStaffMember(one!)).toEqual(first);
+    const row = await db.admin.staff.fetch.first({ id });
     expect(toStaffMember(row!)).toEqual(first);
 
     expect(await db.admin.staff.delete({ id })).toBe(1);
+  });
+
+  it("writes a draft the site does not list", async () => {
+    const body = staffBody.parse({ slug: "draft", name: "Draft", role: "x" });
+    const created = await db.admin.staff.create.first(toStaffArguments(body));
+    expect(
+      (await db.web.staff.list()).map(toStaffMember).map((m) => m.slug),
+    ).not.toContain("draft");
+    expect(await db.admin.staff.delete({ id: created!.id })).toBe(1);
   });
 });
 

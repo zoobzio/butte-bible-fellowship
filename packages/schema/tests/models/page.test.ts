@@ -33,18 +33,9 @@ describe("page", () => {
     expect(page.parse(value)).toEqual(value);
   });
 
-  it("accepts the contact page's staff", () => {
-    const value = {
-      title: "Connect",
-      staff: [{ name: "Jane Doe", role: "Elder" }],
-    };
-    expect(page.parse(value)).toEqual(value);
-  });
-
-  it("rejects a staff member without a role", () => {
+  it("carries no staff: the site reads them from its API", () => {
     expect(
-      page.safeParse({ title: "Connect", staff: [{ name: "Jane Doe" }] })
-        .success,
-    ).toBe(false);
+      page.parse({ title: "Connect", staff: [{ name: "Jane Doe" }] }),
+    ).toEqual({ title: "Connect" });
   });
 });

@@ -11,6 +11,7 @@ import MarkdownBody from "~/components/MarkdownBody.vue";
 import PageHeader from "~/components/PageHeader.vue";
 import StaffCard from "~/components/StaffCard.vue";
 import { usePage } from "~/composables/page";
+import { useStaff } from "~/composables/staff";
 </script>
 
 <script setup lang="ts">
@@ -31,9 +32,10 @@ if (!page.value) {
 
 useHead(() => ({ title: page.value?.title }));
 
-// The page's front matter lists the staff, who lead the page; its body —
-// how to reach and find the church — follows them.
-const staff = computed(() => page.value?.staff ?? []);
+// The staff lead the page, as the site's API lists them; its body — how to
+// reach and find the church — follows them.
+const { data } = await useStaff();
+const staff = computed(() => data.value ?? []);
 </script>
 
 <template>
@@ -43,11 +45,7 @@ const staff = computed(() => page.value?.staff ?? []);
       :description="$t.connect.description()"
     />
     <section v-if="staff.length" class="connect-staff">
-      <StaffCard
-        v-for="(member, index) in staff"
-        :key="index"
-        :member="member"
-      />
+      <StaffCard v-for="member in staff" :key="member.slug" :member="member" />
     </section>
     <article class="prose">
       <MarkdownBody :page="page" />

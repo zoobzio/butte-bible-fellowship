@@ -41,8 +41,8 @@ const initials = computed(() => {
     <div class="staff-card-meta">
       <p class="staff-card-role">{{ member.role }}</p>
       <h3>{{ member.name }}</h3>
-      <p v-if="member.bio && !compact" class="staff-card-bio">
-        {{ member.bio }}
+      <p v-if="member.summary && !compact" class="staff-card-summary">
+        {{ member.summary }}
       </p>
       <a v-if="member.email && !compact" :href="`mailto:${member.email}`">
         {{ member.email }}
@@ -126,7 +126,7 @@ const initials = computed(() => {
   color: var(--on-surface-high-contrast);
 }
 
-.staff-card-bio {
+.staff-card-summary {
   margin: 0;
   font-size: var(--label-size);
   line-height: 1.7;

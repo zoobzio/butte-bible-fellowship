@@ -27,6 +27,13 @@ export type Checks = [
   Assert<Equal<Row<Contract, "web.events.upcoming">["date"], string>>,
   // What a page may leave out comes back as null.
   Assert<Equal<Row<Contract, "web.staff.list">["bio"], string | null>>,
+  // An enum column reads as its labels.
+  Assert<
+    Equal<
+      Row<Contract, "admin.staff.fetch">["status"],
+      "draft" | "published" | "archived"
+    >
+  >,
   Assert<Equal<Row<Contract, "web.events.weekly">["end_time"], string | null>>,
   // A timestamp is a Date; a time or a date is a string.
   Assert<Equal<Row<Contract, "web.sermons.latest">["published_at"], Date>>,
@@ -76,6 +83,7 @@ export const spare: Arguments<Contract, "admin.staff.create"> = {
   name: "x",
   role: "x",
   position: 0,
+  status: "draft",
 };
 
 // @ts-expect-error A member needs a role.
@@ -83,4 +91,5 @@ export const incomplete: Arguments<Contract, "admin.staff.create"> = {
   slug: "x",
   name: "x",
   position: 0,
+  status: "draft",
 };

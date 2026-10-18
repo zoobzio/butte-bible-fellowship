@@ -43,9 +43,10 @@ arguments type it speaks goes in `types.ts`.
 
 The database and the schema were drawn to the same shapes, so most of a
 transform is the difference between a column and a field. What a row has
-null in, a model leaves out: a `note`, a `location`, an event's `end`. What
-a body leaves out, the arguments write as null, so an update that passes
-no `date` clears one. A time comes out of Postgres as `HH:MM:SS` and the
+null in, a model leaves out: a `summary`, a `note`, a `location`, an
+event's `end`. What a body leaves out, the arguments write as null, so an
+update that passes no `date` clears one; what a body defaults, a member's
+`position` and `status`, is written as the body parsed it. A time comes out of Postgres as `HH:MM:SS` and the
 API says `HH:MM`; a `timestamptz` comes out as a `Date` and the API says an
 ISO 8601 timestamp, and `admin.sermons.upsert` takes the `Date` back.
 
@@ -53,8 +54,8 @@ A row's columns differ by query. `web.events.weekly` has no `date` and
 `web.events.upcoming` no `day` or `weeks`, each knowing its kind of event
 has none, so `EventRow` lets a row do without those three and
 `toChurchEvent` takes any query's row of the events, the admin's included.
-Columns a model has no field for go nowhere: an admin row's `id` and
-timestamps, a staff row's `slug` and `position`.
+Columns a model has no field for go nowhere: an admin row's `id`,
+`position`, `status` and timestamps.
 
 `toEventArguments` and `toStaffArguments` build what `create` takes; an
 `update` takes the same and the `id` of the row it replaces, so it is

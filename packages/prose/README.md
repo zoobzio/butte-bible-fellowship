@@ -43,7 +43,7 @@ character — write a typographic one (`You’re`), as the pages already do.
 A page is Markdown with YAML front matter. The front matter is what
 `@bbf/schema` says a page carries: every page has a `title` and a
 `description`, and a page adds what it needs — the home page its `hero`, the
-events page its `events`, the connect page its `staff`, an event's page its
+events page its `events`, an event's page its
 `image`.
 
 The build runs each page through `@prosary/parse` with the presets

@@ -11,9 +11,10 @@ const mountCard = (member: StaffMember, compact?: boolean) =>
 describe("StaffCard", () => {
   it("names the person under their role, with their words and email", () => {
     const wrapper = mountCard({
+      slug: "jane-doe",
       name: "Jane Doe",
       role: "Elder",
-      bio: "Has served since 2010.",
+      summary: "Has served since 2010.",
       email: "jane@example.com",
     });
     expect(wrapper.find(".staff-card-frame + .staff-card-meta").exists()).toBe(
@@ -21,7 +22,7 @@ describe("StaffCard", () => {
     );
     expect(wrapper.find(".staff-card-role").text()).toBe("Elder");
     expect(wrapper.find(".staff-card-role + h3").text()).toBe("Jane Doe");
-    expect(wrapper.find("h3 + .staff-card-bio").text()).toBe(
+    expect(wrapper.find("h3 + .staff-card-summary").text()).toBe(
       "Has served since 2010.",
     );
     const email = wrapper.find("a");
@@ -31,6 +32,7 @@ describe("StaffCard", () => {
 
   it("shows the person's photo when they have one", () => {
     const wrapper = mountCard({
+      slug: "jane-doe",
       name: "Jane Doe",
       role: "Elder",
       photo: "/images/jane.jpg",
@@ -55,9 +57,10 @@ describe("StaffCard", () => {
   it("says only who the person is when it is compact", () => {
     const wrapper = mountCard(
       {
+        slug: "jane-doe",
         name: "Jane Doe",
         role: "Elder",
-        bio: "Has served since 2010.",
+        summary: "Has served since 2010.",
         email: "jane@example.com",
       },
       true,
@@ -67,18 +70,26 @@ describe("StaffCard", () => {
     );
     expect(wrapper.find(".staff-card-initials").text()).toBe("JD");
     expect(wrapper.find(".staff-card-role + h3").text()).toBe("Jane Doe");
-    expect(wrapper.find(".staff-card-bio").exists()).toBe(false);
+    expect(wrapper.find(".staff-card-summary").exists()).toBe(false);
     expect(wrapper.find("a").exists()).toBe(false);
   });
 
   it("is not compact unless it is asked to be", () => {
-    const wrapper = mountCard({ name: "Jane Doe", role: "Elder" });
+    const wrapper = mountCard({
+      slug: "jane-doe",
+      name: "Jane Doe",
+      role: "Elder",
+    });
     expect(wrapper.find(".staff-card-compact").exists()).toBe(false);
   });
 
   it("leaves out the words and email it was not given", () => {
-    const wrapper = mountCard({ name: "Jane Doe", role: "Elder" });
-    expect(wrapper.find(".staff-card-bio").exists()).toBe(false);
+    const wrapper = mountCard({
+      slug: "jane-doe",
+      name: "Jane Doe",
+      role: "Elder",
+    });
+    expect(wrapper.find(".staff-card-summary").exists()).toBe(false);
     expect(wrapper.find("a").exists()).toBe(false);
   });
 });

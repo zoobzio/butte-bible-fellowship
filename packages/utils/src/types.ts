@@ -17,7 +17,10 @@ type EventColumns = Row<Contract, "web.events.bySlug">;
 export type EventRow = Omit<EventColumns, "date" | "day" | "weeks"> &
   Partial<Pick<EventColumns, "date" | "day" | "weeks">>;
 
-/** A staff member as a query returns them: the columns the contact page lists. */
+/**
+ * A staff member as a query returns them: the columns the site lists. The
+ * admin's rows carry more, and pass as they are.
+ */
 export type StaffRow = Row<Contract, "web.staff.list">;
 
 /** A sermon as a query returns it: its `published_at` is a `Date`. */

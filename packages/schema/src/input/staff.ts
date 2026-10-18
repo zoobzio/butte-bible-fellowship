@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { slug } from "../models/slug";
+import { contentStatus } from "../models/staff";
 
 /** The path of one staff member: `/staff/{slug}`. */
 export const staffPath = z.object({
@@ -12,7 +13,8 @@ export const staffPath = z.object({
 
 /**
  * A staff member as they are written: what creating one takes, and what
- * updating one replaces, every field.
+ * updating one replaces, every field. A new member is a draft until the
+ * body says otherwise.
  */
 export const staffBody = z
   .object({
@@ -31,13 +33,20 @@ export const staffBody = z
         description: "What they do.",
         examples: ["Elder"],
       }),
-    bio: z.string().optional().meta({
-      description: "A few words about them.",
+    summary: z.string().optional().meta({
+      description: "A line or two about them, as a card shows.",
     }),
-    photo: z.string().optional().meta({
-      description: "The path of their photo, under the site's media.",
+    bio: z.string().optional().meta({
+      description: "Their bio in full, as Markdown, for their own page.",
+    }),
+    photo: z.url().optional().meta({
+      description: "The URL of their photo.",
     }),
     email: z.email().optional(),
+    phone: z
+      .string()
+      .optional()
+      .meta({ examples: ["530-555-0100"] }),
     position: z
       .int()
       .min(0)
@@ -47,6 +56,9 @@ export const staffBody = z
         description: "Where they stand in the list, lowest first.",
         examples: [1],
       }),
+    status: contentStatus.default("draft").meta({
+      description: "Whether they reach the site. Left out, a draft.",
+    }),
   })
   .meta({
     id: "StaffBody",

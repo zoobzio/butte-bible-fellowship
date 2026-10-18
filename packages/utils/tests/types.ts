@@ -14,13 +14,14 @@ declare const upcoming: Row<Contract, "web.events.upcoming">;
 declare const bySlug: Row<Contract, "web.events.bySlug">;
 declare const adminEvent: Row<Contract, "admin.events.byId">;
 declare const webStaff: Row<Contract, "web.staff.list">;
-declare const adminStaff: Row<Contract, "admin.staff.byId">;
+declare const webOne: Row<Contract, "web.staff.fetch">;
+declare const adminStaff: Row<Contract, "admin.staff.fetch">;
 declare const latest: Row<Contract, "web.sermons.latest">;
 declare const adminSermon: Row<Contract, "admin.sermons.byId">;
 
 // Every query of a kind returns a row its transform takes.
 export const events = [weekly, upcoming, bySlug, adminEvent].map(toChurchEvent);
-export const staff = [webStaff, adminStaff].map(toStaffMember);
+export const staff = [webStaff, webOne, adminStaff].map(toStaffMember);
 export const sermons = [latest, adminSermon].map(toSermon);
 
 // @ts-expect-error A row without a start is no event.

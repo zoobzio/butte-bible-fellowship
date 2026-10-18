@@ -13,6 +13,7 @@ import {
   sermonsQuery,
   staffBody,
   staffMember,
+  staffMembers,
   staffPath,
 } from "../src";
 
@@ -59,6 +60,7 @@ const document = createDocument({
       },
     },
     "/api/staff": {
+      get: { responses: { 200: json(staffMembers) } },
       post: {
         requestBody: { content: { "application/json": { schema: staffBody } } },
         responses: { 201: json(staffMember) },
@@ -97,6 +99,7 @@ describe("the components", () => {
   it("name every model and every body", () => {
     expect(Object.keys(schemas).sort()).toEqual([
       "ChurchEvent",
+      "ContentStatus",
       "EventBody",
       "EventDay",
       "EventTime",
@@ -159,7 +162,11 @@ describe("the components", () => {
       properties: { date: { format: "date" } },
     });
     expect(schemas.StaffMember).toMatchObject({
-      properties: { email: { format: "email" } },
+      required: ["slug", "name", "role"],
+      properties: { email: { format: "email" }, photo: { format: "uri" } },
+    });
+    expect(schemas.StaffBody).toMatchObject({
+      properties: { status: { $ref: "#/components/schemas/ContentStatus" } },
     });
   });
 
@@ -168,7 +175,6 @@ describe("the components", () => {
       properties: {
         hero: { $ref: "#/components/schemas/Hero" },
         events: { items: { $ref: "#/components/schemas/ChurchEvent" } },
-        staff: { items: { $ref: "#/components/schemas/StaffMember" } },
       },
     });
   });

@@ -1,16 +1,6 @@
 ---
 title: Connect – Butte Bible Fellowship
 description: Visit us at 2255 Pillsbury Road, Chico, California.
-staff:
-  - name: Elder Name
-    role: Elder
-    bio: A few words about this elder — how long they have served, and what they care for at Butte Bible Fellowship.
-  - name: Elder Name
-    role: Elder
-    bio: A few words about this elder — how long they have served, and what they care for at Butte Bible Fellowship.
-  - name: Elder Name
-    role: Elder
-    bio: A few words about this elder — how long they have served, and what they care for at Butte Bible Fellowship.
 ---
 
 ::connect-grid

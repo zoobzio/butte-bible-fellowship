@@ -7,7 +7,7 @@ import type { churchEvent, eventDay, eventTime } from "./models/event";
 import type { hero, page } from "./models/page";
 import type { sermon } from "./models/sermon";
 import type { slug } from "./models/slug";
-import type { staffMember } from "./models/staff";
+import type { contentStatus, staffMember, staffMembers } from "./models/staff";
 
 // Models: what the API answers with.
 
@@ -23,8 +23,14 @@ export type EventTime = z.infer<typeof eventTime>;
 /** An event of the church: held once on a date, or weekly on a day. */
 export type ChurchEvent = z.infer<typeof churchEvent>;
 
-/** Someone who serves the church, as the contact page lists them. */
+/** Whether a piece of content reaches the site: draft, published or archived. */
+export type ContentStatus = z.infer<typeof contentStatus>;
+
+/** Someone who serves the church, as the site lists them. */
 export type StaffMember = z.infer<typeof staffMember>;
+
+/** The staff the site lists, in their order. */
+export type StaffMembers = z.infer<typeof staffMembers>;
 
 /** A sermon on the church's YouTube channel, as its feed lists it. */
 export type Sermon = z.infer<typeof sermon>;

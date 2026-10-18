@@ -1,7 +1,6 @@
 import { z } from "zod";
 
 import { churchEvent } from "./event";
-import { staffMember } from "./staff";
 
 /** The words and picture a page opens with, over its body. */
 export const hero = z
@@ -50,9 +49,6 @@ export const page = z
     image: z.string().optional().meta({
       description:
         "An event's own page, /events/<slug>: the picture over its words.",
-    }),
-    staff: z.array(staffMember).optional().meta({
-      description: "The contact page's staff.",
     }),
   })
   .meta({

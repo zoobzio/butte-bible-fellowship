@@ -36,6 +36,14 @@ describe("the build", () => {
     expect(seeds.map((seed) => seed.name)).toEqual(["01_staff", "02_events"]);
   });
 
+  it("reads the statuses content passes through from the schema", () => {
+    expect(contract.enums.content_status).toEqual([
+      "draft",
+      "published",
+      "archived",
+    ]);
+  });
+
   it("reads the days of the week from the schema, Sunday first", () => {
     expect(contract.enums.event_day).toEqual([
       "sunday",
@@ -56,10 +64,11 @@ describe("the build", () => {
       "web.events.weekly",
       "web.sermons.byId",
       "web.sermons.latest",
+      "web.staff.fetch",
       "web.staff.list",
     ]);
     expect(names.filter((name) => name.startsWith("admin."))).toHaveLength(14);
-    expect(names).toHaveLength(20);
+    expect(names).toHaveLength(21);
   });
 });
 
@@ -71,10 +80,20 @@ describe("web", () => {
       slug: "elder-1",
       name: "Elder Name",
       role: "Elder",
+      bio: null,
       photo: null,
       email: null,
+      phone: null,
     });
-    expect(staff[0]?.bio).toMatch(/^A few words/);
+    expect(staff[0]?.summary).toMatch(/^A few words/);
+  });
+
+  it("finds a member by slug, or nothing", async () => {
+    expect(await db.web.staff.fetch.first({ slug: "elder-2" })).toMatchObject({
+      name: "Elder Name",
+      role: "Elder",
+    });
+    expect(await db.web.staff.fetch.first({ slug: "nope" })).toBeNull();
   });
 
   it("lists the weekly events Sunday first, then by start", async () => {
@@ -118,30 +137,36 @@ describe("web", () => {
 });
 
 describe("admin.staff", () => {
+  const member = {
+    slug: "pastor",
+    name: "Pastor Name",
+    role: "Pastor",
+    photo: "https://cdn.example.com/staff/pastor.jpg",
+    email: "pastor@example.com",
+    position: 0,
+    status: "published" as const,
+  };
+
   it("creates, reads, updates and deletes a member", async () => {
-    const created = await db.admin.staff.create.first({
-      slug: "pastor",
-      name: "Pastor Name",
-      role: "Pastor",
-      photo: "/media/pastor.jpg",
-      email: "pastor@example.com",
-      position: 0,
-    });
+    const created = await db.admin.staff.create.first(member);
     expect(created?.slug).toBe("pastor");
     expect(created?.created_at).toBeInstanceOf(Date);
     const id = created!.id;
 
-    // A bio left out is none.
-    expect(await db.admin.staff.byId.first({ id })).toMatchObject({
+    // What is left out is none.
+    expect(await db.admin.staff.fetch.first({ id })).toMatchObject({
+      summary: null,
       bio: null,
-      photo: "/media/pastor.jpg",
-      email: "pastor@example.com",
+      phone: null,
+      photo: member.photo,
+      email: member.email,
       position: 0,
+      status: "published",
     });
 
     // Position 0 lists first, ahead of the seeded elders.
     const list = await db.admin.staff.list();
-    expect(list.map((member) => member.slug)).toEqual([
+    expect(list.map((row) => row.slug)).toEqual([
       "pastor",
       "elder-1",
       "elder-2",
@@ -150,27 +175,73 @@ describe("admin.staff", () => {
     expect((await db.web.staff.list())[0]?.slug).toBe("pastor");
 
     const updated = await db.admin.staff.update.first({
+      ...member,
       id,
-      slug: "pastor",
-      name: "Pastor Name",
       role: "Senior Pastor",
-      bio: "Serving since 2010.",
+      summary: "Serving since 2010.",
+      bio: "## Serving since 2010\n\nA pastor's story.",
       photo: null,
       email: null,
+      phone: "530-555-0100",
       position: 9,
     });
     expect(updated?.updated_at).toBeInstanceOf(Date);
-    expect(await db.admin.staff.byId.first({ id })).toMatchObject({
+    expect(await db.admin.staff.fetch.first({ id })).toMatchObject({
       role: "Senior Pastor",
-      bio: "Serving since 2010.",
+      summary: "Serving since 2010.",
+      bio: "## Serving since 2010\n\nA pastor's story.",
       photo: null,
       email: null,
+      phone: "530-555-0100",
       position: 9,
     });
 
     expect(await db.admin.staff.delete({ id })).toBe(1);
-    expect(await db.admin.staff.byId.first({ id })).toBeNull();
+    expect(await db.admin.staff.fetch.first({ id })).toBeNull();
     expect(await db.admin.staff.delete({ id })).toBe(0);
+  });
+
+  it("keeps a draft or an archived member off the site", async () => {
+    const draft = await db.admin.staff.create.first({
+      ...member,
+      slug: "draft",
+      status: "draft",
+    });
+    const archived = await db.admin.staff.create.first({
+      ...member,
+      slug: "archived",
+      status: "archived",
+    });
+
+    expect(await db.admin.staff.list()).toHaveLength(5);
+    expect((await db.web.staff.list()).map((row) => row.slug)).toEqual([
+      "elder-1",
+      "elder-2",
+      "elder-3",
+    ]);
+    expect(await db.web.staff.fetch.first({ slug: "draft" })).toBeNull();
+
+    await db.admin.staff.update({ ...member, id: draft!.id, slug: "draft" });
+    expect(await db.web.staff.fetch.first({ slug: "draft" })).toMatchObject({
+      name: "Pastor Name",
+    });
+
+    expect(await db.admin.staff.delete({ id: draft!.id })).toBe(1);
+    expect(await db.admin.staff.delete({ id: archived!.id })).toBe(1);
+  });
+
+  it("refuses a status that is not one, and a slug already taken", async () => {
+    // A status the enum lacks is refused before Postgres sees it.
+    await expect(
+      db.admin.staff.create({
+        ...member,
+        slug: "x",
+        status: "hidden" as never,
+      }),
+    ).rejects.toThrow(/status: Invalid option/);
+    expect(
+      await refusal(db.admin.staff.create({ ...member, slug: "elder-1" })),
+    ).toMatch(/staff_slug_key/);
   });
 });
 

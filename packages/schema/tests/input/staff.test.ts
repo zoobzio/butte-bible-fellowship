@@ -12,17 +12,24 @@ describe("staffPath", () => {
 });
 
 describe("staffBody", () => {
-  it("puts a member last when not told where", () => {
-    expect(staffBody.parse(MEMBER)).toEqual({ ...MEMBER, position: 0 });
+  it("writes a member as a draft, last in the list, when not told otherwise", () => {
+    expect(staffBody.parse(MEMBER)).toEqual({
+      ...MEMBER,
+      position: 0,
+      status: "draft",
+    });
   });
 
   it("accepts all a member can say", () => {
     const value = {
       ...MEMBER,
-      bio: "Has served since 2010.",
-      photo: "/staff/jane-doe.jpg",
+      summary: "Has served since 2010.",
+      bio: "## Jane\n\nHas served since 2010.",
+      photo: "https://cdn.example.com/staff/jane-doe.jpg",
       email: "jane@example.com",
+      phone: "530-555-0100",
       position: 2,
+      status: "published",
     };
     expect(staffBody.parse(value)).toEqual(value);
   });
@@ -33,6 +40,12 @@ describe("staffBody", () => {
     ).toBe(false);
     expect(staffBody.safeParse({ ...MEMBER, name: "" }).success).toBe(false);
     expect(staffBody.safeParse({ ...MEMBER, role: "" }).success).toBe(false);
+  });
+
+  it("rejects a status that is not one", () => {
+    expect(staffBody.safeParse({ ...MEMBER, status: "hidden" }).success).toBe(
+      false,
+    );
   });
 
   it("rejects a position that is not a whole number from zero", () => {

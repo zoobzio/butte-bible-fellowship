@@ -1,6 +1,6 @@
 import type { Root } from "hast";
 
-import { describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { setContentPages, setRoutePath, useHead, useNuxtApp } from "#imports";
 import MarkdownBody from "~/components/MarkdownBody.vue";
@@ -11,14 +11,32 @@ import { document, element } from "#test/support/content";
 import { mountSuspended } from "#test/support/mount";
 
 const STAFF = [
-  { name: "Jane Doe", role: "Elder", bio: "Has served since 2010." },
-  { name: "John Roe", role: "Elder" },
+  {
+    slug: "jane-doe",
+    name: "Jane Doe",
+    role: "Elder",
+    summary: "Has served since 2010.",
+  },
+  { slug: "john-roe", name: "John Roe", role: "Elder" },
 ];
 
 const CONNECT = document(
-  { title: "Connect – Test Church", staff: STAFF },
+  { title: "Connect – Test Church" },
   element("p", {}, "Visit us."),
 );
+
+// The staff come from the site's API, which the page fetches.
+const fetchStaff = vi.fn(async () => STAFF);
+
+beforeEach(() => {
+  vi.stubGlobal("$fetch", fetchStaff);
+});
+
+afterEach(() => {
+  vi.unstubAllGlobals();
+  fetchStaff.mockReset();
+  fetchStaff.mockImplementation(async () => STAFF);
+});
 
 const mountPage = async (page: Root = CONNECT) => {
   setContentPages({ "/connect": page });
@@ -41,6 +59,7 @@ describe("connect page", () => {
 
   it("leads with the staff, a card each, under the header", async () => {
     const { wrapper } = await mountPage();
+    expect(fetchStaff).toHaveBeenCalledWith("/api/staff");
     const section = wrapper.find(
       ".connect > .page-header + section.connect-staff",
     );
@@ -58,16 +77,12 @@ describe("connect page", () => {
         .find(".connect > .connect-staff + article.prose")
         .findComponent(MarkdownBody)
         .props("page"),
-    ).toEqual({ title: "Connect – Test Church", staff: STAFF, body: CONNECT });
+    ).toEqual({ title: "Connect – Test Church", body: CONNECT });
   });
 
-  it("puts the article straight under the header when the page lists no one", async () => {
-    const { wrapper } = await mountPage(
-      document(
-        { title: "Connect – Test Church" },
-        element("p", {}, "Visit us."),
-      ),
-    );
+  it("puts the article straight under the header when the API lists no one", async () => {
+    fetchStaff.mockImplementation(async () => []);
+    const { wrapper } = await mountPage();
     expect(wrapper.find(".connect-staff").exists()).toBe(false);
     expect(
       wrapper.find(".connect > .page-header + article.prose").exists(),
