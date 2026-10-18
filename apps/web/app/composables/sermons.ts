@@ -1,8 +1,8 @@
 import type { ComputedRef } from "vue";
 
-import type { Sermon } from "@bbf/validators/types";
+import type { Sermon } from "@bbf/schema/types";
 
-import { sermons } from "@bbf/validators";
+import { sermons } from "@bbf/schema";
 
 import { computed, useAsyncData } from "#imports";
 

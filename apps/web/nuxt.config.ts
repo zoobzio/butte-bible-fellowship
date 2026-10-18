@@ -32,6 +32,7 @@ export default defineNuxtConfig({
     "@icon-sheets/nuxt",
     "@untheme/nuxt",
     "@prosary/nuxt",
+    "@bezoar/nuxt",
   ],
 
   imports: { autoImport: false },
@@ -47,6 +48,18 @@ export default defineNuxtConfig({
   // The words and the pages are `@bbf/prose`'s build: the module provides
   // `$t` over its messages and serves its pages, every locale's, to `usePage`.
   prosary: { build: "@bbf/prose" },
+
+  // The database is `@bbf/database`'s build: the module makes the service
+  // `useDatabase` hands on, over the Postgres `NUXT_BEZOAR_URL` names, and
+  // brings its migrations up to date as the server starts.
+  bezoar: { build: "@bbf/database", migrate: true },
+
+  // Developing, the database is a Postgres in the process, in memory:
+  // migrated and seeded as the server starts, so `pnpm dev` needs no
+  // server and no connection string.
+  $development: {
+    bezoar: { driver: "pglite", seed: true },
+  },
 
   runtimeConfig: {
     public: {

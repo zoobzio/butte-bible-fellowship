@@ -265,8 +265,308 @@
           {
             "patterns": [
               {
-                "group": ["~/**", "@/**", "#imports", "#components", "vue"],
-                "message": "server: the app layer is out of reach — use server/utils."
+                "group": ["./**", "../**", "@/**", "@@/**", "~/**"],
+                "message": "Import by alias — ~~/server/<layer>/… — so the layer is in the specifier. The app layer (~/) is out of reach."
+              },
+              {
+                "group": ["#imports", "#app", "#app/**", "#components", "vue"],
+                "message": "server: the app layer is out of reach — import h3 and nitropack/runtime by name."
+              }
+            ],
+            "paths": []
+          }
+        ]
+      }
+    },
+    {
+      "files": ["server/types/**"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "paths": [
+              {
+                "name": "h3",
+                "allowTypeImports": true,
+                "message": "types: shapes only — only `import type` from h3."
+              },
+              {
+                "name": "nitropack/runtime",
+                "allowTypeImports": true,
+                "message": "types: shapes only — only `import type` from nitropack/runtime."
+              },
+              {
+                "name": "@bbf/database",
+                "allowTypeImports": true,
+                "message": "types: only `import type` from @bbf/database — a row's type, never the contract."
+              },
+              {
+                "name": "@bbf/schema",
+                "allowTypeImports": true,
+                "message": "types: only `import type` from @bbf/schema — the shape, never the schema."
+              },
+              {
+                "name": "@bbf/database/queries",
+                "message": "types: the SQL is the database service's — a composable builds it."
+              },
+              {
+                "name": "@bbf/database/migrations",
+                "message": "types: the SQL is the database service's — a composable builds it."
+              },
+              {
+                "name": "@bbf/database/seeds",
+                "message": "types: the SQL is the database service's — a composable builds it."
+              },
+              {
+                "name": "#bezoar/service",
+                "allowTypeImports": true,
+                "message": "types: only `import type` from #bezoar/service — a row's type, never the service."
+              },
+              {
+                "name": "#bezoar/build",
+                "message": "types: the build is the database service's — a composable has it."
+              }
+            ],
+            "patterns": [
+              {
+                "group": ["./**", "../**", "@/**", "@@/**", "~/**"],
+                "message": "Import by alias — ~~/server/<layer>/… — so the layer is in the specifier. The app layer (~/) is out of reach."
+              },
+              {
+                "group": ["#imports", "#app", "#app/**", "#components", "vue"],
+                "message": "server: the app layer is out of reach — import h3 and nitropack/runtime by name."
+              },
+              {
+                "group": [
+                  "~~/server/constants/**",
+                  "~~/server/utils/**",
+                  "~~/server/composables/**",
+                  "~~/server/api/**",
+                  "~~/server/routes/**",
+                  "~~/server/middleware/**",
+                  "~~/server/plugins/**"
+                ],
+                "message": "types: the top of the DAG — import only other types and external packages."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["server/constants/**"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "paths": [
+              {
+                "name": "h3",
+                "allowTypeImports": true,
+                "message": "constants: values only — only `import type` from h3."
+              },
+              {
+                "name": "nitropack/runtime",
+                "allowTypeImports": true,
+                "message": "constants: values only — only `import type` from nitropack/runtime."
+              },
+              {
+                "name": "@bbf/database/queries",
+                "message": "constants: the SQL is the database service's — a composable builds it."
+              },
+              {
+                "name": "@bbf/database/migrations",
+                "message": "constants: the SQL is the database service's — a composable builds it."
+              },
+              {
+                "name": "@bbf/database/seeds",
+                "message": "constants: the SQL is the database service's — a composable builds it."
+              },
+              {
+                "name": "#bezoar/service",
+                "message": "constants: the database is a service — a composable has it."
+              },
+              {
+                "name": "#bezoar/build",
+                "message": "constants: the database is a service — a composable has it."
+              }
+            ],
+            "patterns": [
+              {
+                "group": ["./**", "../**", "@/**", "@@/**", "~/**"],
+                "message": "Import by alias — ~~/server/<layer>/… — so the layer is in the specifier. The app layer (~/) is out of reach."
+              },
+              {
+                "group": ["#imports", "#app", "#app/**", "#components", "vue"],
+                "message": "server: the app layer is out of reach — import h3 and nitropack/runtime by name."
+              },
+              {
+                "group": [
+                  "~~/server/utils/**",
+                  "~~/server/composables/**",
+                  "~~/server/api/**",
+                  "~~/server/routes/**",
+                  "~~/server/middleware/**",
+                  "~~/server/plugins/**"
+                ],
+                "message": "constants: import only types, constants and external packages."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["server/utils/**"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "paths": [
+              {
+                "name": "h3",
+                "allowTypeImports": true,
+                "message": "utils: pure functions — no request, no Nitro runtime — only `import type` from h3."
+              },
+              {
+                "name": "nitropack/runtime",
+                "allowTypeImports": true,
+                "message": "utils: pure functions — no request, no Nitro runtime — only `import type` from nitropack/runtime."
+              },
+              {
+                "name": "@bbf/database/queries",
+                "message": "utils: the SQL is the database service's — a composable builds it."
+              },
+              {
+                "name": "@bbf/database/migrations",
+                "message": "utils: the SQL is the database service's — a composable builds it."
+              },
+              {
+                "name": "@bbf/database/seeds",
+                "message": "utils: the SQL is the database service's — a composable builds it."
+              },
+              {
+                "name": "#bezoar/service",
+                "message": "utils: pure functions — a row comes typed through ~~/server/types; the service through a composable."
+              },
+              {
+                "name": "#bezoar/build",
+                "message": "utils: pure functions — the SQL is the database service's."
+              }
+            ],
+            "patterns": [
+              {
+                "group": ["./**", "../**", "@/**", "@@/**", "~/**"],
+                "message": "Import by alias — ~~/server/<layer>/… — so the layer is in the specifier. The app layer (~/) is out of reach."
+              },
+              {
+                "group": ["#imports", "#app", "#app/**", "#components", "vue"],
+                "message": "server: the app layer is out of reach — import h3 and nitropack/runtime by name."
+              },
+              {
+                "group": [
+                  "~~/server/composables/**",
+                  "~~/server/api/**",
+                  "~~/server/routes/**",
+                  "~~/server/middleware/**",
+                  "~~/server/plugins/**"
+                ],
+                "message": "utils: import only types, constants, utils and external packages."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["server/composables/**"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": ["./**", "../**", "@/**", "@@/**", "~/**"],
+                "message": "Import by alias — ~~/server/<layer>/… — so the layer is in the specifier. The app layer (~/) is out of reach."
+              },
+              {
+                "group": ["#imports", "#app", "#app/**", "#components", "vue"],
+                "message": "server: the app layer is out of reach — import h3 and nitropack/runtime by name."
+              },
+              {
+                "group": [
+                  "~~/server/api/**",
+                  "~~/server/routes/**",
+                  "~~/server/middleware/**",
+                  "~~/server/plugins/**"
+                ],
+                "message": "composables: the services an endpoint needs, over types, constants, utils and composables — never an endpoint."
+              }
+            ],
+            "paths": []
+          }
+        ]
+      }
+    },
+    {
+      "files": [
+        "server/api/**",
+        "server/routes/**",
+        "server/middleware/**",
+        "server/plugins/**"
+      ],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "paths": [
+              {
+                "name": "@bbf/database",
+                "allowTypeImports": true,
+                "message": "endpoints: the database is a service — reach it through a composable."
+              },
+              {
+                "name": "@bbf/database/queries",
+                "message": "endpoints: the database is a service — reach it through a composable."
+              },
+              {
+                "name": "@bbf/database/migrations",
+                "message": "endpoints: the database is a service — reach it through a composable."
+              },
+              {
+                "name": "@bbf/database/seeds",
+                "message": "endpoints: the database is a service — reach it through a composable."
+              },
+              {
+                "name": "#bezoar/service",
+                "message": "endpoints: the database is a service — reach it through useDatabase."
+              },
+              {
+                "name": "#bezoar/build",
+                "message": "endpoints: the database is a service — reach it through useDatabase."
+              }
+            ],
+            "patterns": [
+              {
+                "group": ["./**", "../**", "@/**", "@@/**", "~/**"],
+                "message": "Import by alias — ~~/server/<layer>/… — so the layer is in the specifier. The app layer (~/) is out of reach."
+              },
+              {
+                "group": ["#imports", "#app", "#app/**", "#components", "vue"],
+                "message": "server: the app layer is out of reach — import h3 and nitropack/runtime by name."
+              },
+              {
+                "group": [
+                  "~~/server/api/**",
+                  "~~/server/routes/**",
+                  "~~/server/middleware/**",
+                  "~~/server/plugins/**"
+                ],
+                "message": "api, routes, middleware, plugins: the bottom of the DAG — never import one another."
+              },
+              {
+                "group": ["~~/server/utils/**"],
+                "message": "endpoints execute — put the logic in a composable."
               }
             ]
           }

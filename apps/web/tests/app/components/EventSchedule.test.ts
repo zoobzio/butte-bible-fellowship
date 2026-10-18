@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { mount } from "@vue/test-utils";
 
-import type { ChurchEvent } from "@bbf/validators/types";
+import type { ChurchEvent } from "@bbf/schema/types";
 
 import { setRoutePath, useNuxtApp } from "#imports";
 import EventSchedule from "~/components/EventSchedule.vue";

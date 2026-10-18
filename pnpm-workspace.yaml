@@ -5,6 +5,7 @@ packages:
 catalog:
   "@ai-sdk/anthropic": "^4.0.71"
   "@bezoar/kit": "0.0.3"
+  "@bezoar/nuxt": "0.0.3"
   "@bezoar/testing": "0.0.3"
   "@icon-sheets/kit": "0.0.7"
   "@icon-sheets/nuxt": "0.0.7"

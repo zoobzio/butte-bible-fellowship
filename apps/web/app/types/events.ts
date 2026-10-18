@@ -1,4 +1,4 @@
-import type { ChurchEvent } from "@bbf/validators/types";
+import type { ChurchEvent } from "@bbf/schema/types";
 
 /** A day of the calendar, with the events held on it in the order they start. */
 export interface CalendarDay {

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { mount } from "@vue/test-utils";
 
-import type { StaffMember } from "@bbf/validators/types";
+import type { StaffMember } from "@bbf/schema/types";
 
 import StaffCard from "~/components/StaffCard.vue";
 

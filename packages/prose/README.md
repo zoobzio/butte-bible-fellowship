@@ -41,7 +41,7 @@ character — write a typographic one (`You’re`), as the pages already do.
 ## Pages
 
 A page is Markdown with YAML front matter. The front matter is what
-`@bbf/validators` says a page carries: every page has a `title` and a
+`@bbf/schema` says a page carries: every page has a `title` and a
 `description`, and a page adds what it needs — the home page its `hero`, the
 events page its `events`, the connect page its `staff`, an event's page its
 `image`.
@@ -135,7 +135,7 @@ The locale is in the route: English at `/about-us`, Spanish at
 
 A page reaches the app through `usePage`, which fetches the page the route
 names in the route's locale, checks its front matter against
-`@bbf/validators`, and hands back the front matter over the page's body. The
+`@bbf/schema`, and hands back the front matter over the page's body. The
 body renders through `<Prose>`, with the overrides under
 `app/components/prose/`.
 

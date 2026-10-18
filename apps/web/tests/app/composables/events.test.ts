@@ -5,7 +5,7 @@ import { nextTick, ref } from "vue";
 import type { CalendarDay } from "~/types/events";
 import type { PageItem } from "~/types/page";
 
-import type { ChurchEvent } from "@bbf/validators/types";
+import type { ChurchEvent } from "@bbf/schema/types";
 
 import {
   requestedDocuments,

@@ -2,7 +2,7 @@ import type { Root } from "hast";
 
 import type { PageItem } from "~/types/page";
 
-import { page as schema } from "@bbf/validators";
+import { page as schema } from "@bbf/schema";
 import { CONTENT_URL } from "@prosary/nuxt/constant";
 
 import { useAsyncData, useRequestFetch, useRoute } from "#imports";

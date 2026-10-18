@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import type { ChurchEvent } from "@bbf/validators/types";
+import type { ChurchEvent } from "@bbf/schema/types";
 
 import {
   addDays,

@@ -1,5 +1,5 @@
 <script lang="ts">
-import type { Sermon } from "@bbf/validators/types";
+import type { Sermon } from "@bbf/schema/types";
 
 import { Icon } from "#components";
 import { computed, ref, useNuxtApp } from "#imports";

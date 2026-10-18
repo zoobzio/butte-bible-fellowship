@@ -5,7 +5,7 @@ import { mount } from "@vue/test-utils";
 
 import type { PageItem } from "~/types/page";
 
-import type { ChurchEvent } from "@bbf/validators/types";
+import type { ChurchEvent } from "@bbf/schema/types";
 
 import { setAppConfig, setRoutePath, useNuxtApp } from "#imports";
 import EventArticle from "~/components/EventArticle.vue";

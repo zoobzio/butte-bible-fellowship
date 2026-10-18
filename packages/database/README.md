@@ -8,7 +8,7 @@ what this package exports. An app imports the build and has the database:
 the kit and the sources never reach it.
 
 The tables are the site's three kinds of data, each the shape its
-validator in `@bbf/validators` already gives it: `staff`, who serve the
+validator in `@bbf/schema` already gives it: `staff`, who serve the
 church; `events`, each held once on a date or weekly on a day; and
 `sermons`, as the church's YouTube feed lists them.
 

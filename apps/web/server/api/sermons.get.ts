@@ -1,7 +1,7 @@
-import { defineCachedEventHandler, useRuntimeConfig } from "nitropack/runtime";
+import { defineCachedEventHandler } from "nitropack/runtime";
 
-import { SERMONS_MAX_AGE } from "../constants/sermons";
-import { parseSermonFeed, sermonFeedUrl } from "../utils/sermons";
+import { useSermonFeed } from "~~/server/composables/sermons";
+import { SERMONS_MAX_AGE } from "~~/server/constants/sermons";
 
 /**
  * The channel's latest sermons, read from its YouTube feed. The answer is
@@ -10,12 +10,6 @@ import { parseSermonFeed, sermonFeedUrl } from "../utils/sermons";
  * A feed that cannot be read is an error, which is never kept.
  */
 export default defineCachedEventHandler(
-  async (event) => {
-    const { channel } = useRuntimeConfig(event).public.youtube;
-    const xml = await $fetch<string>(sermonFeedUrl(channel), {
-      responseType: "text",
-    });
-    return parseSermonFeed(xml);
-  },
+  (event) => useSermonFeed(event).read(),
   { name: "sermons", maxAge: SERMONS_MAX_AGE, swr: true },
 );

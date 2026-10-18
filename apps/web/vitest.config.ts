@@ -12,8 +12,11 @@ export default defineConfig({
       "#imports": r("./tests/mocks/imports.ts"),
       "#app": r("./tests/mocks/imports.ts"),
       "#components": r("./tests/mocks/components.ts"),
-      // App source alias mirrors Nuxt's "~" → project root.
+      "#bezoar/service": r("./tests/mocks/bezoar.ts"),
+      // Source aliases mirror Nuxt's: "~" is the app, "~~" the project root
+      // — what the server imports by, as ~~/server/<layer>/….
       "~": r("./app"),
+      "~~": r("."),
       // Test-only support (mocks, mount factories).
       "#test": r("./tests"),
     },
@@ -29,7 +32,7 @@ export default defineConfig({
     fsModuleCache: true,
     setupFiles: ["tests/setup.ts"],
     coverage: {
-      include: ["app/**/*.{ts,vue}"],
+      include: ["app/**/*.{ts,vue}", "server/**/*.ts"],
       reportsDirectory: ".coverage",
     },
   },

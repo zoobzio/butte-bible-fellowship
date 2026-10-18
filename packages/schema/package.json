@@ -1,5 +1,5 @@
 {
-  "name": "@bbf/validators",
+  "name": "@bbf/schema",
   "private": true,
   "type": "module",
   "sideEffects": false,

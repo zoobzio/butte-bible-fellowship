@@ -1,7 +1,7 @@
 <script lang="ts">
 import type { PageItem } from "~/types/page";
 
-import type { ChurchEvent } from "@bbf/validators/types";
+import type { ChurchEvent } from "@bbf/schema/types";
 
 import { useNuxtApp } from "#imports";
 

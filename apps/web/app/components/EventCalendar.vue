@@ -1,5 +1,5 @@
 <script lang="ts">
-import type { ChurchEvent } from "@bbf/validators/types";
+import type { ChurchEvent } from "@bbf/schema/types";
 
 import { Icon, NuxtLink } from "#components";
 import { useNuxtApp } from "#imports";

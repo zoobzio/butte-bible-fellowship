@@ -1,6 +1,6 @@
 import type { Root } from "hast";
 
-import type { Page } from "@bbf/validators/types";
+import type { Page } from "@bbf/schema/types";
 
 /**
  * A page of the site, in one locale: its front matter, as the site's pages

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { parseSermonFeed, sermonFeedUrl } from "../../../server/utils/sermons";
+import { parseSermonFeed, sermonFeedUrl } from "~~/server/utils/sermons";
 
 const entry = (fields: string) => `<entry>${fields}</entry>`;
 

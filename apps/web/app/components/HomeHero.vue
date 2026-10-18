@@ -1,5 +1,5 @@
 <script lang="ts">
-import type { Hero } from "@bbf/validators/types";
+import type { Hero } from "@bbf/schema/types";
 
 import { NuxtLink } from "#components";
 

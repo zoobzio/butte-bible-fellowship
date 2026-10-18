@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { mount } from "@vue/test-utils";
 
-import type { Hero } from "@bbf/validators/types";
+import type { Hero } from "@bbf/schema/types";
 
 import { setRoutePath } from "#imports";
 import HomeHero from "~/components/HomeHero.vue";

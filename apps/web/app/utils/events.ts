@@ -1,8 +1,8 @@
 import type { CalendarDay } from "~/types/events";
 
-import type { ChurchEvent, EventDay } from "@bbf/validators/types";
+import type { ChurchEvent, EventDay } from "@bbf/schema/types";
 
-import { EVENT_DAYS } from "@bbf/validators";
+import { EVENT_DAYS } from "@bbf/schema";
 import { EVENT_TIME_ZONE } from "~/constants/events";
 
 // A date here is a day on the calendar, written `YYYY-MM-DD`, and not a

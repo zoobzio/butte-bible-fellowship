@@ -27,7 +27,7 @@ The pages are Markdown in [`@bbf/prose`](packages/prose), which builds every
 one for every locale as the tree the app renders, its front matter on the
 root. `@prosary/nuxt` serves them, and `usePage` fetches the one the route
 names in the route's locale, checking its front matter against
-[`@bbf/validators`](packages/validators). A page's body renders through the
+[`@bbf/schema`](packages/schema). A page's body renders through the
 module's `<Prose>`, with the components under `app/components/prose/` in
 place of the elements and blocks they are named for: `A.vue` renders every
 link as a NuxtLink in the reader's locale, `InviteCard.vue` every
@@ -103,8 +103,67 @@ keeps the selection in its cookie and renders it on the server. There is no them
 ```
 app/
   app.vue           — root: NuxtLayout + NuxtPage
-  layouts/default.vue
-  components/       — site chrome (AppHeader, AppFooter), each with its styles
+  types/            — the shapes the app speaks in
+  constants/
+  utils/            — pure functions
+  composables/      — reactivity and the Nuxt instance, for the components
+  components/       — template and style; the logic in a composable
   pages/            — routes
+  layouts/, middleware/, plugins/
+server/
+  types/            — the shapes the server speaks in
+  constants/
+  utils/            — pure, single-purpose functions: most often a row into the shape the API serves
+  composables/      — the services an endpoint needs, over the request and the Nitro runtime
+  api/              — endpoints: each names a composable and runs it
 nuxt.config.ts      — extends @zoobzio/foundation
+```
+
+### Layers
+
+Both sides of the app are the same directed graph, and `apps/web/.oxlintrc.json`
+enforces it with `no-restricted-imports`, one override per layer. A file
+imports by alias — `~/<layer>/…` in the app, `~~/server/<layer>/…` on the
+server — so the layer is in the specifier, and a file may only import the
+layers above its own:
+
+| layer       | may import                                 | may not                                           |
+| ----------- | ------------------------------------------ | ------------------------------------------------- |
+| types       | types, external packages (`import type`)   | anything with a runtime                           |
+| constants   | types, constants, external packages        | utils and below; the Nitro or Vue runtime         |
+| utils       | types, constants, utils, external packages | the runtime; the request; the database            |
+| composables | all of the above, and composables          | components or endpoints                           |
+| the bottom  | composables, constants, types              | utils (put the logic in a composable); each other |
+
+In the app the bottom is `components`, `pages`, `layouts`, `middleware` and
+`plugins`; on the server it is `api`, `routes`, `middleware` and `plugins`.
+The app layer is out of the server's reach — no `~/`, `#imports` or `vue` —
+and the server imports `h3` and `nitropack/runtime` by name.
+
+### Server
+
+An endpoint is an executor: it names the composable that does the work and
+the policy it runs under — caching, say — and nothing else, so what it does
+can be read in a line. A composable is a function of the request's
+`H3Event` that gathers what the endpoint needs — the runtime config, the
+database, another service — and hands back the operations to run. A util is
+a pure function, most often turning a row of [`@bbf/database`](packages/database)
+into the shape [`@bbf/schema`](packages/schema) says the API serves. The
+database is a service: only a composable builds it, and only a composable
+hands a connection on.
+
+```ts
+// server/composables/sermons.ts
+export const useSermonFeed = (event: H3Event) => {
+  const { channel } = useRuntimeConfig(event).public.youtube;
+  const read = () =>
+    $fetch<string>(sermonFeedUrl(channel)).then(parseSermonFeed);
+  return { read };
+};
+
+// server/api/sermons.get.ts
+export default defineCachedEventHandler(
+  (event) => useSermonFeed(event).read(),
+  { name: "sermons", maxAge: SERMONS_MAX_AGE, swr: true },
+);
 ```
