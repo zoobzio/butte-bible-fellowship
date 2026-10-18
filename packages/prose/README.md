@@ -13,7 +13,7 @@ prosary.config.ts  the kit config: the locales, the sources, the model
 src/messages/      the interface messages, in English, one file per group
 src/content/       the pages, in English, as Markdown
 .cache/            the translation cache: each locale's translations (committed)
-.env               the model's API key, for `pnpm translate` (yours, not committed)
+.env               the model's API key, which `pnpm translate` loads (yours, not committed)
 .output/           the kit's output, every locale's (generated, not committed)
 ```
 
@@ -83,7 +83,9 @@ run it too:
 
 To add a locale, list it under `translate.targets` in `prosary.config.ts`
 and run `pnpm translate`. That needs `ANTHROPIC_API_KEY`: copy `.env.example`
-to `.env` and fill it in (CI reads the repository secret of the same name).
+to `.env` and fill it in: the `translate` script loads the file, through
+Node's `--env-file-if-exists`, and the config knows nothing of it (CI sets
+the variable from the repository secret of the same name).
 The model is `translate.model` in the config — any AI SDK provider's.
 `pnpm translate:check` lists what a run would translate without calling the
 model, and exits 1 when there is anything.

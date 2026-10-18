@@ -1,18 +1,7 @@
-import { existsSync } from "node:fs";
-import { fileURLToPath } from "node:url";
-
 import { anthropic } from "@ai-sdk/anthropic";
 import { defineConfig } from "@prosary/kit";
 import { gfm, matter, mdc } from "@prosary/parse/plugins";
 import rehypeSlug from "rehype-slug";
-
-// The model's API key, for `prosary translate`: `.env` beside this file,
-// never committed (`.env.example` lists what it holds). A variable already
-// set wins over the file. Building needs no key.
-const env = fileURLToPath(new URL(".env", import.meta.url));
-if (existsSync(env)) {
-  process.loadEnvFile(env);
-}
 
 /**
  * The site's words: the interface messages under `src/messages/` and the

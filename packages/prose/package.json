@@ -16,7 +16,7 @@
   "scripts": {
     "build": "prosary build",
     "prepare": "prosary build",
-    "translate": "prosary translate",
+    "translate": "node --env-file-if-exists=.env node_modules/@prosary/kit/bin/prosary.mjs translate",
     "translate:check": "prosary translate --check",
     "test": "vitest run"
   },
