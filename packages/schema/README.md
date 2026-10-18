@@ -20,6 +20,7 @@ into a query's arguments before it runs.
 ```
 src/models/      what the API answers with: one file per kind of thing
   event.ts       an event of the church, and the days and times it names
+  hast.ts        rich text as the API serves it: an HTML syntax tree of elements and text
   staff.ts       someone who serves the church, the list of them, and the statuses content passes through
   sermon.ts      a sermon, as the YouTube feed lists it, and the list of them
   page.ts        a page's front matter: its hero, events and image
@@ -45,7 +46,12 @@ that directory's `index.ts`, and a type beside it in `types.ts`.
 A model is the response: `churchEvent`, `staffMember`, `sermon`, `hero`,
 `page`, with `staffMembers` and `sermons`, the lists the API answers with,
 and the primitives they are built from — `eventDay`, `eventTime`, `slug`,
-`contentStatus`. An input is one
+`contentStatus`, and `hast`, rich text as an HTML syntax tree. A column
+written as Markdown — a member's `bio` — goes over the wire as `hast`: the
+tree the site's pages are built to, which the app renders with its own
+components, so the wire never carries Markdown and the app never parses it.
+`@bbf/utils`'s `toHast` builds it, through the same presets as the pages.
+A body still takes the Markdown: `staffBody.bio` is the string as written. An input is one
 part of a request, named for the group and the part: `eventPath` is the
 path parameters of one event, `eventsQuery` the query of the events list,
 `eventBody` what a write carries. A body says what a model cannot: an
@@ -63,7 +69,8 @@ Every schema is documented where it is declared. A model or a body is
 `components.schemas` and refers to it from every operation that uses it:
 `ChurchEvent`, `StaffMember`, `Sermon`, `Hero`, `Page`, `EventBody`,
 `StaffBody`. A primitive used by both — `EventDay`, `EventTime`,
-`ContentStatus` — is one component too, rendered the same in a request and a response. A field is
+`ContentStatus` — is one component too, and so is `Hast`, with
+`HastElement` and `HastText`, which refer to each other as a tree does; rendered the same in a request and a response. A field is
 `.meta({ description, examples })`, and its format comes from its zod type:
 `z.iso.date()` is `date`, `z.iso.datetime()` is `date-time`, `z.url()` is
 `uri`, `z.email()` is `email`, a regex is its `pattern`.
@@ -106,8 +113,8 @@ what it renders: the components, their references, the parameters.
 - `@bbf/schema/models`: the models alone; `@bbf/schema/input`: the inputs
   alone. `@bbf/schema/models/event` and the like reach one file.
 - `@bbf/schema/types`: the type each schema infers, under its `PascalCase`
-  name — `ChurchEvent`, `EventDay`, `EventTime`, `ContentStatus`,
-  `StaffMember`, `StaffMembers`, `Hero`,
+  name — `ChurchEvent`, `EventDay`, `EventTime`, `Hast`, `HastElement`,
+  `HastText`, `ContentStatus`, `StaffMember`, `StaffMembers`, `Hero`,
   `Page`, `Sermon`, `Slug`, `EventPath`, `EventsQuery`, `EventBody`,
   `StaffPath`, `StaffBody`, `SermonPath`, `SermonsQuery`. Nothing here
   reaches a bundle: a file that only needs the shape imports from here and

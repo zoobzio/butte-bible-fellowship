@@ -33,12 +33,29 @@ describe("staffMember", () => {
       ...MEMBER,
       role: "Pastor",
       summary: "Has served since 2010.",
-      bio: "## Jane\n\nHas served since 2010.",
+      bio: {
+        type: "root",
+        children: [
+          {
+            type: "element",
+            tagName: "p",
+            properties: {},
+            children: [{ type: "text", value: "Has served since 2010." }],
+          },
+        ],
+      },
       photo: "https://cdn.example.com/staff/jane-doe.jpg",
       email: "jane@example.com",
       phone: "530-555-0100",
     };
     expect(staffMember.parse(value)).toEqual(value);
+  });
+
+  it("takes a bio as a tree, never as the Markdown it was written as", () => {
+    expect(
+      staffMember.safeParse({ ...MEMBER, bio: "## Jane\n\nHas served." })
+        .success,
+    ).toBe(false);
   });
 
   it("rejects an email, a photo or a slug that is not one", () => {

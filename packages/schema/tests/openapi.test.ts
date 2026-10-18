@@ -103,6 +103,9 @@ describe("the components", () => {
       "EventBody",
       "EventDay",
       "EventTime",
+      "Hast",
+      "HastElement",
+      "HastText",
       "Hero",
       "Page",
       "Sermon",
@@ -163,10 +166,31 @@ describe("the components", () => {
     });
     expect(schemas.StaffMember).toMatchObject({
       required: ["slug", "name", "role"],
-      properties: { email: { format: "email" }, photo: { format: "uri" } },
+      properties: {
+        email: { format: "email" },
+        photo: { format: "uri" },
+        bio: { $ref: "#/components/schemas/Hast" },
+      },
     });
     expect(schemas.StaffBody).toMatchObject({
       properties: { status: { $ref: "#/components/schemas/ContentStatus" } },
+    });
+  });
+
+  it("render rich text as a tree that refers to itself", () => {
+    const items = {
+      anyOf: [
+        { $ref: "#/components/schemas/HastElement" },
+        { $ref: "#/components/schemas/HastText" },
+      ],
+    };
+    expect(schemas.Hast).toMatchObject({
+      required: ["type", "children"],
+      properties: { children: { type: "array", items } },
+    });
+    expect(schemas.HastElement).toMatchObject({
+      required: ["type", "tagName", "properties", "children"],
+      properties: { children: { type: "array", items } },
     });
   });
 

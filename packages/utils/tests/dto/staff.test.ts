@@ -36,10 +36,35 @@ describe("toStaffMember", () => {
       }),
     ).toMatchObject({
       summary: "Serving since 2010.",
-      bio: "## Jane\n\nServing since 2010.",
       email: "j@x.org",
       phone: "530-555-0100",
     });
+  });
+
+  it("serves the bio as the tree the app renders, not the Markdown", () => {
+    const member = toStaffMember({
+      ...ROW,
+      bio: "## Jane\n\nServing since 2010.",
+    });
+    expect(member.bio).toEqual({
+      type: "root",
+      children: [
+        {
+          type: "element",
+          tagName: "h2",
+          properties: { id: "jane" },
+          children: [{ type: "text", value: "Jane" }],
+        },
+        { type: "text", value: "\n" },
+        {
+          type: "element",
+          tagName: "p",
+          properties: {},
+          children: [{ type: "text", value: "Serving since 2010." }],
+        },
+      ],
+    });
+    expect(staffMember.safeParse(member).success).toBe(true);
   });
 
   it("leaves an admin row's id, position and status behind", () => {

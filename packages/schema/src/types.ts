@@ -4,6 +4,7 @@ import type { eventBody, eventPath, eventsQuery } from "./input/event";
 import type { sermonPath, sermonsQuery } from "./input/sermon";
 import type { staffBody, staffPath } from "./input/staff";
 import type { churchEvent, eventDay, eventTime } from "./models/event";
+import type { hast, hastElement, hastText } from "./models/hast";
 import type { hero, page } from "./models/page";
 import type { sermon } from "./models/sermon";
 import type { slug } from "./models/slug";
@@ -22,6 +23,15 @@ export type EventTime = z.infer<typeof eventTime>;
 
 /** An event of the church: held once on a date, or weekly on a day. */
 export type ChurchEvent = z.infer<typeof churchEvent>;
+
+/** Rich text as the API serves it: an HTML syntax tree of elements and text. */
+export type Hast = z.infer<typeof hast>;
+
+/** An HTML element of a tree: its tag, its attributes, and what it holds. */
+export type HastElement = z.infer<typeof hastElement>;
+
+/** A run of text in a tree. */
+export type HastText = z.infer<typeof hastText>;
 
 /** Whether a piece of content reaches the site: draft, published or archived. */
 export type ContentStatus = z.infer<typeof contentStatus>;

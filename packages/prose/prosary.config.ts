@@ -1,5 +1,4 @@
-import { anthropic } from "@ai-sdk/anthropic";
-import { defineConfig } from "@prosary/kit";
+import { defineConfig } from "@prosary/kit/config";
 import { gfm, matter, mdc } from "@prosary/parse/plugins";
 import rehypeSlug from "rehype-slug";
 
@@ -33,7 +32,7 @@ export default defineConfig({
     source: "en",
     targets: ["es", "fr"],
     cache: ".cache",
-    model: anthropic("claude-sonnet-5-5"),
+    model: "anthropic/claude-sonnet-5-5",
   },
   outDir: ".output",
 });

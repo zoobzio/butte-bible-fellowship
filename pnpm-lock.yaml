@@ -7,8 +7,8 @@ settings:
 catalogs:
   default:
     '@ai-sdk/anthropic':
-      specifier: ^4.0.71
-      version: 4.0.71
+      specifier: ^4.0.82
+      version: 4.0.82
     '@bezoar/kit':
       specifier: 0.0.4
       version: 0.0.4
@@ -34,17 +34,17 @@ catalogs:
       specifier: ^4.5.2
       version: 4.6.1
     '@prosary/kit':
-      specifier: 0.0.6
-      version: 0.0.6
+      specifier: 0.0.7
+      version: 0.0.7
     '@prosary/nuxt':
       specifier: 0.0.6
       version: 0.0.6
     '@prosary/parse':
-      specifier: 0.0.6
-      version: 0.0.6
+      specifier: 0.0.7
+      version: 0.0.7
     '@prosary/translate':
-      specifier: 0.0.6
-      version: 0.0.6
+      specifier: 0.0.7
+      version: 0.0.7
     '@types/hast':
       specifier: ^3.0.5
       version: 3.0.5
@@ -94,8 +94,8 @@ catalogs:
       specifier: ^1.86.0
       version: 1.86.0
     prosary:
-      specifier: 0.0.6
-      version: 0.0.6
+      specifier: 0.0.7
+      version: 0.0.7
     rehype-slug:
       specifier: ^6.0.0
       version: 6.0.0
@@ -187,7 +187,7 @@ importers:
         version: 4.6.1(@babel/plugin-syntax-jsx@7.29.7(@babel/core@7.29.7))(@babel/plugin-syntax-typescript@7.29.7(@babel/core@7.29.7))(@electric-sql/pglite@0.5.10)(@oxc-project/types@0.154.0)(@types/node@26.2.0)(@vue/compiler-sfc@3.5.44)(acorn@8.18.0)(confbox@0.3.1)(db0@0.3.4(@electric-sql/pglite@0.5.10))(dotenv@17.4.2)(esbuild@0.28.2)(eslint@9.39.5(jiti@2.7.0))(giget@3.3.1)(ioredis@5.11.1)(lightningcss@1.33.0)(mlly@1.8.2)(optionator@0.9.4)(oxlint@1.86.0)(rolldown@1.2.14)(rollup-plugin-visualizer@7.1.1(rolldown@1.2.14)(rollup@4.62.4))(rollup@4.62.4)(srvx@1.0.5)(terser@5.50.0)(typescript@5.9.3)(vite@8.3.4(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(yaml@2.9.1))(vue-tsc@2.2.12(typescript@5.9.3))(yaml@2.9.1)
       prosary:
         specifier: 'catalog:'
-        version: 0.0.6
+        version: 0.0.7
       untheme:
         specifier: 'catalog:'
         version: 0.6.0
@@ -274,25 +274,25 @@ importers:
 
   packages/prose:
     dependencies:
-      prosary:
-        specifier: 'catalog:'
-        version: 0.0.6
-    devDependencies:
-      '@ai-sdk/anthropic':
-        specifier: 'catalog:'
-        version: 4.0.71(zod@4.6.5)
       '@prosary/kit':
         specifier: 'catalog:'
-        version: 0.0.6(@prosary/translate@0.0.6)
+        version: 0.0.7(@prosary/translate@0.0.7(@ai-sdk/anthropic@4.0.82(zod@4.6.5)))
       '@prosary/parse':
         specifier: 'catalog:'
-        version: 0.0.6
-      '@prosary/translate':
+        version: 0.0.7
+      prosary:
         specifier: 'catalog:'
-        version: 0.0.6
+        version: 0.0.7
       rehype-slug:
         specifier: 'catalog:'
         version: 6.0.0
+    devDependencies:
+      '@ai-sdk/anthropic':
+        specifier: 'catalog:'
+        version: 4.0.82(zod@4.6.5)
+      '@prosary/translate':
+        specifier: 'catalog:'
+        version: 0.0.7(@ai-sdk/anthropic@4.0.82(zod@4.6.5))
       vitest:
         specifier: 'catalog:'
         version: 5.0.3(@opentelemetry/api@1.9.1)(@types/node@26.2.0)(@vitest/coverage-v8@5.0.3)(happy-dom@20.11.6)(vite@8.3.4(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(yaml@2.9.1))
@@ -334,16 +334,25 @@ importers:
       '@bbf/database':
         specifier: workspace:*
         version: link:../database
+      '@bbf/prose':
+        specifier: workspace:*
+        version: link:../prose
       '@bbf/schema':
         specifier: workspace:*
         version: link:../schema
       bezoar:
         specifier: 'catalog:'
         version: 0.0.4
+      objectively:
+        specifier: 'catalog:'
+        version: 0.3.0
     devDependencies:
       '@bezoar/testing':
         specifier: 'catalog:'
         version: 0.0.4
+      '@types/hast':
+        specifier: 'catalog:'
+        version: 3.0.5
       '@types/node':
         specifier: 'catalog:'
         version: 26.2.0
@@ -356,8 +365,8 @@ importers:
 
 packages:
 
-  '@ai-sdk/anthropic@4.0.71':
-    resolution: {integrity: sha512-wiv3jhUH0RrvGzSolJMZfZ2cI9As45LhwYmcAoWvNivXjC7wzJ4W/Udq9/u7EGnGsT8lpmFKEKBrMXVeUO97Dg==}
+  '@ai-sdk/anthropic@4.0.82':
+    resolution: {integrity: sha512-1HvCBHdBsfG/OTDOmo3R+rwKtVofnPCWKyMKqOa75yieQEC8V7leB40EaG6uQ1wKnqeXdc31s7tNyq+OnKV/mg==}
     engines: {node: '>=22'}
     peerDependencies:
       zod: ^3.25.76 || ^4.1.8
@@ -374,8 +383,18 @@ packages:
     peerDependencies:
       zod: ^3.25.76 || ^4.1.8
 
+  '@ai-sdk/provider-utils@5.0.62':
+    resolution: {integrity: sha512-//6sHa6QNQdM2KHOg5pxp1UMFQB4U8cqdw/kSm9BMr0DLeaFgG3TXZfxhpwRZmxgBpOrzMVZ/gwLXH309+Ortw==}
+    engines: {node: '>=22'}
+    peerDependencies:
+      zod: ^3.25.76 || ^4.1.8
+
   '@ai-sdk/provider@4.0.21':
     resolution: {integrity: sha512-UpbC9C1oht8dhfKPbVXSLRZS3DI8uk8n5v2uMjBPNIYGsC2kL045ywq7D8Hh9KgnH9rP5W/GxQdYtWScRouqlA==}
+    engines: {node: '>=22'}
+
+  '@ai-sdk/provider@4.0.29':
+    resolution: {integrity: sha512-nV7UpLADtKn9f0xfnxVZAeFEKuNkScJv5rOpHL7qeWe2EwEEBa3pd6P0QVK6D6coCJ0E8FyCgoM50AffTYrzDQ==}
     engines: {node: '>=22'}
 
   '@antfu/install-pkg@2.0.1':
@@ -1519,11 +1538,23 @@ packages:
   '@prosary/core@0.0.6':
     resolution: {integrity: sha512-CCS4ICtH13ux8JgooaB4zMf9b4tUGtHj2zu9JeNjZc7zoEgjjqDa33t+lCmSXrW6l9bNDn5MpvaH/UQLOP6xaA==}
 
+  '@prosary/core@0.0.7':
+    resolution: {integrity: sha512-a/zXeigj6/tXWksmhxSEBbbzTOdvhfRLLRAVtHgm8rIQYk2rAyVhkslIrWnURzNtxb51JzW+/HsBipsqTUfXMQ==}
+
   '@prosary/kit@0.0.6':
     resolution: {integrity: sha512-ukfKGgIzjMGprpNhfQg/+Y9wJHTCU25gunGKJ9lwNjwTyH7ci6X8o2lmiRNVXfCWG3v0nuCs4d3BUH0W3R3u0g==}
     hasBin: true
     peerDependencies:
       '@prosary/translate': 0.0.6
+    peerDependenciesMeta:
+      '@prosary/translate':
+        optional: true
+
+  '@prosary/kit@0.0.7':
+    resolution: {integrity: sha512-topq6JK6piaziLmtScsx5gG6v1cWPT8DSXUGwje7/lgzIHsxU6NeJi4ceVJrWk6bZPj7AsT4Q6fzXtIRv6hqnQ==}
+    hasBin: true
+    peerDependencies:
+      '@prosary/translate': 0.0.7
     peerDependenciesMeta:
       '@prosary/translate':
         optional: true
@@ -1539,11 +1570,31 @@ packages:
   '@prosary/parse@0.0.6':
     resolution: {integrity: sha512-r2k8EMowAc/sH2TKfgPsX5Lk1Crc6LeCid3reotzF3r0kIBcSBm/D7kRL/Wtbdy7r5IBFRgn1zem4ybldB5TdA==}
 
+  '@prosary/parse@0.0.7':
+    resolution: {integrity: sha512-WeYVhRJ3PWf+hn5O3RkKS2WiX4Z5CFVm12w3BGtp8S/zGf7IZ79IL9bwhQv+pVqly85hB7RgGHlA1KwHCLiaWA==}
+
   '@prosary/schema@0.0.6':
     resolution: {integrity: sha512-6XQ2ezcOeeNIhlzJmx/t0dqKc5puRU2qTD8UUtEyD4QDZwtYEt7KpE7ed9AZRd+YgWGm2kAiuLATDQI2upWmnA==}
 
+  '@prosary/schema@0.0.7':
+    resolution: {integrity: sha512-BYWkgVHTfpWZHXQtpAHr4TCw1P1ynpeUFOUADmvB9OkjhisVZPbtsKWrVZ59H/3bp+N5MzeHcUd13x6dr6yHWQ==}
+
   '@prosary/translate@0.0.6':
     resolution: {integrity: sha512-ffC42Ivk+K/L0qVAAYFUaD8E7aHC0nGoYq9iaplQgoXPHefch1faquC5fUwl/uEZ/RQQZ6kXv1WYZEP4VrKtpw==}
+
+  '@prosary/translate@0.0.7':
+    resolution: {integrity: sha512-8Fzb61grYl1lAc17ItLKuqPV7ZJm/F2YKY21A35NBBEqbvhwyAr+UBPsjzfOM0a4tnL4phebDQMXKULEG+1sSg==}
+    peerDependencies:
+      '@ai-sdk/anthropic': ^4.0.82
+      '@ai-sdk/google': ^4.0.99
+      '@ai-sdk/openai': ^4.0.96
+    peerDependenciesMeta:
+      '@ai-sdk/anthropic':
+        optional: true
+      '@ai-sdk/google':
+        optional: true
+      '@ai-sdk/openai':
+        optional: true
 
   '@prosary/vue@0.0.6':
     resolution: {integrity: sha512-feGxd9IgTakAm9Tkqrr/htAl5ZY3ASblojEOW3E+SCR+VBzqdhreCTBetihKaYd4bKXQhdPxmtD0ywgJ/Vxocw==}
@@ -4268,6 +4319,9 @@ packages:
   prosary@0.0.6:
     resolution: {integrity: sha512-zuJ1FsqsQk4oqnTdoFbDXgUUjl5I7R0OgiiobJK61ok0292YQWD490snZAmzoaVC3MUlhCnwIEdiHH/bg2zpJQ==}
 
+  prosary@0.0.7:
+    resolution: {integrity: sha512-jBfr8tWdQYsFD7MOdlXjr73y5Qj/PO4lWjiS6OZJqseCVu78qNVtibzdrRf6teP7XEY/4xmwqgds1nsznhEf0Q==}
+
   proto-list@1.2.4:
     resolution: {integrity: sha512-vtK/94akxsTMhe0/cbfpR+syPuszcuwhqVjJq26CuNDgFGj682oRBXOP5MJpv2r7JtE8MsiepGIqvvOTBwn2vA==}
 
@@ -5332,10 +5386,10 @@ packages:
 
 snapshots:
 
-  '@ai-sdk/anthropic@4.0.71(zod@4.6.5)':
+  '@ai-sdk/anthropic@4.0.82(zod@4.6.5)':
     dependencies:
-      '@ai-sdk/provider': 4.0.21
-      '@ai-sdk/provider-utils': 5.0.53(zod@4.6.5)
+      '@ai-sdk/provider': 4.0.29
+      '@ai-sdk/provider-utils': 5.0.62(zod@4.6.5)
       zod: 4.6.5
 
   '@ai-sdk/gateway@4.0.103(zod@4.6.5)':
@@ -5354,7 +5408,20 @@ snapshots:
       undici: 7.30.0
       zod: 4.6.5
 
+  '@ai-sdk/provider-utils@5.0.62(zod@4.6.5)':
+    dependencies:
+      '@ai-sdk/provider': 4.0.29
+      '@standard-schema/spec': 1.1.0
+      '@workflow/serde': 4.1.0
+      eventsource-parser: 3.1.1
+      undici: 7.30.0
+      zod: 4.6.5
+
   '@ai-sdk/provider@4.0.21':
+    dependencies:
+      json-schema: 0.4.0
+
+  '@ai-sdk/provider@4.0.29':
     dependencies:
       json-schema: 0.4.0
 
@@ -6748,6 +6815,10 @@ snapshots:
     dependencies:
       '@prosary/schema': 0.0.6
 
+  '@prosary/core@0.0.7':
+    dependencies:
+      '@prosary/schema': 0.0.7
+
   '@prosary/kit@0.0.6(@prosary/translate@0.0.6)':
     dependencies:
       '@formatjs/icu-messageformat-parser': 3.5.20
@@ -6760,6 +6831,22 @@ snapshots:
       vfile-message: 4.0.3
     optionalDependencies:
       '@prosary/translate': 0.0.6
+    transitivePeerDependencies:
+      - supports-color
+    optional: true
+
+  '@prosary/kit@0.0.7(@prosary/translate@0.0.7(@ai-sdk/anthropic@4.0.82(zod@4.6.5)))':
+    dependencies:
+      '@formatjs/icu-messageformat-parser': 3.5.20
+      '@prosary/parse': 0.0.7
+      '@prosary/schema': 0.0.7
+      hast-util-to-html: 9.0.5
+      jiti: 2.7.0
+      objectively: 0.3.0
+      unist-util-visit: 5.1.0
+      vfile-message: 4.0.3
+    optionalDependencies:
+      '@prosary/translate': 0.0.7(@ai-sdk/anthropic@4.0.82(zod@4.6.5))
     transitivePeerDependencies:
       - supports-color
 
@@ -6804,8 +6891,34 @@ snapshots:
       yaml: 2.9.1
     transitivePeerDependencies:
       - supports-color
+    optional: true
+
+  '@prosary/parse@0.0.7':
+    dependencies:
+      '@types/hast': 3.0.5
+      '@types/mdast': 4.0.4
+      mdast-util-directive: 3.1.1
+      mdast-util-to-hast: 13.2.1
+      objectively: 0.3.0
+      remark-directive: 4.0.0
+      remark-frontmatter: 5.0.0
+      remark-gfm: 4.0.1
+      remark-mdc: 3.11.1
+      remark-parse: 11.0.0
+      remark-rehype: 11.1.2
+      unified: 11.0.5
+      unist-util-visit: 5.1.0
+      vfile: 6.0.3
+      yaml: 2.9.1
+    transitivePeerDependencies:
+      - supports-color
 
   '@prosary/schema@0.0.6':
+    dependencies:
+      '@formatjs/icu-messageformat-parser': 3.5.20
+      objectively: 0.3.0
+
+  '@prosary/schema@0.0.7':
     dependencies:
       '@formatjs/icu-messageformat-parser': 3.5.20
       objectively: 0.3.0
@@ -6814,6 +6927,14 @@ snapshots:
     dependencies:
       ai: 7.0.127(zod@4.6.5)
       zod: 4.6.5
+    optional: true
+
+  '@prosary/translate@0.0.7(@ai-sdk/anthropic@4.0.82(zod@4.6.5))':
+    dependencies:
+      ai: 7.0.127(zod@4.6.5)
+      zod: 4.6.5
+    optionalDependencies:
+      '@ai-sdk/anthropic': 4.0.82(zod@4.6.5)
 
   '@prosary/vue@0.0.6(vue@3.5.44(typescript@5.9.3))':
     dependencies:
@@ -10066,6 +10187,11 @@ snapshots:
     dependencies:
       '@prosary/core': 0.0.6
       '@prosary/schema': 0.0.6
+
+  prosary@0.0.7:
+    dependencies:
+      '@prosary/core': 0.0.7
+      '@prosary/schema': 0.0.7
 
   proto-list@1.2.4: {}
 

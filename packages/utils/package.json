@@ -17,11 +17,14 @@
   },
   "dependencies": {
     "@bbf/database": "workspace:*",
+    "@bbf/prose": "workspace:*",
     "@bbf/schema": "workspace:*",
-    "bezoar": "catalog:"
+    "bezoar": "catalog:",
+    "objectively": "catalog:"
   },
   "devDependencies": {
     "@bezoar/testing": "catalog:",
+    "@types/hast": "catalog:",
     "@types/node": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:"

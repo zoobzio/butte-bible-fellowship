@@ -103,6 +103,7 @@ describe("staff", () => {
       name: "Pastor Name",
       role: "Pastor",
       summary: "Serving since 2010.",
+      bio: "Serving **since 2010**.",
       phone: "530-555-0100",
       position: 0,
       status: "published",
@@ -110,12 +111,36 @@ describe("staff", () => {
     const created = await db.admin.staff.create.first(toStaffArguments(body));
     const id = created!.id;
 
+    // The bio is stored as it was written, and served as the tree.
+    expect(await db.admin.staff.fetch.first({ id })).toMatchObject({
+      bio: "Serving **since 2010**.",
+    });
     const [first] = (await db.web.staff.list()).map(toStaffMember);
     expect(first).toEqual({
       slug: "pastor",
       name: "Pastor Name",
       role: "Pastor",
       summary: "Serving since 2010.",
+      bio: {
+        type: "root",
+        children: [
+          {
+            type: "element",
+            tagName: "p",
+            properties: {},
+            children: [
+              { type: "text", value: "Serving " },
+              {
+                type: "element",
+                tagName: "strong",
+                properties: {},
+                children: [{ type: "text", value: "since 2010" }],
+              },
+              { type: "text", value: "." },
+            ],
+          },
+        ],
+      },
       phone: "530-555-0100",
     });
     expect(staffMember.safeParse(first).success).toBe(true);

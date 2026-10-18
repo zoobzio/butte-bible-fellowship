@@ -19,6 +19,7 @@ and hands the row or the body here.
 ```
 src/dto/        a row into the model the API answers with, one file per kind
   event.ts      toChurchEvent: any row of the events into a ChurchEvent
+  hast.ts       toHast: a column of Markdown into the Hast the API answers with
   staff.ts      toStaffMember: a row of the staff into a StaffMember
   sermon.ts     toSermon: a row of the sermons into a Sermon
 src/dao/        an input into the arguments a query takes, one file per kind
@@ -57,6 +58,16 @@ has none, so `EventRow` lets a row do without those three and
 Columns a model has no field for go nowhere: an admin row's `id`,
 `position`, `status` and timestamps.
 
+A column that holds Markdown — a bio, an event's body — reaches the wire
+as the HTML tree the app renders, not as the string. `toHast` reads it
+through `@bbf/prose/parse`, the pipeline the pages are built with, and
+builds the schema's `hast` from the parser's tree node by node: an element's
+tag, its attributes and what it holds, or a run of text. The position the
+parser kept is not built, nor is an attribute left `undefined`, nor a node
+Markdown never makes. Nothing is cast: the parser's shape goes in, the
+wire's comes out, as with any row. `toStaffMember` runs a member's `bio`
+through it; the body a request carries, and the column, stay Markdown.
+
 `toEventArguments` and `toStaffArguments` build what `create` takes; an
 `update` takes the same and the `id` of the row it replaces, so it is
 spread with one. `tests/types.ts` proves both fit, and that a row from
@@ -73,9 +84,10 @@ either side fails `pnpm typecheck` here, before it reaches an app.
   the database's contract through `bezoar`.
 
 The package exports its sources, as `@bbf/schema` does: there is nothing
-to build. It carries no runtime dependency of its own — `@bbf/database` and
-`bezoar` are imported for their types alone, and `@bbf/schema` for its
-types.
+to build. `@bbf/database` and `bezoar` are imported for their types alone,
+and `@bbf/schema` for its types; what runs is `@bbf/prose/parse`, the
+Markdown pipeline, and `objectively`, the typed object helpers that keep
+the transforms free of casts.
 
 ```ts
 // server/composables/events.ts

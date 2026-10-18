@@ -11,7 +11,8 @@
     "./bundles": {
       "types": "./.output/bundles.d.mts",
       "import": "./.output/bundles.mjs"
-    }
+    },
+    "./parse": "./src/parse.ts"
   },
   "scripts": {
     "build": "prosary build",
@@ -21,14 +22,14 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "prosary": "catalog:"
+    "@prosary/kit": "catalog:",
+    "@prosary/parse": "catalog:",
+    "prosary": "catalog:",
+    "rehype-slug": "catalog:"
   },
   "devDependencies": {
     "@ai-sdk/anthropic": "catalog:",
-    "@prosary/kit": "catalog:",
-    "@prosary/parse": "catalog:",
     "@prosary/translate": "catalog:",
-    "rehype-slug": "catalog:",
     "vitest": "catalog:"
   }
 }

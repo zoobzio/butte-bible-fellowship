@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import { hast } from "./hast";
 import { slug } from "./slug";
 
 /** The statuses a piece of content passes through: written, live, kept. */
@@ -35,8 +36,9 @@ export const staffMember = z
         description: "A line or two about them, as a card shows.",
         examples: ["Has served as an elder since 2010."],
       }),
-    bio: z.string().optional().meta({
-      description: "Their bio in full, as Markdown, for their own page.",
+    bio: hast.optional().meta({
+      description:
+        "Their bio in full, for their own page: the tree the app renders, built from the Markdown it was written as.",
     }),
     photo: z
       .url()
