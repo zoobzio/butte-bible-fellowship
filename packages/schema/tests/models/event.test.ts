@@ -3,11 +3,17 @@ import { describe, expect, it } from "vitest";
 import {
   EVENT_DAYS,
   churchEvent,
+  churchEvents,
   eventDay,
   eventTime,
 } from "../../src/models/event";
 
-const WEEKLY = { title: "Worship Service", day: "sunday", start: "10:00" };
+const WEEKLY = {
+  slug: "worship-service",
+  title: "Worship Service",
+  day: "sunday",
+  start: "10:00",
+};
 
 describe("eventDay", () => {
   it("accepts each day of the week", () => {
@@ -37,9 +43,22 @@ describe("churchEvent", () => {
 
   it("accepts an event held once, with all it can say", () => {
     const event = {
-      title: "Volunteer Work Fellowship",
       slug: "volunteer-work-fellowship",
+      title: "Volunteer Work Fellowship",
       note: "Bring gloves.",
+      summary: "Volunteers lend a hand with the work of the church.",
+      body: {
+        type: "root",
+        children: [
+          {
+            type: "element",
+            tagName: "p",
+            properties: {},
+            children: [{ type: "text", value: "Come along." }],
+          },
+        ],
+      },
+      image: "https://cdn.example.com/events/volunteer.jpg",
       location: "Bidwell Park",
       date: "2026-10-17",
       weeks: [1, 3],
@@ -49,10 +68,30 @@ describe("churchEvent", () => {
     expect(churchEvent.parse(event)).toEqual(event);
   });
 
-  it("rejects a slug that would not do in an address", () => {
+  it("needs a slug, and one that would do in an address", () => {
+    const { slug: _slug, ...unnamed } = WEEKLY;
+    expect(churchEvent.safeParse(unnamed).success).toBe(false);
     expect(
       churchEvent.safeParse({ ...WEEKLY, slug: "Worship Service" }).success,
     ).toBe(false);
+  });
+
+  it("takes a body as a tree, never as the Markdown it was written as", () => {
+    expect(
+      churchEvent.safeParse({ ...WEEKLY, body: "## Sunday\n\nWe gather." })
+        .success,
+    ).toBe(false);
+  });
+
+  it("rejects an image that is not a URL", () => {
+    expect(
+      churchEvent.safeParse({ ...WEEKLY, image: "/events/worship.jpg" })
+        .success,
+    ).toBe(false);
+  });
+
+  it("carries no status: the site lists only the published", () => {
+    expect(churchEvent.parse({ ...WEEKLY, status: "draft" })).toEqual(WEEKLY);
   });
 
   it("rejects a date that is not YYYY-MM-DD", () => {
@@ -81,7 +120,18 @@ describe("churchEvent", () => {
 
   it("rejects an event without a start", () => {
     expect(
-      churchEvent.safeParse({ title: "Prayer", day: "wednesday" }).success,
+      churchEvent.safeParse({
+        slug: "prayer",
+        title: "Prayer",
+        day: "wednesday",
+      }).success,
     ).toBe(false);
+  });
+});
+
+describe("churchEvents", () => {
+  it("is a list of events", () => {
+    expect(churchEvents.parse([WEEKLY])).toEqual([WEEKLY]);
+    expect(churchEvents.safeParse([{ title: "Worship" }]).success).toBe(false);
   });
 });

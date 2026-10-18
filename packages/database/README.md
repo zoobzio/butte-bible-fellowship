@@ -8,10 +8,10 @@ what this package exports. An app imports the build and has the database:
 the kit and the sources never reach it.
 
 The tables are the site's three kinds of data: `staff`, who serve the
-church; `events`, each held once on a date or weekly on a day; and
-`sermons`, as the church's YouTube feed lists them. Content the admin app
-edits carries a `content_status` — draft, published, archived — and only
-the published reaches the site.
+church; `events`, each held once on a date or weekly on a day, with the page
+written about it; and `sermons`, as the church's YouTube feed lists them.
+Content the admin app edits carries a `content_status` — draft, published,
+archived — and only the published reaches the site.
 
 The queries are grouped by the app that runs them. `web` is the reads the
 site needs and nothing else; `admin` is the full set of reads and writes
@@ -39,9 +39,12 @@ first row or `null`; one with none returns the count of the rows it changed.
 
 A query is named for what it does: `list` lists, `fetch` reads one.
 `web.staff.list` lists the published staff in order, and `web.staff.fetch`
-is one of them by slug. `web.events.weekly` lists every
-repeating event Sunday first, and `web.events.upcoming` the one-offs on or
-after a date; `web.events.bySlug` is an event's own page. `web.sermons.latest`
+is one of them by slug. The events the web reads are the published ones:
+`web.events.list` is the calendar's feed — every repeating event Sunday
+first, then the one-offs on or after a date — and `web.events.weekly` and
+`web.events.upcoming` are its two halves on their own; `web.events.fetch`
+is an event's own page by slug, and alone carries the event's `body`, the
+Markdown written about it, which the lists leave out. `web.sermons.latest`
 takes the newest as many as asked, and `web.sermons.byId` one of them.
 
 `admin.staff` has `list`, `fetch`, `create`, `update` and `delete`, over
@@ -50,11 +53,12 @@ every member whatever their status. `admin.events` has the same, by `id`.
 feed lists it or brings it up to date, and `delete`.
 
 An argument written into a column the schema lets be null — a summary, a
-bio, a note, a location, an end time, an event's `date` or `day` or
-`weeks` — is optional, and takes `null`; left out, it is null. Every other
-argument is required, a member's `status` among them. An event is created with its `date` or its `day`, never both,
-and the schema refuses anything else. An `update` replaces every field,
-so one that passes a `date` and no `day` makes the event a one-off.
+bio, a body, an image, a note, a location, an end time, an event's `date`
+or `day` or `weeks` — is optional, and takes `null`; left out, it is null.
+Every other argument is required, a member's or an event's `status` among
+them. An event is created with its `date` or its `day`, never both, and the
+schema refuses anything else. An `update` replaces every field, so one that
+passes a `date` and no `day` makes the event a one-off.
 
 ## Exports
 

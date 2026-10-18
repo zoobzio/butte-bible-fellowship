@@ -51,18 +51,29 @@ describe("eventsQuery", () => {
 });
 
 describe("eventBody", () => {
-  it("accepts a weekly event", () => {
-    expect(eventBody.parse(WEEKLY)).toEqual(WEEKLY);
+  it("writes an event as a draft when not told otherwise", () => {
+    expect(eventBody.parse(WEEKLY)).toEqual({ ...WEEKLY, status: "draft" });
   });
 
   it("accepts an event held once, with all it can say", () => {
     const value = {
       ...ONCE,
       note: "Bring gloves.",
+      summary: "A morning's work on the grounds.",
+      body: "## Work Day\n\nBring gloves.",
+      image: "https://cdn.example.com/events/work-day.jpg",
       location: "Bidwell Park",
       end: "12:00",
+      status: "published",
     };
     expect(eventBody.parse(value)).toEqual(value);
+  });
+
+  it("rejects a status that is not one, and an image that is not a URL", () => {
+    expect(issues({ ...WEEKLY, status: "hidden" })).toEqual(["status"]);
+    expect(issues({ ...WEEKLY, image: "/events/worship.jpg" })).toEqual([
+      "image",
+    ]);
   });
 
   it("insists on a date or a day, never both and never neither", () => {
@@ -74,6 +85,7 @@ describe("eventBody", () => {
     expect(eventBody.parse({ ...WEEKLY, weeks: [1, 3] })).toEqual({
       ...WEEKLY,
       weeks: [1, 3],
+      status: "draft",
     });
     expect(issues({ ...ONCE, weeks: [1, 3] })).toEqual(["weeks"]);
   });

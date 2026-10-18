@@ -18,11 +18,31 @@ const INVITATION: InvitationConfig = {
   address: "1 Test Street, Testville",
 };
 
-const WORSHIP = { title: "Worship Service", day: "sunday", start: "10:00" };
-const SCHOOL = { title: "Sunday School", day: "sunday", start: "08:45" };
-const PRAYER = { title: "Prayer Meeting", day: "thursday", start: "10:00" };
+const WORSHIP = {
+  title: "Worship Service",
+  slug: "worship-service",
+  day: "sunday",
+  start: "10:00",
+};
+const SCHOOL = {
+  title: "Sunday School",
+  slug: "sunday-school",
+  day: "sunday",
+  start: "08:45",
+};
+const PRAYER = {
+  title: "Prayer Meeting",
+  slug: "prayer-meeting",
+  day: "thursday",
+  start: "10:00",
+};
 // Held once, on a Sunday.
-const DINNER = { title: "Harvest Dinner", date: "2026-10-18", start: "17:30" };
+const DINNER = {
+  title: "Harvest Dinner",
+  slug: "harvest-dinner",
+  date: "2026-10-18",
+  start: "17:30",
+};
 
 const EVENTS_PAGE = document({
   title: "Events – Test Church",

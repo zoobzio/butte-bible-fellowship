@@ -28,7 +28,14 @@ describe("page", () => {
   it("accepts the events page's calendar", () => {
     const value = {
       title: "Events",
-      events: [{ title: "Worship Service", day: "sunday", start: "10:00" }],
+      events: [
+        {
+          slug: "worship-service",
+          title: "Worship Service",
+          day: "sunday",
+          start: "10:00",
+        },
+      ],
     };
     expect(page.parse(value)).toEqual(value);
   });

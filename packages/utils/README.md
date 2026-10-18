@@ -47,13 +47,15 @@ transform is the difference between a column and a field. What a row has
 null in, a model leaves out: a `summary`, a `note`, a `location`, an
 event's `end`. What a body leaves out, the arguments write as null, so an
 update that passes no `date` clears one; what a body defaults, a member's
-`position` and `status`, is written as the body parsed it. A time comes out of Postgres as `HH:MM:SS` and the
+`position` and `status` and an event's `status`, is written as the body
+parsed it. A time comes out of Postgres as `HH:MM:SS` and the
 API says `HH:MM`; a `timestamptz` comes out as a `Date` and the API says an
 ISO 8601 timestamp, and `admin.sermons.upsert` takes the `Date` back.
 
 A row's columns differ by query. `web.events.weekly` has no `date` and
 `web.events.upcoming` no `day` or `weeks`, each knowing its kind of event
-has none, so `EventRow` lets a row do without those three and
+has none, and every list of the events has no `body`, which is the event's
+own page's to carry, so `EventRow` lets a row do without those four and
 `toChurchEvent` takes any query's row of the events, the admin's included.
 Columns a model has no field for go nowhere: an admin row's `id`,
 `position`, `status` and timestamps.
@@ -66,7 +68,8 @@ tag, its attributes and what it holds, or a run of text. The position the
 parser kept is not built, nor is an attribute left `undefined`, nor a node
 Markdown never makes. Nothing is cast: the parser's shape goes in, the
 wire's comes out, as with any row. `toStaffMember` runs a member's `bio`
-through it; the body a request carries, and the column, stay Markdown.
+through it and `toChurchEvent` an event's `body`; the body a request
+carries, and the column, stay Markdown.
 
 `toEventArguments` and `toStaffArguments` build what `create` takes; an
 `update` takes the same and the `id` of the row it replaces, so it is

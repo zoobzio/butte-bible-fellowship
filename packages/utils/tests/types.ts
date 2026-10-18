@@ -9,10 +9,11 @@ import { toChurchEvent, toSermon, toStaffMember } from "../src/dto";
  * each against `@bbf/database`'s build and `@bbf/schema`'s types: a column
  * renamed or a field added on either side fails here, before any app.
  */
+declare const listed: Row<Contract, "web.events.list">;
 declare const weekly: Row<Contract, "web.events.weekly">;
 declare const upcoming: Row<Contract, "web.events.upcoming">;
-declare const bySlug: Row<Contract, "web.events.bySlug">;
-declare const adminEvent: Row<Contract, "admin.events.byId">;
+declare const fetched: Row<Contract, "web.events.fetch">;
+declare const adminEvent: Row<Contract, "admin.events.fetch">;
 declare const webStaff: Row<Contract, "web.staff.list">;
 declare const webOne: Row<Contract, "web.staff.fetch">;
 declare const adminStaff: Row<Contract, "admin.staff.fetch">;
@@ -20,7 +21,9 @@ declare const latest: Row<Contract, "web.sermons.latest">;
 declare const adminSermon: Row<Contract, "admin.sermons.byId">;
 
 // Every query of a kind returns a row its transform takes.
-export const events = [weekly, upcoming, bySlug, adminEvent].map(toChurchEvent);
+export const events = [listed, weekly, upcoming, fetched, adminEvent].map(
+  toChurchEvent,
+);
 export const staff = [webStaff, webOne, adminStaff].map(toStaffMember);
 export const sermons = [latest, adminSermon].map(toSermon);
 

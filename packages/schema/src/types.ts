@@ -3,7 +3,12 @@ import type { z } from "zod";
 import type { eventBody, eventPath, eventsQuery } from "./input/event";
 import type { sermonPath, sermonsQuery } from "./input/sermon";
 import type { staffBody, staffPath } from "./input/staff";
-import type { churchEvent, eventDay, eventTime } from "./models/event";
+import type {
+  churchEvent,
+  churchEvents,
+  eventDay,
+  eventTime,
+} from "./models/event";
 import type { hast, hastElement, hastText } from "./models/hast";
 import type { hero, page } from "./models/page";
 import type { sermon } from "./models/sermon";
@@ -23,6 +28,9 @@ export type EventTime = z.infer<typeof eventTime>;
 
 /** An event of the church: held once on a date, or weekly on a day. */
 export type ChurchEvent = z.infer<typeof churchEvent>;
+
+/** The events the site lists: the repeating ones Sunday first, then the one-offs to come. */
+export type ChurchEvents = z.infer<typeof churchEvents>;
 
 /** Rich text as the API serves it: an HTML syntax tree of elements and text. */
 export type Hast = z.infer<typeof hast>;

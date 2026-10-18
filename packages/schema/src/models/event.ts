@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import { hast } from "./hast";
 import { slug } from "./slug";
 
 /** The days of the week an event can repeat on, Sunday first. */
@@ -31,24 +32,45 @@ export const eventTime = z
   });
 
 /**
- * An event of the church, as the API serves it and the events page's front
- * matter lists it. One with a `date` happens once, on that date; one with a
- * `day` instead repeats every week on that day. Its times are the church's
- * own.
+ * An event of the church, as the API serves it. One with a `date` happens
+ * once, on that date; one with a `day` instead repeats every week on that
+ * day. Its times are the church's own. What is written about it, its
+ * `body`, is its own page's: a list leaves it out.
  */
 export const churchEvent = z
   .object({
-    title: z.string().meta({ examples: ["Worship Service"] }),
-    slug: slug.optional().meta({
+    slug: slug.meta({
       description:
-        "What the event's own page is called in its address: /events/<slug>. Left out, it is made from the title — which a translation changes, so an event with a slug keeps one address in every language.",
+        "What the event's own page is called in its address: /events/<slug>.",
+      examples: ["worship-service"],
     }),
+    title: z.string().meta({ examples: ["Worship Service"] }),
     note: z
       .string()
       .optional()
       .meta({
         description: "A few words more about it, shown under its title.",
         examples: ["All welcome"],
+      }),
+    summary: z
+      .string()
+      .optional()
+      .meta({
+        description:
+          "A line or two about it, as a card shows and search engines list.",
+        examples: ["We gather on Sunday morning to worship God together."],
+      }),
+    body: hast.optional().meta({
+      description:
+        "What is written about it, for its own page: the tree the app renders, built from the Markdown it was written as. A list leaves it out.",
+    }),
+    image: z
+      .url()
+      .optional()
+      .meta({
+        description:
+          "The URL of its picture. Left out, it is pictured by the church.",
+        examples: ["https://cdn.example.com/events/worship-service.jpg"],
       }),
     location: z
       .string()
@@ -83,3 +105,9 @@ export const churchEvent = z
     description:
       "An event of the church. One with a date happens once, on that date; one with a day instead repeats every week on that day. Its times are the church's own.",
   });
+
+/** The events the site lists: the repeating ones Sunday first, then the one-offs to come. */
+export const churchEvents = z.array(churchEvent).meta({
+  description:
+    "The events the site lists: the repeating ones Sunday first, then the one-offs to come.",
+});

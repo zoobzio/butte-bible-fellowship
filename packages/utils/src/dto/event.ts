@@ -1,5 +1,6 @@
 import type { ChurchEvent } from "@bbf/schema/types";
 
+import { toHast } from "./hast";
 import type { EventRow } from "../types";
 
 /** A time as Postgres writes it, `HH:MM:SS`, as the API says it, `HH:MM`. */
@@ -15,13 +16,19 @@ const toWeeks = (weeks: EventRow["weeks"]): number[] | undefined =>
 
 /**
  * An event as the API serves it, from a row of the events. A column the
- * row has null in, the event leaves out; its times lose their seconds, as
- * `start_time` and `end_time` are written to the minute.
+ * row has null in, or a list's row has not, the event leaves out; the body,
+ * written as Markdown, goes out as the tree the app renders; its times lose
+ * their seconds, as `start_time` and `end_time` are written to the minute.
+ * An admin row's `id`, `status` and timestamps keep it, and are not what
+ * the site shows: the model carries none of them.
  */
 export const toChurchEvent = (row: EventRow): ChurchEvent => ({
-  title: row.title,
   slug: row.slug,
+  title: row.title,
   note: row.note ?? undefined,
+  summary: row.summary ?? undefined,
+  body: row.body == null ? undefined : toHast(row.body),
+  image: row.image ?? undefined,
   location: row.location ?? undefined,
   date: row.date ?? undefined,
   day: row.day ?? undefined,

@@ -6,10 +6,25 @@ import HomeWeek from "~/components/HomeWeek.vue";
 import { document } from "#test/support/content";
 import { mountSuspended } from "#test/support/mount";
 
-const WORSHIP = { title: "Worship Service", day: "sunday", start: "10:00" };
-const PRAYER = { title: "Prayer Meeting", day: "thursday", start: "10:00" };
+const WORSHIP = {
+  title: "Worship Service",
+  slug: "worship-service",
+  day: "sunday",
+  start: "10:00",
+};
+const PRAYER = {
+  title: "Prayer Meeting",
+  slug: "prayer-meeting",
+  day: "thursday",
+  start: "10:00",
+};
 // Held once, the week after the one the tests are in.
-const DINNER = { title: "Harvest Dinner", date: "2026-10-14", start: "17:30" };
+const DINNER = {
+  title: "Harvest Dinner",
+  slug: "harvest-dinner",
+  date: "2026-10-14",
+  start: "17:30",
+};
 
 const EVENTS_PAGE = document({
   title: "Events – Test Church",

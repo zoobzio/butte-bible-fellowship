@@ -2,6 +2,7 @@ import { z } from "zod";
 
 import { eventDay, eventTime } from "../models/event";
 import { slug } from "../models/slug";
+import { contentStatus } from "../models/staff";
 
 /** The path of an event's own page: `/events/{slug}`. */
 export const eventPath = z.object({
@@ -27,7 +28,8 @@ export const eventsQuery = z.object({
  * An event as it is written: what creating one takes, and what updating one
  * replaces, every field. It happens once, on its `date`, or repeats every
  * week on its `day`: one of the two, never both. Only a repeating event
- * picks its `weeks`, and an `end` comes after its `start`.
+ * picks its `weeks`, and an `end` comes after its `start`. A new event is a
+ * draft until the body says otherwise.
  */
 export const eventBody = z
   .object({
@@ -40,6 +42,16 @@ export const eventBody = z
       .meta({ examples: ["Worship Service"] }),
     note: z.string().optional().meta({
       description: "A few words more about it, shown under its title.",
+    }),
+    summary: z.string().optional().meta({
+      description:
+        "A line or two about it, as a card shows and search engines list.",
+    }),
+    body: z.string().optional().meta({
+      description: "What is written about it, as Markdown, for its own page.",
+    }),
+    image: z.url().optional().meta({
+      description: "The URL of its picture.",
     }),
     location: z.string().optional().meta({
       description: "Where it is held, when that is not at the church.",
@@ -64,6 +76,9 @@ export const eventBody = z
       }),
     start: eventTime.meta({ description: "When it starts." }),
     end: eventTime.optional().meta({ description: "When it ends." }),
+    status: contentStatus.default("draft").meta({
+      description: "Whether it reaches the site. Left out, a draft.",
+    }),
   })
   .check((ctx) => {
     const { date, day, weeks, start, end } = ctx.value;

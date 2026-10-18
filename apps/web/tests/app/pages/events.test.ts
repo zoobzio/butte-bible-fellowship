@@ -9,8 +9,19 @@ import { document } from "#test/support/content";
 import { mountSuspended } from "#test/support/mount";
 
 const EVENTS = [
-  { title: "Worship Service", day: "sunday", start: "10:00", end: "11:30" },
-  { title: "Harvest Dinner", date: "2026-10-24", start: "17:30" },
+  {
+    title: "Worship Service",
+    slug: "worship-service",
+    day: "sunday",
+    start: "10:00",
+    end: "11:30",
+  },
+  {
+    title: "Harvest Dinner",
+    slug: "harvest-dinner",
+    date: "2026-10-24",
+    start: "17:30",
+  },
 ];
 
 const EVENTS_PAGE = document({ title: "Events – Test Church", events: EVENTS });

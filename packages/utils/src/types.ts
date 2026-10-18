@@ -5,17 +5,21 @@ import type { Arguments, Row } from "bezoar";
 // transform under `dto/` takes one and builds the model `@bbf/schema` says
 // the API answers with.
 
-/** Every column an event's row can carry, as `web.events.bySlug` reads them. */
-type EventColumns = Row<Contract, "web.events.bySlug">;
+/** Every column an event's row can carry, as `web.events.fetch` reads them. */
+type EventColumns = Row<Contract, "web.events.fetch">;
+
+/** The columns a query of the events may leave out. */
+type EventSpare = "date" | "day" | "weeks" | "body";
 
 /**
  * An event as a query returns it. `web.events.weekly` leaves out `date` and
  * `web.events.upcoming` leaves out `day` and `weeks`, each knowing its kind
- * of event has none, so a row may do without those three; the admin's rows
+ * of event has none; every list leaves out `body`, which is the event's own
+ * page's to carry. So a row may do without those four; the admin's rows
  * carry more, and pass as they are.
  */
-export type EventRow = Omit<EventColumns, "date" | "day" | "weeks"> &
-  Partial<Pick<EventColumns, "date" | "day" | "weeks">>;
+export type EventRow = Omit<EventColumns, EventSpare> &
+  Partial<Pick<EventColumns, EventSpare>>;
 
 /**
  * A staff member as a query returns them: the columns the site lists. The

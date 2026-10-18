@@ -48,6 +48,7 @@ const WORSHIP: ChurchEvent = {
 
 const SCHOOL: ChurchEvent = {
   title: "Sunday School",
+  slug: "sunday-school",
   day: "sunday",
   start: "08:45",
   end: "09:30",
@@ -55,6 +56,7 @@ const SCHOOL: ChurchEvent = {
 
 const STAMPS: ChurchEvent = {
   title: "Stamp Ministry",
+  slug: "stamp-ministry",
   day: "tuesday",
   weeks: [1, 3],
   start: "13:00",
@@ -62,12 +64,17 @@ const STAMPS: ChurchEvent = {
 
 const DINNER: ChurchEvent = {
   title: "Harvest Dinner",
+  slug: "harvest-dinner",
   date: "2026-10-24",
   start: "17:30",
   note: "Bring a dish",
 };
 
-const OPEN_HOUSE: ChurchEvent = { title: "Open House", start: "all day" };
+const OPEN_HOUSE: ChurchEvent = {
+  title: "Open House",
+  slug: "open-house",
+  start: "all day",
+};
 
 afterEach(() => {
   vi.useRealTimers();

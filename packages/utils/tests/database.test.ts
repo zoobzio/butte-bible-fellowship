@@ -37,8 +37,9 @@ describe("events", () => {
       expect(churchEvent.safeParse(event).success).toBe(true);
     }
     expect(events.find((event) => event.slug === "worship-service")).toEqual({
-      title: "Worship Service",
       slug: "worship-service",
+      title: "Worship Service",
+      summary: "We gather on Sunday morning to worship God together.",
       day: "sunday",
       start: "10:00",
       end: "11:30",
@@ -48,29 +49,77 @@ describe("events", () => {
     ).toEqual([1, 3]);
   });
 
+  it("reads a seeded event's own page, its body as the tree", async () => {
+    const row = await db.web.events.fetch.first({ slug: "prayer-meeting" });
+    const event = toChurchEvent(row!);
+    expect(event.body).toMatchObject({
+      type: "root",
+      children: [
+        expect.objectContaining({ type: "element", tagName: "p" }),
+        { type: "text", value: "\n" },
+        expect.objectContaining({ type: "element", tagName: "p" }),
+      ],
+    });
+    expect(churchEvent.safeParse(event).success).toBe(true);
+  });
+
   it("writes a one-off from its body, and reads it back as upcoming", async () => {
     const body = eventBody.parse({
       slug: "christmas-eve",
       title: "Christmas Eve Service",
       note: "Candlelight",
+      summary: "A candlelight service.",
+      body: "Come **early**.",
       date: "2026-12-24",
       start: "18:00",
       end: "19:30",
+      status: "published",
     });
     const created = await db.admin.events.create.first(toEventArguments(body));
     const id = created!.id;
 
+    // The body is stored as it was written, and the lists leave it out.
+    expect(await db.admin.events.fetch.first({ id })).toMatchObject({
+      body: "Come **early**.",
+    });
     const upcoming = await db.web.events.upcoming({ from: "2026-12-01" });
     expect(upcoming.map(toChurchEvent)).toEqual([
       {
-        title: "Christmas Eve Service",
         slug: "christmas-eve",
+        title: "Christmas Eve Service",
         note: "Candlelight",
+        summary: "A candlelight service.",
         date: "2026-12-24",
         start: "18:00",
         end: "19:30",
       },
     ]);
+
+    // Its own page carries the body, as the tree.
+    const page = await db.web.events.fetch.first({ slug: "christmas-eve" });
+    expect(toChurchEvent(page!)).toEqual({
+      ...toChurchEvent(upcoming[0]!),
+      body: {
+        type: "root",
+        children: [
+          {
+            type: "element",
+            tagName: "p",
+            properties: {},
+            children: [
+              { type: "text", value: "Come " },
+              {
+                type: "element",
+                tagName: "strong",
+                properties: {},
+                children: [{ type: "text", value: "early" }],
+              },
+              { type: "text", value: "." },
+            ],
+          },
+        ],
+      },
+    });
 
     // Updated as weekly from a body: the date goes, the day and weeks come.
     const weekly = eventBody.parse({
@@ -80,12 +129,13 @@ describe("events", () => {
       day: "wednesday",
       weeks: [1, 2, 3, 4],
       start: "18:00",
+      status: "published",
     });
     await db.admin.events.update({ ...toEventArguments(weekly), id });
-    const found = await db.web.events.bySlug.first({ slug: "christmas-eve" });
+    const found = await db.web.events.fetch.first({ slug: "christmas-eve" });
     expect(toChurchEvent(found!)).toEqual({
-      title: "Advent Evening",
       slug: "christmas-eve",
+      title: "Advent Evening",
       location: "Fellowship Hall",
       day: "wednesday",
       weeks: [1, 2, 3, 4],
@@ -93,6 +143,21 @@ describe("events", () => {
     });
 
     expect(await db.admin.events.delete({ id })).toBe(1);
+  });
+
+  it("writes a draft the site does not list", async () => {
+    const body = eventBody.parse({
+      slug: "draft",
+      title: "Draft",
+      day: "monday",
+      start: "19:00",
+    });
+    const created = await db.admin.events.create.first(toEventArguments(body));
+    expect(
+      (await db.web.events.weekly()).map(toChurchEvent).map((e) => e.slug),
+    ).not.toContain("draft");
+    expect(await db.web.events.fetch.first({ slug: "draft" })).toBeNull();
+    expect(await db.admin.events.delete({ id: created!.id })).toBe(1);
   });
 });
 

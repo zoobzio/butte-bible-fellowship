@@ -59,7 +59,8 @@ describe("the build", () => {
   it("groups the queries by app: reads for the web, CRUD for admin", () => {
     const names = Object.keys(contract.queries);
     expect(names.filter((name) => name.startsWith("web."))).toEqual([
-      "web.events.bySlug",
+      "web.events.fetch",
+      "web.events.list",
       "web.events.upcoming",
       "web.events.weekly",
       "web.sermons.byId",
@@ -68,7 +69,7 @@ describe("the build", () => {
       "web.staff.list",
     ]);
     expect(names.filter((name) => name.startsWith("admin."))).toHaveLength(14);
-    expect(names).toHaveLength(21);
+    expect(names).toHaveLength(22);
   });
 });
 
@@ -113,20 +114,31 @@ describe("web", () => {
       weeks: null,
       start_time: "10:00:00",
       end_time: "11:30:00",
+      image: null,
     });
+    expect(events[2]?.summary).toMatch(/^We gather on Sunday morning/);
+    expect(events[2]).not.toHaveProperty("body");
     expect(events[5]).toMatchObject({ slug: "stamp-ministry", weeks: [1, 3] });
     expect(events[6]).toMatchObject({ note: "All welcome" });
   });
 
-  it("finds an event by slug, or nothing", async () => {
-    expect(
-      await db.web.events.bySlug.first({ slug: "prayer-meeting" }),
-    ).toMatchObject({
+  it("lists the calendar's events: the weekly ones, then the one-offs to come", async () => {
+    const events = await db.web.events.list({ from: "2026-01-01" });
+    expect(events.map((event) => event.slug)).toEqual(
+      (await db.web.events.weekly()).map((event) => event.slug),
+    );
+    expect(events[0]).not.toHaveProperty("body");
+  });
+
+  it("finds an event by slug, with what is written about it, or nothing", async () => {
+    const found = await db.web.events.fetch.first({ slug: "prayer-meeting" });
+    expect(found).toMatchObject({
       title: "Prayer Meeting",
       day: "thursday",
       date: null,
     });
-    expect(await db.web.events.bySlug.first({ slug: "nope" })).toBeNull();
+    expect(found?.body).toMatch(/^We set aside time/);
+    expect(await db.web.events.fetch.first({ slug: "nope" })).toBeNull();
   });
 
   it("has no upcoming one-offs and no sermons until admin adds them", async () => {
@@ -252,8 +264,18 @@ describe("admin.events", () => {
       title: "Christmas Eve Service",
       date: "2026-12-24",
       start: "18:00",
+      status: "published",
     });
+    expect(created?.created_at).toBeInstanceOf(Date);
     const id = created!.id;
+
+    // What is left out is none.
+    expect(await db.admin.events.fetch.first({ id })).toMatchObject({
+      summary: null,
+      body: null,
+      image: null,
+      status: "published",
+    });
 
     expect(await db.web.events.upcoming({ from: "2026-12-01" })).toEqual([
       expect.objectContaining({
@@ -266,23 +288,37 @@ describe("admin.events", () => {
       }),
     ]);
     expect(await db.web.events.upcoming({ from: "2026-12-25" })).toEqual([]);
+    expect(
+      (await db.web.events.list({ from: "2026-12-01" })).map((e) => e.slug),
+    ).toContain("christmas-eve");
+    expect(
+      (await db.web.events.list({ from: "2026-12-25" })).map((e) => e.slug),
+    ).not.toContain("christmas-eve");
 
     // Re-scheduled as weekly: the date goes, the day comes.
-    await db.admin.events.update({
+    const updated = await db.admin.events.update.first({
       id,
       slug: "christmas-eve",
       title: "Advent Evening",
       note: "Through December",
+      summary: "An evening a week through Advent.",
+      body: "## Advent\n\nAn evening a week.",
+      image: "https://cdn.example.com/events/advent.jpg",
       location: null,
       date: null,
       day: "wednesday",
       weeks: [1, 2, 3, 4],
       start: "18:00",
       end: "19:00",
+      status: "published",
     });
-    expect(await db.admin.events.byId.first({ id })).toMatchObject({
+    expect(updated?.updated_at).toBeInstanceOf(Date);
+    expect(await db.admin.events.fetch.first({ id })).toMatchObject({
       title: "Advent Evening",
       note: "Through December",
+      summary: "An evening a week through Advent.",
+      body: "## Advent\n\nAn evening a week.",
+      image: "https://cdn.example.com/events/advent.jpg",
       date: null,
       day: "wednesday",
       weeks: [1, 2, 3, 4],
@@ -301,9 +337,13 @@ describe("admin.events", () => {
       location: "Pillsbury Road",
       date: "2026-12-24",
       start: "18:00",
+      status: "published",
     });
-    expect(await db.admin.events.byId.first({ id })).toMatchObject({
+    expect(await db.admin.events.fetch.first({ id })).toMatchObject({
       note: null,
+      summary: null,
+      body: null,
+      image: null,
       day: null,
       weeks: null,
       date: "2026-12-24",
@@ -312,6 +352,48 @@ describe("admin.events", () => {
     });
 
     expect(await db.admin.events.delete({ id })).toBe(1);
+    expect(await db.admin.events.fetch.first({ id })).toBeNull();
+    expect(await db.admin.events.delete({ id })).toBe(0);
+  });
+
+  it("keeps a draft or an archived event off the site", async () => {
+    const draft = await db.admin.events.create.first({
+      slug: "draft",
+      title: "Draft",
+      day: "monday",
+      start: "19:00",
+      status: "draft",
+    });
+    const archived = await db.admin.events.create.first({
+      slug: "archived",
+      title: "Archived",
+      date: "2026-12-24",
+      start: "19:00",
+      status: "archived",
+    });
+
+    expect(await db.admin.events.list()).toHaveLength(10);
+    expect((await db.web.events.weekly()).map((e) => e.slug)).not.toContain(
+      "draft",
+    );
+    expect(await db.web.events.upcoming({ from: "2026-01-01" })).toEqual([]);
+    expect(await db.web.events.list({ from: "2026-01-01" })).toHaveLength(8);
+    expect(await db.web.events.fetch.first({ slug: "draft" })).toBeNull();
+
+    await db.admin.events.update({
+      id: draft!.id,
+      slug: "draft",
+      title: "Draft",
+      day: "monday",
+      start: "19:00",
+      status: "published",
+    });
+    expect(await db.web.events.fetch.first({ slug: "draft" })).toMatchObject({
+      title: "Draft",
+    });
+
+    expect(await db.admin.events.delete({ id: draft!.id })).toBe(1);
+    expect(await db.admin.events.delete({ id: archived!.id })).toBe(1);
   });
 
   it("creates a weekly event, with null weeks meaning every week", async () => {
@@ -321,8 +403,9 @@ describe("admin.events", () => {
       day: "monday",
       start: "19:00",
       end: "20:30",
+      status: "published",
     });
-    expect(await db.admin.events.byId.first({ id: every!.id })).toMatchObject({
+    expect(await db.admin.events.fetch.first({ id: every!.id })).toMatchObject({
       day: "monday",
       weeks: null,
     });
@@ -333,8 +416,9 @@ describe("admin.events", () => {
       day: "friday",
       weeks: [2, 4],
       start: "18:30",
+      status: "published",
     });
-    expect(await db.admin.events.byId.first({ id: some!.id })).toMatchObject({
+    expect(await db.admin.events.fetch.first({ id: some!.id })).toMatchObject({
       weeks: [2, 4],
       end_time: null,
     });
@@ -358,7 +442,12 @@ describe("admin.events", () => {
   });
 
   it("refuses what the schema rules out", async () => {
-    const base = { slug: "bad", title: "Bad", start: "10:00" };
+    const base = {
+      slug: "bad",
+      title: "Bad",
+      start: "10:00",
+      status: "draft" as const,
+    };
     expect(await refusal(db.admin.events.create({ ...base }))).toMatch(
       /events_date_or_day/,
     );

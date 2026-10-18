@@ -3,6 +3,7 @@ import { createDocument } from "zod-openapi";
 
 import {
   churchEvent,
+  churchEvents,
   eventBody,
   eventPath,
   eventsQuery,
@@ -34,7 +35,7 @@ const document = createDocument({
     "/api/events": {
       get: {
         requestParams: { query: eventsQuery },
-        responses: { 200: json(churchEvent.array()) },
+        responses: { 200: json(churchEvents) },
       },
       post: {
         requestBody: { content: { "application/json": { schema: eventBody } } },
@@ -161,8 +162,15 @@ describe("the components", () => {
       },
     });
     expect(schemas.ChurchEvent).toMatchObject({
-      required: ["title", "start"],
-      properties: { date: { format: "date" } },
+      required: ["slug", "title", "start"],
+      properties: {
+        date: { format: "date" },
+        image: { format: "uri" },
+        body: { $ref: "#/components/schemas/Hast" },
+      },
+    });
+    expect(schemas.EventBody).toMatchObject({
+      properties: { status: { $ref: "#/components/schemas/ContentStatus" } },
     });
     expect(schemas.StaffMember).toMatchObject({
       required: ["slug", "name", "role"],

@@ -35,6 +35,20 @@ export type Checks = [
     >
   >,
   Assert<Equal<Row<Contract, "web.events.weekly">["end_time"], string | null>>,
+  // What is written about an event is its own page's: the lists carry none.
+  Assert<Equal<Row<Contract, "web.events.fetch">["body"], string | null>>,
+  Assert<
+    Equal<
+      "body" extends keyof Row<Contract, "web.events.list"> ? true : false,
+      false
+    >
+  >,
+  Assert<
+    Equal<
+      Arguments<Contract, "admin.events.create">["status"],
+      "draft" | "published" | "archived"
+    >
+  >,
   // A timestamp is a Date; a time or a date is a string.
   Assert<Equal<Row<Contract, "web.sermons.latest">["published_at"], Date>>,
   Assert<Equal<Row<Contract, "web.events.weekly">["start_time"], string>>,

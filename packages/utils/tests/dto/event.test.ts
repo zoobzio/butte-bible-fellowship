@@ -3,11 +3,13 @@ import { describe, expect, it } from "vitest";
 
 import { toChurchEvent } from "../../src/dto/event";
 
-/** A row as `web.events.weekly` returns it: no `date` column at all. */
+/** A row as `web.events.weekly` returns it: no `date` or `body` column at all. */
 const WEEKLY = {
   slug: "worship-service",
   title: "Worship Service",
   note: null,
+  summary: null,
+  image: null,
   location: null,
   day: "sunday" as const,
   weeks: null,
@@ -15,11 +17,13 @@ const WEEKLY = {
   end_time: "11:30:00",
 };
 
-/** A row as `web.events.upcoming` returns it: no `day` or `weeks` column. */
+/** A row as `web.events.upcoming` returns it: no `day`, `weeks` or `body` column. */
 const ONE_OFF = {
   slug: "christmas-eve",
   title: "Christmas Eve Service",
   note: "Candlelight",
+  summary: "A candlelight service on Christmas Eve.",
+  image: "https://cdn.example.com/events/christmas-eve.jpg",
   location: "Pillsbury Road",
   date: "2026-12-24",
   start_time: "18:00:00",
@@ -29,8 +33,8 @@ const ONE_OFF = {
 describe("toChurchEvent", () => {
   it("builds a weekly event, leaving out what the row has null in", () => {
     expect(toChurchEvent(WEEKLY)).toEqual({
-      title: "Worship Service",
       slug: "worship-service",
+      title: "Worship Service",
       day: "sunday",
       start: "10:00",
       end: "11:30",
@@ -39,13 +43,42 @@ describe("toChurchEvent", () => {
 
   it("builds a one-off from a row without a day", () => {
     expect(toChurchEvent(ONE_OFF)).toEqual({
-      title: "Christmas Eve Service",
       slug: "christmas-eve",
+      title: "Christmas Eve Service",
       note: "Candlelight",
+      summary: "A candlelight service on Christmas Eve.",
+      image: "https://cdn.example.com/events/christmas-eve.jpg",
       location: "Pillsbury Road",
       date: "2026-12-24",
       start: "18:00",
     });
+  });
+
+  it("serves the body as the tree the app renders, not the Markdown", () => {
+    const event = toChurchEvent({
+      ...WEEKLY,
+      body: "## Sunday\n\nWe gather.",
+    });
+    expect(event.body).toEqual({
+      type: "root",
+      children: [
+        {
+          type: "element",
+          tagName: "h2",
+          properties: { id: "sunday" },
+          children: [{ type: "text", value: "Sunday" }],
+        },
+        { type: "text", value: "\n" },
+        {
+          type: "element",
+          tagName: "p",
+          properties: {},
+          children: [{ type: "text", value: "We gather." }],
+        },
+      ],
+    });
+    expect(churchEvent.safeParse(event).success).toBe(true);
+    expect(toChurchEvent({ ...WEEKLY, body: null }).body).toBeUndefined();
   });
 
   it("keeps the weeks a repeating event is held in, dropping a null", () => {
@@ -66,10 +99,13 @@ describe("toChurchEvent", () => {
       ...WEEKLY,
       id: 7,
       date: null,
+      body: null,
+      status: "published" as const,
       created_at: new Date(),
       updated_at: new Date(),
     };
     expect(toChurchEvent(row)).not.toHaveProperty("id");
+    expect(toChurchEvent(row)).not.toHaveProperty("status");
     expect(toChurchEvent(row)).not.toHaveProperty("created_at");
   });
 

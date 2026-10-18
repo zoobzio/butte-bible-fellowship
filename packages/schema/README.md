@@ -19,7 +19,7 @@ into a query's arguments before it runs.
 
 ```
 src/models/      what the API answers with: one file per kind of thing
-  event.ts       an event of the church, and the days and times it names
+  event.ts       an event of the church, the list of them, and the days and times it names
   hast.ts        rich text as the API serves it: an HTML syntax tree of elements and text
   staff.ts       someone who serves the church, the list of them, and the statuses content passes through
   sermon.ts      a sermon, as the YouTube feed lists it, and the list of them
@@ -44,20 +44,23 @@ type is a new schema in the file of its kind, or a new file, exported from
 that directory's `index.ts`, and a type beside it in `types.ts`.
 
 A model is the response: `churchEvent`, `staffMember`, `sermon`, `hero`,
-`page`, with `staffMembers` and `sermons`, the lists the API answers with,
-and the primitives they are built from — `eventDay`, `eventTime`, `slug`,
-`contentStatus`, and `hast`, rich text as an HTML syntax tree. A column
-written as Markdown — a member's `bio` — goes over the wire as `hast`: the
-tree the site's pages are built to, which the app renders with its own
-components, so the wire never carries Markdown and the app never parses it.
-`@bbf/utils`'s `toHast` builds it, through the same presets as the pages.
-A body still takes the Markdown: `staffBody.bio` is the string as written. An input is one
-part of a request, named for the group and the part: `eventPath` is the
-path parameters of one event, `eventsQuery` the query of the events list,
-`eventBody` what a write carries. A body says what a model cannot: an
-event is written with a date or a day, never both, only a repeating one
-picks its weeks, and an end comes after its start — the rules the
-database's constraints keep, checked before a query runs.
+`page`, with `churchEvents`, `staffMembers` and `sermons`, the lists the
+API answers with, and the primitives they are built from — `eventDay`,
+`eventTime`, `slug`, `contentStatus`, and `hast`, rich text as an HTML
+syntax tree. A column written as Markdown — a member's `bio`, an event's
+`body` — goes over the wire as `hast`: the tree the site's pages are built
+to, which the app renders with its own components, so the wire never
+carries Markdown and the app never parses it. `@bbf/utils`'s `toHast`
+builds it, through the same presets as the pages. A body still takes the
+Markdown: `staffBody.bio` and `eventBody.body` are the string as written.
+An input is one part of a request, named for the group and the part:
+`eventPath` is the path parameters of one event, `eventsQuery` the query of
+the events list, `eventBody` what a write carries. A body says what a model
+cannot: an event is written with a date or a day, never both, only a
+repeating one picks its weeks, and an end comes after its start — the rules
+the database's constraints keep, checked before a query runs. A body also
+carries what the site never shows: the `status` that decides whether a
+member or an event reaches it, a draft until the body says otherwise.
 
 The package exports its sources: there is nothing to build. Every consumer
 here reads TypeScript from a workspace package as it is.
@@ -113,7 +116,7 @@ what it renders: the components, their references, the parameters.
 - `@bbf/schema/models`: the models alone; `@bbf/schema/input`: the inputs
   alone. `@bbf/schema/models/event` and the like reach one file.
 - `@bbf/schema/types`: the type each schema infers, under its `PascalCase`
-  name — `ChurchEvent`, `EventDay`, `EventTime`, `Hast`, `HastElement`,
+  name — `ChurchEvent`, `ChurchEvents`, `EventDay`, `EventTime`, `Hast`, `HastElement`,
   `HastText`, `ContentStatus`, `StaffMember`, `StaffMembers`, `Hero`,
   `Page`, `Sermon`, `Slug`, `EventPath`, `EventsQuery`, `EventBody`,
   `StaffPath`, `StaffBody`, `SermonPath`, `SermonsQuery`. Nothing here
