@@ -1,0 +1,96 @@
+import { describe, expect, it } from "vitest";
+
+import { eventBody, eventPath, eventsQuery } from "../../src/input/event";
+
+const WEEKLY = {
+  slug: "worship-service",
+  title: "Worship Service",
+  day: "sunday",
+  start: "10:00",
+};
+const ONCE = {
+  slug: "work-day",
+  title: "Work Day",
+  date: "2026-10-17",
+  start: "08:00",
+};
+
+/** The paths of the issues a value raises, for telling which field is wrong. */
+const issues = (value: unknown) =>
+  eventBody
+    .safeParse(value)
+    .error?.issues.map((issue) => issue.path.join(".")) ?? [];
+
+describe("eventPath", () => {
+  it("names an event by its slug", () => {
+    expect(eventPath.parse({ slug: "worship-service" })).toEqual({
+      slug: "worship-service",
+    });
+  });
+
+  it("rejects a slug that would not do in an address", () => {
+    expect(eventPath.safeParse({ slug: "Worship Service" }).success).toBe(
+      false,
+    );
+    expect(eventPath.safeParse({ slug: "" }).success).toBe(false);
+    expect(eventPath.safeParse({}).success).toBe(false);
+  });
+});
+
+describe("eventsQuery", () => {
+  it("takes no query at all", () => {
+    expect(eventsQuery.parse({})).toEqual({});
+  });
+
+  it("takes the date to list from", () => {
+    expect(eventsQuery.parse({ from: "2026-10-17" })).toEqual({
+      from: "2026-10-17",
+    });
+    expect(eventsQuery.safeParse({ from: "10/17/2026" }).success).toBe(false);
+  });
+});
+
+describe("eventBody", () => {
+  it("accepts a weekly event", () => {
+    expect(eventBody.parse(WEEKLY)).toEqual(WEEKLY);
+  });
+
+  it("accepts an event held once, with all it can say", () => {
+    const value = {
+      ...ONCE,
+      note: "Bring gloves.",
+      location: "Bidwell Park",
+      end: "12:00",
+    };
+    expect(eventBody.parse(value)).toEqual(value);
+  });
+
+  it("insists on a date or a day, never both and never neither", () => {
+    expect(issues({ ...WEEKLY, date: "2026-10-17" })).toEqual(["day"]);
+    expect(issues({ slug: "x", title: "X", start: "10:00" })).toEqual(["date"]);
+  });
+
+  it("lets only a repeating event pick its weeks", () => {
+    expect(eventBody.parse({ ...WEEKLY, weeks: [1, 3] })).toEqual({
+      ...WEEKLY,
+      weeks: [1, 3],
+    });
+    expect(issues({ ...ONCE, weeks: [1, 3] })).toEqual(["weeks"]);
+  });
+
+  it("insists an end comes after its start", () => {
+    expect(issues({ ...WEEKLY, end: "10:00" })).toEqual(["end"]);
+    expect(issues({ ...WEEKLY, end: "09:30" })).toEqual(["end"]);
+    expect(eventBody.safeParse({ ...WEEKLY, end: "11:30" }).success).toBe(true);
+  });
+
+  it("needs a slug, a title and a start", () => {
+    expect(issues({ title: "X", day: "sunday", start: "10:00" })).toEqual([
+      "slug",
+    ]);
+    expect(
+      issues({ slug: "x", title: "", day: "sunday", start: "10:00" }),
+    ).toEqual(["title"]);
+    expect(issues({ slug: "x", title: "X", day: "sunday" })).toEqual(["start"]);
+  });
+});

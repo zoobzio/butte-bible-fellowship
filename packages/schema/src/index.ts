@@ -1,4 +1,2 @@
-export * from "./events";
-export * from "./pages";
-export * from "./sermons";
-export * from "./staff";
+export * from "./input";
+export * from "./models";

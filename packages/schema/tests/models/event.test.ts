@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
 
-import { EVENT_DAYS, churchEvent, eventDay } from "../src/events";
+import {
+  EVENT_DAYS,
+  churchEvent,
+  eventDay,
+  eventTime,
+} from "../../src/models/event";
 
 const WEEKLY = { title: "Worship Service", day: "sunday", start: "10:00" };
 
@@ -11,6 +16,17 @@ describe("eventDay", () => {
 
   it("rejects what is not a day", () => {
     expect(eventDay.safeParse("Sunday").success).toBe(false);
+  });
+});
+
+describe("eventTime", () => {
+  it("accepts a time as HH:MM", () => {
+    expect(eventTime.parse("13:00")).toBe("13:00");
+  });
+
+  it("rejects a time said any other way", () => {
+    expect(eventTime.safeParse("1pm").success).toBe(false);
+    expect(eventTime.safeParse("13:00:00").success).toBe(false);
   });
 });
 
@@ -31,6 +47,12 @@ describe("churchEvent", () => {
       end: "12:00",
     };
     expect(churchEvent.parse(event)).toEqual(event);
+  });
+
+  it("rejects a slug that would not do in an address", () => {
+    expect(
+      churchEvent.safeParse({ ...WEEKLY, slug: "Worship Service" }).success,
+    ).toBe(false);
   });
 
   it("rejects a date that is not YYYY-MM-DD", () => {

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { hero, page } from "../src/pages";
+import { hero, page } from "../../src/models/page";
 
 describe("hero", () => {
   it("needs only a tagline", () => {

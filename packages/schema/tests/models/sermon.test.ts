@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { sermon, sermons } from "../src/sermons";
+import { sermon, sermons } from "../../src/models/sermon";
 
 const SERMON = {
   id: "abc123",
