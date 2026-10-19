@@ -21,17 +21,12 @@ const SUNDAY: ChurchEvent[] = [
 const mountSchedule = (events = SUNDAY) =>
   mount(EventSchedule, { props: { events } });
 
-/** Every space a plain one: a formatter sets narrow ones about a time. */
-const plain = (text: string) => text.replace(/\s/g, " ");
-
 describe("EventSchedule", () => {
   it("lists each event, in the order it was handed, with when it is held", () => {
     expect(
       mountSchedule()
         .findAll("ol.event-schedule > li")
-        .map((event) =>
-          event.findAll(":scope > *").map((part) => plain(part.text())),
-        ),
+        .map((event) => event.findAll(":scope > *").map((part) => part.text())),
     ).toEqual([
       ["Sunday School", "8:45 – 9:30 AM"],
       ["Worship Service", "10:00 – 11:30 AM"],

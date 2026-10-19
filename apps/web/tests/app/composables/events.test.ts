@@ -35,9 +35,6 @@ import {
 import { document } from "#test/support/content";
 import { withSetup } from "#test/support/mount";
 
-/** Every space a plain one: a formatter sets narrow ones about a time. */
-const plain = (text: string | undefined) => text?.replace(/\s/g, " ");
-
 const WORSHIP: ChurchEvent = {
   title: "Worship Service",
   slug: "worship-service",
@@ -109,11 +106,8 @@ describe("useToday", () => {
 });
 
 describe("useEventTime", () => {
-  /** Every space a plain one: a formatter sets narrow ones about a time. */
   const said = (start: string, end?: string) =>
-    withSetup(useEventTime)
-      .result({ title: "Event", start, end })
-      ?.replace(/\s/g, " ");
+    withSetup(useEventTime).result({ title: "Event", start, end });
 
   it("says when an event starts, on the reader's clock", () => {
     expect(said("17:30")).toBe("5:30 PM");
@@ -142,6 +136,11 @@ describe("useEventTime", () => {
         .format(new Date(17.5 * 60 * 60 * 1000))
         .replace(/\s/g, " "),
     );
+  });
+
+  it("spaces a time with plain spaces only, wherever it is rendered", () => {
+    expect(said("10:00", "11:30")).not.toMatch(/[^\S ]/);
+    expect(said("17:30")).not.toMatch(/[^\S ]/);
   });
 });
 
@@ -215,8 +214,7 @@ describe("useEventDate", () => {
 });
 
 describe("useEventStart", () => {
-  const said = (event: ChurchEvent) =>
-    plain(withSetup(useEventStart).result(event));
+  const said = (event: ChurchEvent) => withSetup(useEventStart).result(event);
 
   it("says when an event starts, and not when it ends", () => {
     expect(said(WORSHIP)).toBe("10:00 AM");
@@ -254,9 +252,7 @@ describe("useEventListing", () => {
     const { result } = withSetup(() =>
       useEventListing([WORSHIP, DINNER, OPEN_HOUSE]),
     );
-    expect(
-      result.value.map((event) => ({ ...event, time: plain(event.time) })),
-    ).toEqual([
+    expect(result.value).toEqual([
       {
         title: "Worship Service",
         note: undefined,
@@ -292,7 +288,7 @@ describe("useEventListing", () => {
   it("writes the time and the link in the route's locale", () => {
     setRoutePath("/es/events");
     const { result } = withSetup(() => useEventListing([DINNER]));
-    expect(plain(result.value[0]!.time)).toBe("17:30");
+    expect(result.value[0]!.time).toBe("17:30");
     expect(result.value[0]!.to).toBe("/es/events/harvest-dinner");
   });
 });
@@ -320,7 +316,7 @@ describe("useEventWeek", () => {
       result.value.map((day) => ({
         date: day.date,
         label: day.label,
-        events: day.events.map((event) => [event.title, plain(event.time)]),
+        events: day.events.map((event) => [event.title, event.time]),
       })),
     ).toEqual([
       {
@@ -365,7 +361,7 @@ describe("useEventDetails", () => {
     setAppConfig({ contact: CONTACT });
     const { result } = withSetup(() => useEventDetails(event));
     return {
-      when: result.when.value.map(plain),
+      when: result.when.value,
       where: result.where.value,
       questions: result.questions.value,
     };
@@ -464,7 +460,7 @@ describe("useEventCalendar", () => {
     expect(
       day("2026-10-04").events.map((event) => ({
         ...event,
-        time: plain(event.time),
+        time: event.time,
       })),
     ).toEqual([
       { title: "Sunday School", time: "8:45 AM", to: "/events/sunday-school" },
@@ -535,7 +531,7 @@ describe("useEventCalendar", () => {
     expect(period.value).toBe("octubre de 2026");
     expect(weekdays.value[0]).toBe("dom");
     const dinner = days.value.find((day) => day.date === "2026-10-24")!;
-    expect(plain(dinner.events[0]!.time)).toBe("17:30");
+    expect(dinner.events[0]!.time).toBe("17:30");
     expect(dinner.events[0]!.to).toBe("/es/events/harvest-dinner");
   });
 });
@@ -775,7 +771,7 @@ describe("useEventArticle", () => {
     setAppConfig({ events: { image: "/images/church.jpg" } });
     const { result } = withSetup(() => useEventArticle(event, page));
     return {
-      description: plain(result.description.value),
+      description: result.description.value,
       image: result.image.value,
     };
   };

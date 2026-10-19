@@ -56,15 +56,9 @@ const { $t } = useNuxtApp();
 const mountArticle = (event: ChurchEvent, page: PageItem | null = null) =>
   mount(EventArticle, { props: { event, page } });
 
-/** The header's props, every space a plain one: a formatter sets narrow
- * ones about a time. */
-const header = (wrapper: VueWrapper) => {
-  const props = wrapper.findComponent(PageHeader).props();
-  return {
-    ...props,
-    description: props.description?.replace(/\s/g, " "),
-  };
-};
+/** The header's props. */
+const header = (wrapper: VueWrapper) =>
+  wrapper.findComponent(PageHeader).props();
 
 beforeEach(() => {
   setAppConfig({

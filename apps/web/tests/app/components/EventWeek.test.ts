@@ -31,9 +31,6 @@ const DAYS: CalendarDay[] = [
 
 const mountWeek = (days = DAYS) => mount(EventWeek, { props: { days } });
 
-/** Every space a plain one: a formatter sets narrow ones about a time. */
-const plain = (text: string) => text.replace(/\s/g, " ");
-
 describe("EventWeek", () => {
   it("lists the days something is held on, in order, each under its date", () => {
     const days = mountWeek().findAll("ol.event-week > li");
@@ -53,17 +50,13 @@ describe("EventWeek", () => {
     expect(
       thursday!
         .findAll("ul > li")
-        .map((event) =>
-          event.findAll(":scope > *").map((part) => plain(part.text())),
-        ),
+        .map((event) => event.findAll(":scope > *").map((part) => part.text())),
     ).toEqual([["Prayer Meeting", "10:00 AM"], ["Open House"]]);
   });
 
   it("sets an event's start and end as one range", () => {
     const [sunday] = mountWeek().findAll("ol.event-week > li");
-    expect(plain(sunday!.find(".event-week-time").text())).toBe(
-      "10:00 – 11:30 AM",
-    );
+    expect(sunday!.find(".event-week-time").text()).toBe("10:00 – 11:30 AM");
   });
 
   it("links each event to its page, and writes the week, in the route's locale", () => {

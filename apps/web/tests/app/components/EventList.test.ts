@@ -9,13 +9,11 @@ import EventList from "~/components/EventList.vue";
 const mountList = (events: ChurchEvent[]) =>
   mount(EventList, { props: { events } });
 
-/** Each listed event's words, part by part, with every space a plain one. */
+/** Each listed event's words, part by part. */
 const listed = (events: ChurchEvent[]) =>
   mountList(events)
     .findAll(".event-list > ol > li")
-    .map((item) =>
-      item.findAll(":scope > *").map((part) => part.text().replace(/\s/g, " ")),
-    );
+    .map((item) => item.findAll(":scope > *").map((part) => part.text()));
 
 describe("EventList", () => {
   it("lists each event with its title, when it is held, and its note", () => {

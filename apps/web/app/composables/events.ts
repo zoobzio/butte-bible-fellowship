@@ -120,13 +120,23 @@ export const useEventDate = (options: Intl.DateTimeFormatOptions) => {
 };
 
 /**
- * A time of day's formatter, in the route's locale. The time is formatted
- * as written — the church's own, whatever the visitor's zone.
+ * Every space in a formatted time a plain one. A formatter sets thin and
+ * no-break spaces about a time — `10:00 – 11:30 AM` — and which it sets
+ * depends on the ICU it was built with: the server's and a browser's are
+ * not the same build, and the words the server renders would not match the
+ * browser's own. Plain spaces are the same everywhere.
+ */
+const plain = (text: string): string => text.replace(/\s/g, " ");
+
+/**
+ * A time of day's formatter, in the route's locale: one time, or a range
+ * from one to another. The time is formatted as written — the church's own,
+ * whatever the visitor's zone — and spaced the same wherever it is rendered.
  */
 const useTimeFormat = () => {
   const { locale } = useRouteLocale();
 
-  return computed(
+  const formatter = computed(
     () =>
       new Intl.DateTimeFormat(locale.value, {
         hour: "numeric",
@@ -134,6 +144,12 @@ const useTimeFormat = () => {
         timeZone: "UTC",
       }),
   );
+
+  return {
+    format: (time: Date): string => plain(formatter.value.format(time)),
+    formatRange: (start: Date, end: Date): string =>
+      plain(formatter.value.formatRange(start, end)),
+  };
 };
 
 /**
@@ -145,7 +161,7 @@ export const useEventStart = () => {
 
   return (event: ChurchEvent): string | undefined => {
     const start = minutes(event.start);
-    return start === null ? undefined : format.value.format(toTime(start));
+    return start === null ? undefined : format.format(toTime(start));
   };
 };
 
@@ -161,8 +177,8 @@ export const useEventTime = () => {
     if (start === null) return undefined;
     const end = minutes(event.end);
     return end === null
-      ? format.value.format(toTime(start))
-      : format.value.formatRange(toTime(start), toTime(end));
+      ? format.format(toTime(start))
+      : format.formatRange(toTime(start), toTime(end));
   };
 };
 

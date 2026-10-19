@@ -21,14 +21,14 @@ const WORSHIP: ChurchEvent = {
 
 const { $t } = useNuxtApp();
 
-/** Each section's label and lines, with every space a plain one. */
+/** Each section's label and lines. */
 const sections = (event: ChurchEvent) =>
   mount(EventDetails, { props: { event } })
     .findAll("dl.event-details > div")
     .map((section) =>
       section.findAll(":scope > *").map((part) => ({
         tag: part.element.tagName.toLowerCase(),
-        text: part.text().replace(/\s/g, " "),
+        text: part.text(),
       })),
     );
 
