@@ -1,7 +1,9 @@
 import { z } from "zod";
 
 import { hast } from "./hast";
+import { listing } from "./listing";
 import { slug } from "./slug";
+import { contentStatus } from "./staff";
 
 /** The days of the week an event can repeat on, Sunday first. */
 export const EVENT_DAYS = [
@@ -110,4 +112,84 @@ export const churchEvent = z
 export const churchEvents = z.array(churchEvent).meta({
   description:
     "The events the site lists: the repeating ones Sunday first, then the one-offs to come.",
+});
+
+/**
+ * An event of the church, as the admin reads it: every column of its row,
+ * whatever its status. The `id` names it to the admin, as the slug names
+ * its page to the site; the `body` is the Markdown as it was written, for
+ * an editor to show, where the site's `body` is the tree.
+ */
+export const eventRecord = z
+  .object({
+    id: z
+      .int()
+      .positive()
+      .meta({
+        description: "What names it to the admin: its row's number.",
+        examples: [1],
+      }),
+    slug: slug.meta({
+      description: "What the event's own page is called in its address.",
+    }),
+    title: z.string().meta({ examples: ["Worship Service"] }),
+    note: z.string().optional().meta({
+      description: "A few words more about it, shown under its title.",
+    }),
+    summary: z.string().optional().meta({
+      description:
+        "A line or two about it, as a card shows and search engines list.",
+    }),
+    body: z.string().optional().meta({
+      description: "What is written about it, as Markdown, as it was written.",
+    }),
+    image: z.url().optional().meta({
+      description: "The URL of its picture.",
+    }),
+    location: z.string().optional().meta({
+      description: "Where it is held, when that is not at the church.",
+    }),
+    date: z.iso
+      .date()
+      .optional()
+      .meta({
+        description: "The one date it happens on, as YYYY-MM-DD.",
+        examples: ["2026-10-17"],
+      }),
+    day: eventDay.optional().meta({
+      description: "The day of the week it repeats on.",
+    }),
+    weeks: z
+      .array(z.int().min(1).max(5))
+      .optional()
+      .meta({
+        description:
+          "Which of the month's weeks a repeating event is held in. Left out, every week.",
+        examples: [[1, 3]],
+      }),
+    start: eventTime.meta({ description: "When it starts." }),
+    end: eventTime.optional().meta({ description: "When it ends." }),
+    status: contentStatus.meta({
+      description: "Whether it reaches the site.",
+    }),
+    createdAt: z.iso.datetime().meta({
+      description: "When its row was written.",
+      examples: ["2026-10-17T18:00:00.000Z"],
+    }),
+    updatedAt: z.iso.datetime().meta({
+      description: "When its row was last changed.",
+      examples: ["2026-10-17T18:00:00.000Z"],
+    }),
+  })
+  .meta({
+    id: "EventRecord",
+    description:
+      "An event of the church, as the admin reads it: every column of its row, whatever its status.",
+  });
+
+/** A page of the events, as the admin lists them: the repeating ones first, then the one-offs by date, whatever their status. */
+export const eventListing = listing(eventRecord).meta({
+  id: "EventListing",
+  description:
+    "A page of the events, as the admin lists them: the repeating ones Sunday first, then the one-offs by date, whatever their status.",
 });

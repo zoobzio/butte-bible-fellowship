@@ -22,10 +22,24 @@ export type EventRow = Omit<EventColumns, EventSpare> &
   Partial<Pick<EventColumns, EventSpare>>;
 
 /**
+ * An event as the admin's queries return it: every column of the row,
+ * `admin.events.list` and `admin.events.fetch` alike. What `toEventRecord`
+ * takes.
+ */
+export type EventRecordRow = Row<Contract, "admin.events.fetch">;
+
+/**
  * A staff member as a query returns them: the columns the site lists. The
  * admin's rows carry more, and pass as they are.
  */
 export type StaffRow = Row<Contract, "web.staff.list">;
+
+/**
+ * A staff member as the admin's queries return them: every column of the
+ * row, `admin.staff.list` and `admin.staff.fetch` alike. What
+ * `toStaffRecord` takes.
+ */
+export type StaffRecordRow = Row<Contract, "admin.staff.fetch">;
 
 /** Every column a sermon's row can carry, as `web.sermons.fetch` reads them. */
 type SermonColumns = Row<Contract, "web.sermons.fetch">;

@@ -7,17 +7,13 @@ import { prefix } from "@bbf/icons";
 import icons from "@bbf/icons/config";
 import sets from "@bbf/icons/sets";
 
-/** The locales the site is translated to: each has its pages under `/<locale>`. */
 const targets = locales.filter((locale) => locale !== source);
 
-/** A page's path in a locale: `/es/about-us`, and `/es` for the home page. */
 const localized = (locale: string, path: string) =>
   path === "/" ? `/${locale}` : `/${locale}${path}`;
 
-/** The pages that have moved: the path each was at, and where it is now. */
 const moved = { "/calendar": "/events" };
 
-/** The static assets: `@bbf/assets`'s sources, served from the site's root. */
 const assets = fileURLToPath(
   new URL("src", import.meta.resolve("@bbf/assets/package.json")),
 );
@@ -41,29 +37,18 @@ export default defineNuxtConfig({
 
   iconSheets: { ...icons, sets, prefix },
 
-  // The theme is a preset: its base, its boot selection and its layers —
-  // the site's palette and every aurora theme — are the package's own build.
   untheme: { preset: "@bbf/theme" },
 
-  // The words and the pages are `@bbf/prose`'s build: the module provides
-  // `$t` over its messages and serves its pages, every locale's, to `usePage`.
   prosary: { build: "@bbf/prose" },
 
-  // The database is `@bbf/database`'s build: the module makes the service
-  // `useDatabase` hands on, over the Postgres `NUXT_BEZOAR_URL` names, and
-  // brings its migrations up to date as the server starts.
   bezoar: { build: "@bbf/database", migrate: true },
 
-  // Developing, the database is a Postgres in the process, in memory:
-  // migrated and seeded as the server starts, so `pnpm dev` needs no
-  // server and no connection string.
   $development: {
     bezoar: { driver: "pglite", seed: true },
   },
 
   runtimeConfig: {
     public: {
-      // The channel whose sermons `/sermons` lists, by its YouTube id.
       youtube: { channel: "UCCVz4wFgCBmw-Iwyz61OPng" },
     },
   },
@@ -92,8 +77,6 @@ export default defineNuxtConfig({
   css: ["@bbf/assets/css/index.css"],
 
   hooks: {
-    // English keeps the routes as the pages declare them; every other
-    // locale gets the same pages again under its own prefix.
     "pages:extend": (pages) => {
       const own = pages.filter((page) => page.file?.includes("/app/pages/"));
       for (const locale of targets) {

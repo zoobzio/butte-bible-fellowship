@@ -1,7 +1,7 @@
-import type { ChurchEvent } from "@bbf/schema/types";
+import type { ChurchEvent, EventRecord } from "@bbf/schema/types";
 
 import { toHast } from "./hast";
-import type { EventRow } from "../types";
+import type { EventRecordRow, EventRow } from "../types";
 
 /** A time as Postgres writes it, `HH:MM:SS`, as the API says it, `HH:MM`. */
 const toEventTime = (time: string): string => time.slice(0, 5);
@@ -35,4 +35,30 @@ export const toChurchEvent = (row: EventRow): ChurchEvent => ({
   weeks: toWeeks(row.weeks),
   start: toEventTime(row.start_time),
   end: row.end_time === null ? undefined : toEventTime(row.end_time),
+});
+
+/**
+ * An event as the admin reads it, from a row of the admin's queries. A
+ * column the row has null in, the record leaves out; the body stays the
+ * Markdown it was written as, for an editor to show; its times lose their
+ * seconds as the site's do; the id and status come along, and the
+ * timestamps as moments in UTC.
+ */
+export const toEventRecord = (row: EventRecordRow): EventRecord => ({
+  id: row.id,
+  slug: row.slug,
+  title: row.title,
+  note: row.note ?? undefined,
+  summary: row.summary ?? undefined,
+  body: row.body ?? undefined,
+  image: row.image ?? undefined,
+  location: row.location ?? undefined,
+  date: row.date ?? undefined,
+  day: row.day ?? undefined,
+  weeks: toWeeks(row.weeks),
+  start: toEventTime(row.start_time),
+  end: row.end_time === null ? undefined : toEventTime(row.end_time),
+  status: row.status,
+  createdAt: row.created_at.toISOString(),
+  updatedAt: row.updated_at.toISOString(),
 });

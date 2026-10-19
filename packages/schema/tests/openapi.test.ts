@@ -5,8 +5,12 @@ import {
   churchEvent,
   churchEvents,
   eventBody,
+  eventId,
+  eventListing,
   eventPath,
+  eventRecord,
   eventsQuery,
+  listingQuery,
   page,
   sermon,
   sermonBody,
@@ -14,9 +18,12 @@ import {
   sermons,
   sermonsQuery,
   staffBody,
+  staffId,
+  staffListing,
   staffMember,
   staffMembers,
   staffPath,
+  staffRecord,
 } from "../src";
 
 /** A response of one shape, for the document's sake. */
@@ -83,13 +90,43 @@ const document = createDocument({
     "/api/pages/{slug}": {
       get: { responses: { 200: json(page) } },
     },
+    // The admin's: what it lists and edits, by id.
+    "/admin/api/staff": {
+      get: {
+        requestParams: { query: listingQuery },
+        responses: { 200: json(staffListing) },
+      },
+    },
+    "/admin/api/staff/{id}": {
+      get: {
+        requestParams: { path: staffId },
+        responses: { 200: json(staffRecord) },
+      },
+      put: {
+        requestParams: { path: staffId },
+        requestBody: { content: { "application/json": { schema: staffBody } } },
+        responses: { 200: json(staffRecord) },
+      },
+    },
+    "/admin/api/events": {
+      get: {
+        requestParams: { query: listingQuery },
+        responses: { 200: json(eventListing) },
+      },
+    },
+    "/admin/api/events/{id}": {
+      get: {
+        requestParams: { path: eventId },
+        responses: { 200: json(eventRecord) },
+      },
+    },
   },
 });
 
 const schemas = document.components?.schemas ?? {};
 
 /** The parameters of an operation, by name. */
-const parameters = (path: string, method: "get" | "post") => {
+const parameters = (path: string, method: "get" | "post" | "put") => {
   const operation = document.paths?.[path]?.[method];
   const list = (operation?.parameters ?? []) as Array<{
     name: string;
@@ -110,6 +147,8 @@ describe("the components", () => {
       "ContentStatus",
       "EventBody",
       "EventDay",
+      "EventListing",
+      "EventRecord",
       "EventTime",
       "Hast",
       "HastElement",
@@ -119,8 +158,62 @@ describe("the components", () => {
       "Sermon",
       "SermonBody",
       "StaffBody",
+      "StaffListing",
       "StaffMember",
+      "StaffRecord",
     ]);
+  });
+
+  it("carry each record's description, its Markdown as a string, and its listing", () => {
+    expect(schemas.StaffRecord).toMatchObject({
+      required: [
+        "id",
+        "slug",
+        "name",
+        "role",
+        "position",
+        "status",
+        "createdAt",
+        "updatedAt",
+      ],
+      properties: {
+        id: { type: "integer" },
+        bio: { type: "string" },
+        status: { $ref: "#/components/schemas/ContentStatus" },
+        createdAt: { format: "date-time" },
+      },
+    });
+    expect(schemas.EventRecord).toMatchObject({
+      required: [
+        "id",
+        "slug",
+        "title",
+        "start",
+        "status",
+        "createdAt",
+        "updatedAt",
+      ],
+      properties: {
+        body: { type: "string" },
+        day: { $ref: "#/components/schemas/EventDay" },
+        start: { $ref: "#/components/schemas/EventTime" },
+      },
+    });
+    expect(schemas.StaffListing).toMatchObject({
+      required: ["items", "total"],
+      properties: {
+        items: {
+          type: "array",
+          items: { $ref: "#/components/schemas/StaffRecord" },
+        },
+        total: { type: "integer", minimum: 0 },
+      },
+    });
+    expect(schemas.EventListing).toMatchObject({
+      properties: {
+        items: { items: { $ref: "#/components/schemas/EventRecord" } },
+      },
+    });
   });
 
   it("render a shared primitive once, the same in a request and a response", () => {
@@ -246,6 +339,32 @@ describe("the requests", () => {
       schema: { type: "integer", minimum: 1, maximum: 50, default: 15 },
     });
     expect(limit?.required).toBeUndefined();
+  });
+
+  it("take a listing's page and size, optional, with their defaults", () => {
+    const { page, size } = parameters("/admin/api/staff", "get");
+    expect(page).toMatchObject({
+      in: "query",
+      schema: { minimum: 1, default: 1 },
+    });
+    expect(page?.required).toBeUndefined();
+    expect(size).toMatchObject({
+      in: "query",
+      schema: { minimum: 1, maximum: 100, default: 25 },
+    });
+  });
+
+  it("take a record's id in the path, required, as a number from one", () => {
+    for (const [path, method] of [
+      ["/admin/api/events/{id}", "get"],
+      ["/admin/api/staff/{id}", "put"],
+    ] as const) {
+      expect(parameters(path, method).id).toMatchObject({
+        in: "path",
+        required: true,
+        schema: { type: "integer", exclusiveMinimum: 0 },
+      });
+    }
   });
 
   it("take a body by its name", () => {

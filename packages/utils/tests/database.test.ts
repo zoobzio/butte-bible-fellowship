@@ -5,10 +5,12 @@ import { seeds } from "@bbf/database/seeds";
 import {
   churchEvent,
   eventBody,
+  eventRecord,
   sermon,
   sermonBody,
   staffBody,
   staffMember,
+  staffRecord,
 } from "@bbf/schema";
 import { makeTestBezoar } from "@bezoar/testing";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
@@ -18,7 +20,13 @@ import {
   toSermonArguments,
   toStaffArguments,
 } from "../src/dao";
-import { toChurchEvent, toSermon, toStaffMember } from "../src/dto";
+import {
+  toChurchEvent,
+  toEventRecord,
+  toSermon,
+  toStaffMember,
+  toStaffRecord,
+} from "../src/dto";
 
 let db: Awaited<ReturnType<typeof makeTestBezoar<typeof contract>>>;
 
@@ -83,6 +91,22 @@ describe("events", () => {
     expect(await db.admin.events.fetch.first({ id })).toMatchObject({
       body: "Come **early**.",
     });
+
+    // The admin reads it back whole, the body still as written.
+    const record = toEventRecord((await db.admin.events.fetch.first({ id }))!);
+    expect(record).toMatchObject({
+      id,
+      slug: "christmas-eve",
+      body: "Come **early**.",
+      date: "2026-12-24",
+      start: "18:00",
+      end: "19:30",
+      status: "published",
+    });
+    expect(eventRecord.safeParse(record).success).toBe(true);
+    expect(
+      (await db.admin.events.list()).map(toEventRecord).map((e) => e.slug),
+    ).toContain("christmas-eve");
     const upcoming = await db.web.events.upcoming({ from: "2026-12-01" });
     expect(upcoming.map(toChurchEvent)).toEqual([
       {
@@ -181,6 +205,17 @@ describe("staff", () => {
     expect(await db.admin.staff.fetch.first({ id })).toMatchObject({
       bio: "Serving **since 2010**.",
     });
+
+    // The admin reads them back whole, the bio still as written.
+    const record = toStaffRecord((await db.admin.staff.fetch.first({ id }))!);
+    expect(record).toMatchObject({
+      id,
+      slug: "pastor",
+      bio: "Serving **since 2010**.",
+      position: 0,
+      status: "published",
+    });
+    expect(staffRecord.safeParse(record).success).toBe(true);
     const [first] = (await db.web.staff.list()).map(toStaffMember);
     expect(first).toEqual({
       slug: "pastor",
@@ -219,12 +254,15 @@ describe("staff", () => {
     expect(await db.admin.staff.delete({ id })).toBe(1);
   });
 
-  it("writes a draft the site does not list", async () => {
+  it("writes a draft the site does not list, and the admin does", async () => {
     const body = staffBody.parse({ slug: "draft", name: "Draft", role: "x" });
     const created = await db.admin.staff.create.first(toStaffArguments(body));
     expect(
       (await db.web.staff.list()).map(toStaffMember).map((m) => m.slug),
     ).not.toContain("draft");
+    expect(
+      (await db.admin.staff.list()).map(toStaffRecord).map((m) => m.slug),
+    ).toContain("draft");
     expect(await db.admin.staff.delete({ id: created!.id })).toBe(1);
   });
 });

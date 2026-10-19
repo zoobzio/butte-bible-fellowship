@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { staffBody, staffPath } from "../../src/input/staff";
+import { staffBody, staffId, staffPath } from "../../src/input/staff";
 
 const MEMBER = { slug: "jane-doe", name: "Jane Doe", role: "Elder" };
 
@@ -8,6 +8,15 @@ describe("staffPath", () => {
   it("names a member by their slug", () => {
     expect(staffPath.parse({ slug: "jane-doe" })).toEqual({ slug: "jane-doe" });
     expect(staffPath.safeParse({ slug: "Jane Doe" }).success).toBe(false);
+  });
+});
+
+describe("staffId", () => {
+  it("names a member by their row's number, as the address writes it", () => {
+    expect(staffId.parse({ id: "12" })).toEqual({ id: 12 });
+    expect(staffId.safeParse({ id: "0" }).success).toBe(false);
+    expect(staffId.safeParse({ id: "1.5" }).success).toBe(false);
+    expect(staffId.safeParse({ id: "jane-doe" }).success).toBe(false);
   });
 });
 

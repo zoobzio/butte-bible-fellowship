@@ -5,6 +5,8 @@ import {
   churchEvent,
   churchEvents,
   eventDay,
+  eventListing,
+  eventRecord,
   eventTime,
 } from "../../src/models/event";
 
@@ -133,5 +135,76 @@ describe("churchEvents", () => {
   it("is a list of events", () => {
     expect(churchEvents.parse([WEEKLY])).toEqual([WEEKLY]);
     expect(churchEvents.safeParse([{ title: "Worship" }]).success).toBe(false);
+  });
+});
+
+describe("eventRecord", () => {
+  const RECORD = {
+    id: 1,
+    slug: "worship-service",
+    title: "Worship Service",
+    day: "sunday",
+    start: "10:00",
+    status: "published",
+    createdAt: "2026-10-17T18:00:00.000Z",
+    updatedAt: "2026-10-17T18:00:00.000Z",
+  };
+
+  it("needs what an event needs, and its id, status and timestamps", () => {
+    expect(eventRecord.parse(RECORD)).toEqual(RECORD);
+    for (const key of ["id", "status", "createdAt", "updatedAt"]) {
+      const { [key]: _gone, ...without } = RECORD as Record<string, unknown>;
+      expect(eventRecord.safeParse(without).success, key).toBe(false);
+    }
+  });
+
+  it("accepts all an event can say, the body as the Markdown it was written as", () => {
+    const value = {
+      ...RECORD,
+      note: "Bring gloves.",
+      summary: "Volunteers lend a hand.",
+      body: "## Work\n\nCome along.",
+      image: "https://cdn.example.com/events/volunteer.jpg",
+      location: "Bidwell Park",
+      weeks: [1, 3],
+      end: "12:00",
+      status: "draft",
+    };
+    expect(eventRecord.parse(value)).toEqual(value);
+  });
+
+  it("takes a body as the Markdown, never as the tree the site renders", () => {
+    expect(
+      eventRecord.safeParse({ ...RECORD, body: { type: "root", children: [] } })
+        .success,
+    ).toBe(false);
+  });
+
+  it("names an event by a whole number from one", () => {
+    expect(eventRecord.safeParse({ ...RECORD, id: 0 }).success).toBe(false);
+  });
+});
+
+describe("eventListing", () => {
+  it("is a page of records and how many there are in all", () => {
+    const page = {
+      items: [
+        {
+          id: 1,
+          slug: "worship-service",
+          title: "Worship Service",
+          day: "sunday",
+          start: "10:00",
+          status: "published",
+          createdAt: "2026-10-17T18:00:00.000Z",
+          updatedAt: "2026-10-17T18:00:00.000Z",
+        },
+      ],
+      total: 9,
+    };
+    expect(eventListing.parse(page)).toEqual(page);
+    expect(eventListing.safeParse({ items: [WEEKLY], total: 1 }).success).toBe(
+      false,
+    );
   });
 });

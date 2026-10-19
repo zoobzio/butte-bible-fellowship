@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
 
-import { eventBody, eventPath, eventsQuery } from "../../src/input/event";
+import {
+  eventBody,
+  eventId,
+  eventPath,
+  eventsQuery,
+} from "../../src/input/event";
 
 const WEEKLY = {
   slug: "worship-service",
@@ -20,6 +25,14 @@ const issues = (value: unknown) =>
   eventBody
     .safeParse(value)
     .error?.issues.map((issue) => issue.path.join(".")) ?? [];
+
+describe("eventId", () => {
+  it("names an event by its row's number, as the address writes it", () => {
+    expect(eventId.parse({ id: "7" })).toEqual({ id: 7 });
+    expect(eventId.safeParse({ id: "0" }).success).toBe(false);
+    expect(eventId.safeParse({ id: "worship-service" }).success).toBe(false);
+  });
+});
 
 describe("eventPath", () => {
   it("names an event by its slug", () => {

@@ -11,6 +11,18 @@ export const staffPath = z.object({
   }),
 });
 
+/** The path of one staff member to the admin: `/staff/{id}`, by their row's number. */
+export const staffId = z.object({
+  id: z.coerce
+    .number()
+    .int()
+    .positive()
+    .meta({
+      description: "What names them to the admin: their row's number.",
+      examples: [1],
+    }),
+});
+
 /**
  * A staff member as they are written: what creating one takes, and what
  * updating one replaces, every field. A new member is a draft until the

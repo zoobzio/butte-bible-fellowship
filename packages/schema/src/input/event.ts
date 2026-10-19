@@ -12,6 +12,18 @@ export const eventPath = z.object({
   }),
 });
 
+/** The path of one event to the admin: `/events/{id}`, by its row's number. */
+export const eventId = z.object({
+  id: z.coerce
+    .number()
+    .int()
+    .positive()
+    .meta({
+      description: "What names it to the admin: its row's number.",
+      examples: [1],
+    }),
+});
+
 /** The query of the events list: from which date the one-offs are listed. */
 export const eventsQuery = z.object({
   from: z.iso

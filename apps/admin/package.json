@@ -1,0 +1,48 @@
+{
+  "name": "@bbf/admin",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "nuxi dev",
+    "build": "nuxi build",
+    "preview": "nuxi preview",
+    "postinstall": "nuxi prepare",
+    "typecheck": "nuxi typecheck",
+    "test": "vitest run --passWithNoTests",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage --passWithNoTests"
+  },
+  "dependencies": {
+    "@bbf/assets": "workspace:*",
+    "@bbf/database": "workspace:*",
+    "@bbf/icons": "workspace:*",
+    "@bbf/schema": "workspace:*",
+    "@bbf/theme": "workspace:*",
+    "@bbf/utils": "workspace:*",
+    "@bezoar/nuxt": "catalog:",
+    "@icon-sheets/nuxt": "catalog:",
+    "@untheme/nuxt": "catalog:",
+    "@zoobzio/foundation": "catalog:",
+    "bezoar": "catalog:",
+    "nuxt": "catalog:",
+    "untheme": "catalog:",
+    "vue": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@nuxt/fonts": "catalog:",
+    "@nuxt/kit": "catalog:",
+    "@vitejs/plugin-vue": "catalog:",
+    "@vitest/coverage-v8": "catalog:",
+    "@vue/test-utils": "catalog:",
+    "happy-dom": "catalog:",
+    "objectively": "catalog:",
+    "reka-ui": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:",
+    "vue-tsc": "catalog:"
+  },
+  "engines": {
+    "node": "24.x"
+  }
+}

@@ -1,7 +1,7 @@
-import { staffMember } from "@bbf/schema";
+import { staffMember, staffRecord } from "@bbf/schema";
 import { describe, expect, it } from "vitest";
 
-import { toStaffMember } from "../../src/dto/staff";
+import { toStaffMember, toStaffRecord } from "../../src/dto/staff";
 
 /** A row as `web.staff.list` returns it. */
 const ROW = {
@@ -77,5 +77,58 @@ describe("toStaffMember", () => {
 
   it("builds what the schema accepts", () => {
     expect(staffMember.safeParse(toStaffMember(ROW)).success).toBe(true);
+  });
+});
+
+/** A row as `admin.staff.fetch` returns it: every column, the timestamps as dates. */
+const ADMIN_ROW = {
+  ...ROW,
+  id: 7,
+  position: 2,
+  status: "draft" as const,
+  created_at: new Date("2026-10-17T18:00:00Z"),
+  updated_at: new Date("2026-10-18T09:30:00Z"),
+};
+
+describe("toStaffRecord", () => {
+  it("builds a record, leaving out what the row has null in", () => {
+    expect(toStaffRecord(ADMIN_ROW)).toEqual({
+      id: 7,
+      slug: "jane-doe",
+      name: "Jane Doe",
+      role: "Elder",
+      photo: "https://cdn.example.com/staff/jane-doe.jpg",
+      position: 2,
+      status: "draft",
+      createdAt: "2026-10-17T18:00:00.000Z",
+      updatedAt: "2026-10-18T09:30:00.000Z",
+    });
+  });
+
+  it("keeps the bio as the Markdown it was written as", () => {
+    expect(
+      toStaffRecord({ ...ADMIN_ROW, bio: "## Jane\n\nServing since 2010." }),
+    ).toMatchObject({ bio: "## Jane\n\nServing since 2010." });
+  });
+
+  it("carries what else the row has", () => {
+    expect(
+      toStaffRecord({
+        ...ADMIN_ROW,
+        summary: "Serving since 2010.",
+        email: "j@x.org",
+        phone: "530-555-0100",
+        status: "published",
+      }),
+    ).toMatchObject({
+      summary: "Serving since 2010.",
+      email: "j@x.org",
+      phone: "530-555-0100",
+      status: "published",
+    });
+  });
+
+  it("builds what the schema accepts", () => {
+    expect(staffRecord.safeParse(toStaffRecord(ADMIN_ROW)).success).toBe(true);
   });
 });

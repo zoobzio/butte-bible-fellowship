@@ -6,7 +6,13 @@ import type {
   toSermonArguments,
   toStaffArguments,
 } from "../src/dao";
-import { toChurchEvent, toSermon, toStaffMember } from "../src/dto";
+import {
+  toChurchEvent,
+  toEventRecord,
+  toSermon,
+  toStaffMember,
+  toStaffRecord,
+} from "../src/dto";
 
 /**
  * What the transforms promise at the type level. `pnpm typecheck` proves
@@ -18,9 +24,11 @@ declare const weekly: Row<Contract, "web.events.weekly">;
 declare const upcoming: Row<Contract, "web.events.upcoming">;
 declare const fetched: Row<Contract, "web.events.fetch">;
 declare const adminEvent: Row<Contract, "admin.events.fetch">;
+declare const adminEvents: Row<Contract, "admin.events.list">;
 declare const webStaff: Row<Contract, "web.staff.list">;
 declare const webOne: Row<Contract, "web.staff.fetch">;
 declare const adminStaff: Row<Contract, "admin.staff.fetch">;
+declare const adminStaffList: Row<Contract, "admin.staff.list">;
 declare const listedSermon: Row<Contract, "web.sermons.list">;
 declare const fetchedSermon: Row<Contract, "web.sermons.fetch">;
 declare const adminSermon: Row<Contract, "admin.sermons.fetch">;
@@ -31,6 +39,16 @@ export const events = [listed, weekly, upcoming, fetched, adminEvent].map(
 );
 export const staff = [webStaff, webOne, adminStaff].map(toStaffMember);
 export const sermons = [listedSermon, fetchedSermon, adminSermon].map(toSermon);
+
+// The admin's queries, listed or fetched, return a row a record is built from.
+export const eventRecords = [adminEvent, adminEvents].map(toEventRecord);
+export const staffRecords = [adminStaff, adminStaffList].map(toStaffRecord);
+
+// @ts-expect-error The site's row has no id, status or timestamps: it is no record.
+export const noRecord = toStaffRecord(webStaff);
+
+// @ts-expect-error A list's row of the site has no id either.
+export const noEventRecord = toEventRecord(listed);
 
 // @ts-expect-error A row without a start is no event.
 export const noStart = toChurchEvent({ slug: "x", title: "x" });

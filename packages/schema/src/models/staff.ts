@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { hast } from "./hast";
+import { listing } from "./listing";
 import { slug } from "./slug";
 
 /** The statuses a piece of content passes through: written, live, kept. */
@@ -61,4 +62,75 @@ export const staffMember = z
 /** The staff the site lists, in their order. */
 export const staffMembers = z.array(staffMember).meta({
   description: "The staff the site lists, in their order.",
+});
+
+/**
+ * Someone who serves the church, as the admin reads them: every column of
+ * their row, whatever their status. The `id` names them to the admin, as
+ * the slug names them to the site; the `bio` is the Markdown as it was
+ * written, for an editor to show, where the site's `bio` is the tree.
+ */
+export const staffRecord = z
+  .object({
+    id: z
+      .int()
+      .positive()
+      .meta({
+        description: "What names them to the admin: their row's number.",
+        examples: [1],
+      }),
+    slug: slug.meta({
+      description: "What names them in an address: /staff/<slug>.",
+      examples: ["jane-doe"],
+    }),
+    name: z.string().meta({ examples: ["Jane Doe"] }),
+    role: z.string().meta({
+      description: "What they do.",
+      examples: ["Elder", "Pastor", "Office Administrator"],
+    }),
+    summary: z.string().optional().meta({
+      description: "A line or two about them, as a card shows.",
+    }),
+    bio: z.string().optional().meta({
+      description: "Their bio in full, as Markdown, as it was written.",
+    }),
+    photo: z.url().optional().meta({
+      description: "The URL of their photo.",
+    }),
+    email: z.email().optional(),
+    phone: z
+      .string()
+      .optional()
+      .meta({ examples: ["530-555-0100"] }),
+    position: z
+      .int()
+      .min(0)
+      .max(32_767)
+      .meta({
+        description: "Where they stand in the list, lowest first.",
+        examples: [1],
+      }),
+    status: contentStatus.meta({
+      description: "Whether they reach the site.",
+    }),
+    createdAt: z.iso.datetime().meta({
+      description: "When their row was written.",
+      examples: ["2026-10-17T18:00:00.000Z"],
+    }),
+    updatedAt: z.iso.datetime().meta({
+      description: "When their row was last changed.",
+      examples: ["2026-10-17T18:00:00.000Z"],
+    }),
+  })
+  .meta({
+    id: "StaffRecord",
+    description:
+      "Someone who serves the church, as the admin reads them: every column of their row, whatever their status.",
+  });
+
+/** A page of the staff, as the admin lists them: in their order, whatever their status. */
+export const staffListing = listing(staffRecord).meta({
+  id: "StaffListing",
+  description:
+    "A page of the staff, as the admin lists them: in their order, whatever their status.",
 });
