@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { defineComponent, h } from "vue";
+import { defineComponent, h, markRaw } from "vue";
 import { mount } from "@vue/test-utils";
 
 import { STAFF } from "#test/support/records";
@@ -12,18 +12,20 @@ import RecordTable from "~/components/RecordTable.vue";
  */
 const widget = (data: (typeof STAFF)[]) => ({
   service: { id: "staff", data },
-  component: defineComponent({
-    props: { service: { type: Object, required: true }, pt: Object },
-    setup(props, { slots }) {
-      return () =>
-        h("table", { "data-pt": JSON.stringify(props.pt) }, [
-          ...props.service.data.map((row: typeof STAFF) =>
-            h("tr", [h("td", slots["cell:name"]?.({ row }))]),
-          ),
-          props.service.data.length ? null : h("tr", [slots.empty?.()]),
-        ]);
-    },
-  }),
+  component: markRaw(
+    defineComponent({
+      props: { service: { type: Object, required: true }, pt: Object },
+      setup(props, { slots }) {
+        return () =>
+          h("table", { "data-pt": JSON.stringify(props.pt) }, [
+            ...props.service.data.map((row: typeof STAFF) =>
+              h("tr", [h("td", slots["cell:name"]?.({ row }))]),
+            ),
+            props.service.data.length ? null : h("tr", [slots.empty?.()]),
+          ]);
+      },
+    }),
+  ),
   settings: () => ({ scroller: {} }),
 });
 
