@@ -1,9 +1,7 @@
 <script lang="ts">
-import Menu from "@zoobzio/foundation/components/core/menu.vue";
-
-import { Icon } from "#components";
-import { useNuxtApp } from "#imports";
-import { defineMenu } from "@zoobzio/foundation/definitions/menu";
+import { Icon, Menu } from "#components";
+import { defineMenu, useNuxtApp } from "#imports";
+import MenuLink from "~/components/MenuLink.vue";
 import { useLanguages } from "~/composables/locale";
 </script>
 
@@ -34,6 +32,9 @@ const menu = defineMenu(() => ({
       <Icon name="languages" class="icon" />
       <span>{{ current }}</span>
     </button>
+    <template #item="{ item, settings }">
+      <MenuLink :item="item" :settings="settings" />
+    </template>
   </Menu>
 </template>
 

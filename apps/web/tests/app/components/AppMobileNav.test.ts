@@ -4,9 +4,9 @@ import { mount } from "@vue/test-utils";
 
 import type { NavigationLink } from "~/types/navigation";
 
+import { Menu } from "#components";
 import { setAppConfig, useNuxtApp } from "#imports";
 import AppMobileNav from "~/components/AppMobileNav.vue";
-import Menu from "@zoobzio/foundation/components/core/menu";
 
 const LINKS: NavigationLink[] = [
   { label: "navigation.about", to: "/" },

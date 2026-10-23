@@ -1,14 +1,9 @@
 <script lang="ts">
-import type { CommandOption } from "@zoobzio/foundation/types/core/command";
+import type { CommandOption } from "@zoobzio/vue/types/components/command";
 import type { Theme } from "~/types/theme";
 
-import Command from "@zoobzio/foundation/components/core/command.vue";
-import Popover from "@zoobzio/foundation/components/core/popover.vue";
-
-import { Icon } from "#components";
-import { useNuxtApp } from "#imports";
-import { defineCommand } from "@zoobzio/foundation/definitions/command";
-import { definePopover } from "@zoobzio/foundation/definitions/popover";
+import { Command, Icon, Popover } from "#components";
+import { defineCommand, definePopover, useNuxtApp } from "#imports";
 import { useThemes } from "~/composables/themes";
 </script>
 
@@ -26,8 +21,6 @@ const options: ThemeOption[] = themes.map(({ id, name }) => ({
 
 const popover = definePopover({ side: "top", align: "start" });
 
-// Picking the active theme again would clear a single selection; the
-// selection is the service's, so an empty pick changes nothing.
 const command = defineCommand(() => ({
   groups: [{ key: "themes", label: $t.appearance.themes(), options }],
   modelValue: options.filter((option) => option.value === active.value),

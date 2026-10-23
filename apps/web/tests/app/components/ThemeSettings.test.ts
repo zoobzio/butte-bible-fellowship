@@ -2,9 +2,9 @@ import { describe, expect, it, vi } from "vitest";
 import { nextTick } from "vue";
 import { mount } from "@vue/test-utils";
 
+import { SegmentedControl } from "#components";
 import { useUntheme } from "#imports";
 import ThemeSettings from "~/components/ThemeSettings.vue";
-import SegmentedControl from "@zoobzio/foundation/components/core/segmented-control";
 
 // The popover content is portalled to the body, so it is queried from there.
 const all = (selector: string) => [

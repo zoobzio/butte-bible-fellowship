@@ -24,6 +24,13 @@ import { layers } from "@bbf/theme/layers";
 // Real Vue APIs (ref, computed, watch, onMounted, useTemplateRef, useId, …).
 export * from "vue";
 
+// The design system's definition constructors, as the @zoobzio/nuxt layer
+// registers them.
+export { defineCommand } from "@zoobzio/vue/definitions/command";
+export { defineMenu } from "@zoobzio/vue/definitions/menu";
+export { definePopover } from "@zoobzio/vue/definitions/popover";
+export { defineSegmentedControl } from "@zoobzio/vue/definitions/segmented-control";
+
 // useState dedupes by key — two calls with the same key share one ref. Keep a
 // keyed registry, cleared between tests by tests/setup.ts.
 const stateRegistry = new Map<string, Ref<unknown>>();

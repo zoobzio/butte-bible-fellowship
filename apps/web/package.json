@@ -25,10 +25,12 @@
     "@icon-sheets/nuxt": "catalog:",
     "@prosary/nuxt": "catalog:",
     "@untheme/nuxt": "catalog:",
-    "@zoobzio/foundation": "catalog:",
+    "@zoobzio/nuxt": "catalog:",
+    "@zoobzio/vue": "catalog:",
     "bezoar": "catalog:",
     "nuxt": "catalog:",
     "prosary": "catalog:",
+    "reka-ui": "catalog:",
     "untheme": "catalog:",
     "vue": "catalog:"
   },
@@ -41,7 +43,6 @@
     "@vue/test-utils": "catalog:",
     "happy-dom": "catalog:",
     "objectively": "catalog:",
-    "reka-ui": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:",
     "vue-tsc": "catalog:"

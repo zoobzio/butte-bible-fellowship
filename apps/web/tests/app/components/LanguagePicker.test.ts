@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { mount } from "@vue/test-utils";
 
+import { Menu } from "#components";
 import { setRoutePath, useNuxtApp } from "#imports";
 import LanguagePicker from "~/components/LanguagePicker.vue";
-import Menu from "@zoobzio/foundation/components/core/menu";
 
 const links = (wrapper: ReturnType<typeof mount>) =>
   (

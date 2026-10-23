@@ -1,9 +1,7 @@
 <script lang="ts">
-import Menu from "@zoobzio/foundation/components/core/menu.vue";
-
-import { Icon } from "#components";
-import { useNuxtApp } from "#imports";
-import { defineMenu } from "@zoobzio/foundation/definitions/menu";
+import { Icon, Menu } from "#components";
+import { defineMenu, useNuxtApp } from "#imports";
+import MenuLink from "~/components/MenuLink.vue";
 import { useNavigation } from "~/composables/navigation";
 </script>
 
@@ -28,6 +26,9 @@ const menu = defineMenu(() => ({
       <button type="button" :aria-label="$t.navigation.open()">
         <Icon name="menu" class="icon" />
       </button>
+      <template #item="{ item, settings }">
+        <MenuLink :item="item" :settings="settings" />
+      </template>
     </Menu>
   </div>
 </template>

@@ -2,9 +2,9 @@ import { describe, expect, it, vi } from "vitest";
 import { nextTick } from "vue";
 import { mount } from "@vue/test-utils";
 
+import { Command } from "#components";
 import { useUntheme } from "#imports";
 import ThemePicker from "~/components/ThemePicker.vue";
-import Command from "@zoobzio/foundation/components/core/command";
 
 // The popover content is portalled to the body, so it is queried from there.
 const all = (selector: string) => [

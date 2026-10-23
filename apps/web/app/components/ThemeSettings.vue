@@ -1,11 +1,6 @@
 <script lang="ts">
-import Popover from "@zoobzio/foundation/components/core/popover.vue";
-import SegmentedControl from "@zoobzio/foundation/components/core/segmented-control.vue";
-
-import { Icon } from "#components";
-import { useNuxtApp } from "#imports";
-import { definePopover } from "@zoobzio/foundation/definitions/popover";
-import { defineSegmentedControl } from "@zoobzio/foundation/definitions/segmented-control";
+import { Icon, Popover, SegmentedControl } from "#components";
+import { definePopover, defineSegmentedControl, useNuxtApp } from "#imports";
 import { useModifiers } from "~/composables/modifiers";
 </script>
 
