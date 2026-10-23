@@ -7,13 +7,13 @@
     "build": {
       "dependsOn": ["^build"],
       "outputs": [".output/**", ".nuxt/**"],
-      "env": ["NUXT_*", "NITRO_*", "STUDIO_*", "VERCEL"],
+      "env": ["NUXT_*", "NITRO_*", "VERCEL"],
       "passThroughEnv": ["VERCEL_*"]
     },
     "generate": {
       "dependsOn": ["^build"],
       "outputs": [".output/**", ".nuxt/**", "dist/**"],
-      "env": ["NUXT_*", "NITRO_*", "STUDIO_*", "VERCEL"],
+      "env": ["NUXT_*", "NITRO_*", "VERCEL"],
       "passThroughEnv": ["VERCEL_*"]
     },
     "typecheck": {

@@ -1,0 +1,4 @@
+# Copy to terraform.tfvars (gitignored) and fill in. Tokens for the
+# providers go in the environment instead: VERCEL_API_TOKEN, NEON_API_KEY.
+
+# neon_org_id = "org-..."

@@ -1,4 +1,4 @@
-.PHONY: help install dev build generate preview lint lint-fix format format-check typecheck test test-watch coverage check ci clean
+.PHONY: help install dev build generate preview lint lint-fix format format-check typecheck test test-watch coverage check ci clean infra-init infra-plan infra-test infra-apply
 
 help: ## Show available commands
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-15s\033[0m %s\n", $$1, $$2}'
@@ -51,3 +51,15 @@ clean: ## Remove generated files
 	rm -rf apps/*/.coverage
 	rm -rf apps/*/.nuxt apps/*/.output
 	rm -rf .turbo apps/*/.turbo packages/*/.turbo
+
+infra-init: ## Install the Terraform providers
+	cd infra && terraform init
+
+infra-plan: ## Show what Terraform would change
+	cd infra && terraform plan
+
+infra-test: ## Run the Terraform tests against mock providers
+	cd infra && terraform test
+
+infra-apply: ## Apply the infrastructure
+	cd infra && terraform apply

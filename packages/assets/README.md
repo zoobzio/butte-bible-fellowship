@@ -21,7 +21,7 @@ A file's path under `src/` is its URL: `src/images/tulips.jpg` is served at
 `/images/tulips.jpg`, which is how a page refers to it.
 
 Nothing is built. The web app serves `src/` as public assets from
-`nuxt.config.ts`, and Nuxt Studio's media library reads and writes it.
+`nuxt.config.ts`.
 
 The favicon is `@bbf/icons`' `src/logo.svg` — the mark, drawn in
 `currentColor` — in the palette's `primary-500` (`#367eff`) over a white
