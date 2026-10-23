@@ -19,6 +19,10 @@
     "./seeds": {
       "types": "./.output/seeds.d.mts",
       "import": "./.output/seeds.mjs"
+    },
+    "./roles": {
+      "types": "./.output/roles.d.mts",
+      "import": "./.output/roles.mjs"
     }
   },
   "scripts": {

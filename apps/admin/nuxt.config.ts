@@ -32,10 +32,10 @@ export default defineNuxtConfig({
 
   untheme: { preset: "@bbf/theme" },
 
-  bezoar: { build: "@bbf/database", migrate: true },
+  bezoar: { build: "@bbf/database", role: "admin" },
 
   $development: {
-    bezoar: { driver: "pglite", seed: true },
+    bezoar: { driver: "pglite", migrate: true, roles: true, seed: true },
   },
 
   fonts: {

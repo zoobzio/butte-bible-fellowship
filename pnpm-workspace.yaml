@@ -4,9 +4,9 @@ packages:
 
 catalog:
   "@ai-sdk/anthropic": "^4.0.82"
-  "@bezoar/kit": "0.0.4"
-  "@bezoar/nuxt": "0.0.4"
-  "@bezoar/testing": "0.0.4"
+  "@bezoar/kit": "0.0.5"
+  "@bezoar/nuxt": "0.0.5"
+  "@bezoar/testing": "0.0.5"
   "@icon-sheets/kit": "0.0.7"
   "@icon-sheets/nuxt": "0.0.7"
   "@iconify-json/lucide": "^1.2.138"
@@ -26,7 +26,7 @@ catalog:
   "@vue/test-utils": "^2.4.11"
   "@zoobzio/nuxt": "0.0.4"
   "@zoobzio/vue": "0.0.4"
-  bezoar: "0.0.4"
+  bezoar: "0.0.5"
   happy-dom: "^20.11.6"
   icon-sheets: "0.0.7"
   nuxt: "^4.5.2"

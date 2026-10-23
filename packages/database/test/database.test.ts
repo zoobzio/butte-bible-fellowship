@@ -1,9 +1,11 @@
 import { makeTestBezoar } from "@bezoar/testing";
+import { ForbiddenQueryError } from "bezoar";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { contract } from "../.output/index.mjs";
 import { migrations } from "../.output/migrations.mjs";
 import { queries } from "../.output/queries.mjs";
+import { roles } from "../.output/roles.mjs";
 import { seeds } from "../.output/seeds.mjs";
 
 let db: Awaited<ReturnType<typeof makeTestBezoar<typeof contract>>>;
@@ -630,5 +632,88 @@ describe("admin.sermons", () => {
     expect(unrecorded?.slug).toBe("unrecorded");
     expect(await db.admin.sermons.delete({ id: created!.id })).toBe(1);
     expect(await db.admin.sermons.delete({ id: unrecorded!.id })).toBe(1);
+  });
+});
+
+// A role holds an app to its group: the service of a role offers the
+// queries the kit found it may run, and Postgres runs each as the role, so
+// what the service would not offer, the database refuses too.
+describe("roles", () => {
+  type Scoped<R extends keyof typeof contract.roles> = Awaited<
+    ReturnType<typeof makeTestBezoar<typeof contract, R>>
+  >;
+  let web: Scoped<"web">;
+  let admin: Scoped<"admin">;
+
+  beforeAll(async () => {
+    [web, admin] = await Promise.all([
+      makeTestBezoar(contract, {
+        queries,
+        migrations,
+        seeds,
+        roles,
+        role: "web",
+      }),
+      makeTestBezoar(contract, {
+        queries,
+        migrations,
+        seeds,
+        roles,
+        role: "admin",
+      }),
+    ]);
+  });
+
+  afterAll(() => Promise.all([web.close(), admin.close()]));
+
+  it("carries a grant for each app", () => {
+    expect(roles.map((grant) => grant.role)).toEqual(["admin", "web"]);
+  });
+
+  it("lets web read and admin do everything", () => {
+    const names = Object.keys(contract.queries);
+    expect(contract.roles.admin).toEqual(names);
+    expect(contract.roles.web).toEqual(
+      names.filter((name) => /\.(fetch|list|upcoming|weekly)$/.test(name)),
+    );
+  });
+
+  it("reads the site as web", async () => {
+    expect(await web.web.staff.list()).toHaveLength(3);
+    expect(await web.web.events.weekly()).toHaveLength(8);
+  });
+
+  it("refuses a write as web, by name and in the database", async () => {
+    await expect(
+      // @ts-expect-error: not a query of web.
+      web.query("admin.events.delete", { id: 1 }),
+    ).rejects.toBeInstanceOf(ForbiddenQueryError);
+    await expect(
+      web.build
+        .deleteFrom("events")
+        .where("slug", "=", "prayer-meeting")
+        .execute(),
+    ).rejects.toThrow(/permission denied for table events/);
+    expect(
+      await web.web.events.fetch.first({ slug: "prayer-meeting" }),
+    ).not.toBeNull();
+  });
+
+  it("writes as admin, with ids the database fills", async () => {
+    const created = await admin.admin.staff.create.first({
+      slug: "deacon",
+      name: "Deacon Name",
+      role: "Deacon",
+      position: 9,
+      status: "draft",
+    });
+    expect(created?.id).toBeGreaterThan(0);
+    expect(
+      await admin.admin.staff.fetch.first({ id: created!.id }),
+    ).toMatchObject({
+      slug: "deacon",
+      status: "draft",
+    });
+    expect(await admin.admin.staff.delete({ id: created!.id })).toBe(1);
   });
 });

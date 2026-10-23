@@ -41,10 +41,10 @@ export default defineNuxtConfig({
 
   prosary: { build: "@bbf/prose" },
 
-  bezoar: { build: "@bbf/database", migrate: true },
+  bezoar: { build: "@bbf/database", role: "web" },
 
   $development: {
-    bezoar: { driver: "pglite", seed: true },
+    bezoar: { driver: "pglite", migrate: true, roles: true, seed: true },
   },
 
   runtimeConfig: {
