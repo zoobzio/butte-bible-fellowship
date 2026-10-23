@@ -18,14 +18,6 @@ const assets = fileURLToPath(
   new URL("src", import.meta.resolve("@bbf/assets/package.json")),
 );
 
-// The design system layer's `#app` augmentation (its hook map and `$logger`)
-// lives in a file nothing imports, and Nuxt's tsconfig excludes node_modules,
-// so the layer's own factories fail to typecheck here without a reference
-// to it. Until the layer registers the reference itself, this does.
-const foundation = fileURLToPath(
-  new URL("app/app.d.ts", import.meta.resolve("@zoobzio/nuxt/package.json")),
-);
-
 export default defineNuxtConfig({
   compatibilityDate: "2026-08-19",
 
@@ -85,9 +77,6 @@ export default defineNuxtConfig({
   css: ["@bbf/assets/css/index.css"],
 
   hooks: {
-    "prepare:types": ({ references }) => {
-      references.push({ path: foundation });
-    },
     "pages:extend": (pages) => {
       const own = pages.filter((page) => page.file?.includes("/app/pages/"));
       for (const locale of targets) {

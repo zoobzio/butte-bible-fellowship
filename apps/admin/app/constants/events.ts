@@ -1,14 +1,15 @@
 import type { EventRecord } from "@bbf/schema/types";
 
+import type { TableConfig } from "~/types/listing";
+
 import { CONTENT_STATUSES, EVENT_DAYS } from "@bbf/schema";
-import { defineEntity } from "@zoobzio/foundation/definitions/entity";
 
 /**
  * The events table: an event to a row, the repeating ones first and then
  * the one-offs by date, the title pinned as the way to the editor. A
  * repeating event shows its day; one held once shows its date.
  */
-export const EVENTS_TABLE = defineEntity<EventRecord>().defineTable({
+export const EVENTS_TABLE: TableConfig<EventRecord> = {
   rowKey: "id",
   searchable: false,
   pinnedColumns: ["title"],
@@ -25,7 +26,4 @@ export const EVENTS_TABLE = defineEntity<EventRecord>().defineTable({
     },
     { key: "updatedAt", label: "Updated", type: "datetime" },
   ],
-  actions: {
-    edit: { label: "Edit" },
-  },
-});
+};

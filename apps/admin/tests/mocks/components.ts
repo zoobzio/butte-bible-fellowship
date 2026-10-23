@@ -1,7 +1,12 @@
 // Vitest shim for Nuxt's virtual `#components` module: minimal stand-ins for
-// the framework and module components the app imports explicitly.
+// the framework and module components the app imports explicitly, and the
+// design system's components as the @zoobzio/nuxt layer registers them.
 
 import { defineComponent, h } from "vue";
+
+// The design system's components, real: the tests exercise them.
+export { default as Table } from "@zoobzio/vue/components/table.vue";
+export { default as Tabs } from "@zoobzio/vue/components/tabs.vue";
 
 // NuxtLink: an anchor to `to`. Class, target and listeners fall through.
 export const NuxtLink = defineComponent({

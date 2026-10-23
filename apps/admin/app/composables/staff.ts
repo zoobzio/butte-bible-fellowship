@@ -3,9 +3,7 @@ import type { StaffRecord } from "@bbf/schema/types";
 import type { RecordLink } from "~/types/listing";
 
 import { staffListing, staffRecord } from "@bbf/schema";
-import { useTable } from "@zoobzio/foundation/factories/table";
-
-import { useRouter } from "#imports";
+import { createTable, navigateTo } from "#imports";
 import { useApi } from "~/composables/api";
 import { useEditor } from "~/composables/editor";
 import { useListingFetch } from "~/composables/listing";
@@ -25,20 +23,21 @@ const link: RecordLink<StaffRecord> = (record) => `/staff/${record.id}`;
  * The staff table: the members a page at a time from `/api/staff`, each
  * row the way to its editor, as is the `Edit` action on it.
  */
-export const useStaffTable = () => {
-  const router = useRouter();
-
-  const widget = useTable("staff", STAFF_TABLE, {
-    fetch: useListingFetch(ROUTE, staffListing),
-    actions: {
-      edit: (record) => {
-        router.push(link(record));
+const useTable = createTable<StaffRecord>("staff", {
+  ...STAFF_TABLE,
+  fetch: useListingFetch(ROUTE, staffListing),
+  actions: {
+    edit: {
+      label: "Edit",
+      action: (record) => {
+        navigateTo(link(record));
       },
     },
-  });
+  },
+});
 
-  return { widget, link };
-};
+/** The staff table's service, and the way to each row's editor. */
+export const useStaffTable = () => ({ table: useTable(), link });
 
 /** The member the route names, by id, or `null` when no member has it. */
 export const useStaffRecord = () => useRecord("staff", endpoint, staffRecord);

@@ -1,12 +1,8 @@
 <script lang="ts">
-import type { Events } from "@zoobzio/foundation/types/data/table";
-import type { TableWidgetProps } from "@zoobzio/foundation/types/data/table/widget";
-import type { Widget } from "@zoobzio/foundation/types/widget";
+import type { RecordLink, TableService } from "~/types/listing";
 
-import type { RecordLink } from "~/types/listing";
-
-import { NuxtLink } from "#components";
-import { computed, toValue } from "#imports";
+import { NuxtLink, Table } from "#components";
+import { computed } from "#imports";
 </script>
 
 <script setup lang="ts" generic="T extends object">
@@ -14,8 +10,8 @@ defineOptions({ name: "RecordTable" });
 
 // A table of records, a page at a time, as the design system renders it;
 // the cell the `title` names is the way to the record's editor.
-const { widget, link, title } = defineProps<{
-  widget: Widget<TableWidgetProps<T>, Events>;
+const { table, link, title } = defineProps<{
+  table: TableService<T>;
   link: RecordLink<T>;
   title: keyof T & string;
 }>();
@@ -25,11 +21,7 @@ const cell = computed(() => `cell:${title}` as const);
 
 <template>
   <div class="record-table">
-    <component
-      :is="widget.component"
-      :service="widget.service"
-      :pt="toValue(widget.settings)"
-    >
+    <Table :service="table">
       <template #[cell]="{ row }: { row: T }">
         <NuxtLink :to="link(row)" class="record-table-link">
           {{ row[title] }}
@@ -38,7 +30,7 @@ const cell = computed(() => `cell:${title}` as const);
       <template #empty>
         <span class="record-table-empty">Nothing here yet.</span>
       </template>
-    </component>
+    </Table>
   </div>
 </template>
 

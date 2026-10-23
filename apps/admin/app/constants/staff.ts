@@ -1,14 +1,15 @@
 import type { StaffRecord } from "@bbf/schema/types";
 
+import type { TableConfig } from "~/types/listing";
+
 import { CONTENT_STATUSES } from "@bbf/schema";
-import { defineEntity } from "@zoobzio/foundation/definitions/entity";
 
 /**
  * The staff table: a member to a row, in the order the site lists them, the
  * name pinned as the way to the editor. The search is left off: the list is
  * short, and the queries do not filter.
  */
-export const STAFF_TABLE = defineEntity<StaffRecord>().defineTable({
+export const STAFF_TABLE: TableConfig<StaffRecord> = {
   rowKey: "id",
   searchable: false,
   pinnedColumns: ["name"],
@@ -24,7 +25,4 @@ export const STAFF_TABLE = defineEntity<StaffRecord>().defineTable({
     },
     { key: "updatedAt", label: "Updated", type: "datetime" },
   ],
-  actions: {
-    edit: { label: "Edit" },
-  },
-});
+};

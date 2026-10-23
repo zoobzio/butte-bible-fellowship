@@ -8,12 +8,15 @@ import RecordTable from "~/components/RecordTable.vue";
 import Index from "~/pages/events/index.vue";
 import New from "~/pages/events/new.vue";
 import Editor from "~/pages/events/[id].vue";
-import { DINNER } from "#test/support/records";
+import { DINNER, WORSHIP } from "#test/support/records";
 import { mountSuspended } from "#test/support/mount";
 
 describe("events page", () => {
-  it("heads the events table with the way to a new event", () => {
-    const wrapper = mount(Index, { global: { stubs: { RecordTable: true } } });
+  it("heads the events table with the way to a new event, its first page fetched on load", async () => {
+    const fetch = vi.fn(async () => ({ items: [WORSHIP, DINNER], total: 2 }));
+    vi.stubGlobal("$fetch", fetch);
+    const { wrapper, error } = await mountSuspended(Index);
+    expect(error).toBeUndefined();
     expect(wrapper.findComponent(PageHeader).props()).toEqual({
       title: "Events",
       to: "/events/new",
@@ -21,8 +24,13 @@ describe("events page", () => {
     });
     const table = wrapper.findComponent(RecordTable);
     expect(table.props("title")).toBe("title");
-    expect(table.props("widget").service.id).toBe("events");
+    expect(table.props("table").id).toBe("events");
     expect(table.props("link")(DINNER)).toBe("/events/4");
+    expect(fetch).toHaveBeenCalledTimes(1);
+    expect(fetch).toHaveBeenCalledWith("/api/events", {
+      query: { page: 1, size: 25 },
+    });
+    expect(table.props("table").data).toEqual([WORSHIP, DINNER]);
     expect(useHead).toHaveBeenCalledWith({ title: "Events" });
   });
 });

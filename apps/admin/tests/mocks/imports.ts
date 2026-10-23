@@ -11,6 +11,11 @@ import { vi } from "vitest";
 // Real Vue APIs (ref, computed, watch, onMounted, useTemplateRef, useId, …).
 export * from "vue";
 
+// The design system's definition constructors and factories, as the
+// @zoobzio/nuxt layer registers them.
+export { defineTabs } from "@zoobzio/vue/definitions/tabs";
+export { createTable } from "@zoobzio/nuxt/factories/table";
+
 // useState dedupes by key — two calls with the same key share one ref. Keep a
 // keyed registry, cleared between tests by tests/setup.ts.
 const stateRegistry = new Map<string, Ref<unknown>>();
@@ -96,9 +101,13 @@ export const clearRouter = () => {
   router.back.mockClear();
   router.push.mockClear();
   router.replace.mockClear();
+  navigateTo.mockClear();
 };
 
 export const useRouter = () => router;
+
+// navigateTo: records where it was sent.
+export const navigateTo = vi.fn(async () => {});
 
 // useHead: records what it was given.
 export const useHead = vi.fn();
@@ -145,3 +154,10 @@ export const useLazyAsyncData = <T>(
     });
   return { data, error, status, pending };
 };
+
+// useRequest and useLazyRequest: the layer's requests over Nuxt's async
+// data, which here are the mocks above. A failure is the handler's own
+// rejection; the layer's app error over it is not under test.
+export const useRequest = useAsyncData;
+
+export const useLazyRequest = useLazyAsyncData;

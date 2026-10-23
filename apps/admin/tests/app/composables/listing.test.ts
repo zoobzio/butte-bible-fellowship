@@ -1,8 +1,11 @@
 import { staffListing } from "@bbf/schema";
 import { describe, expect, it, vi } from "vitest";
 
+import { createTable } from "#imports";
 import { STAFF } from "#test/support/records";
-import { useListingFetch } from "~/composables/listing";
+import { withSetup } from "#test/support/mount";
+import { useListingFetch, useTableRequest } from "~/composables/listing";
+import { STAFF_TABLE } from "~/constants/staff";
 
 const PARAMS = {
   page: 2,
@@ -32,5 +35,24 @@ describe("useListingFetch", () => {
     await expect(
       useListingFetch("/api/staff", staffListing)(PARAMS),
     ).rejects.toThrow();
+  });
+});
+
+describe("useTableRequest", () => {
+  it("fetches the table's first page on load, and only once", async () => {
+    const fetch = vi.fn(async () => ({
+      data: [STAFF],
+      total: 1,
+      pageCount: 1,
+    }));
+    const useTable = createTable("listing-request", { ...STAFF_TABLE, fetch });
+    const table = withSetup(() => useTable()).result;
+    expect(table.initialized).toBe(false);
+    await useTableRequest(table);
+    expect(table.initialized).toBe(true);
+    expect(table.data).toEqual([STAFF]);
+    expect(fetch).toHaveBeenCalledTimes(1);
+    await useTableRequest(withSetup(() => useTable()).result);
+    expect(fetch).toHaveBeenCalledTimes(1);
   });
 });

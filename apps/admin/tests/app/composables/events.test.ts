@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { setRoutePath, useRouter } from "#imports";
+import { navigateTo, setRoutePath, useRouter } from "#imports";
 import { DINNER, WORSHIP } from "#test/support/records";
 import { withSetup } from "#test/support/mount";
 import {
@@ -14,9 +14,9 @@ describe("useEventsTable", () => {
     const fetch = vi.fn(async () => ({ items: [WORSHIP, DINNER], total: 2 }));
     vi.stubGlobal("$fetch", fetch);
     const { result } = withSetup(() => useEventsTable());
-    const { widget, link } = result;
-    expect(widget.service.id).toBe("events");
-    expect(widget.service.columns.map((column) => column.key)).toEqual([
+    const { table, link } = result;
+    expect(table.id).toBe("events");
+    expect(table.columns.map((column) => column.key)).toEqual([
       "title",
       "day",
       "date",
@@ -25,13 +25,13 @@ describe("useEventsTable", () => {
       "updatedAt",
     ]);
     expect(link(DINNER)).toBe("/events/4");
-    await widget.service.fetch();
+    await table.fetch();
     expect(fetch).toHaveBeenCalledWith("/api/events", {
       query: { page: 1, size: 25 },
     });
-    expect(widget.service.data).toEqual([WORSHIP, DINNER]);
-    widget.service.actions[0]?.action(WORSHIP);
-    expect(useRouter().push).toHaveBeenCalledWith("/events/3");
+    expect(table.data).toEqual([WORSHIP, DINNER]);
+    table.actions[0]?.action(WORSHIP);
+    expect(navigateTo).toHaveBeenCalledWith("/events/3");
   });
 });
 

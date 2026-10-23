@@ -1,4 +1,4 @@
-import { config, enableAutoUnmount } from "@vue/test-utils";
+import { enableAutoUnmount } from "@vue/test-utils";
 import { afterEach, beforeEach, vi } from "vitest";
 import {
   clearAppConfig,
@@ -8,11 +8,6 @@ import {
   setRoutePath,
   useHead,
 } from "#test/mocks/imports";
-import { NuxtLink } from "#test/mocks/components";
-
-// Foundation components use NuxtLink as the runtime global Nuxt registers,
-// without importing it; mirror that global here.
-config.global.components = { ...config.global.components, NuxtLink };
 
 // Shared mock state (see mocks/imports.ts) must not leak between tests.
 beforeEach(() => {

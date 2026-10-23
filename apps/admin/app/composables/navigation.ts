@@ -1,6 +1,4 @@
-import { defineTabs } from "@zoobzio/foundation/definitions/tabs";
-
-import { computed, useAppConfig, useRoute } from "#imports";
+import { computed, defineTabs, useAppConfig, useRoute } from "#imports";
 import { isWithin } from "~/utils/navigation";
 
 /**

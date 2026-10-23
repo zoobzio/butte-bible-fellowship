@@ -13,7 +13,7 @@ const assets = fileURLToPath(
 export default defineNuxtConfig({
   compatibilityDate: "2026-08-19",
 
-  extends: ["@zoobzio/foundation"],
+  extends: ["@zoobzio/nuxt"],
 
   modules: [
     "@nuxt/fonts",

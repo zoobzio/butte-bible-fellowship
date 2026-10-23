@@ -3,9 +3,7 @@ import type { EventRecord } from "@bbf/schema/types";
 import type { RecordLink } from "~/types/listing";
 
 import { eventListing, eventRecord } from "@bbf/schema";
-import { useTable } from "@zoobzio/foundation/factories/table";
-
-import { useRouter } from "#imports";
+import { createTable, navigateTo } from "#imports";
 import { useApi } from "~/composables/api";
 import { useEditor } from "~/composables/editor";
 import { useListingFetch } from "~/composables/listing";
@@ -25,20 +23,21 @@ const link: RecordLink<EventRecord> = (record) => `/events/${record.id}`;
  * The events table: the events a page at a time from `/api/events`, each
  * row the way to its editor, as is the `Edit` action on it.
  */
-export const useEventsTable = () => {
-  const router = useRouter();
-
-  const widget = useTable("events", EVENTS_TABLE, {
-    fetch: useListingFetch(ROUTE, eventListing),
-    actions: {
-      edit: (record) => {
-        router.push(link(record));
+const useTable = createTable<EventRecord>("events", {
+  ...EVENTS_TABLE,
+  fetch: useListingFetch(ROUTE, eventListing),
+  actions: {
+    edit: {
+      label: "Edit",
+      action: (record) => {
+        navigateTo(link(record));
       },
     },
-  });
+  },
+});
 
-  return { widget, link };
-};
+/** The events table's service, and the way to each row's editor. */
+export const useEventsTable = () => ({ table: useTable(), link });
 
 /** The event the route names, by id, or `null` when no event has it. */
 export const useEventRecord = () => useRecord("event", endpoint, eventRecord);

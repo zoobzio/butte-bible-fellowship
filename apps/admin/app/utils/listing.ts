@@ -1,16 +1,16 @@
 import type { ListingQuery } from "@bbf/schema/types";
-import type {
-  DataTableFetchParams,
-  DataTableFetchResult,
-} from "@zoobzio/foundation/types/data/table";
 
-import type { Listing } from "~/types/listing";
+import type {
+  Listing,
+  TableFetchParams,
+  TableFetchResult,
+} from "~/types/listing";
 
 /** The query of a listing, from what the table asks for: its page and page size. */
 export const toListingQuery = ({
   page,
   pageSize,
-}: DataTableFetchParams): ListingQuery => ({ page, size: pageSize });
+}: TableFetchParams): ListingQuery => ({ page, size: pageSize });
 
 /**
  * What the table shows, from the page the API answered with: the items as
@@ -20,7 +20,7 @@ export const toListingQuery = ({
 export const toFetchResult = <T>(
   listing: Listing<T>,
   size: number,
-): DataTableFetchResult<T> => ({
+): TableFetchResult<T> => ({
   data: listing.items,
   total: listing.total,
   pageCount: Math.max(1, Math.ceil(listing.total / size)),

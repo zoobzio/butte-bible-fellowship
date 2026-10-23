@@ -1,7 +1,5 @@
 <script lang="ts">
-import Tabs from "@zoobzio/foundation/components/core/tabs.vue";
-
-import { Icon, NuxtLink } from "#components";
+import { Icon, NuxtLink, Tabs } from "#components";
 import { useSidebar } from "~/composables/navigation";
 </script>
 
