@@ -1,8 +1,7 @@
-import { defineConfig } from "vitest/config";
+import { plainPackage } from "@bbf/toolbox/vitest/package";
 
-export default defineConfig({
+export default plainPackage({
   test: {
-    include: ["test/**/*.test.ts"],
     testTimeout: 30_000,
     hookTimeout: 30_000,
   },

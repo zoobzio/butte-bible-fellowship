@@ -1,14 +1,7 @@
 {
+  "extends": "@bbf/toolbox/tsconfig/base.json",
   "compilerOptions": {
-    "strict": true,
-    "noUncheckedIndexedAccess": true,
-    "target": "esnext",
-    "module": "esnext",
-    "moduleResolution": "bundler",
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "noEmit": true,
     "types": ["node"]
   },
-  "include": ["bezoar.config.ts", "vitest.config.ts", "test"]
+  "include": ["bezoar.config.ts", "vitest.config.ts", "tests"]
 }

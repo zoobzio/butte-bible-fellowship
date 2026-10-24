@@ -35,6 +35,7 @@
     "bezoar": "catalog:"
   },
   "devDependencies": {
+    "@bbf/toolbox": "workspace:*",
     "@bezoar/kit": "catalog:",
     "@bezoar/testing": "catalog:",
     "@types/node": "catalog:",

@@ -23,6 +23,7 @@
     "objectively": "catalog:"
   },
   "devDependencies": {
+    "@bbf/toolbox": "workspace:*",
     "@bezoar/testing": "catalog:",
     "@types/hast": "catalog:",
     "@types/node": "catalog:",

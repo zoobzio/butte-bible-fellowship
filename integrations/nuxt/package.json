@@ -29,6 +29,7 @@
     "@zoobzio/nuxt": "catalog:"
   },
   "devDependencies": {
+    "@bbf/toolbox": "workspace:*",
     "@vitest/coverage-v8": "catalog:",
     "@vue/test-utils": "catalog:",
     "happy-dom": "catalog:",

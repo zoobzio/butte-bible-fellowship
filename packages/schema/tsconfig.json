@@ -1,14 +1,4 @@
 {
-  "compilerOptions": {
-    "strict": true,
-    "noUncheckedIndexedAccess": true,
-    "target": "esnext",
-    "module": "esnext",
-    "moduleResolution": "bundler",
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "noEmit": true,
-    "types": []
-  },
-  "include": ["src", "tests"]
+  "extends": "@bbf/toolbox/tsconfig/base.json",
+  "include": ["src", "tests", "vitest.config.ts"]
 }

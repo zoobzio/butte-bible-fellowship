@@ -31,7 +31,7 @@ src/seeds/         the staff and the events the content lists, each safe to run 
 src/queries/web/   what the site reads: staff, events, sermons
 src/queries/admin/ what the admin app will read and write: the same, in full
 src/roles/         what each app's role may do: web reads, admin reads and writes
-test/              the build, run through @bezoar/testing
+tests/             the build, run through @bezoar/testing
 ```
 
 A query is named for its path: `events/list.sql` is `events.list`, and a

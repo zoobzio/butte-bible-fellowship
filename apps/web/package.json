@@ -31,6 +31,7 @@
     "vue": "catalog:"
   },
   "devDependencies": {
+    "@bbf/toolbox": "workspace:*",
     "@nuxt/kit": "catalog:",
     "@types/hast": "catalog:",
     "@vitejs/plugin-vue": "catalog:",
