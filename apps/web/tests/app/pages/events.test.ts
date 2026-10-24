@@ -6,7 +6,7 @@ import { setContentPages, setRoutePath, useHead } from "#imports";
 import EventsBrowser from "~/components/EventsBrowser.vue";
 import Page from "~/pages/events/index.vue";
 import { document } from "#test/support/content";
-import { mountSuspended } from "#test/support/mount";
+import { mountSuspended } from "@bbf/nuxt/testing/mount";
 
 const EVENTS = [
   {

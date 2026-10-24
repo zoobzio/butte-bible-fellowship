@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 
 import { navigateTo, setRoutePath, useRouter } from "#imports";
 import { DINNER, WORSHIP } from "#test/support/records";
-import { withSetup } from "#test/support/mount";
+import { withSetup } from "@bbf/nuxt/testing/mount";
 import {
   useEventEditor,
   useEventRecord,

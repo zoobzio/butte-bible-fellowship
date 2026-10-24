@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 
 import { navigateTo, useRouter } from "#imports";
 import { STAFF } from "#test/support/records";
-import { withSetup } from "#test/support/mount";
+import { withSetup } from "@bbf/nuxt/testing/mount";
 import {
   useStaffEditor,
   useStaffRecord,

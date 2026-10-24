@@ -5,7 +5,7 @@ import { flushPromises, mount } from "@vue/test-utils";
 
 import { createTable } from "#imports";
 import { STAFF } from "#test/support/records";
-import { withSetup } from "#test/support/mount";
+import { withSetup } from "@bbf/nuxt/testing/mount";
 import RecordTable from "~/components/RecordTable.vue";
 import { STAFF_TABLE } from "~/constants/staff";
 

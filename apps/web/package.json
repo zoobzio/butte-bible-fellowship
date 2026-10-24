@@ -16,16 +16,12 @@
   "dependencies": {
     "@bbf/assets": "workspace:*",
     "@bbf/database": "workspace:*",
-    "@bbf/icons": "workspace:*",
+    "@bbf/nuxt": "workspace:*",
     "@bbf/prose": "workspace:*",
     "@bbf/schema": "workspace:*",
     "@bbf/theme": "workspace:*",
     "@bbf/utils": "workspace:*",
-    "@bezoar/nuxt": "catalog:",
-    "@icon-sheets/nuxt": "catalog:",
     "@prosary/nuxt": "catalog:",
-    "@untheme/nuxt": "catalog:",
-    "@zoobzio/nuxt": "catalog:",
     "@zoobzio/vue": "catalog:",
     "bezoar": "catalog:",
     "nuxt": "catalog:",
@@ -35,7 +31,6 @@
     "vue": "catalog:"
   },
   "devDependencies": {
-    "@nuxt/fonts": "catalog:",
     "@nuxt/kit": "catalog:",
     "@types/hast": "catalog:",
     "@vitejs/plugin-vue": "catalog:",

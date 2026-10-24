@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { useFrame, useScrollProgress } from "~/composables/motion";
-import { withSetup } from "#test/support/mount";
+import { withSetup } from "@bbf/nuxt/testing/mount";
 import { stubPage } from "#test/support/page";
 
 afterEach(() => {

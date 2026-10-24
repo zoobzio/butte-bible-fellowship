@@ -54,20 +54,24 @@ language.
 
 ## Architecture
 
-The app extends the Foundation layer from `nuxt.config.ts`:
+Both apps extend [`@bbf/nuxt`](integrations/nuxt), the church's layer over
+the `@zoobzio/nuxt` design system layer, from `nuxt.config.ts`:
 
 ```ts
 export default defineNuxtConfig({
-  extends: ["@zoobzio/foundation"],
+  extends: ["@bbf/nuxt"],
+  bezoar: { role: "web" },
 });
 ```
 
-Foundation disables auto-imports, so everything is imported explicitly —
-Foundation modules come in through the package's subpath exports:
+The layer sets up the icons, theme, fonts, stylesheet and database service
+every app shares, and holds the server code and test support they share;
+see [`integrations/`](integrations). The design system disables
+auto-imports, so everything is imported explicitly — its modules come in
+through the package's subpath exports:
 
 ```ts
-import Button from "@zoobzio/foundation/components/common/button.vue";
-import { useTable } from "@zoobzio/foundation/factories/table";
+import { createTable } from "@zoobzio/nuxt/factories/table";
 ```
 
 Styling uses the aurora untheme tokens (`--surface`, `--space-*`, `--type-*`, …).
@@ -116,7 +120,7 @@ server/
   utils/            — pure, single-purpose functions of this app alone; the shared ones are @bbf/utils
   composables/      — the services an endpoint needs, over the request and the Nitro runtime
   api/              — endpoints: each names a composable and runs it
-nuxt.config.ts      — extends @zoobzio/foundation
+nuxt.config.ts      — extends @bbf/nuxt
 ```
 
 ### Layers

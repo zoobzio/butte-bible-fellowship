@@ -6,7 +6,7 @@ import type { PageItem } from "~/types/page";
 
 import { useOutline, useOutlineSpy } from "~/composables/outline";
 import { document as page, element } from "#test/support/content";
-import { withSetup } from "#test/support/mount";
+import { withSetup } from "@bbf/nuxt/testing/mount";
 import { stubPage } from "#test/support/page";
 
 const ENTRIES: OutlineEntry[] = [

@@ -7,7 +7,7 @@ import HomeWeek from "~/components/HomeWeek.vue";
 import MarkdownBody from "~/components/MarkdownBody.vue";
 import Page from "~/pages/index.vue";
 import { document } from "#test/support/content";
-import { mountSuspended } from "#test/support/mount";
+import { mountSuspended } from "@bbf/nuxt/testing/mount";
 
 const HERO = {
   tagline: "Discover",

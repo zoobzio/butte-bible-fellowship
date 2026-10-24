@@ -3,7 +3,7 @@ import { ref } from "vue";
 
 import { useOrbDrift } from "~/composables/orbs";
 import { orbDrift } from "~/utils/orbs";
-import { withSetup } from "#test/support/mount";
+import { withSetup } from "@bbf/nuxt/testing/mount";
 import { stubMatchMedia, stubPage } from "#test/support/page";
 
 const setup = () => {

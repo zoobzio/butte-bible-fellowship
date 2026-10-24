@@ -1,0 +1,44 @@
+{
+  "name": "@bbf/nuxt",
+  "private": true,
+  "type": "module",
+  "main": "./nuxt.config.ts",
+  "exports": {
+    ".": "./nuxt.config.ts",
+    "./server/composables/*": "./server/composables/*.ts",
+    "./server/types/*": "./server/types/*.ts",
+    "./testing/*": "./testing/*.ts",
+    "./package.json": "./package.json"
+  },
+  "scripts": {
+    "postinstall": "nuxi prepare",
+    "typecheck": "nuxi typecheck",
+    "test": "vitest run --passWithNoTests",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage --passWithNoTests"
+  },
+  "dependencies": {
+    "@bbf/assets": "workspace:*",
+    "@bbf/database": "workspace:*",
+    "@bbf/icons": "workspace:*",
+    "@bbf/theme": "workspace:*",
+    "@bezoar/nuxt": "catalog:",
+    "@icon-sheets/nuxt": "catalog:",
+    "@nuxt/fonts": "catalog:",
+    "@untheme/nuxt": "catalog:",
+    "@zoobzio/nuxt": "catalog:"
+  },
+  "devDependencies": {
+    "@vitest/coverage-v8": "catalog:",
+    "@vue/test-utils": "catalog:",
+    "happy-dom": "catalog:",
+    "nuxt": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:",
+    "vue": "catalog:"
+  },
+  "peerDependencies": {
+    "nuxt": "catalog:",
+    "vue": "catalog:"
+  }
+}

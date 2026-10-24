@@ -4,7 +4,7 @@ import { setContentPages, setRoutePath, useHead } from "#imports";
 import AboutArticle from "~/components/AboutArticle.vue";
 import Page from "~/pages/about-us.vue";
 import { document, element } from "#test/support/content";
-import { mountSuspended } from "#test/support/mount";
+import { mountSuspended } from "@bbf/nuxt/testing/mount";
 
 const ABOUT = document(
   { title: "About – Test Church" },

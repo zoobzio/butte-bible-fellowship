@@ -8,7 +8,7 @@ import PageHeader from "~/components/PageHeader.vue";
 import StaffCard from "~/components/StaffCard.vue";
 import Page from "~/pages/connect.vue";
 import { document, element } from "#test/support/content";
-import { mountSuspended } from "#test/support/mount";
+import { mountSuspended } from "@bbf/nuxt/testing/mount";
 
 const STAFF = [
   {

@@ -4,6 +4,10 @@ import { fileURLToPath } from "node:url";
 
 const r = (p: string) => fileURLToPath(new URL(p, import.meta.url));
 
+// The @bbf/nuxt layer, where the app's shared server code and test support are.
+const layer = (p: string) =>
+  fileURLToPath(new URL(p, import.meta.resolve("@bbf/nuxt/package.json")));
+
 export default defineConfig({
   plugins: [vue()],
   resolve: {
@@ -12,7 +16,9 @@ export default defineConfig({
       "#imports": r("./tests/mocks/imports.ts"),
       "#app": r("./tests/mocks/imports.ts"),
       "#components": r("./tests/mocks/components.ts"),
-      "#bezoar/service": r("./tests/mocks/bezoar.ts"),
+      "#bezoar/service": layer("./testing/bezoar.ts"),
+      // The named layer's alias, as Nuxt adds it.
+      "#layers/bbf": layer("."),
       // Source aliases mirror Nuxt's: "~" is the app, "~~" the project root
       // — what the server imports by, as ~~/server/<layer>/….
       "~": r("./app"),

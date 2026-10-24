@@ -2,7 +2,7 @@ import type { ChurchEvent } from "@bbf/schema/types";
 
 import { toChurchEvent } from "@bbf/utils";
 
-import { useDatabase } from "~~/server/composables/database";
+import { useDatabase } from "#layers/bbf/server/composables/database";
 import { churchDate } from "~~/server/utils/events";
 
 /**

@@ -47,10 +47,10 @@ check: lint typecheck test ## Run lint, typecheck, and tests
 ci: clean install check coverage ## Full CI simulation
 
 clean: ## Remove generated files
-	rm -rf node_modules/.cache apps/*/node_modules/.cache
-	rm -rf apps/*/.coverage
-	rm -rf apps/*/.nuxt apps/*/.output
-	rm -rf .turbo apps/*/.turbo packages/*/.turbo
+	rm -rf node_modules/.cache apps/*/node_modules/.cache integrations/*/node_modules/.cache
+	rm -rf apps/*/.coverage integrations/*/.coverage
+	rm -rf apps/*/.nuxt apps/*/.output integrations/*/.nuxt
+	rm -rf .turbo apps/*/.turbo packages/*/.turbo integrations/*/.turbo
 
 infra-init: ## Install the Terraform providers
 	cd infra && terraform init

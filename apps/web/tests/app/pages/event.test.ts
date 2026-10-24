@@ -4,7 +4,7 @@ import { setAppConfig, setContentPages, setRoutePath, useHead } from "#imports";
 import EventArticle from "~/components/EventArticle.vue";
 import Page from "~/pages/events/[event].vue";
 import { document, element } from "#test/support/content";
-import { mountSuspended } from "#test/support/mount";
+import { mountSuspended } from "@bbf/nuxt/testing/mount";
 
 const WORSHIP = {
   title: "Worship Service",

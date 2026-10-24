@@ -3,7 +3,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { setRoutePath, useNuxtApp } from "#imports";
 import HomeSermons from "~/components/HomeSermons.vue";
 import SermonGrid from "~/components/SermonGrid.vue";
-import { mountSuspended } from "#test/support/mount";
+import { mountSuspended } from "@bbf/nuxt/testing/mount";
 
 const sermon = (slug: string) => ({
   slug,

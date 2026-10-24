@@ -2,7 +2,7 @@ import type { Sermon } from "@bbf/schema/types";
 
 import { toSermon } from "@bbf/utils";
 
-import { useDatabase } from "~~/server/composables/database";
+import { useDatabase } from "#layers/bbf/server/composables/database";
 
 /**
  * The sermons the site lists: the published ones, as the database holds

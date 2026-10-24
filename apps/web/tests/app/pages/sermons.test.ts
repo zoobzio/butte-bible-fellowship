@@ -6,7 +6,7 @@ import SermonCard from "~/components/SermonCard.vue";
 import SermonGrid from "~/components/SermonGrid.vue";
 import Page from "~/pages/sermons.vue";
 import { document } from "#test/support/content";
-import { mountSuspended } from "#test/support/mount";
+import { mountSuspended } from "@bbf/nuxt/testing/mount";
 
 const SERMONS_PAGE = document({ title: "Sermons – Test Church" });
 

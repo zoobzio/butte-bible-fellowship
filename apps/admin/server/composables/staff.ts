@@ -6,7 +6,7 @@ import type {
 } from "@bbf/schema/types";
 
 import { toStaffArguments, toStaffRecord } from "@bbf/utils";
-import { useDatabase } from "~~/server/composables/database";
+import { useDatabase } from "#layers/bbf/server/composables/database";
 import { paginate } from "~~/server/utils/listing";
 
 /**

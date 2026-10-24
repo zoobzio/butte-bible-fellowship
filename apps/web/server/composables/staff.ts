@@ -2,7 +2,7 @@ import type { StaffMember } from "@bbf/schema/types";
 
 import { toStaffMember } from "@bbf/utils";
 
-import { useDatabase } from "~~/server/composables/database";
+import { useDatabase } from "#layers/bbf/server/composables/database";
 
 /**
  * The staff the site lists: the published members, as the database holds

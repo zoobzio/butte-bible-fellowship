@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { service } from "#test/mocks/bezoar";
+import { service } from "@bbf/nuxt/testing/bezoar";
 import { useStaff } from "~~/server/composables/staff";
 
 /** A row as `admin.staff.list` and `admin.staff.fetch` return it. */

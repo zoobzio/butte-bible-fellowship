@@ -4,7 +4,7 @@ import { setContentPages, setRoutePath, useNuxtApp } from "#imports";
 import EventWeek from "~/components/EventWeek.vue";
 import HomeWeek from "~/components/HomeWeek.vue";
 import { document } from "#test/support/content";
-import { mountSuspended } from "#test/support/mount";
+import { mountSuspended } from "@bbf/nuxt/testing/mount";
 
 const WORSHIP = {
   title: "Worship Service",

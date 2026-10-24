@@ -14,7 +14,7 @@ import {
   archStop,
   describeArchLine,
 } from "~/utils/arches";
-import { withSetup } from "#test/support/mount";
+import { withSetup } from "@bbf/nuxt/testing/mount";
 import { stubMatchMedia, stubPage } from "#test/support/page";
 
 const SVG_NS = "http://www.w3.org/2000/svg";

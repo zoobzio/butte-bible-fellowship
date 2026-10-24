@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { service } from "#test/mocks/bezoar";
+import { service } from "@bbf/nuxt/testing/bezoar";
 import { useSermons } from "~~/server/composables/sermons";
 
 /** A row as `web.sermons.list` returns it: no body. */

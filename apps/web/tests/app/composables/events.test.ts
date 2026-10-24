@@ -33,7 +33,7 @@ import {
   useToday,
 } from "~/composables/events";
 import { document } from "#test/support/content";
-import { withSetup } from "#test/support/mount";
+import { withSetup } from "@bbf/nuxt/testing/mount";
 
 const WORSHIP: ChurchEvent = {
   title: "Worship Service",

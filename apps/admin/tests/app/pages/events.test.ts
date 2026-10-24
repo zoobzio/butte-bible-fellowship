@@ -9,7 +9,7 @@ import Index from "~/pages/events/index.vue";
 import New from "~/pages/events/new.vue";
 import Editor from "~/pages/events/[id].vue";
 import { DINNER, WORSHIP } from "#test/support/records";
-import { mountSuspended } from "#test/support/mount";
+import { mountSuspended } from "@bbf/nuxt/testing/mount";
 
 describe("events page", () => {
   it("heads the events table with the way to a new event, its first page fetched on load", async () => {

@@ -9,7 +9,7 @@ import Index from "~/pages/staff/index.vue";
 import New from "~/pages/staff/new.vue";
 import Editor from "~/pages/staff/[id].vue";
 import { STAFF } from "#test/support/records";
-import { mountSuspended } from "#test/support/mount";
+import { mountSuspended } from "@bbf/nuxt/testing/mount";
 
 describe("staff page", () => {
   it("heads the staff table with the way to a new member, its first page fetched on load", async () => {

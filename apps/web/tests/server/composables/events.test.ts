@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { service } from "#test/mocks/bezoar";
+import { service } from "@bbf/nuxt/testing/bezoar";
 import { useEvents } from "~~/server/composables/events";
 
 /** A row as `web.events.list` and `web.events.weekly` return it: no body. */

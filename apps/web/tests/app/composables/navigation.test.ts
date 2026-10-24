@@ -15,7 +15,7 @@ import {
   useNavigation,
   usePageBack,
 } from "~/composables/navigation";
-import { withSetup } from "#test/support/mount";
+import { withSetup } from "@bbf/nuxt/testing/mount";
 
 const LINKS: NavigationLink[] = [
   { label: "navigation.about", to: "/" },

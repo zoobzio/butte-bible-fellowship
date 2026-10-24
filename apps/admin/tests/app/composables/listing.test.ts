@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 
 import { createTable } from "#imports";
 import { STAFF } from "#test/support/records";
-import { withSetup } from "#test/support/mount";
+import { withSetup } from "@bbf/nuxt/testing/mount";
 import { useListingFetch, useTableRequest } from "~/composables/listing";
 import { STAFF_TABLE } from "~/constants/staff";
 

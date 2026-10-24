@@ -12,7 +12,7 @@ import {
 import AppInvitation from "~/components/AppInvitation.vue";
 import EventSchedule from "~/components/EventSchedule.vue";
 import { document } from "#test/support/content";
-import { mountSuspended } from "#test/support/mount";
+import { mountSuspended } from "@bbf/nuxt/testing/mount";
 
 const INVITATION: InvitationConfig = {
   address: "1 Test Street, Testville",

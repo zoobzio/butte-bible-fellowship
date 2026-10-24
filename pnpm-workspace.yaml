@@ -1,6 +1,7 @@
 packages:
   - "apps/*"
   - "packages/*"
+  - "integrations/*"
 
 catalog:
   "@ai-sdk/anthropic": "^4.0.82"
