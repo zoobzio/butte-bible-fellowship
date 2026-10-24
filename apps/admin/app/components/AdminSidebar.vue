@@ -1,5 +1,6 @@
 <script lang="ts">
 import { Icon, NuxtLink, Tabs } from "#components";
+import { navigateTo, useAuth } from "#imports";
 import { useSidebar } from "~/composables/navigation";
 </script>
 
@@ -7,6 +8,13 @@ import { useSidebar } from "~/composables/navigation";
 defineOptions({ name: "AdminSidebar" });
 
 const { tabs } = useSidebar();
+
+// Who is signed in, and the way out: the session ends, then the login page.
+const auth = useAuth();
+const signOut = async () => {
+  await auth.logout();
+  await navigateTo("/login");
+};
 </script>
 
 <template>
@@ -22,6 +30,15 @@ const { tabs } = useSidebar();
     <nav class="admin-nav" aria-label="Sections">
       <Tabs v-bind="tabs" />
     </nav>
+
+    <div v-if="auth.current" class="admin-account">
+      <span class="admin-account-name">
+        {{ auth.current.name ?? auth.current.email }}
+      </span>
+      <button type="button" class="admin-account-action" @click="signOut">
+        Sign out
+      </button>
+    </div>
   </aside>
 </template>
 
@@ -120,6 +137,33 @@ const { tabs } = useSidebar();
   display: none;
 }
 
+/* Who is signed in sits at the foot of the sidebar. */
+.admin-account {
+  display: grid;
+  gap: var(--space-2);
+  margin-top: auto;
+  padding: 0 var(--space-3);
+}
+
+.admin-account-name {
+  overflow: hidden;
+  font: var(--type-label);
+  color: var(--on-surface-muted);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-account-action {
+  justify-self: start;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--primary);
+  font: var(--type-label);
+  font-weight: var(--weight-medium);
+  cursor: pointer;
+}
+
 /* Small screens: the sidebar is a bar across the top, the sections in a
    row under the brand. */
 @media (max-width: 44rem) {
@@ -132,6 +176,9 @@ const { tabs } = useSidebar();
     border-right: 0;
     border-bottom: 1px var(--stroke-solid) var(--rule);
     z-index: 20;
+  }
+  .admin-account {
+    display: none;
   }
   .admin-nav .f-tabs-list {
     grid-auto-flow: column;

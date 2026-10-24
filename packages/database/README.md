@@ -10,7 +10,8 @@ the kit and the sources never reach it.
 The tables are the site's three kinds of data: `staff`, who serve the
 church; `events`, each held once on a date or weekly on a day, with the page
 written about it; and `sermons`, each preached on a day, with the page
-written about it and its recording on the church's YouTube channel. Content
+written about it and its recording on the church's YouTube channel. Beside them, `users` is who may sign in to the admin app.
+Content
 the admin app edits carries a `content_status` — draft, published, archived —
 and only the published reaches the site.
 
@@ -26,7 +27,7 @@ would not have offered.
 
 ```
 bezoar.config.ts   the kit config: the output directory, the defaults for the rest
-src/migrations/    the schema, forward only: staff, events, sermons
+src/migrations/    the schema, forward only: staff, events, sermons, users
 src/seeds/         the staff and the events the content lists, each safe to run again
 src/queries/web/   what the site reads: staff, events, sermons
 src/queries/admin/ what the admin app will read and write: the same, in full
@@ -58,6 +59,15 @@ takes the newest published sermons, as many as asked, and
 every member whatever their status. `admin.events` and `admin.sermons` have
 the same, by `id`.
 
+`admin.users` has the same, and two more for signing in. A user is added
+by their email and a `user_role` — `admin` or `editor`, the roles of
+`@bbf/patents` — and is bound to Google's subject (`sub`) the first time
+they sign in: `admin.users.claim` binds it to the user added by that
+email, when no subject is bound yet, and `admin.users.subject` finds the
+user by it on every request after. An `update` that changes the email
+unbinds the user until they sign in with the new one. The admin app passes
+`claim` only an email Google has verified.
+
 An argument written into a column the schema lets be null — a summary, a
 bio, a body, an image, a note, a location, an end time, a sermon's
 `speaker` or `video`, an event's `date` or `day` or `weeks` — is optional,
@@ -79,9 +89,9 @@ applies its grants after them, and then plans every query as every role,
 so the contract carries, by role, the queries the role may run.
 
 `web` has `SELECT` on `staff`, `events` and `sermons`, and nothing else.
-It may run every read, the admin app's plain reads among them, and no
-write. `admin` has `SELECT`, `INSERT`, `UPDATE` and `DELETE` on the three
-tables, and may run every query. Each `id` is an identity column, which
+It may run every read of them, the admin app's plain reads among them, and
+no write; it may not read `users` at all. `admin` has `SELECT`, `INSERT`,
+`UPDATE` and `DELETE` on the four tables, and may run every query. Each `id` is an identity column, which
 Postgres fills without a privilege on its sequence, so the tables are the
 whole of each grant.
 

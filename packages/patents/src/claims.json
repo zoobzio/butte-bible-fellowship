@@ -1,0 +1,9 @@
+{
+  "id_token": {
+    "email": { "essential": true },
+    "email_verified": null,
+    "name": null,
+    "picture": null,
+    "roles": { "essential": true, "values": ["admin", "editor"] }
+  }
+}

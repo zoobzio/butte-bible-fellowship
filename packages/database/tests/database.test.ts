@@ -26,11 +26,12 @@ beforeAll(async () => {
 afterAll(() => db.close());
 
 describe("the build", () => {
-  it("carries the staff, events and sermons migrations in order", () => {
+  it("carries the staff, events, sermons and users migrations in order", () => {
     expect(migrations.map((migration) => migration.name)).toEqual([
       "staff",
       "events",
       "sermons",
+      "users",
     ]);
   });
 
@@ -44,6 +45,10 @@ describe("the build", () => {
       "published",
       "archived",
     ]);
+  });
+
+  it("reads the admin's user roles from the schema", () => {
+    expect(contract.enums.user_role).toEqual(["admin", "editor"]);
   });
 
   it("reads the days of the week from the schema, Sunday first", () => {
@@ -70,8 +75,8 @@ describe("the build", () => {
       "web.staff.fetch",
       "web.staff.list",
     ]);
-    expect(names.filter((name) => name.startsWith("admin."))).toHaveLength(15);
-    expect(names).toHaveLength(23);
+    expect(names.filter((name) => name.startsWith("admin."))).toHaveLength(22);
+    expect(names).toHaveLength(30);
   });
 });
 
@@ -635,6 +640,105 @@ describe("admin.sermons", () => {
   });
 });
 
+describe("admin.users", () => {
+  const sub = "104958204857204857204";
+
+  it("adds a user by email and binds them to Google on first sign-in", async () => {
+    const created = await db.admin.users.create.first({
+      email: "Pastor@Example.com",
+      role: "admin",
+    });
+    expect(created?.email).toBe("pastor@example.com");
+    const id = created!.id;
+
+    // Nobody is bound to the subject until they sign in.
+    expect(await db.admin.users.subject.first({ sub })).toBeNull();
+    expect(await db.admin.users.fetch.first({ id })).toMatchObject({
+      sub: null,
+      name: null,
+      role: "admin",
+      signed_in_at: null,
+    });
+
+    const claimed = await db.admin.users.claim.first({
+      sub,
+      email: "pastor@example.com",
+      name: "Pastor Name",
+      picture: "https://example.com/pastor.jpg",
+    });
+    expect(claimed).toMatchObject({ id, role: "admin", name: "Pastor Name" });
+    expect(await db.admin.users.subject.first({ sub })).toMatchObject({
+      id,
+      email: "pastor@example.com",
+      role: "admin",
+    });
+    expect(
+      (await db.admin.users.fetch.first({ id }))?.signed_in_at,
+    ).toBeInstanceOf(Date);
+
+    // A bound user is not claimed again, by this subject or another.
+    expect(
+      await db.admin.users.claim.first({
+        sub: "other",
+        email: "pastor@example.com",
+      }),
+    ).toBeNull();
+
+    expect(await db.admin.users.delete({ id })).toBe(1);
+  });
+
+  it("claims no one for an email nobody added", async () => {
+    expect(
+      await db.admin.users.claim.first({ sub, email: "stranger@example.com" }),
+    ).toBeNull();
+    expect(await db.admin.users.subject.first({ sub })).toBeNull();
+  });
+
+  it("changes a role, and unbinds a user whose email changes", async () => {
+    const created = await db.admin.users.create.first({
+      email: "office@example.com",
+      role: "editor",
+    });
+    const id = created!.id;
+    await db.admin.users.claim({ sub, email: "office@example.com" });
+
+    await db.admin.users.update({
+      id,
+      email: "office@example.com",
+      role: "admin",
+    });
+    expect(await db.admin.users.subject.first({ sub })).toMatchObject({
+      role: "admin",
+    });
+
+    await db.admin.users.update({
+      id,
+      email: "new@example.com",
+      role: "admin",
+    });
+    expect(await db.admin.users.subject.first({ sub })).toBeNull();
+    expect(await db.admin.users.fetch.first({ id })).toMatchObject({
+      email: "new@example.com",
+      sub: null,
+    });
+
+    expect(await db.admin.users.delete({ id })).toBe(1);
+  });
+
+  it("refuses an email already added", async () => {
+    const created = await db.admin.users.create.first({
+      email: "twice@example.com",
+      role: "editor",
+    });
+    expect(
+      await refusal(
+        db.admin.users.create({ email: "TWICE@example.com", role: "admin" }),
+      ),
+    ).toMatch(/users_email_key/);
+    expect(await db.admin.users.delete({ id: created!.id })).toBe(1);
+  });
+});
+
 // A role holds an app to its group: the service of a role offers the
 // queries the kit found it may run, and Postgres runs each as the role, so
 // what the service would not offer, the database refuses too.
@@ -674,7 +778,11 @@ describe("roles", () => {
     const names = Object.keys(contract.queries);
     expect(contract.roles.admin).toEqual(names);
     expect(contract.roles.web).toEqual(
-      names.filter((name) => /\.(fetch|list|upcoming|weekly)$/.test(name)),
+      names.filter(
+        (name) =>
+          !name.startsWith("admin.users.") &&
+          /\.(fetch|list|upcoming|weekly)$/.test(name),
+      ),
     );
   });
 
@@ -697,6 +805,16 @@ describe("roles", () => {
     expect(
       await web.web.events.fetch.first({ slug: "prayer-meeting" }),
     ).not.toBeNull();
+  });
+
+  it("keeps the users from web", async () => {
+    await expect(
+      // @ts-expect-error: not a query of web.
+      web.query("admin.users.list", {}),
+    ).rejects.toBeInstanceOf(ForbiddenQueryError);
+    await expect(
+      web.build.selectFrom("users").selectAll().execute(),
+    ).rejects.toThrow(/permission denied for table users/);
   });
 
   it("writes as admin, with ids the database fills", async () => {

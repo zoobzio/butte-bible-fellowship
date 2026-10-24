@@ -1,5 +1,5 @@
 <script lang="ts">
-import { useHead } from "#imports";
+import { definePageMeta, useHead } from "#imports";
 
 import PageHeader from "~/components/PageHeader.vue";
 import RecordTable from "~/components/RecordTable.vue";
@@ -8,6 +8,8 @@ import { useStaffTable } from "~/composables/staff";
 </script>
 
 <script setup lang="ts">
+definePageMeta({ middleware: "auth", auth: { scopes: ["staff:read"] } });
+
 useHead({ title: "Staff" });
 
 // The table's first page is fetched on load, once.

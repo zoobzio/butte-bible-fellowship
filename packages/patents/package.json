@@ -1,0 +1,47 @@
+{
+  "name": "@bbf/patents",
+  "private": true,
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./.output/index.d.mts",
+      "import": "./.output/index.mjs"
+    },
+    "./config": {
+      "types": "./.output/config.d.mts",
+      "import": "./.output/config.mjs"
+    },
+    "./manifest": {
+      "types": "./.output/manifest.d.mts",
+      "import": "./.output/manifest.mjs"
+    },
+    "./issuers": {
+      "types": "./.output/issuers.d.mts",
+      "import": "./.output/issuers.mjs"
+    },
+    "./issuers/*": {
+      "types": "./.output/issuers/*.d.mts",
+      "import": "./.output/issuers/*.mjs"
+    },
+    "./resource.json": "./.output/resource.json",
+    "./src/*": "./src/*",
+    "./package.json": "./package.json"
+  },
+  "scripts": {
+    "build": "patent build",
+    "prepare": "patent build",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "letters-patent": "catalog:"
+  },
+  "devDependencies": {
+    "@bbf/toolbox": "workspace:*",
+    "@letters-patent/kit": "catalog:",
+    "@types/node": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

@@ -2,6 +2,7 @@ import { enableAutoUnmount } from "@vue/test-utils";
 import { afterEach, beforeEach, vi } from "vitest";
 import {
   clearAppConfig,
+  clearAuth,
   clearNuxtApp,
   clearNuxtStateRegistry,
   clearRouter,
@@ -14,6 +15,7 @@ beforeEach(() => {
   clearNuxtStateRegistry();
   clearNuxtApp();
   clearAppConfig();
+  clearAuth();
   setRoutePath("/");
   clearRouter();
   useHead.mockClear();

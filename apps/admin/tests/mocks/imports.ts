@@ -62,6 +62,26 @@ export const clearNuxtApp = () => {
 // defineNuxtRouteMiddleware hands the middleware back as it is.
 export const defineNuxtRouteMiddleware = <T>(middleware: T) => middleware;
 
+// useAuth: the letters-patent service, as far as the app reaches into it —
+// who is signed in, which a test sets, and a logout that records the call.
+const auth = reactive({
+  current: null as { sub: string; name?: string; email?: string } | null,
+  logout: vi.fn(async () => {
+    auth.current = null;
+  }),
+});
+
+export const setAuthUser = (user: typeof auth.current) => {
+  auth.current = user;
+};
+
+export const clearAuth = () => {
+  auth.current = null;
+  auth.logout.mockClear();
+};
+
+export const useAuth = () => auth;
+
 // useAppConfig: tests supply their own config so they don't depend on the
 // app's own.
 let appConfig: Record<string, unknown> = {};
@@ -77,15 +97,22 @@ export const useAppConfig = () => appConfig;
 // useRuntimeConfig: the public config the app reads.
 export const useRuntimeConfig = () => ({ public: {} });
 
-// useRoute: one reactive route, moved with setRoutePath, its params with it.
-const route = reactive({ path: "/", params: {} as Record<string, string> });
+// useRoute: one reactive route, moved with setRoutePath, its params and
+// its query with it.
+const route = reactive({
+  path: "/",
+  params: {} as Record<string, string>,
+  query: {} as Record<string, string>,
+});
 
 export const setRoutePath = (
   path: string,
   params: Record<string, string> = {},
+  query: Record<string, string> = {},
 ) => {
   route.path = path;
   route.params = params;
+  route.query = query;
 };
 
 export const useRoute = () => route;

@@ -1,0 +1,13 @@
+{
+  "resource": "https://admin.bbf.example",
+  "authorization_servers": ["https://accounts.google.com"],
+  "scopes_supported": [
+    "events:read",
+    "events:write",
+    "staff:read",
+    "staff:write",
+    "users:read",
+    "users:write"
+  ],
+  "bearer_methods_supported": ["header"]
+}

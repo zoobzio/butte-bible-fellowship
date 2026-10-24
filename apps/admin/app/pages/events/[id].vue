@@ -1,5 +1,5 @@
 <script lang="ts">
-import { createError, useHead } from "#imports";
+import { createError, definePageMeta, useHead } from "#imports";
 
 import EventEditor from "~/components/EventEditor.vue";
 import PageHeader from "~/components/PageHeader.vue";
@@ -7,6 +7,8 @@ import { useEventRecord } from "~/composables/events";
 </script>
 
 <script setup lang="ts">
+definePageMeta({ middleware: "auth", auth: { scopes: ["events:read"] } });
+
 // The event is the one the address names, by id.
 const { data: record } = await useEventRecord();
 
