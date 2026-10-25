@@ -1,0 +1,71 @@
+# The local environment: one Postgres, and the site and the admin app on it
+# together, so a change made in one shows in the other. `make up` runs it.
+#
+# `pnpm dev` on the host gives each app a Postgres of its own, in the
+# process; here both connect to `db` instead, through the `pg` driver, as
+# the one superuser. The layer's development config has each app apply the
+# migrations, the roles and the seeds as it starts, under bezoar's advisory
+# locks, so the two may start together. Each app then takes its role on
+# every statement, as it does on the host.
+#
+# The checkout is bind-mounted over /app, node_modules included, so the dev
+# servers watch the files you edit and hot-reload as they would on the
+# host. Run `pnpm install` on the host first (`make up` does); a change to a
+# package's sources is built by its `prepare` script, as on the host.
+
+name: bbf
+
+# The apps run as the container's root. Under a rootless Docker that is
+# the user who ran `docker compose`, so what the dev servers write into the
+# checkout is theirs; under a rootful daemon add `user: "1000:1000"` (your
+# own uid and gid) to each app so the files are not root's.
+x-app: &app
+  build: tools/docker
+  working_dir: /app
+  volumes:
+    - .:/app
+  environment:
+    NUXT_BEZOAR_DRIVER: pg
+    NUXT_BEZOAR_URL: postgres://postgres:postgres@db:5432/bbf
+  depends_on:
+    db:
+      condition: service_healthy
+  init: true
+
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: bbf
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d bbf"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+
+  web:
+    <<: *app
+    command: pnpm --filter @bbf/web dev --host 0.0.0.0
+    ports:
+      - "3000:3000"
+
+  admin:
+    <<: *app
+    command: pnpm --filter @bbf/admin dev --host 0.0.0.0
+    ports:
+      - "3001:3001"
+    # Google sign-in and the session secret, from the admin's own `.env`;
+    # see `apps/admin/.env.example`. The app starts without them, but no
+    # one can sign in.
+    env_file:
+      - path: apps/admin/.env
+        required: false
+
+volumes:
+  pgdata:

@@ -1,4 +1,4 @@
-.PHONY: help install dev build generate preview lint lint-fix format format-check typecheck test test-watch coverage check ci clean infra-init infra-plan infra-test infra-apply
+.PHONY: help install dev build generate preview up down reset psql lint lint-fix format format-check typecheck test test-watch coverage check ci clean infra-init infra-plan infra-test infra-apply
 
 help: ## Show available commands
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-15s\033[0m %s\n", $$1, $$2}'
@@ -17,6 +17,18 @@ generate: ## Generate the static site
 
 preview: ## Preview the production build
 	pnpm preview
+
+up: install ## Start Postgres, the site and the admin app together in Docker
+	docker compose up --build
+
+down: ## Stop the Docker environment
+	docker compose down
+
+reset: ## Stop the Docker environment and drop its database
+	docker compose down --volumes
+
+psql: ## Open psql on the Docker Postgres
+	docker compose exec db psql -U postgres -d bbf
 
 lint: ## Run oxlint
 	pnpm lint

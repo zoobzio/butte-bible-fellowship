@@ -11,6 +11,33 @@ pnpm install
 pnpm dev          # start the dev server at http://localhost:3000
 ```
 
+## Local environment
+
+`pnpm dev` runs each app over a Postgres of its own, in the process, so a
+change the admin app makes never reaches the site. To see them together,
+run both over one database in Docker:
+
+```sh
+make up           # Postgres, the site at :3000 and the admin at :3001
+make psql         # a shell on the database
+make down         # stop; `make reset` also drops the database
+```
+
+[`compose.yaml`](compose.yaml) bind-mounts the checkout into each app's
+container, so the dev servers hot-reload the files you edit as they would
+on the host, and both connect to the one Postgres through the `pg` driver,
+each applying the migrations, the roles and the seeds as it starts. The
+database is also on `localhost:5432`, so `pnpm dev` on the host can use it
+instead with the same two variables:
+
+```sh
+NUXT_BEZOAR_DRIVER=pg NUXT_BEZOAR_URL=postgres://postgres:postgres@localhost:5432/bbf pnpm dev
+```
+
+The containers use the host's `node_modules`, so `pnpm install` runs on the
+host (`make up` runs it), and a change to a package is built as it is on the
+host, by the package's `prepare` script.
+
 ## Scripts
 
 | Command          | Description                   |
