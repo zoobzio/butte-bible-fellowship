@@ -1,18 +1,15 @@
 <script lang="ts">
 import { Body } from "#components";
-import { computed, useHead, useLocale, useNuxtApp } from "#imports";
+import { useHead, useLocale, useNuxtApp } from "#imports";
 
 import { useRouteLocale } from "~/composables/locale";
-import { useMediaQuery } from "~/composables/viewport";
 import AppHeader from "~/components/AppHeader.vue";
 import AppFooter from "~/components/AppFooter.vue";
 import AppInvitation from "~/components/AppInvitation.vue";
-import Orbs from "~/components/Orbs.vue";
-import Arches from "~/components/Arches.vue";
 </script>
 
 <script setup lang="ts">
-const { path, locale: reading } = useRouteLocale();
+const { locale: reading } = useRouteLocale();
 const { $t } = useNuxtApp();
 const { locale } = useLocale();
 
@@ -23,15 +20,10 @@ useHead(() => ({
   title: $t.site.name(),
   meta: [{ name: "description", content: $t.site.description() }],
 }));
-
-const isMobile = useMediaQuery("(max-width: 44rem)");
-const isHome = computed(() => path.value === "/");
-const decor = computed(() => !isMobile.value);
 </script>
 
 <template>
   <Body>
-    <Orbs v-if="decor" />
     <AppHeader />
     <main class="site-main">
       <slot />
@@ -40,7 +32,6 @@ const decor = computed(() => !isMobile.value);
          who changes language is handed a new one. -->
     <AppInvitation :key="reading" />
     <AppFooter />
-    <Arches v-if="isHome && decor" />
   </Body>
 </template>
 

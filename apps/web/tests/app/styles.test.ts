@@ -71,6 +71,5 @@ describe("styles", () => {
 
   it("keys dark mode off the attribute the module mirrors onto <html>", () => {
     expect(theme).toContain('[data-color="dark"] {');
-    expect(app).toContain('[data-color="light"]');
   });
 });

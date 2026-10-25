@@ -4,10 +4,8 @@ import { mount } from "@vue/test-utils";
 
 import { setRoutePath } from "#imports";
 import Layout from "~/layouts/default.vue";
-import { stubMatchMedia } from "#test/support/page";
 
-const mountLayout = async ({ mobile = false, path = "/" } = {}) => {
-  stubMatchMedia(mobile);
+const mountLayout = async ({ path = "/" } = {}) => {
   setRoutePath(path);
   const wrapper = mount(Layout, {
     slots: { default: '<p class="page">Page</p>' },
@@ -16,8 +14,6 @@ const mountLayout = async ({ mobile = false, path = "/" } = {}) => {
         AppHeader: true,
         AppInvitation: true,
         AppFooter: true,
-        Orbs: true,
-        Arches: true,
       },
     },
   });
@@ -61,30 +57,5 @@ describe("default layout", () => {
     setRoutePath("/es/connect");
     await nextTick();
     expect(invitation()).not.toBe(before);
-  });
-
-  it("shows the orbs and the arches on the home page", async () => {
-    const wrapper = await mountLayout({ path: "/" });
-    expect(has(wrapper, "Orbs")).toBe(true);
-    expect(has(wrapper, "Arches")).toBe(true);
-  });
-
-  it("shows the orbs but not the arches on other pages", async () => {
-    const wrapper = await mountLayout({ path: "/about-us" });
-    expect(has(wrapper, "Orbs")).toBe(true);
-    expect(has(wrapper, "Arches")).toBe(false);
-  });
-
-  it("drops the arches when navigating away from home", async () => {
-    const wrapper = await mountLayout({ path: "/" });
-    setRoutePath("/about-us");
-    await nextTick();
-    expect(has(wrapper, "Arches")).toBe(false);
-  });
-
-  it("mounts neither decoration on mobile", async () => {
-    const wrapper = await mountLayout({ mobile: true, path: "/" });
-    expect(has(wrapper, "Orbs")).toBe(false);
-    expect(has(wrapper, "Arches")).toBe(false);
   });
 });

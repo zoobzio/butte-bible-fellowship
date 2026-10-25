@@ -67,11 +67,3 @@ export const stubPage = (metrics: Partial<PageMetrics> = {}) => {
   };
 };
 
-/** Answers every media query with `matches`. */
-export const stubMatchMedia = (matches: boolean) => {
-  window.matchMedia = vi.fn(() => ({
-    matches,
-    addEventListener: () => {},
-    removeEventListener: () => {},
-  })) as unknown as typeof window.matchMedia;
-};
