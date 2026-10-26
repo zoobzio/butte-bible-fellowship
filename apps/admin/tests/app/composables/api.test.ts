@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 import { useApi } from "~/composables/api";
 
 describe("useApi", () => {
-  it("is the app's fetch, by path, with what the request carries", async () => {
+  it("is the request's fetch, by path, with what the request carries", async () => {
     const fetch = vi.fn(async () => ({ ok: true }));
     vi.stubGlobal("$fetch", fetch);
     const api = useApi();

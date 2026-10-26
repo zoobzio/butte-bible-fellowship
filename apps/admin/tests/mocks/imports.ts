@@ -139,6 +139,15 @@ export const navigateTo = vi.fn(async () => {});
 // useHead: records what it was given.
 export const useHead = vi.fn();
 
+// useRequestFetch: in the browser, Nuxt's is `$fetch` itself; here it is
+// whatever a test has stubbed `$fetch` with, read as each request is made.
+export const useRequestFetch =
+  () =>
+  (...args: unknown[]) =>
+    (
+      globalThis as unknown as { $fetch: (...args: unknown[]) => unknown }
+    ).$fetch(...args);
+
 // createError: an Error carrying the status code.
 export const createError = (input: { statusCode: number; message: string }) =>
   Object.assign(new Error(input.message), input);

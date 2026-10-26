@@ -18,7 +18,8 @@ change the admin app makes never reaches the site. To see them together,
 run both over one database in Docker:
 
 ```sh
-make up           # Postgres, the site at :3000 and the admin at :3001
+make dev          # Postgres, the site at :3000 and the admin at :3001, detached
+make logs         # follow their output; `make up` runs them in the foreground
 make psql         # a shell on the database
 make down         # stop; `make reset` also drops the database
 ```
@@ -35,7 +36,7 @@ NUXT_BEZOAR_DRIVER=pg NUXT_BEZOAR_URL=postgres://postgres:postgres@localhost:543
 ```
 
 The containers use the host's `node_modules`, so `pnpm install` runs on the
-host (`make up` runs it), and a change to a package is built as it is on the
+host (`make dev` and `make up` run it), and a change to a package is built as it is on the
 host, by the package's `prepare` script.
 
 ## Scripts

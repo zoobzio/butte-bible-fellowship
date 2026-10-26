@@ -28,7 +28,7 @@ would not have offered.
 ```
 bezoar.config.ts   the kit config: the output directory, the defaults for the rest
 src/migrations/    the schema, forward only: staff, events, sermons, users
-src/seeds/         the staff and the events the content lists, each safe to run again
+src/seeds/         the staff and events the content lists, and the first admin user, each safe to run again
 src/queries/web/   what the site reads: staff, events, sermons
 src/queries/admin/ what the admin app will read and write: the same, in full
 src/roles/         what each app's role may do: web reads, admin reads and writes

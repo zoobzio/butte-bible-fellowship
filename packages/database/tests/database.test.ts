@@ -35,8 +35,12 @@ describe("the build", () => {
     ]);
   });
 
-  it("carries the staff and events seeds in order", () => {
-    expect(seeds.map((seed) => seed.name)).toEqual(["01_staff", "02_events"]);
+  it("carries the staff, events and users seeds in order", () => {
+    expect(seeds.map((seed) => seed.name)).toEqual([
+      "01_staff",
+      "02_events",
+      "03_users",
+    ]);
   });
 
   it("reads the statuses content passes through from the schema", () => {

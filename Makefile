@@ -1,4 +1,4 @@
-.PHONY: help install dev build generate preview up down reset psql lint lint-fix format format-check typecheck test test-watch coverage check ci clean infra-init infra-plan infra-test infra-apply
+.PHONY: help install dev build generate preview up logs down reset psql lint lint-fix format format-check typecheck test test-watch coverage check ci clean infra-init infra-plan infra-test infra-apply
 
 help: ## Show available commands
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-15s\033[0m %s\n", $$1, $$2}'
@@ -6,8 +6,8 @@ help: ## Show available commands
 install: ## Install dependencies
 	pnpm install
 
-dev: ## Start the Nuxt dev server
-	pnpm dev
+dev: install ## Start Postgres, the site and the admin app in Docker, detached
+	docker compose up --build -d
 
 build: ## Build the app
 	pnpm build
@@ -18,8 +18,11 @@ generate: ## Generate the static site
 preview: ## Preview the production build
 	pnpm preview
 
-up: install ## Start Postgres, the site and the admin app together in Docker
+up: install ## Start Postgres, the site and the admin app in Docker, in the foreground
 	docker compose up --build
+
+logs: ## Follow the Docker environment's logs
+	docker compose logs -f
 
 down: ## Stop the Docker environment
 	docker compose down

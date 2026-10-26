@@ -1,5 +1,6 @@
 # The local environment: one Postgres, and the site and the admin app on it
-# together, so a change made in one shows in the other. `make up` runs it.
+# together, so a change made in one shows in the other. `make dev` runs it
+# detached, `make up` in the foreground.
 #
 # `pnpm dev` on the host gives each app a Postgres of its own, in the
 # process; here both connect to `db` instead, through the `pg` driver, as
@@ -10,7 +11,7 @@
 #
 # The checkout is bind-mounted over /app, node_modules included, so the dev
 # servers watch the files you edit and hot-reload as they would on the
-# host. Run `pnpm install` on the host first (`make up` does); a change to a
+# host. Run `pnpm install` on the host first (`make dev` does); a change to a
 # package's sources is built by its `prepare` script, as on the host.
 
 name: bbf
