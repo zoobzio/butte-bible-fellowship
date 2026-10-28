@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { mount } from "@vue/test-utils";
 
 import { useUntheme } from "#imports";
-import ColorMode from "~/components/ColorMode.vue";
+import ColorMode from "#layers/bbf/app/components/ColorMode.vue";
 
 const icon = (wrapper: ReturnType<typeof mount>) =>
   wrapper.find("use").attributes("href");
@@ -32,5 +32,13 @@ describe("ColorMode", () => {
     await wrapper.trigger("click");
     expect(wrapper.attributes("aria-label")).toBe("Switch to dark mode");
     expect(useUntheme().config.input.color).toBe("light");
+  });
+
+  it("takes its names from the app, by the scheme it switches to", async () => {
+    const labels = { light: "Modo claro", dark: "Modo oscuro" };
+    const wrapper = mount(ColorMode, { props: { labels } });
+    expect(wrapper.attributes("aria-label")).toBe("Modo oscuro");
+    await wrapper.trigger("click");
+    expect(wrapper.attributes("aria-label")).toBe("Modo claro");
   });
 });

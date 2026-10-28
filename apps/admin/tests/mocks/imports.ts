@@ -1,34 +1,23 @@
-// Vitest shim for Nuxt's virtual `#imports` module.
+// Vitest shim for Nuxt's virtual `#imports` module: the part every app of
+// the church shares, from the layer, and what the admin's own modules put
+// there besides.
 //
 // App code imports framework symbols from "#imports" (Vue APIs, Nuxt
-// composables). There is no Nuxt runtime under vitest, so we re-export the real
-// Vue APIs and stub the Nuxt-runtime composables. Type-only imports are erased
-// by esbuild before this module loads, so only value exports matter here.
+// composables). There is no Nuxt runtime under vitest, so the shared shim
+// re-exports the real Vue APIs and stubs the Nuxt-runtime composables.
+// Type-only imports are erased by esbuild before this module loads, so only
+// value exports matter here.
 
-import { reactive, ref, type Ref } from "vue";
+import { reactive, ref } from "vue";
 import { vi } from "vitest";
+import { useAsyncData } from "@bbf/nuxt/testing/imports";
 
-// Real Vue APIs (ref, computed, watch, onMounted, useTemplateRef, useId, …).
-export * from "vue";
+export * from "@bbf/nuxt/testing/imports";
 
-// The design system's definition constructors and factories, as the
-// @zoobzio/nuxt layer registers them.
+// The design system's definition constructors and factories the admin's own
+// components use, as the @zoobzio/nuxt layer registers them.
 export { defineTabs } from "@zoobzio/vue/definitions/tabs";
 export { createTable } from "@zoobzio/nuxt/factories/table";
-
-// useState dedupes by key — two calls with the same key share one ref. Keep a
-// keyed registry, cleared between tests by tests/setup.ts.
-const stateRegistry = new Map<string, Ref<unknown>>();
-
-export const clearNuxtStateRegistry = () => stateRegistry.clear();
-
-export const useState = (key: string, init?: () => unknown): Ref<unknown> => {
-  const existing = stateRegistry.get(key);
-  if (existing) return existing;
-  const state = ref(init ? init() : undefined);
-  stateRegistry.set(key, state);
-  return state;
-};
 
 // useNuxtApp: the app, as far as the design system's widgets reach into it —
 // a logger per service, which records nothing, and the hooks a service emits
@@ -59,9 +48,6 @@ export const clearNuxtApp = () => {
   addHooks.mockClear();
 };
 
-// defineNuxtRouteMiddleware hands the middleware back as it is.
-export const defineNuxtRouteMiddleware = <T>(middleware: T) => middleware;
-
 // useAuth: the letters-patent service, as far as the app reaches into it —
 // who is signed in, which a test sets, and a logout that records the call.
 const auth = reactive({
@@ -81,18 +67,6 @@ export const clearAuth = () => {
 };
 
 export const useAuth = () => auth;
-
-// useAppConfig: tests supply their own config so they don't depend on the
-// app's own.
-let appConfig: Record<string, unknown> = {};
-
-export const setAppConfig = (config: Record<string, unknown>) => {
-  appConfig = config;
-};
-
-export const clearAppConfig = () => setAppConfig({});
-
-export const useAppConfig = () => appConfig;
 
 // useRuntimeConfig: the public config the app reads.
 export const useRuntimeConfig = () => ({ public: {} });
@@ -136,9 +110,6 @@ export const useRouter = () => router;
 // navigateTo: records where it was sent.
 export const navigateTo = vi.fn(async () => {});
 
-// useHead: records what it was given.
-export const useHead = vi.fn();
-
 // useRequestFetch: in the browser, Nuxt's is `$fetch` itself; here it is
 // whatever a test has stubbed `$fetch` with, read as each request is made.
 export const useRequestFetch =
@@ -147,21 +118,6 @@ export const useRequestFetch =
     (
       globalThis as unknown as { $fetch: (...args: unknown[]) => unknown }
     ).$fetch(...args);
-
-// createError: an Error carrying the status code.
-export const createError = (input: { statusCode: number; message: string }) =>
-  Object.assign(new Error(input.message), input);
-
-// definePageMeta is compiled away by Nuxt; here it is a no-op.
-export const definePageMeta = () => {};
-
-// useAsyncData: awaits the handler and hands back its result as `data`.
-export const useAsyncData = async <T>(
-  _key: string,
-  handler: () => Promise<T>,
-) => ({
-  data: ref(await handler()),
-});
 
 // useLazyAsyncData: hands back the request's state at once, as Nuxt does,
 // and fills it as the handler settles — what the design system's widgets

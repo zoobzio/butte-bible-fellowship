@@ -1,8 +1,8 @@
-import type { Theme, ThemeEntry } from "~/types/theme";
+import type { Theme, ThemeEntry } from "#layers/bbf/app/types/theme";
 
 import { computed, useUntheme } from "#imports";
 import { layers } from "@bbf/theme/layers";
-import { transition } from "~/utils/theme";
+import { transition } from "#layers/bbf/app/utils/theme";
 
 /** The themes the build carries: the site's palette and every aurora theme, by name. */
 const themes: ThemeEntry[] = [...layers].sort((a, b) =>
@@ -13,7 +13,7 @@ const themes: ThemeEntry[] = [...layers].sort((a, b) =>
  * The themes on offer, and the one active: the layers of the build, of which
  * the site's palette is the base. Choosing one loads its layer on demand and
  * applies it; the module persists the applied layer's id in a cookie so SSR
- * renders the visitor's choice. The color scheme and the other settings are
+ * renders the choice made. The color scheme and the other settings are
  * modifiers beside it, and apply to every theme.
  */
 export const useThemes = () => {

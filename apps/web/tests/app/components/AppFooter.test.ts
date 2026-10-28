@@ -3,7 +3,7 @@ import type { FooterConfig } from "~/types/footer";
 import { beforeEach, describe, expect, it } from "vitest";
 import { mount } from "@vue/test-utils";
 
-import { setAppConfig, useNuxtApp } from "#imports";
+import { setAppConfig, useLocale, useNuxtApp } from "#imports";
 import AppFooter from "~/components/AppFooter.vue";
 
 // The first column's lines are plain, a message and a literal; the second's
@@ -108,5 +108,21 @@ describe("AppFooter", () => {
     expect(legal.find("span").text()).toBe(
       $t.footer.copyright({ year: new Date().getFullYear() }),
     );
+  });
+
+  it("names the layer's appearance controls in the reader's language", async () => {
+    await useLocale().setLocale("es");
+    const controls = mount(AppFooter, {
+      global: { stubs: { LanguagePicker: true } },
+    }).find(".site-footer-controls");
+    const labels = controls
+      .findAll("button")
+      .map((button) => button.attributes("aria-label"));
+    expect(labels).toEqual([
+      $t.appearance.scheme({ mode: "dark" }),
+      $t.appearance.open(),
+      $t.appearance.settings(),
+    ]);
+    expect(labels).not.toContain("Switch to dark mode");
   });
 });

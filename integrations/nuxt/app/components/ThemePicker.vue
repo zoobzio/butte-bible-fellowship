@@ -1,18 +1,28 @@
 <script lang="ts">
-import type { CommandOption } from "@zoobzio/vue/types/components/command";
-import type { Theme } from "~/types/theme";
+import type { CommandOption } from "#imports";
+import type { Theme, ThemePickerLabels } from "#layers/bbf/app/types/theme";
 
 import { Command, Icon, Popover } from "#components";
-import { defineCommand, definePopover, useNuxtApp } from "#imports";
-import { useThemes } from "~/composables/themes";
+import { defineCommand, definePopover } from "#imports";
+import { useThemes } from "#layers/bbf/app/composables/themes";
 </script>
 
 <script setup lang="ts">
+defineOptions({ name: "ThemePicker" });
+
 type ThemeOption = CommandOption & { value: Theme };
 
-const { themes, active, choose } = useThemes();
+// The names of the button, the list and the search field. An app that
+// speaks another language names them in that one.
+const {
+  labels = {
+    open: "Choose a theme",
+    themes: "Themes",
+    search: "Search themes…",
+  },
+} = defineProps<{ labels?: ThemePickerLabels }>();
 
-const { $t } = useNuxtApp();
+const { themes, active, choose } = useThemes();
 
 const options: ThemeOption[] = themes.map(({ id, name }) => ({
   value: id,
@@ -22,9 +32,9 @@ const options: ThemeOption[] = themes.map(({ id, name }) => ({
 const popover = definePopover({ side: "top", align: "start" });
 
 const command = defineCommand(() => ({
-  groups: [{ key: "themes", label: $t.appearance.themes(), options }],
+  groups: [{ key: "themes", label: labels.themes, options }],
   modelValue: options.filter((option) => option.value === active.value),
-  placeholder: $t.appearance.search(),
+  placeholder: labels.search,
   "onUpdate:modelValue": ([option] = []) => {
     if (option) {
       choose(option.value);
@@ -36,11 +46,7 @@ const command = defineCommand(() => ({
 <template>
   <Popover v-bind="popover">
     <template #trigger>
-      <button
-        type="button"
-        class="theme-toggle"
-        :aria-label="$t.appearance.open()"
-      >
+      <button type="button" class="theme-toggle" :aria-label="labels.open">
         <Icon name="palette" class="icon" />
       </button>
     </template>
@@ -48,7 +54,7 @@ const command = defineCommand(() => ({
       <Command
         v-bind="command"
         class="theme-picker"
-        :aria-label="$t.appearance.themes()"
+        :aria-label="labels.themes"
       >
         <template #inputIcon>
           <Icon name="search" class="icon" />

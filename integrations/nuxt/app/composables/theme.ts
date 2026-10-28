@@ -1,12 +1,12 @@
-import type { ColorMode } from "~/types/theme";
+import type { ColorMode } from "#layers/bbf/app/types/theme";
 
 import { computed, useUntheme } from "#imports";
 
 /**
  * The active color scheme: untheme's `color` modifier. The service holds the
  * selection in app-wide state, persists it in a cookie so SSR renders the
- * visitor's choice, and mirrors it onto <html> as `data-color`, which the
- * theme's dark block and the app's own scheme-specific rules key off.
+ * choice made, and mirrors it onto <html> as `data-color`, which the theme's
+ * dark block and an app's own scheme-specific rules key off.
  */
 export const useColorMode = () => {
   const untheme = useUntheme();

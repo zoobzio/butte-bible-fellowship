@@ -4,7 +4,7 @@ import { mount } from "@vue/test-utils";
 
 import { Command } from "#components";
 import { useUntheme } from "#imports";
-import ThemePicker from "~/components/ThemePicker.vue";
+import ThemePicker from "#layers/bbf/app/components/ThemePicker.vue";
 
 // The popover content is portalled to the body, so it is queried from there.
 const all = (selector: string) => [
@@ -96,5 +96,20 @@ describe("ThemePicker", () => {
     await nextTick();
     expect(useUntheme().theme().id).toBe("bbf");
     expect(useUntheme().config.patch).toEqual({});
+  });
+
+  it("takes its names from the app", async () => {
+    const labels = { open: "Elegir", themes: "Temas", search: "Buscar…" };
+    const wrapper = mount(ThemePicker, {
+      props: { labels },
+      attachTo: document.body,
+    });
+    expect(wrapper.find("button").attributes("aria-label")).toBe("Elegir");
+    await wrapper.find("button").trigger("click");
+    await vi.waitFor(() => expect(popover()).not.toBeNull());
+    expect(
+      popover()!.querySelector(".theme-picker")!.getAttribute("aria-label"),
+    ).toBe("Temas");
+    expect(document.body.querySelector("input")!.placeholder).toBe("Buscar…");
   });
 });

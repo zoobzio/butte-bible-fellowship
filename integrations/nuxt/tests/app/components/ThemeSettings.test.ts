@@ -4,7 +4,7 @@ import { mount } from "@vue/test-utils";
 
 import { SegmentedControl } from "#components";
 import { useUntheme } from "#imports";
-import ThemeSettings from "~/components/ThemeSettings.vue";
+import ThemeSettings from "#layers/bbf/app/components/ThemeSettings.vue";
 
 // The popover content is portalled to the body, so it is queried from there.
 const all = (selector: string) => [
@@ -104,5 +104,18 @@ describe("ThemeSettings", () => {
     expect(
       segments("color").map((item) => item.getAttribute("data-state")),
     ).toEqual(["on", "off"]);
+  });
+
+  it("takes its name from the app, for its button and its panel", async () => {
+    const wrapper = mount(ThemeSettings, {
+      props: { label: "Apariencia" },
+      attachTo: document.body,
+    });
+    expect(wrapper.find("button").attributes("aria-label")).toBe("Apariencia");
+    await wrapper.find("button").trigger("click");
+    await vi.waitFor(() => expect(popover()).not.toBeNull());
+    expect(
+      popover()!.querySelector(".theme-settings")!.getAttribute("aria-label"),
+    ).toBe("Apariencia");
   });
 });

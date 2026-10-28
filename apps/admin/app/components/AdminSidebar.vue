@@ -1,6 +1,8 @@
 <script lang="ts">
 import { Icon, NuxtLink, Tabs } from "#components";
-import { navigateTo, useAuth } from "#imports";
+import { useAuth } from "#imports";
+
+import AccountPanel from "~/components/AccountPanel.vue";
 import { useSidebar } from "~/composables/navigation";
 </script>
 
@@ -9,12 +11,8 @@ defineOptions({ name: "AdminSidebar" });
 
 const { tabs } = useSidebar();
 
-// Who is signed in, and the way out: the session ends, then the login page.
+// The account panel stands at the foot once someone is signed in.
 const auth = useAuth();
-const signOut = async () => {
-  await auth.logout();
-  await navigateTo("/login");
-};
 </script>
 
 <template>
@@ -32,12 +30,7 @@ const signOut = async () => {
     </nav>
 
     <div v-if="auth.current" class="admin-account">
-      <span class="admin-account-name">
-        {{ auth.current.name ?? auth.current.email }}
-      </span>
-      <button type="button" class="admin-account-action" @click="signOut">
-        Sign out
-      </button>
+      <AccountPanel />
     </div>
   </aside>
 </template>
@@ -137,31 +130,10 @@ const signOut = async () => {
   display: none;
 }
 
-/* Who is signed in sits at the foot of the sidebar. */
+/* The account panel sits at the foot of the sidebar: who is signed in, the
+   appearance controls and the way out. */
 .admin-account {
-  display: grid;
-  gap: var(--space-2);
   margin-top: auto;
-  padding: 0 var(--space-3);
-}
-
-.admin-account-name {
-  overflow: hidden;
-  font: var(--type-label);
-  color: var(--on-surface-muted);
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.admin-account-action {
-  justify-self: start;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: var(--primary);
-  font: var(--type-label);
-  font-weight: var(--weight-medium);
-  cursor: pointer;
 }
 
 /* Small screens: the sidebar is a bar across the top, the sections in a

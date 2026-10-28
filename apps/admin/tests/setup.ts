@@ -6,6 +6,7 @@ import {
   clearNuxtApp,
   clearNuxtStateRegistry,
   clearRouter,
+  clearUntheme,
   setRoutePath,
   useHead,
 } from "#test/mocks/imports";
@@ -16,6 +17,7 @@ beforeEach(() => {
   clearNuxtApp();
   clearAppConfig();
   clearAuth();
+  clearUntheme();
   setRoutePath("/");
   clearRouter();
   useHead.mockClear();

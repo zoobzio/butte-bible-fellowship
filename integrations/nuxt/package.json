@@ -26,17 +26,21 @@
     "@icon-sheets/nuxt": "catalog:",
     "@nuxt/fonts": "catalog:",
     "@untheme/nuxt": "catalog:",
-    "@zoobzio/nuxt": "catalog:"
+    "@zoobzio/nuxt": "catalog:",
+    "@zoobzio/vue": "catalog:",
+    "untheme": "catalog:"
   },
   "devDependencies": {
     "@bbf/toolbox": "workspace:*",
+    "@vitejs/plugin-vue": "catalog:",
     "@vitest/coverage-v8": "catalog:",
     "@vue/test-utils": "catalog:",
     "happy-dom": "catalog:",
     "nuxt": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:",
-    "vue": "catalog:"
+    "vue": "catalog:",
+    "vue-tsc": "catalog:"
   },
   "peerDependencies": {
     "nuxt": "catalog:",

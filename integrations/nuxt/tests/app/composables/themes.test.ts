@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { useUntheme } from "#imports";
-import { useThemes } from "~/composables/themes";
+import { useThemes } from "#layers/bbf/app/composables/themes";
 
 const primary = () => useUntheme().resolve("primary-600");
 

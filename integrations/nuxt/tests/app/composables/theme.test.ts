@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { useUntheme } from "#imports";
-import { useColorMode } from "~/composables/theme";
+import { useColorMode } from "#layers/bbf/app/composables/theme";
 
 describe("useColorMode", () => {
   it("defaults to the theme's boot selection, light", () => {

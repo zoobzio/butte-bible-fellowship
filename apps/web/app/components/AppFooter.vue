@@ -2,12 +2,12 @@
 import type { FooterLine } from "~/types/footer";
 
 import { NuxtLink } from "#components";
-import { useAppConfig, useNuxtApp } from "#imports";
+import { computed, useAppConfig, useNuxtApp } from "#imports";
 
-import ColorMode from "~/components/ColorMode.vue";
+import ColorMode from "#layers/bbf/app/components/ColorMode.vue";
+import ThemePicker from "#layers/bbf/app/components/ThemePicker.vue";
+import ThemeSettings from "#layers/bbf/app/components/ThemeSettings.vue";
 import LanguagePicker from "~/components/LanguagePicker.vue";
-import ThemePicker from "~/components/ThemePicker.vue";
-import ThemeSettings from "~/components/ThemeSettings.vue";
 </script>
 
 <script setup lang="ts">
@@ -17,6 +17,21 @@ const { footer } = useAppConfig();
 const { $t } = useNuxtApp();
 
 const year = new Date().getFullYear();
+
+// The appearance controls are the layer's, named here in the reader's
+// language.
+const appearance = computed(() => ({
+  scheme: {
+    light: $t.appearance.scheme({ mode: "light" }),
+    dark: $t.appearance.scheme({ mode: "dark" }),
+  },
+  themes: {
+    open: $t.appearance.open(),
+    themes: $t.appearance.themes(),
+    search: $t.appearance.search(),
+  },
+  settings: $t.appearance.settings(),
+}));
 
 /** A line's text: its message in the active locale, or its text as written. */
 const text = (line: FooterLine) => {
@@ -62,9 +77,9 @@ const text = (line: FooterLine) => {
     <div class="site-footer-legal">
       <div class="site-footer-controls">
         <LanguagePicker />
-        <ColorMode />
-        <ThemePicker />
-        <ThemeSettings />
+        <ColorMode :labels="appearance.scheme" />
+        <ThemePicker :labels="appearance.themes" />
+        <ThemeSettings :label="appearance.settings" />
       </div>
       <span>{{ $t.footer.copyright({ year }) }}</span>
     </div>

@@ -1,40 +1,14 @@
-// Vitest shim for Nuxt's virtual `#components` module: minimal stand-ins for
-// the framework and module components the app imports explicitly, and the
-// design system's components as the @zoobzio/nuxt layer registers them.
+// Vitest shim for Nuxt's virtual `#components` module: the part every app of
+// the church shares, from the layer, and what the web's own modules put
+// there besides.
 
 import { defineComponent, h } from "vue";
 
-// The design system's components, real: the tests exercise them.
-export { default as Command } from "@zoobzio/vue/components/command.vue";
+export * from "@bbf/nuxt/testing/components";
+
+// The design system's components the web's own components use, real: the
+// tests exercise them.
 export { default as Menu } from "@zoobzio/vue/components/menu.vue";
-export { default as Popover } from "@zoobzio/vue/components/popover.vue";
-export { default as SegmentedControl } from "@zoobzio/vue/components/segmented-control.vue";
-
-// NuxtLink: an anchor to `to`. Class, target and listeners fall through.
-export const NuxtLink = defineComponent({
-  name: "NuxtLink",
-  props: { to: { type: String, default: undefined } },
-  setup(props, { slots }) {
-    return () => h("a", { href: props.to }, slots.default?.());
-  },
-});
-
-// Icon: a sprite reference to `name`, like @icon-sheets/nuxt renders.
-export const Icon = defineComponent({
-  name: "Icon",
-  props: { name: { type: String, required: true } },
-  setup(props) {
-    return () => h("svg", [h("use", { href: `#${props.name}` })]);
-  },
-});
-
-// Body: renders its children in place.
-export const Body = defineComponent({
-  name: "Body",
-  setup(_, { slots }) {
-    return () => slots.default?.();
-  },
-});
 
 // Prose: a placeholder for the prosary module's document renderer that
 // keeps the tree it was given.

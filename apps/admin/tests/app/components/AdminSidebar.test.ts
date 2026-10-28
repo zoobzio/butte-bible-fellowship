@@ -2,13 +2,8 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { nextTick } from "vue";
 import { mount } from "@vue/test-utils";
 
-import {
-  navigateTo,
-  setAppConfig,
-  setAuthUser,
-  setRoutePath,
-  useAuth,
-} from "#imports";
+import { setAppConfig, setAuthUser, setRoutePath } from "#imports";
+import AccountPanel from "~/components/AccountPanel.vue";
 import AdminSidebar from "~/components/AdminSidebar.vue";
 
 beforeEach(() => {
@@ -71,25 +66,24 @@ describe("AdminSidebar", () => {
     );
   });
 
-  it("shows nobody until someone is signed in", () => {
-    expect(mount(AdminSidebar).find(".admin-account").exists()).toBe(false);
+  it("offers no account panel until someone is signed in", () => {
+    const wrapper = mount(AdminSidebar, {
+      global: { stubs: { AccountPanel: true } },
+    });
+    expect(wrapper.find(".admin-account").exists()).toBe(false);
+    expect(wrapper.findComponent(AccountPanel).exists()).toBe(false);
   });
 
-  it("names who is signed in, and signs them out to the login page", async () => {
+  it("stands the account panel at its foot once someone is signed in", () => {
     setAuthUser({ sub: "u", name: "Pastor Name", email: "pastor@example.com" });
-    const wrapper = mount(AdminSidebar);
-    expect(wrapper.find(".admin-account-name").text()).toBe("Pastor Name");
-
-    await wrapper.find(".admin-account-action").trigger("click");
-    await nextTick();
-    expect(useAuth().logout).toHaveBeenCalledOnce();
-    expect(navigateTo).toHaveBeenCalledWith("/login");
-  });
-
-  it("names a user Google gave no name by their email", () => {
-    setAuthUser({ sub: "u", email: "pastor@example.com" });
-    expect(mount(AdminSidebar).find(".admin-account-name").text()).toBe(
-      "pastor@example.com",
-    );
+    const wrapper = mount(AdminSidebar, {
+      global: { stubs: { AccountPanel: true } },
+    });
+    expect(
+      wrapper.find(".admin-sidebar > .admin-account:last-child").exists(),
+    ).toBe(true);
+    expect(
+      wrapper.find(".admin-account").findComponent(AccountPanel).exists(),
+    ).toBe(true);
   });
 });
