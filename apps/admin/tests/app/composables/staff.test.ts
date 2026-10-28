@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 
 import { navigateTo, useRouter } from "#imports";
-import { STAFF } from "#test/support/records";
+import { BIO, STAFF } from "#test/support/records";
 import { withSetup } from "@bbf/nuxt/testing/mount";
 import {
   useStaffEditor,
@@ -19,7 +19,6 @@ describe("useStaffTable", () => {
     expect(table.columns.map((column) => column.key)).toEqual([
       "name",
       "role",
-      "position",
       "status",
       "updatedAt",
     ]);
@@ -66,19 +65,12 @@ describe("useStaffEditor", () => {
     vi.stubGlobal("$fetch", fetch);
     const editor = useStaffEditor(null);
     expect(editor.removable).toBe(false);
-    editor.draft.slug = "john-roe";
     editor.draft.name = "John Roe";
-    editor.draft.role = "Deacon";
+    editor.draft.role = "staff";
     await editor.submit();
     expect(fetch).toHaveBeenCalledWith("/api/staff", {
       method: "POST",
-      body: {
-        slug: "john-roe",
-        name: "John Roe",
-        role: "Deacon",
-        position: 0,
-        status: "draft",
-      },
+      body: { name: "John Roe", role: "staff", status: "draft" },
     });
     expect(useRouter().push).toHaveBeenCalledWith("/staff");
   });
@@ -88,12 +80,52 @@ describe("useStaffEditor", () => {
     vi.stubGlobal("$fetch", fetch);
     const editor = useStaffEditor(STAFF);
     expect(editor.removable).toBe(true);
-    editor.draft.role = "Pastor";
+    editor.draft.role = "pastor";
     await editor.submit();
     expect(fetch).toHaveBeenCalledWith("/api/staff/1", {
       method: "PUT",
-      body: expect.objectContaining({ slug: "jane-doe", role: "Pastor" }),
+      body: expect.objectContaining({ name: "Jane Doe", role: "pastor" }),
     });
+  });
+
+  it("holds the bio in its editor, and writes what is written there", async () => {
+    const fetch = vi.fn(async () => STAFF);
+    vi.stubGlobal("$fetch", fetch);
+    const editor = useStaffEditor(STAFF);
+    expect(editor.bio.document).toEqual(BIO);
+    expect(editor.draft.bio).toEqual(BIO);
+
+    editor.bio.run((chain) => chain.selectAll().deleteSelection());
+    expect(editor.bio.empty).toBe(true);
+    expect(editor.draft.bio).toBeUndefined();
+
+    editor.bio.insert({
+      type: "paragraph",
+      content: [{ type: "text", text: "Since 2010." }],
+    });
+    expect(editor.draft.bio).toEqual({
+      type: "root",
+      children: [
+        {
+          type: "element",
+          tagName: "p",
+          properties: {},
+          children: [{ type: "text", value: "Since 2010." }],
+        },
+      ],
+    });
+
+    await editor.submit();
+    expect(fetch).toHaveBeenCalledWith("/api/staff/1", {
+      method: "PUT",
+      body: expect.objectContaining({ bio: editor.draft.bio }),
+    });
+  });
+
+  it("opens a new member's bio empty", () => {
+    const editor = useStaffEditor(null);
+    expect(editor.bio.empty).toBe(true);
+    expect(editor.draft.bio).toBeUndefined();
   });
 
   it("deletes the member, once asked by name", async () => {
@@ -115,6 +147,6 @@ describe("useStaffEditor", () => {
     const editor = useStaffEditor(null);
     await editor.submit();
     expect(fetch).not.toHaveBeenCalled();
-    expect(editor.error.value).toContain("slug:");
+    expect(editor.error.value).toContain("role:");
   });
 });

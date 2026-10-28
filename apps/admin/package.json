@@ -23,6 +23,7 @@
     "@bbf/utils": "workspace:*",
     "@letters-patent/google": "catalog:",
     "@letters-patent/nuxt": "catalog:",
+    "@zoobzio/editor": "catalog:",
     "@zoobzio/nuxt": "catalog:",
     "@zoobzio/vue": "catalog:",
     "bezoar": "catalog:",

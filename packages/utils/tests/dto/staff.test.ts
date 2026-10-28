@@ -3,10 +3,28 @@ import { describe, expect, it } from "vitest";
 
 import { toStaffMember, toStaffRecord } from "../../src/dto/staff";
 
+const BIO = {
+  type: "root",
+  children: [
+    {
+      type: "element",
+      tagName: "h2",
+      properties: {},
+      children: [{ type: "text", value: "Jane" }],
+    },
+    {
+      type: "element",
+      tagName: "p",
+      properties: {},
+      children: [{ type: "text", value: "Serving since 2010." }],
+    },
+  ],
+};
+
 const ROW = {
-  slug: "jane-doe",
+  id: 1,
   name: "Jane Doe",
-  role: "Elder",
+  role: "elder" as const,
   summary: null,
   bio: null,
   photo: "https://cdn.example.com/staff/jane-doe.jpg",
@@ -17,9 +35,9 @@ const ROW = {
 describe("toStaffMember", () => {
   it("builds a member, leaving out what the row has null in", () => {
     expect(toStaffMember(ROW)).toEqual({
-      slug: "jane-doe",
+      id: 1,
       name: "Jane Doe",
-      role: "Elder",
+      role: "elder",
       photo: "https://cdn.example.com/staff/jane-doe.jpg",
     });
   });
@@ -29,48 +47,28 @@ describe("toStaffMember", () => {
       toStaffMember({
         ...ROW,
         summary: "Serving since 2010.",
-        bio: "## Jane\n\nServing since 2010.",
+        bio: BIO,
         email: "j@x.org",
         phone: "530-555-0100",
       }),
     ).toMatchObject({
       summary: "Serving since 2010.",
+      bio: BIO,
       email: "j@x.org",
       phone: "530-555-0100",
     });
   });
 
-  it("serves the bio as the tree the app renders, not the Markdown", () => {
-    const member = toStaffMember({
-      ...ROW,
-      bio: "## Jane\n\nServing since 2010.",
-    });
-    expect(member.bio).toEqual({
-      type: "root",
-      children: [
-        {
-          type: "element",
-          tagName: "h2",
-          properties: { id: "jane" },
-          children: [{ type: "text", value: "Jane" }],
-        },
-        { type: "text", value: "\n" },
-        {
-          type: "element",
-          tagName: "p",
-          properties: {},
-          children: [{ type: "text", value: "Serving since 2010." }],
-        },
-      ],
-    });
+  it("serves the bio as the tree it was stored as, and refuses one that is not", () => {
+    const member = toStaffMember({ ...ROW, bio: BIO });
+    expect(member.bio).toEqual(BIO);
     expect(staffMember.safeParse(member).success).toBe(true);
+    expect(() => toStaffMember({ ...ROW, bio: "## Jane" })).toThrow();
   });
 
-  it("leaves an admin row's id, position and status behind", () => {
-    const row = { ...ROW, id: 1, position: 2, status: "published" };
+  it("leaves an admin row's status behind", () => {
+    const row = { ...ROW, status: "published" };
     const member = toStaffMember(row);
-    expect(member).not.toHaveProperty("id");
-    expect(member).not.toHaveProperty("position");
     expect(member).not.toHaveProperty("status");
   });
 
@@ -82,7 +80,6 @@ describe("toStaffMember", () => {
 const ADMIN_ROW = {
   ...ROW,
   id: 7,
-  position: 2,
   status: "draft" as const,
   created_at: new Date("2026-10-17T18:00:00Z"),
   updated_at: new Date("2026-10-18T09:30:00Z"),
@@ -92,21 +89,19 @@ describe("toStaffRecord", () => {
   it("builds a record, leaving out what the row has null in", () => {
     expect(toStaffRecord(ADMIN_ROW)).toEqual({
       id: 7,
-      slug: "jane-doe",
       name: "Jane Doe",
-      role: "Elder",
+      role: "elder",
       photo: "https://cdn.example.com/staff/jane-doe.jpg",
-      position: 2,
       status: "draft",
       createdAt: "2026-10-17T18:00:00.000Z",
       updatedAt: "2026-10-18T09:30:00.000Z",
     });
   });
 
-  it("keeps the bio as the Markdown it was written as", () => {
-    expect(
-      toStaffRecord({ ...ADMIN_ROW, bio: "## Jane\n\nServing since 2010." }),
-    ).toMatchObject({ bio: "## Jane\n\nServing since 2010." });
+  it("keeps the bio as the tree it was stored as", () => {
+    expect(toStaffRecord({ ...ADMIN_ROW, bio: BIO })).toMatchObject({
+      bio: BIO,
+    });
   });
 
   it("carries what else the row has", () => {

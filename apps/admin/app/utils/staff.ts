@@ -10,28 +10,24 @@ const written = (value: string): string | undefined => {
 };
 
 export const toStaffDraft = (record?: StaffRecord): StaffDraft => ({
-  slug: record?.slug ?? "",
   name: record?.name ?? "",
   role: record?.role ?? "",
   summary: record?.summary ?? "",
-  bio: record?.bio ?? "",
+  bio: record?.bio,
   photo: record?.photo ?? "",
   email: record?.email ?? "",
   phone: record?.phone ?? "",
-  position: record?.position ?? 0,
   status: record?.status ?? "draft",
 });
 
 export const toStaffBody = (draft: StaffDraft): StaffBody =>
   staffBody.parse({
-    slug: draft.slug.trim(),
     name: draft.name.trim(),
-    role: draft.role.trim(),
+    role: draft.role,
     summary: written(draft.summary),
-    bio: written(draft.bio),
+    bio: draft.bio,
     photo: written(draft.photo),
     email: written(draft.email),
     phone: written(draft.phone),
-    position: draft.position,
     status: draft.status,
   });

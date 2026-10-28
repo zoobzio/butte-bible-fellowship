@@ -22,7 +22,6 @@ import {
   staffListing,
   staffMember,
   staffMembers,
-  staffPath,
   staffRecord,
 } from "../src";
 
@@ -31,91 +30,103 @@ const json = (schema: unknown) => ({
   content: { "application/json": { schema } },
 });
 
-const document = createDocument({
-  openapi: "3.1.0",
-  info: { title: "Butte Bible Fellowship", version: "0.0.0" },
-  paths: {
-    "/api/events": {
-      get: {
-        requestParams: { query: eventsQuery },
-        responses: { 200: json(churchEvents) },
-      },
-      post: {
-        requestBody: { content: { "application/json": { schema: eventBody } } },
-        responses: { 201: json(churchEvent) },
-      },
-    },
-    "/api/events/{slug}": {
-      get: {
-        requestParams: { path: eventPath },
-        responses: { 200: json(churchEvent) },
-      },
-    },
-    "/api/sermons": {
-      get: {
-        requestParams: { query: sermonsQuery },
-        responses: { 200: json(sermons) },
-      },
-      post: {
-        requestBody: {
-          content: { "application/json": { schema: sermonBody } },
+const document = createDocument(
+  {
+    openapi: "3.1.0",
+    info: { title: "Butte Bible Fellowship", version: "0.0.0" },
+    paths: {
+      "/api/events": {
+        get: {
+          requestParams: { query: eventsQuery },
+          responses: { 200: json(churchEvents) },
         },
-        responses: { 201: json(sermon) },
+        post: {
+          requestBody: {
+            content: { "application/json": { schema: eventBody } },
+          },
+          responses: { 201: json(churchEvent) },
+        },
       },
-    },
-    "/api/sermons/{slug}": {
-      get: {
-        requestParams: { path: sermonPath },
-        responses: { 200: json(sermon) },
+      "/api/events/{slug}": {
+        get: {
+          requestParams: { path: eventPath },
+          responses: { 200: json(churchEvent) },
+        },
       },
-    },
-    "/api/staff": {
-      get: { responses: { 200: json(staffMembers) } },
-      post: {
-        requestBody: { content: { "application/json": { schema: staffBody } } },
-        responses: { 201: json(staffMember) },
+      "/api/sermons": {
+        get: {
+          requestParams: { query: sermonsQuery },
+          responses: { 200: json(sermons) },
+        },
+        post: {
+          requestBody: {
+            content: { "application/json": { schema: sermonBody } },
+          },
+          responses: { 201: json(sermon) },
+        },
       },
-    },
-    "/api/staff/{slug}": {
-      get: {
-        requestParams: { path: staffPath },
-        responses: { 200: json(staffMember) },
+      "/api/sermons/{slug}": {
+        get: {
+          requestParams: { path: sermonPath },
+          responses: { 200: json(sermon) },
+        },
       },
-    },
-    "/api/pages/{slug}": {
-      get: { responses: { 200: json(page) } },
-    },
-    "/admin/api/staff": {
-      get: {
-        requestParams: { query: listingQuery },
-        responses: { 200: json(staffListing) },
+      "/api/staff": {
+        get: { responses: { 200: json(staffMembers) } },
+        post: {
+          requestBody: {
+            content: { "application/json": { schema: staffBody } },
+          },
+          responses: { 201: json(staffMember) },
+        },
       },
-    },
-    "/admin/api/staff/{id}": {
-      get: {
-        requestParams: { path: staffId },
-        responses: { 200: json(staffRecord) },
+      "/api/pages/{slug}": {
+        get: { responses: { 200: json(page) } },
       },
-      put: {
-        requestParams: { path: staffId },
-        requestBody: { content: { "application/json": { schema: staffBody } } },
-        responses: { 200: json(staffRecord) },
+      "/admin/api/staff": {
+        get: {
+          requestParams: { query: listingQuery },
+          responses: { 200: json(staffListing) },
+        },
       },
-    },
-    "/admin/api/events": {
-      get: {
-        requestParams: { query: listingQuery },
-        responses: { 200: json(eventListing) },
+      "/admin/api/staff/{id}": {
+        get: {
+          requestParams: { path: staffId },
+          responses: { 200: json(staffRecord) },
+        },
+        put: {
+          requestParams: { path: staffId },
+          requestBody: {
+            content: { "application/json": { schema: staffBody } },
+          },
+          responses: { 200: json(staffRecord) },
+        },
       },
-    },
-    "/admin/api/events/{id}": {
-      get: {
-        requestParams: { path: eventId },
-        responses: { 200: json(eventRecord) },
+      "/admin/api/events": {
+        get: {
+          requestParams: { query: listingQuery },
+          responses: { 200: json(eventListing) },
+        },
+      },
+      "/admin/api/events/{id}": {
+        get: {
+          requestParams: { path: eventId },
+          responses: { 200: json(eventRecord) },
+        },
       },
     },
   },
-});
+  {
+    // Zod closes an object it has parsed (unknown keys are stripped), so an
+    // object schema a request and a response share would render twice, once
+    // closed. Rich text is one: render it once, open, as a request takes it.
+    override: ({ jsonSchema, zodSchema, io }) => {
+      if (io === "output" && zodSchema._zod.def.type === "object") {
+        delete jsonSchema.additionalProperties;
+      }
+    },
+  },
+);
 
 const schemas = document.components?.schemas ?? {};
 
@@ -154,24 +165,17 @@ describe("the components", () => {
       "StaffListing",
       "StaffMember",
       "StaffRecord",
+      "StaffRole",
     ]);
   });
 
   it("carry each record's description, its Markdown as a string, and its listing", () => {
     expect(schemas.StaffRecord).toMatchObject({
-      required: [
-        "id",
-        "slug",
-        "name",
-        "role",
-        "position",
-        "status",
-        "createdAt",
-        "updatedAt",
-      ],
+      required: ["id", "name", "role", "status", "createdAt", "updatedAt"],
       properties: {
         id: { type: "integer" },
-        bio: { type: "string" },
+        role: { $ref: "#/components/schemas/StaffRole" },
+        bio: { $ref: "#/components/schemas/Hast" },
         status: { $ref: "#/components/schemas/ContentStatus" },
         createdAt: { format: "date-time" },
       },
@@ -275,15 +279,20 @@ describe("the components", () => {
       properties: { status: { $ref: "#/components/schemas/ContentStatus" } },
     });
     expect(schemas.StaffMember).toMatchObject({
-      required: ["slug", "name", "role"],
+      required: ["id", "name", "role"],
       properties: {
+        role: { $ref: "#/components/schemas/StaffRole" },
         email: { format: "email" },
         photo: { format: "uri" },
         bio: { $ref: "#/components/schemas/Hast" },
       },
     });
     expect(schemas.StaffBody).toMatchObject({
-      properties: { status: { $ref: "#/components/schemas/ContentStatus" } },
+      properties: {
+        role: { $ref: "#/components/schemas/StaffRole" },
+        bio: { $ref: "#/components/schemas/Hast" },
+        status: { $ref: "#/components/schemas/ContentStatus" },
+      },
     });
   });
 

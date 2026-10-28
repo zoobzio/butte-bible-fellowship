@@ -1,14 +1,12 @@
-import type { ContentStatus } from "@bbf/schema/types";
+import type { ContentStatus, Hast, StaffRole } from "@bbf/schema/types";
 
 export interface StaffDraft {
-  slug: string;
   name: string;
-  role: string;
+  role: StaffRole | "";
   summary: string;
-  bio: string;
+  bio: Hast | undefined;
   photo: string;
   email: string;
   phone: string;
-  position: number;
   status: ContentStatus;
 }

@@ -3,17 +3,27 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { service } from "@bbf/nuxt/testing/bezoar";
 import { useStaff } from "~~/server/composables/staff";
 
+const BIO = {
+  type: "root",
+  children: [
+    {
+      type: "element",
+      tagName: "p",
+      properties: {},
+      children: [{ type: "text", value: "Has served since 2010." }],
+    },
+  ],
+};
+
 const ROW = {
   id: 1,
-  slug: "jane-doe",
   name: "Jane Doe",
-  role: "Elder",
+  role: "elder" as const,
   summary: null,
-  bio: "## Jane",
+  bio: BIO,
   photo: null,
   email: "jane@example.com",
   phone: null,
-  position: 2,
   status: "published" as const,
   created_at: new Date("2026-10-17T18:00:00Z"),
   updated_at: new Date("2026-10-18T09:30:00Z"),
@@ -21,32 +31,26 @@ const ROW = {
 
 const RECORD = {
   id: 1,
-  slug: "jane-doe",
   name: "Jane Doe",
-  role: "Elder",
-  bio: "## Jane",
+  role: "elder",
+  bio: BIO,
   email: "jane@example.com",
-  position: 2,
   status: "published",
   createdAt: "2026-10-17T18:00:00.000Z",
   updatedAt: "2026-10-18T09:30:00.000Z",
 };
 
-const ROWS = [ROW, { ...ROW, id: 2, slug: "john-roe", name: "John Roe" }];
+const ROWS = [ROW, { ...ROW, id: 2, name: "John Roe" }];
 
 const list = vi.fn(async () => ROWS);
 const fetched = vi.fn(async ({ id }: { id: number }) =>
   id === 3
-    ? { ...ROW, id: 3, slug: "new", name: "New", status: "draft" as const }
+    ? { ...ROW, id: 3, name: "New", status: "draft" as const }
     : (ROWS.find((row) => row.id === id) ?? null),
 );
-const created = vi.fn(async (args: { slug: string }) => ({
-  id: 3,
-  slug: args.slug,
-  created_at: ROW.created_at,
-}));
-const updated = vi.fn(async (args: { id: number; slug: string }) =>
-  args.id === 1 ? { id: 1, slug: args.slug, updated_at: ROW.updated_at } : null,
+const created = vi.fn(async () => ({ id: 3, created_at: ROW.created_at }));
+const updated = vi.fn(async (args: { id: number }) =>
+  args.id === 1 ? { id: 1, updated_at: ROW.updated_at } : null,
 );
 const deleted = vi.fn(async ({ id }: { id: number }) => (id === 1 ? 1 : 0));
 
@@ -75,7 +79,7 @@ describe("useStaff", () => {
       total: 2,
     });
     expect(await useStaff().list({ page: 2, size: 1 })).toEqual({
-      items: [{ ...RECORD, id: 2, slug: "john-roe", name: "John Roe" }],
+      items: [{ ...RECORD, id: 2, name: "John Roe" }],
       total: 2,
     });
     expect(list).toHaveBeenCalledTimes(2);
@@ -89,50 +93,38 @@ describe("useStaff", () => {
 
   it("creates a member from their body, and hands back the record", async () => {
     const record = await useStaff().create({
-      slug: "new",
       name: "New",
-      role: "Deacon",
-      position: 0,
+      role: "staff",
       status: "draft",
     });
     expect(created).toHaveBeenCalledWith({
-      slug: "new",
       name: "New",
-      role: "Deacon",
+      role: "staff",
       summary: null,
       bio: null,
       photo: null,
       email: null,
       phone: null,
-      position: 0,
       status: "draft",
     });
-    expect(record).toMatchObject({ id: 3, slug: "new", status: "draft" });
+    expect(record).toMatchObject({ id: 3, name: "New", status: "draft" });
   });
 
   it("hands back nothing when nothing was written", async () => {
     created.mockResolvedValueOnce(null as never);
     expect(
-      await useStaff().create({
-        slug: "new",
-        name: "New",
-        role: "Deacon",
-        position: 0,
-        status: "draft",
-      }),
+      await useStaff().create({ name: "New", role: "staff", status: "draft" }),
     ).toBeNull();
   });
 
   it("replaces every field of a member, and hands back the record", async () => {
     const record = await useStaff().update(1, {
-      slug: "jane-doe",
       name: "Jane Doe",
-      role: "Pastor",
-      position: 1,
+      role: "pastor",
       status: "published",
     });
     expect(updated).toHaveBeenCalledWith(
-      expect.objectContaining({ id: 1, role: "Pastor", summary: null }),
+      expect.objectContaining({ id: 1, role: "pastor", summary: null }),
     );
     expect(record).toEqual(RECORD);
     expect(fetched).toHaveBeenCalledWith({ id: 1 });
@@ -140,13 +132,7 @@ describe("useStaff", () => {
 
   it("updates nothing when no member has the id", async () => {
     expect(
-      await useStaff().update(9, {
-        slug: "x",
-        name: "x",
-        role: "x",
-        position: 0,
-        status: "draft",
-      }),
+      await useStaff().update(9, { name: "x", role: "staff", status: "draft" }),
     ).toBeNull();
     expect(fetched).not.toHaveBeenCalled();
   });

@@ -181,65 +181,61 @@ describe("events", () => {
 });
 
 describe("staff", () => {
+  const bio = {
+    type: "root",
+    children: [
+      {
+        type: "element",
+        tagName: "p",
+        properties: {},
+        children: [
+          { type: "text", value: "Serving " },
+          {
+            type: "element",
+            tagName: "strong",
+            properties: {},
+            children: [{ type: "text", value: "since 2010" }],
+          },
+          { type: "text", value: "." },
+        ],
+      },
+    ],
+  };
+
   it("writes a member from their body, and reads them back as listed", async () => {
     const body = staffBody.parse({
-      slug: "pastor",
       name: "Pastor Name",
-      role: "Pastor",
+      role: "pastor",
       summary: "Serving since 2010.",
-      bio: "Serving **since 2010**.",
+      bio,
       phone: "530-555-0100",
-      position: 0,
       status: "published",
     });
     const created = await db.admin.staff.create.first(toStaffArguments(body));
     const id = created!.id;
 
-    expect(await db.admin.staff.fetch.first({ id })).toMatchObject({
-      bio: "Serving **since 2010**.",
-    });
+    expect(await db.admin.staff.fetch.first({ id })).toMatchObject({ bio });
 
     const record = toStaffRecord((await db.admin.staff.fetch.first({ id }))!);
     expect(record).toMatchObject({
       id,
-      slug: "pastor",
-      bio: "Serving **since 2010**.",
-      position: 0,
+      name: "Pastor Name",
+      role: "pastor",
+      bio,
       status: "published",
     });
     expect(staffRecord.safeParse(record).success).toBe(true);
     const [first] = (await db.web.staff.list()).map(toStaffMember);
     expect(first).toEqual({
-      slug: "pastor",
+      id,
       name: "Pastor Name",
-      role: "Pastor",
+      role: "pastor",
       summary: "Serving since 2010.",
-      bio: {
-        type: "root",
-        children: [
-          {
-            type: "element",
-            tagName: "p",
-            properties: {},
-            children: [
-              { type: "text", value: "Serving " },
-              {
-                type: "element",
-                tagName: "strong",
-                properties: {},
-                children: [{ type: "text", value: "since 2010" }],
-              },
-              { type: "text", value: "." },
-            ],
-          },
-        ],
-      },
+      bio,
       phone: "530-555-0100",
     });
     expect(staffMember.safeParse(first).success).toBe(true);
 
-    const one = await db.web.staff.fetch.first({ slug: "pastor" });
-    expect(toStaffMember(one!)).toEqual(first);
     const row = await db.admin.staff.fetch.first({ id });
     expect(toStaffMember(row!)).toEqual(first);
 
@@ -247,14 +243,14 @@ describe("staff", () => {
   });
 
   it("writes a draft the site does not list, and the admin does", async () => {
-    const body = staffBody.parse({ slug: "draft", name: "Draft", role: "x" });
+    const body = staffBody.parse({ name: "Draft", role: "staff" });
     const created = await db.admin.staff.create.first(toStaffArguments(body));
     expect(
-      (await db.web.staff.list()).map(toStaffMember).map((m) => m.slug),
-    ).not.toContain("draft");
+      (await db.web.staff.list()).map(toStaffMember).map((m) => m.name),
+    ).not.toContain("Draft");
     expect(
-      (await db.admin.staff.list()).map(toStaffRecord).map((m) => m.slug),
-    ).toContain("draft");
+      (await db.admin.staff.list()).map(toStaffRecord).map((m) => m.name),
+    ).toContain("Draft");
     expect(await db.admin.staff.delete({ id: created!.id })).toBe(1);
   });
 });

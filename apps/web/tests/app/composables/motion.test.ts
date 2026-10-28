@@ -48,4 +48,3 @@ describe("useFrame", () => {
     expect(callback).not.toHaveBeenCalled();
   });
 });
-

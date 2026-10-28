@@ -30,18 +30,19 @@ The site's messages stand at the top level; the admin's under `admin/`.
 `appearance.json` and `language.json` name the controls both apps offer,
 through the `@bbf/nuxt` layer.
 
-| File              | Messages                                                 |
-| ----------------- | -------------------------------------------------------- |
-| `site.json`       | the church's name, its tagline and the meta description  |
-| `navigation.json` | the primary navigation: its links and accessible names   |
-| `footer.json`     | the footer's headings, service time and copyright line   |
-| `appearance.json` | the color scheme toggle, theme picker and theme settings |
-| `language.json`   | the language switcher                                    |
-| `page.json`       | page-level words: not found, contents, the way back      |
-| `about.json`      | the about page: its title                                |
-| `sermons.json`    | the sermons page: its header, play button, channel link  |
-| `events.json`     | the events pages, an event’s days, the home page’s week  |
-| `connect.json`    | the connect page: its header                             |
+| File              | Messages                                                    |
+| ----------------- | ----------------------------------------------------------- |
+| `site.json`       | the church's name, its tagline and the meta description     |
+| `navigation.json` | the primary navigation: its links and accessible names      |
+| `footer.json`     | the footer's headings, service time and copyright line      |
+| `appearance.json` | the color scheme toggle, theme picker and theme settings    |
+| `language.json`   | the language switcher                                       |
+| `page.json`       | page-level words: not found, contents, the way back         |
+| `about.json`      | the about page: its title                                   |
+| `sermons.json`    | the sermons page: its header, play button, channel link     |
+| `events.json`     | the events pages, an event’s days, the home page’s week     |
+| `connect.json`    | the connect page: its header                                |
+| `roles.json`      | a staff member's roles, as the site and the admin name them |
 
 | File                    | Messages                                                         |
 | ----------------------- | ---------------------------------------------------------------- |

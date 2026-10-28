@@ -20,7 +20,10 @@ type Day =
 export type Checks = [
   Assert<Equal<Row<Contract, "web.events.weekly">["day"], Day>>,
   Assert<Equal<Row<Contract, "web.events.upcoming">["date"], string>>,
-  Assert<Equal<Row<Contract, "web.staff.list">["bio"], string | null>>,
+  Assert<Equal<Row<Contract, "web.staff.list">["bio"], unknown>>,
+  Assert<
+    Equal<Row<Contract, "web.staff.list">["role"], "pastor" | "elder" | "staff">
+  >,
   Assert<
     Equal<
       Row<Contract, "admin.staff.fetch">["status"],
@@ -58,7 +61,7 @@ export type Checks = [
   Assert<
     Equal<
       Returns<Contract, "admin.staff.create">,
-      { id: number; slug: string; created_at: Date }[]
+      { id: number; created_at: Date }[]
     >
   >,
   Assert<
@@ -73,12 +76,7 @@ export type Checks = [
       (number | null)[] | null | undefined
     >
   >,
-  Assert<
-    Equal<
-      Arguments<Contract, "admin.staff.create">["bio"],
-      string | null | undefined
-    >
-  >,
+  Assert<Equal<Arguments<Contract, "admin.staff.create">["bio"], unknown>>,
   Assert<Equal<Arguments<Contract, "admin.events.create">["title"], string>>,
   Assert<Equal<Arguments<Contract, "admin.events.update">["id"], number>>,
 ];
@@ -88,17 +86,17 @@ export const wrongDay: Arguments<Contract, "admin.events.create">["day"] =
   "funday";
 
 export const spare: Arguments<Contract, "admin.staff.create"> = {
-  slug: "x",
   name: "x",
-  role: "x",
-  position: 0,
+  role: "staff",
   status: "draft",
 };
 
 // @ts-expect-error Role is required.
 export const incomplete: Arguments<Contract, "admin.staff.create"> = {
-  slug: "x",
   name: "x",
-  position: 0,
   status: "draft",
 };
+
+// @ts-expect-error Role must be an enum label.
+export const wrongRole: Arguments<Contract, "admin.staff.create">["role"] =
+  "deacon";

@@ -3,7 +3,7 @@ import type { z } from "zod";
 import type { eventBody, eventId, eventPath, eventsQuery } from "./input/event";
 import type { listingQuery } from "./input/listing";
 import type { sermonBody, sermonPath, sermonsQuery } from "./input/sermon";
-import type { staffBody, staffId, staffPath } from "./input/staff";
+import type { staffBody, staffId } from "./input/staff";
 import type {
   churchEvent,
   churchEvents,
@@ -22,6 +22,7 @@ import type {
   staffMember,
   staffMembers,
   staffRecord,
+  staffRole,
 } from "./models/staff";
 
 export type Slug = z.infer<typeof slug>;
@@ -45,6 +46,8 @@ export type HastElement = z.infer<typeof hastElement>;
 export type HastText = z.infer<typeof hastText>;
 
 export type ContentStatus = z.infer<typeof contentStatus>;
+
+export type StaffRole = z.infer<typeof staffRole>;
 
 export type StaffMember = z.infer<typeof staffMember>;
 
@@ -71,8 +74,6 @@ export type EventsQuery = z.infer<typeof eventsQuery>;
 export type ListingQuery = z.infer<typeof listingQuery>;
 
 export type EventBody = z.infer<typeof eventBody>;
-
-export type StaffPath = z.infer<typeof staffPath>;
 
 export type StaffId = z.infer<typeof staffId>;
 

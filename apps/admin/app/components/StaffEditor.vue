@@ -1,10 +1,11 @@
 <script lang="ts">
 import type { StaffRecord } from "@bbf/schema/types";
 
+import { Editor } from "#components";
 import { useNuxtApp } from "#imports";
 import RecordForm from "~/components/RecordForm.vue";
 import { useStaffEditor } from "~/composables/staff";
-import { STATUS_OPTIONS } from "~/constants/editor";
+import { ROLE_OPTIONS, STATUS_OPTIONS } from "~/constants/editor";
 </script>
 
 <script setup lang="ts">
@@ -14,7 +15,7 @@ const { record } = defineProps<{ record: StaffRecord | null }>();
 
 const { $t } = useNuxtApp();
 
-const { draft, saving, removing, error, removable, submit, destroy } =
+const { draft, bio, saving, removing, error, removable, submit, destroy } =
   useStaffEditor(record);
 </script>
 
@@ -33,12 +34,16 @@ const { draft, saving, removing, error, removable, submit, destroy } =
     </div>
     <div class="record-form-field">
       <label for="staff-role">{{ $t.admin.member.role() }}</label>
-      <input id="staff-role" v-model="draft.role" type="text" required />
-    </div>
-    <div class="record-form-field">
-      <label for="staff-slug">{{ $t.admin.editor.slug() }}</label>
-      <input id="staff-slug" v-model="draft.slug" type="text" required />
-      <span class="record-form-hint">{{ $t.admin.editor.slugHint() }}</span>
+      <select id="staff-role" v-model="draft.role" required>
+        <option value="" disabled />
+        <option
+          v-for="option in ROLE_OPTIONS"
+          :key="option.value"
+          :value="option.value"
+        >
+          {{ $t(option.label) }}
+        </option>
+      </select>
     </div>
     <div class="record-form-field">
       <label for="staff-status">{{ $t.admin.editor.status() }}</label>
@@ -51,17 +56,6 @@ const { draft, saving, removing, error, removable, submit, destroy } =
           {{ $t(option.label) }}
         </option>
       </select>
-    </div>
-    <div class="record-form-field">
-      <label for="staff-position">{{ $t.admin.member.position() }}</label>
-      <input
-        id="staff-position"
-        v-model.number="draft.position"
-        type="number"
-        min="0"
-        step="1"
-      />
-      <span class="record-form-hint">{{ $t.admin.member.positionHint() }}</span>
     </div>
     <div class="record-form-field">
       <label for="staff-photo">{{ $t.admin.member.photo() }}</label>
@@ -79,10 +73,68 @@ const { draft, saving, removing, error, removable, submit, destroy } =
       <label for="staff-summary">{{ $t.admin.editor.summary() }}</label>
       <input id="staff-summary" v-model="draft.summary" type="text" />
     </div>
-    <div class="record-form-field record-form-field-wide">
-      <label for="staff-bio">{{ $t.admin.member.bio() }}</label>
-      <textarea id="staff-bio" v-model="draft.bio" rows="12" />
-      <span class="record-form-hint">{{ $t.admin.member.bioHint() }}</span>
+    <div class="record-form-field record-form-field-wide staff-bio">
+      <label id="staff-bio-label" for="staff-bio">
+        {{ $t.admin.member.bio() }}
+      </label>
+      <Editor
+        :service="bio"
+        :pt="{
+          content: { id: 'staff-bio', 'aria-labelledby': 'staff-bio-label' },
+        }"
+      />
     </div>
   </RecordForm>
 </template>
+
+<style>
+.staff-bio .f-data-editor {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.staff-bio .f-data-editor-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+
+.staff-bio .f-data-editor-tool {
+  padding: var(--space-1) var(--space-2);
+  border: 1px var(--stroke-solid) var(--rule);
+  border-radius: var(--shape-sm);
+  background: var(--surface);
+  color: var(--on-surface);
+  font: var(--type-label);
+  cursor: pointer;
+}
+
+.staff-bio .f-data-editor-tool[aria-pressed="true"] {
+  border-color: var(--primary);
+  background: var(--primary-container);
+  color: var(--on-primary-container);
+}
+
+.staff-bio .f-data-editor-tool:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.staff-bio .f-data-editor-content {
+  box-sizing: border-box;
+  min-height: 16rem;
+  padding: var(--space-3);
+  border: 1px var(--stroke-solid) var(--rule);
+  border-radius: var(--shape-sm);
+  background: var(--surface);
+  color: var(--on-surface-high-contrast);
+  font: var(--type-body);
+  transition: border-color var(--transition-fast);
+}
+
+.staff-bio .f-data-editor-content:focus-within {
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
+  border-color: var(--primary);
+}
+</style>

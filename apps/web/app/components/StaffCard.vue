@@ -1,7 +1,7 @@
 <script lang="ts">
 import type { StaffMember } from "@bbf/schema/types";
 
-import { computed } from "#imports";
+import { computed, useNuxtApp } from "#imports";
 </script>
 
 <script setup lang="ts">
@@ -11,6 +11,10 @@ const { member, compact = false } = defineProps<{
   member: StaffMember;
   compact?: boolean;
 }>();
+
+const { $t } = useNuxtApp();
+
+const role = computed(() => $t.roles[member.role]());
 
 const initials = computed(() => {
   const names = member.name.trim().split(/\s+/);
@@ -35,7 +39,7 @@ const initials = computed(() => {
       </span>
     </div>
     <div class="staff-card-meta">
-      <p class="staff-card-role">{{ member.role }}</p>
+      <p class="staff-card-role">{{ role }}</p>
       <h3>{{ member.name }}</h3>
       <p v-if="member.summary && !compact" class="staff-card-summary">
         {{ member.summary }}

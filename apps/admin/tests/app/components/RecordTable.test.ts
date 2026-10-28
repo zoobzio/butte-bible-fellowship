@@ -42,7 +42,6 @@ describe("RecordTable", () => {
     expect(wrapper.findAll(".f-th").map((th) => th.text())).toEqual([
       "Name",
       "Role",
-      "Position",
       "Status",
       "Updated",
     ]);

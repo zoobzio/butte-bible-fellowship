@@ -21,7 +21,6 @@ declare const fetched: Row<Contract, "web.events.fetch">;
 declare const adminEvent: Row<Contract, "admin.events.fetch">;
 declare const adminEvents: Row<Contract, "admin.events.list">;
 declare const webStaff: Row<Contract, "web.staff.list">;
-declare const webOne: Row<Contract, "web.staff.fetch">;
 declare const adminStaff: Row<Contract, "admin.staff.fetch">;
 declare const adminStaffList: Row<Contract, "admin.staff.list">;
 declare const listedSermon: Row<Contract, "web.sermons.list">;
@@ -31,7 +30,7 @@ declare const adminSermon: Row<Contract, "admin.sermons.fetch">;
 export const events = [listed, weekly, upcoming, fetched, adminEvent].map(
   toChurchEvent,
 );
-export const staff = [webStaff, webOne, adminStaff].map(toStaffMember);
+export const staff = [webStaff, adminStaff].map(toStaffMember);
 export const sermons = [listedSermon, fetchedSermon, adminSermon].map(toSermon);
 
 export const eventRecords = [adminEvent, adminEvents].map(toEventRecord);

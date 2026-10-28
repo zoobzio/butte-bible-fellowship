@@ -9,28 +9,46 @@ const value = (wrapper: ReturnType<typeof mount>, id: string) =>
   (wrapper.find(`#${id}`).element as HTMLInputElement).value;
 
 describe("StaffEditor", () => {
-  it("opens blank for a new member, a draft last in the list, with no delete", () => {
+  it("opens blank for a new member, a draft with no role, with no delete", () => {
     const wrapper = mount(StaffEditor, { props: { record: null } });
     expect(value(wrapper, "staff-name")).toBe("");
-    expect(value(wrapper, "staff-slug")).toBe("");
+    expect(value(wrapper, "staff-role")).toBe("");
     expect(value(wrapper, "staff-status")).toBe("draft");
-    expect(value(wrapper, "staff-position")).toBe("0");
+    expect(wrapper.find("#staff-bio").text()).toBe("");
     expect(wrapper.find(".record-form-delete").exists()).toBe(false);
   });
 
   it("opens on a member's record, every field filled, with a delete", () => {
     const wrapper = mount(StaffEditor, { props: { record: STAFF } });
     expect(value(wrapper, "staff-name")).toBe("Jane Doe");
-    expect(value(wrapper, "staff-role")).toBe("Elder");
-    expect(value(wrapper, "staff-slug")).toBe("jane-doe");
+    expect(value(wrapper, "staff-role")).toBe("elder");
     expect(value(wrapper, "staff-status")).toBe("published");
-    expect(value(wrapper, "staff-position")).toBe("2");
     expect(value(wrapper, "staff-email")).toBe("jane@example.com");
     expect(value(wrapper, "staff-summary")).toBe("Has served since 2010.");
-    expect(value(wrapper, "staff-bio")).toBe(
-      "## Jane\n\nHas served since 2010.",
+    expect(wrapper.find("#staff-bio").html()).toContain(
+      "<p>Has served since 2010.</p>",
     );
     expect(wrapper.find(".record-form-delete").exists()).toBe(true);
+  });
+
+  it("offers each role by name, and the bio as rich text", () => {
+    const wrapper = mount(StaffEditor, { props: { record: null } });
+    expect(
+      wrapper
+        .findAll("#staff-role option")
+        .filter((option) => option.attributes("value") !== "")
+        .map((option) => [option.attributes("value"), option.text()]),
+    ).toEqual([
+      ["pastor", "Pastor"],
+      ["elder", "Elder"],
+      ["staff", "Staff"],
+    ]);
+    const editor = wrapper.find(".staff-bio .f-data-editor");
+    expect(editor.exists()).toBe(true);
+    expect(editor.find('[data-tool="bold"]').exists()).toBe(true);
+    expect(wrapper.find("#staff-bio").attributes("aria-labelledby")).toBe(
+      "staff-bio-label",
+    );
   });
 
   it("labels every control", () => {
@@ -47,21 +65,13 @@ describe("StaffEditor", () => {
     vi.stubGlobal("$fetch", fetch);
     const wrapper = mount(StaffEditor, { props: { record: null } });
     await wrapper.find("#staff-name").setValue("John Roe");
-    await wrapper.find("#staff-role").setValue("Deacon");
-    await wrapper.find("#staff-slug").setValue("john-roe");
-    await wrapper.find("#staff-position").setValue("4");
+    await wrapper.find("#staff-role").setValue("staff");
     await wrapper.find("#staff-status").setValue("published");
     await wrapper.find("form").trigger("submit");
     await vi.waitFor(() => expect(fetch).toHaveBeenCalled());
     expect(fetch).toHaveBeenCalledWith("/api/staff", {
       method: "POST",
-      body: {
-        slug: "john-roe",
-        name: "John Roe",
-        role: "Deacon",
-        position: 4,
-        status: "published",
-      },
+      body: { name: "John Roe", role: "staff", status: "published" },
     });
     await vi.waitFor(() =>
       expect(useRouter().push).toHaveBeenCalledWith("/staff"),

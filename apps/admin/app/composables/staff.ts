@@ -1,9 +1,10 @@
-import type { StaffRecord } from "@bbf/schema/types";
+import type { Hast, StaffRecord } from "@bbf/schema/types";
 
 import type { RecordLink } from "~/types/listing";
 
-import { staffListing, staffRecord } from "@bbf/schema";
-import { createTable, navigateTo, useNuxtApp } from "#imports";
+import { hast, staffListing, staffRecord } from "@bbf/schema";
+import { hast as tree } from "@zoobzio/editor";
+import { createEditor, createTable, navigateTo, useNuxtApp } from "#imports";
 import { useApi } from "~/composables/api";
 import { useEditor } from "~/composables/editor";
 import { useListingFetch } from "~/composables/listing";
@@ -16,6 +17,10 @@ const ROUTE = "/api/staff";
 const endpoint = (id: number): string => `${ROUTE}/${id}`;
 
 const link: RecordLink<StaffRecord> = (record) => `/staff/${record.id}`;
+
+const EMPTY: Hast = { type: "root", children: [] };
+
+const useBio = createEditor("staff-bio", tree);
 
 export const useStaffTable = () => {
   const { $t } = useNuxtApp();
@@ -42,7 +47,10 @@ export const useStaffEditor = (record: StaffRecord | null) => {
   const api = useApi();
   const { $t } = useNuxtApp();
 
-  return useEditor({
+  const bio = useBio();
+  bio.load(record?.bio ?? EMPTY);
+
+  const editor = useEditor({
     draft: toStaffDraft(record ?? undefined),
     body: toStaffBody,
     save: (body) =>
@@ -58,4 +66,10 @@ export const useStaffEditor = (record: StaffRecord | null) => {
           },
     back: "/staff",
   });
+
+  bio.on("updated", () => {
+    editor.draft.bio = bio.empty ? undefined : hast.parse(bio.document);
+  });
+
+  return { ...editor, bio };
 };

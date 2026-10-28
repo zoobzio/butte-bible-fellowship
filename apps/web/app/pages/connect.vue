@@ -43,7 +43,7 @@ const staff = computed(() => data.value ?? []);
       :description="$t.connect.description()"
     />
     <section v-if="staff.length" class="connect-staff">
-      <StaffCard v-for="member in staff" :key="member.slug" :member="member" />
+      <StaffCard v-for="member in staff" :key="member.id" :member="member" />
     </section>
     <article class="prose">
       <MarkdownBody :page="page" />

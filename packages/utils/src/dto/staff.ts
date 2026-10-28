@@ -1,14 +1,15 @@
 import type { StaffMember, StaffRecord } from "@bbf/schema/types";
 
-import { toHast } from "./hast";
+import { hast } from "@bbf/schema";
+
 import type { StaffRecordRow, StaffRow } from "../types";
 
 export const toStaffMember = (row: StaffRow): StaffMember => ({
-  slug: row.slug,
+  id: row.id,
   name: row.name,
   role: row.role,
   summary: row.summary ?? undefined,
-  bio: row.bio === null ? undefined : toHast(row.bio),
+  bio: row.bio === null ? undefined : hast.parse(row.bio),
   photo: row.photo ?? undefined,
   email: row.email ?? undefined,
   phone: row.phone ?? undefined,
@@ -16,15 +17,13 @@ export const toStaffMember = (row: StaffRow): StaffMember => ({
 
 export const toStaffRecord = (row: StaffRecordRow): StaffRecord => ({
   id: row.id,
-  slug: row.slug,
   name: row.name,
   role: row.role,
   summary: row.summary ?? undefined,
-  bio: row.bio ?? undefined,
+  bio: row.bio === null ? undefined : hast.parse(row.bio),
   photo: row.photo ?? undefined,
   email: row.email ?? undefined,
   phone: row.phone ?? undefined,
-  position: row.position,
   status: row.status,
   createdAt: row.created_at.toISOString(),
   updatedAt: row.updated_at.toISOString(),

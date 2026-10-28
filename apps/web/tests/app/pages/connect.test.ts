@@ -12,12 +12,12 @@ import { mountSuspended } from "@bbf/nuxt/testing/mount";
 
 const STAFF = [
   {
-    slug: "jane-doe",
+    id: 1,
     name: "Jane Doe",
-    role: "Elder",
+    role: "elder",
     summary: "Has served since 2010.",
   },
-  { slug: "john-roe", name: "John Roe", role: "Elder" },
+  { id: 2, name: "John Roe", role: "elder" },
 ];
 
 const CONNECT = document(

@@ -1,5 +1,8 @@
-INSERT INTO staff (slug, name, role, summary, position, status) VALUES
-  ('elder-1', 'Elder Name', 'Elder', 'A few words about this elder — how long they have served, and what they care for at Butte Bible Fellowship.', 1, 'published'),
-  ('elder-2', 'Elder Name', 'Elder', 'A few words about this elder — how long they have served, and what they care for at Butte Bible Fellowship.', 2, 'published'),
-  ('elder-3', 'Elder Name', 'Elder', 'A few words about this elder — how long they have served, and what they care for at Butte Bible Fellowship.', 3, 'published')
-ON CONFLICT (slug) DO NOTHING;
+INSERT INTO staff (name, role, summary, status)
+SELECT name, role::staff_role, summary, status::content_status
+FROM (VALUES
+  ('Elder Name', 'elder', 'A few words about this elder — how long they have served, and what they care for at Butte Bible Fellowship.', 'published'),
+  ('Elder Name', 'elder', 'A few words about this elder — how long they have served, and what they care for at Butte Bible Fellowship.', 'published'),
+  ('Elder Name', 'elder', 'A few words about this elder — how long they have served, and what they care for at Butte Bible Fellowship.', 'published')
+) AS seed (name, role, summary, status)
+WHERE NOT EXISTS (SELECT 1 FROM staff);

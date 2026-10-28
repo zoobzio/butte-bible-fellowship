@@ -59,4 +59,3 @@ export const stubPage = (metrics: Partial<PageMetrics> = {}) => {
     },
   };
 };
-

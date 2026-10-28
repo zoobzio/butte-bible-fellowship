@@ -1,3 +1,3 @@
-SELECT id, slug, name, role, summary, bio, photo, email, phone, position, status, created_at, updated_at
+SELECT id, name, role, summary, bio, photo, email, phone, status, created_at, updated_at
 FROM staff
-ORDER BY position, name;
+ORDER BY role, name;

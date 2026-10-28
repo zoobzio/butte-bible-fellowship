@@ -12,10 +12,5 @@ export const useStaff = () => {
     return rows.map(toStaffMember);
   };
 
-  const fetch = async (slug: string): Promise<StaffMember | null> => {
-    const row = await db.web.staff.fetch.first({ slug });
-    return row === null ? null : toStaffMember(row);
-  };
-
-  return { list, fetch };
+  return { list };
 };

@@ -1,14 +1,24 @@
 import type { EventRecord, StaffRecord } from "@bbf/schema/types";
 
+export const BIO = {
+  type: "root" as const,
+  children: [
+    {
+      type: "element" as const,
+      tagName: "p",
+      properties: {},
+      children: [{ type: "text" as const, value: "Has served since 2010." }],
+    },
+  ],
+};
+
 export const STAFF: StaffRecord = {
   id: 1,
-  slug: "jane-doe",
   name: "Jane Doe",
-  role: "Elder",
+  role: "elder",
   summary: "Has served since 2010.",
-  bio: "## Jane\n\nHas served since 2010.",
+  bio: BIO,
   email: "jane@example.com",
-  position: 2,
   status: "published",
   createdAt: "2026-10-17T18:00:00.000Z",
   updatedAt: "2026-10-18T09:30:00.000Z",

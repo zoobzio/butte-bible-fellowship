@@ -1,3 +1,3 @@
-INSERT INTO staff (slug, name, role, summary, bio, photo, email, phone, position, status)
-VALUES (:slug, :name, :role, :summary, :bio, :photo, :email, :phone, :position::int2, :status)
-RETURNING id, slug, created_at;
+INSERT INTO staff (name, role, summary, bio, photo, email, phone, status)
+VALUES (:name, :role, :summary, :bio::jsonb, :photo, :email, :phone, :status)
+RETURNING id, created_at;

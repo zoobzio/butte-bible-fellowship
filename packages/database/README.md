@@ -8,7 +8,8 @@ what this package exports. An app imports the build and has the database:
 the kit and the sources never reach it.
 
 The tables are the site's three kinds of data: `staff`, who serve the
-church; `events`, each held once on a date or weekly on a day, with the page
+church, each in a `staff_role` — pastor, elder, staff — which is also the
+order the site lists them in; `events`, each held once on a date or weekly on a day, with the page
 written about it; and `sermons`, each preached on a day, with the page
 written about it and its recording on the church's YouTube channel. Beside them, `users` is who may sign in to the admin app.
 Content
@@ -44,8 +45,8 @@ first row or `null`; one with none returns the count of the rows it changed.
 ## Queries
 
 A query is named for what it does: `list` lists, `fetch` reads one.
-`web.staff.list` lists the published staff in order, and `web.staff.fetch`
-is one of them by slug. The events the web reads are the published ones:
+`web.staff.list` lists the published staff in their order: by role, then
+by name. The events the web reads are the published ones:
 `web.events.list` is the calendar's feed — every repeating event Sunday
 first, then the one-offs on or after a date — and `web.events.weekly` and
 `web.events.upcoming` are its two halves on their own; `web.events.fetch`
@@ -67,6 +68,10 @@ email, when no subject is bound yet, and `admin.users.subject` finds the
 user by it on every request after. An `update` that changes the email
 unbinds the user until they sign in with the new one. The admin app passes
 `claim` only an email Google has verified.
+
+A member's `bio` is `jsonb`: the HTML tree (hast) the app renders, written
+as the admin's editor hands it over and served to the site as it is, where
+an event's or a sermon's `body` is the Markdown it was written as.
 
 An argument written into a column the schema lets be null — a summary, a
 bio, a body, an image, a note, a location, an end time, a sermon's

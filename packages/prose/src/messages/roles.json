@@ -1,0 +1,14 @@
+{
+  "pastor": {
+    "defaultMessage": "Pastor",
+    "description": "A staff member's role, shown over their name on the site and offered in the admin's editor: the pastor of the church."
+  },
+  "elder": {
+    "defaultMessage": "Elder",
+    "description": "A staff member's role, shown over their name on the site and offered in the admin's editor: one of the church's elders."
+  },
+  "staff": {
+    "defaultMessage": "Staff",
+    "description": "A staff member's role, shown over their name on the site and offered in the admin's editor: someone who serves the church in another capacity, such as in its office."
+  }
+}

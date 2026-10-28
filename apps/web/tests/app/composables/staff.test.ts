@@ -3,9 +3,9 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { useStaff } from "~/composables/staff";
 
 const MEMBER = {
-  slug: "jane-doe",
+  id: 1,
   name: "Jane Doe",
-  role: "Elder",
+  role: "elder",
   summary: "Has served since 2010.",
 };
 
@@ -25,7 +25,7 @@ describe("useStaff", () => {
   it("resolves a list that is not staff to an empty one", async () => {
     vi.stubGlobal(
       "$fetch",
-      vi.fn(async () => [{ ...MEMBER, slug: "Jane Doe" }]),
+      vi.fn(async () => [{ ...MEMBER, role: "Elder" }]),
     );
     const { data } = await useStaff();
     expect(data.value).toEqual([]);

@@ -5,15 +5,7 @@
   },
   "role": {
     "defaultMessage": "Role",
-    "description": "The label of the field, and the heading of the table column, for a staff member's role: Pastor, Elder…"
-  },
-  "position": {
-    "defaultMessage": "Position",
-    "description": "The label of the field, and the heading of the table column, for where a staff member stands in the site's list."
-  },
-  "positionHint": {
-    "defaultMessage": "Where they stand in the list, lowest first.",
-    "description": "The hint under the position field: how the position orders the list."
+    "description": "The label of the field, and the heading of the table column, for a staff member's role: pastor, elder or staff."
   },
   "photo": {
     "defaultMessage": "Photo URL",
@@ -29,10 +21,6 @@
   },
   "bio": {
     "defaultMessage": "Bio",
-    "description": "The label of the field for the text of a staff member's own page."
-  },
-  "bioHint": {
-    "defaultMessage": "Markdown, for their own page.",
-    "description": "The hint under the bio field: how the bio is written, and where it is shown."
+    "description": "The label of the rich text editor for a staff member's bio in full."
   }
 }

@@ -2,19 +2,31 @@ import { describe, expect, it } from "vitest";
 
 import {
   CONTENT_STATUSES,
+  STAFF_ROLES,
   contentStatus,
   staffListing,
   staffMember,
   staffMembers,
   staffRecord,
+  staffRole,
 } from "../../src/models/staff";
 
-const MEMBER = { slug: "jane-doe", name: "Jane Doe", role: "Elder" };
+const MEMBER = { id: 1, name: "Jane Doe", role: "elder" };
+
+const BIO = {
+  type: "root",
+  children: [
+    {
+      type: "element",
+      tagName: "p",
+      properties: {},
+      children: [{ type: "text", value: "Has served since 2010." }],
+    },
+  ],
+};
 
 const RECORD = {
-  id: 1,
   ...MEMBER,
-  position: 0,
   status: "draft",
   createdAt: "2026-10-17T18:00:00.000Z",
   updatedAt: "2026-10-17T18:00:00.000Z",
@@ -28,33 +40,30 @@ describe("contentStatus", () => {
   });
 });
 
+describe("staffRole", () => {
+  it("is one of pastor, elder and staff, in the order the site lists them", () => {
+    expect(STAFF_ROLES).toEqual(["pastor", "elder", "staff"]);
+    expect(staffRole.parse("elder")).toBe("elder");
+    expect(staffRole.safeParse("deacon").success).toBe(false);
+    expect(staffRole.safeParse("Elder").success).toBe(false);
+  });
+});
+
 describe("staffMember", () => {
-  it("needs a slug, a name and a role", () => {
+  it("needs an id, a name and a role", () => {
     expect(staffMember.parse(MEMBER)).toEqual(MEMBER);
-    expect(
-      staffMember.safeParse({ name: "Jane Doe", role: "Elder" }).success,
-    ).toBe(false);
-    expect(
-      staffMember.safeParse({ slug: "jane-doe", name: "Jane Doe" }).success,
-    ).toBe(false);
+    for (const key of ["id", "name", "role"]) {
+      const { [key]: _gone, ...without } = MEMBER as Record<string, unknown>;
+      expect(staffMember.safeParse(without).success, key).toBe(false);
+    }
   });
 
   it("accepts all a member can say", () => {
     const value = {
       ...MEMBER,
-      role: "Pastor",
+      role: "pastor",
       summary: "Has served since 2010.",
-      bio: {
-        type: "root",
-        children: [
-          {
-            type: "element",
-            tagName: "p",
-            properties: {},
-            children: [{ type: "text", value: "Has served since 2010." }],
-          },
-        ],
-      },
+      bio: BIO,
       photo: "https://cdn.example.com/staff/jane-doe.jpg",
       email: "jane@example.com",
       phone: "530-555-0100",
@@ -62,14 +71,14 @@ describe("staffMember", () => {
     expect(staffMember.parse(value)).toEqual(value);
   });
 
-  it("takes a bio as a tree, never as the Markdown it was written as", () => {
+  it("takes a bio as a tree, never as a string", () => {
     expect(
       staffMember.safeParse({ ...MEMBER, bio: "## Jane\n\nHas served." })
         .success,
     ).toBe(false);
   });
 
-  it("rejects an email, a photo or a slug that is not one", () => {
+  it("rejects an email, a photo or a role that is not one", () => {
     expect(staffMember.safeParse({ ...MEMBER, email: "jane" }).success).toBe(
       false,
     );
@@ -77,15 +86,13 @@ describe("staffMember", () => {
       staffMember.safeParse({ ...MEMBER, photo: "/staff/jane-doe.jpg" })
         .success,
     ).toBe(false);
-    expect(staffMember.safeParse({ ...MEMBER, slug: "Jane Doe" }).success).toBe(
+    expect(staffMember.safeParse({ ...MEMBER, role: "Elder" }).success).toBe(
       false,
     );
   });
 
-  it("carries no status or position: the site lists only the published", () => {
-    expect(
-      staffMember.parse({ ...MEMBER, status: "draft", position: 3 }),
-    ).toEqual(MEMBER);
+  it("carries no status: the site lists only the published", () => {
+    expect(staffMember.parse({ ...MEMBER, status: "draft" })).toEqual(MEMBER);
   });
 });
 
@@ -97,26 +104,36 @@ describe("staffMembers", () => {
 });
 
 describe("staffRecord", () => {
-  it("needs what a member needs, and their id, position, status and timestamps", () => {
+  it("needs what a member needs, and their status and timestamps", () => {
     expect(staffRecord.parse(RECORD)).toEqual(RECORD);
-    for (const key of ["id", "position", "status", "createdAt", "updatedAt"]) {
+    for (const key of [
+      "id",
+      "name",
+      "role",
+      "status",
+      "createdAt",
+      "updatedAt",
+    ]) {
       const { [key]: _gone, ...without } = RECORD as Record<string, unknown>;
       expect(staffRecord.safeParse(without).success, key).toBe(false);
     }
   });
 
-  it("accepts all a member can say, the bio as the Markdown it was written as", () => {
+  it("accepts all a member can say, the bio as the tree the editor wrote", () => {
     const value = {
       ...RECORD,
       summary: "Has served since 2010.",
-      bio: "## Jane\n\nHas served since 2010.",
+      bio: BIO,
       photo: "https://cdn.example.com/staff/jane-doe.jpg",
       email: "jane@example.com",
       phone: "530-555-0100",
-      position: 2,
       status: "published",
     };
     expect(staffRecord.parse(value)).toEqual(value);
+    expect(
+      staffRecord.safeParse({ ...RECORD, bio: "## Jane\n\nHas served." })
+        .success,
+    ).toBe(false);
   });
 
   it("names a member by a whole number from one", () => {
@@ -130,8 +147,11 @@ describe("staffRecord", () => {
     ).toBe(false);
   });
 
-  it("rejects a status that is not one", () => {
+  it("rejects a status or a role that is not one", () => {
     expect(staffRecord.safeParse({ ...RECORD, status: "hidden" }).success).toBe(
+      false,
+    );
+    expect(staffRecord.safeParse({ ...RECORD, role: "deacon" }).success).toBe(
       false,
     );
   });

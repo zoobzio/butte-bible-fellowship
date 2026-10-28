@@ -22,4 +22,3 @@ export const useFrame = (callback: () => void): MotionFrame => {
 
   return { schedule };
 };
-

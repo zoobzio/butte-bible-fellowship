@@ -8,6 +8,7 @@ import {
 export * from "@bbf/nuxt/testing/imports";
 
 export { defineTabs } from "@zoobzio/vue/definitions/tabs";
+export { createEditor } from "@zoobzio/nuxt/factories/editor";
 export { createTable } from "@zoobzio/nuxt/factories/table";
 
 const logger = {
