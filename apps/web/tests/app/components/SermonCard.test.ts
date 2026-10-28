@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { mount } from "@vue/test-utils";
 
-import { setRoutePath, useNuxtApp } from "#imports";
+import { setLocale, useNuxtApp } from "#imports";
 import SermonCard from "~/components/SermonCard.vue";
 
 const SERMON = {
@@ -103,8 +103,8 @@ describe("SermonCard", () => {
     expect(wrapper.find("img").attributes("loading")).toBe("eager");
   });
 
-  it("writes the date in the route's language", () => {
-    setRoutePath("/es/sermons");
+  it("writes the date in the reader's language", () => {
+    setLocale("es");
     expect(card().find("time").text()).toBe("4 de octubre de 2026");
   });
 });

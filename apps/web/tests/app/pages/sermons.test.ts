@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { setContentPages, setRoutePath, useHead, useNuxtApp } from "#imports";
+import { setContentPages, setLocale, useHead, useNuxtApp } from "#imports";
 import PageHeader from "~/components/PageHeader.vue";
 import SermonCard from "~/components/SermonCard.vue";
 import SermonGrid from "~/components/SermonGrid.vue";
@@ -68,8 +68,8 @@ describe("sermons page", () => {
     expect(wrapper.findComponent(SermonGrid).props("sermons")).toEqual([]);
   });
 
-  it("titles the document after the page, whatever locale the route is in", async () => {
-    setRoutePath("/es/sermons");
+  it("titles the document after the page, whatever language is read", async () => {
+    setLocale("es");
     await mountPage();
     expect(useHead.mock.calls[0]![0]()).toEqual({
       title: "Sermons – Test Church",

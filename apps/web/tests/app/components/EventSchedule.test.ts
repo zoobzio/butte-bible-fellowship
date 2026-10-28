@@ -3,7 +3,7 @@ import { mount } from "@vue/test-utils";
 
 import type { ChurchEvent } from "@bbf/schema/types";
 
-import { setRoutePath, useNuxtApp } from "#imports";
+import { useNuxtApp } from "#imports";
 import EventSchedule from "~/components/EventSchedule.vue";
 
 const SUNDAY: ChurchEvent[] = [
@@ -40,11 +40,10 @@ describe("EventSchedule", () => {
     expect(worship!.find("a + span.event-schedule-time").exists()).toBe(true);
   });
 
-  it("links each event to its page in the route's locale", () => {
-    setRoutePath("/es/about-us");
+  it("links each event to its page", () => {
     const [, worship] = mountSchedule().findAll("li");
     expect(worship!.find("a").attributes("href")).toBe(
-      "/es/events/worship-service",
+      "/events/worship-service",
     );
   });
 

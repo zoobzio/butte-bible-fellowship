@@ -3,7 +3,7 @@ import { mount } from "@vue/test-utils";
 
 import type { CalendarDay } from "~/types/events";
 
-import { setRoutePath, useNuxtApp } from "#imports";
+import { setLocale, useNuxtApp } from "#imports";
 import EventWeek from "~/components/EventWeek.vue";
 
 const WORSHIP = {
@@ -59,11 +59,11 @@ describe("EventWeek", () => {
     expect(sunday!.find(".event-week-time").text()).toBe("10:00 – 11:30 AM");
   });
 
-  it("links each event to its page, and writes the week, in the route's locale", () => {
-    setRoutePath("/es/about-us");
+  it("links each event to its page, and writes the week in the reader's language", () => {
+    setLocale("es");
     const [sunday] = mountWeek().findAll("ol.event-week > li");
     expect(sunday!.find("a").attributes("href")).toBe(
-      "/es/events/worship-service",
+      "/events/worship-service",
     );
     expect(sunday!.find("time").text()).toBe(
       new Intl.DateTimeFormat("es", {

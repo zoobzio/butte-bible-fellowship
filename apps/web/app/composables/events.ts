@@ -16,10 +16,11 @@ import {
   ref,
   toValue,
   useAppConfig,
+  useLocale,
   useNuxtApp,
+  useRoute,
   useState,
 } from "#imports";
-import { useRouteLocale } from "~/composables/locale";
 import { usePage } from "~/composables/page";
 import { emailHref, phoneHref } from "~/utils/contact";
 import {
@@ -53,9 +54,9 @@ export const useToday = (): Ref<string> => {
 };
 
 /**
- * The events, in the route's locale: the events page's front matter is the
- * calendar, and it is read whichever page asks. An events page that cannot
- * be read has none.
+ * The events, in the reader's language: the events page's front matter is
+ * the calendar, and it is read whichever page asks. An events page that
+ * cannot be read has none.
  */
 export const useEvents = async (): Promise<ComputedRef<ChurchEvent[]>> => {
   const { data } = await usePage("/events");
@@ -94,22 +95,22 @@ export const useEventsThisWeek = (
 export const useEvent = async (): Promise<
   ComputedRef<ChurchEvent | undefined>
 > => {
-  const { path } = useRouteLocale();
+  const route = useRoute();
   const events = await useEvents();
 
   return computed(() => {
-    const slug = path.value.split("/").pop();
+    const slug = route.path.split("/").pop();
     return events.value.find((event) => slugOf(event) === slug);
   });
 };
 
 /**
- * Says a date written `YYYY-MM-DD` in the route's locale, as the options
+ * Says a date written `YYYY-MM-DD` in the reader's language, as the options
  * ask. A date is a day on the calendar and not a moment, so it is read
  * where it was written, in UTC.
  */
 export const useEventDate = (options: Intl.DateTimeFormatOptions) => {
-  const { locale } = useRouteLocale();
+  const { locale } = useLocale();
 
   const format = computed(
     () =>
@@ -129,12 +130,12 @@ export const useEventDate = (options: Intl.DateTimeFormatOptions) => {
 const plain = (text: string): string => text.replace(/\s/g, " ");
 
 /**
- * A time of day's formatter, in the route's locale: one time, or a range
+ * A time of day's formatter, in the reader's language: one time, or a range
  * from one to another. The time is formatted as written — the church's own,
  * whatever the visitor's zone — and spaced the same wherever it is rendered.
  */
 const useTimeFormat = () => {
-  const { locale } = useRouteLocale();
+  const { locale } = useLocale();
 
   const formatter = computed(
     () =>
@@ -153,7 +154,7 @@ const useTimeFormat = () => {
 };
 
 /**
- * Says when an event starts, in the route's locale. An event whose start
+ * Says when an event starts, in the reader's language. An event whose start
  * cannot be read has no time to say.
  */
 export const useEventStart = () => {
@@ -166,7 +167,7 @@ export const useEventStart = () => {
 };
 
 /**
- * Says when an event is held, in the route's locale: its start, and its end
+ * Says when an event is held, in the reader's language: its start, and its end
  * when it has one. An event whose start cannot be read has no time to say.
  */
 export const useEventTime = () => {
@@ -183,14 +184,14 @@ export const useEventTime = () => {
 };
 
 /**
- * Says which days an event is held on, in the route's locale: the one date
+ * Says which days an event is held on, in the reader's language: the one date
  * of an event held once, or the day of the week one repeats on — and, for
  * one held only in some of the month's weeks, which of them. An event with
  * neither a date nor a day has no days to say.
  */
 export const useEventDays = () => {
   const { $t } = useNuxtApp();
-  const { locale } = useRouteLocale();
+  const { locale } = useLocale();
 
   const date = useEventDate({ weekday: "long", month: "long", day: "numeric" });
   const weekday = useEventDate({ weekday: "long" });
@@ -211,11 +212,9 @@ export const useEventDays = () => {
   };
 };
 
-/** The way to an event's page, in the route's locale. */
+/** The way to an event's page. */
 export const useEventLink = () => {
-  const { localize } = useRouteLocale();
-
-  return (event: ChurchEvent): string => localize(pathOf(event));
+  return (event: ChurchEvent): string => pathOf(event);
 };
 
 /**

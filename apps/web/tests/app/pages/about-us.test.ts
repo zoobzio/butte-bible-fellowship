@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { setContentPages, setRoutePath, useHead } from "#imports";
+import { setContentPages, setLocale, useHead } from "#imports";
 import AboutArticle from "~/components/AboutArticle.vue";
 import Page from "~/pages/about-us.vue";
 import { document, element } from "#test/support/content";
@@ -12,9 +12,9 @@ const ABOUT = document(
 );
 
 describe("about us page", () => {
-  it("hands its own page to the article, whatever locale the route is in", async () => {
+  it("hands its own page to the article, whatever language is read", async () => {
     setContentPages({ "/about-us": ABOUT });
-    setRoutePath("/es/about-us");
+    setLocale("es");
     const { wrapper } = await mountSuspended(Page);
     expect(wrapper.findComponent(AboutArticle).props("page")).toEqual({
       title: "About – Test Church",

@@ -11,6 +11,7 @@ import {
   requestedDocuments,
   setAppConfig,
   setContentPages,
+  setLocale,
   setRoutePath,
   useState,
 } from "#imports";
@@ -125,8 +126,8 @@ describe("useEventTime", () => {
     expect(said("all day")).toBeUndefined();
   });
 
-  it("says the time as the route's locale writes it", () => {
-    setRoutePath("/es/events");
+  it("says the time as the reader's language writes it", () => {
+    setLocale("es");
     expect(said("17:30")).toBe(
       new Intl.DateTimeFormat("es", {
         hour: "numeric",
@@ -182,8 +183,8 @@ describe("useEventDays", () => {
     expect(said({})).toBeUndefined();
   });
 
-  it("names the date and the day as the route's locale does", () => {
-    setRoutePath("/es/events");
+  it("names the date and the day as the reader's language does", () => {
+    setLocale("es");
     expect(said({ date: "2026-10-14" })).toBe(
       new Intl.DateTimeFormat("es", {
         weekday: "long",
@@ -197,12 +198,12 @@ describe("useEventDays", () => {
 });
 
 describe("useEventDate", () => {
-  it("says a date as the options ask, in the route's locale", () => {
+  it("says a date as the options ask, in the reader's language", () => {
     const { result } = withSetup(() =>
       useEventDate({ weekday: "long", month: "long", day: "numeric" }),
     );
     expect(result("2026-10-14")).toBe("Wednesday, October 14");
-    setRoutePath("/es/events");
+    setLocale("es");
     expect(result("2026-10-14")).toBe("miércoles, 14 de octubre");
   });
 
@@ -225,8 +226,8 @@ describe("useEventStart", () => {
     expect(said(OPEN_HOUSE)).toBeUndefined();
   });
 
-  it("says the time as the route's locale writes it", () => {
-    setRoutePath("/es/events");
+  it("says the time as the reader's language writes it", () => {
+    setLocale("es");
     expect(said(DINNER)).toBe("17:30");
   });
 });
@@ -239,11 +240,6 @@ describe("useEventLink", () => {
     expect(linked({ title: "Men’s Breakfast & Bible Study", start: "x" })).toBe(
       "/events/mens-breakfast-bible-study",
     );
-  });
-
-  it("keeps the link in the route's locale", () => {
-    setRoutePath("/es/about-us");
-    expect(linked(WORSHIP)).toBe("/es/events/worship-service");
   });
 });
 
@@ -285,11 +281,11 @@ describe("useEventListing", () => {
     ]);
   });
 
-  it("writes the time and the link in the route's locale", () => {
-    setRoutePath("/es/events");
+  it("writes the time in the reader's language", () => {
+    setLocale("es");
     const { result } = withSetup(() => useEventListing([DINNER]));
     expect(result.value[0]!.time).toBe("17:30");
-    expect(result.value[0]!.to).toBe("/es/events/harvest-dinner");
+    expect(result.value[0]!.to).toBe("/events/harvest-dinner");
   });
 });
 
@@ -342,11 +338,11 @@ describe("useEventWeek", () => {
     expect(result.value).toEqual([]);
   });
 
-  it("writes the dates and the links in the route's locale", () => {
-    setRoutePath("/es/about-us");
+  it("writes the dates in the reader's language", () => {
+    setLocale("es");
     const { result } = withSetup(() => useEventWeek(DAYS));
     expect(result.value[0]!.label).toBe("dom, 4 oct");
-    expect(result.value[0]!.events[0]!.to).toBe("/es/events/worship-service");
+    expect(result.value[0]!.events[0]!.to).toBe("/events/worship-service");
   });
 });
 
@@ -525,14 +521,14 @@ describe("useEventCalendar", () => {
     expect(onSelect).toHaveBeenCalledWith("2026-10-05");
   });
 
-  it("writes the month, the days and the links in the route's locale", () => {
-    setRoutePath("/es/events");
+  it("writes the month, the days and the times in the reader's language", () => {
+    setLocale("es");
     const { period, weekdays, days } = setUp();
     expect(period.value).toBe("octubre de 2026");
     expect(weekdays.value[0]).toBe("dom");
     const dinner = days.value.find((day) => day.date === "2026-10-24")!;
     expect(dinner.events[0]!.time).toBe("17:30");
-    expect(dinner.events[0]!.to).toBe("/es/events/harvest-dinner");
+    expect(dinner.events[0]!.to).toBe("/events/harvest-dinner");
   });
 });
 
@@ -546,9 +542,10 @@ describe("useEvents", () => {
     expect(events.value).toEqual([WORSHIP]);
   });
 
-  it("reads them in the route's locale", async () => {
+  it("reads them in the reader's language", async () => {
     setContentPages({ "/events": EVENTS_PAGE });
-    setRoutePath("/es/connect");
+    setLocale("es");
+    setRoutePath("/connect");
     await useEvents();
     expect(requestedDocuments).toEqual(["es/events.json"]);
   });
@@ -694,7 +691,7 @@ describe("useEvent", () => {
     setContentPages({ "/events": EVENTS_PAGE });
     setRoutePath("/events/harvest-dinner");
     expect((await useEvent()).value).toEqual(DINNER);
-    setRoutePath("/es/events/prayer-meeting");
+    setRoutePath("/events/prayer-meeting");
     expect((await useEvent()).value).toEqual(PRAYER);
   });
 
@@ -744,8 +741,8 @@ describe("useSelectedDay", () => {
     expect(result.held.value).toEqual([]);
   });
 
-  it("says the day in the route's locale", () => {
-    setRoutePath("/es/events");
+  it("says the day in the reader's language", () => {
+    setLocale("es");
     const { result } = withSetup(() => useSelectedDay(EVENTS));
     expect(result.date.value).toBe("domingo, 4 de octubre");
   });

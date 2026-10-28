@@ -3,7 +3,6 @@ import { NuxtLink } from "#components";
 import { useNuxtApp } from "#imports";
 
 import SermonGrid from "~/components/SermonGrid.vue";
-import { useRouteLocale } from "~/composables/locale";
 import { useRecentSermons } from "~/composables/sermons";
 </script>
 
@@ -11,7 +10,6 @@ import { useRecentSermons } from "~/composables/sermons";
 defineOptions({ name: "HomeSermons" });
 
 const { $t } = useNuxtApp();
-const { localize } = useRouteLocale();
 
 // The three newest sermons close the page: the sermons page has the rest.
 const recent = await useRecentSermons();
@@ -21,7 +19,7 @@ const recent = await useRecentSermons();
   <section v-if="recent.length" class="home-sermons">
     <h2>{{ $t.sermons.recent() }}</h2>
     <SermonGrid :sermons="recent">
-      <NuxtLink :to="localize('/sermons')" class="cta">
+      <NuxtLink to="/sermons" class="cta">
         {{ $t.sermons.more() }}
       </NuxtLink>
     </SermonGrid>

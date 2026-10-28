@@ -3,7 +3,6 @@ import { mount } from "@vue/test-utils";
 
 import type { Hero } from "@bbf/schema/types";
 
-import { setRoutePath } from "#imports";
 import HomeHero from "~/components/HomeHero.vue";
 
 const HERO: Hero = {
@@ -25,11 +24,6 @@ describe("HomeHero", () => {
     const cta = hero.find("a.cta");
     expect(cta.text()).toBe("Learn more");
     expect(cta.attributes("href")).toBe("/about-us");
-  });
-
-  it("keeps the call's link in the visitor's locale", () => {
-    setRoutePath("/es");
-    expect(mountHero().find("a.cta").attributes("href")).toBe("/es/about-us");
   });
 
   it("leaves out the optional parts that are not set", () => {

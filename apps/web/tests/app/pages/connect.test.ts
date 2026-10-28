@@ -2,7 +2,7 @@ import type { Root } from "hast";
 
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { setContentPages, setRoutePath, useHead, useNuxtApp } from "#imports";
+import { setContentPages, setLocale, useHead, useNuxtApp } from "#imports";
 import MarkdownBody from "~/components/MarkdownBody.vue";
 import PageHeader from "~/components/PageHeader.vue";
 import StaffCard from "~/components/StaffCard.vue";
@@ -69,8 +69,8 @@ describe("connect page", () => {
     ).toEqual(STAFF);
   });
 
-  it("renders its own page after the staff, whatever locale the route is in", async () => {
-    setRoutePath("/es/connect");
+  it("renders its own page after the staff, whatever language is read", async () => {
+    setLocale("es");
     const { wrapper } = await mountPage();
     expect(
       wrapper

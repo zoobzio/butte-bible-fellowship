@@ -3,7 +3,7 @@ import { mount } from "@vue/test-utils";
 
 import type { ChurchEvent } from "@bbf/schema/types";
 
-import { setAppConfig, setRoutePath, useNuxtApp } from "#imports";
+import { setAppConfig, setLocale, useNuxtApp } from "#imports";
 import EventDetails from "~/components/EventDetails.vue";
 
 const CONTACT = {
@@ -90,8 +90,8 @@ describe("EventDetails", () => {
     ]);
   });
 
-  it("says when in the route's locale", () => {
-    setRoutePath("/es/events/worship-service");
+  it("says when in the reader's language", () => {
+    setLocale("es");
     const [when] = sections(WORSHIP);
     expect(when![1]!.text).toContain("domingo");
   });

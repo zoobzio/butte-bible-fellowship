@@ -32,20 +32,28 @@ const prosary = makeProsary(
 
 export const useNuxtApp = () => ({ $t: prosary.createResolver() });
 
-// useLocale: the service's one locale, as the module exposes it.
+// useLocale: the service's one locale, as the module exposes it. Every
+// locale's bundle is loaded up front, so a test switches language in one
+// step with setLocale, and the service switches as the module's does.
 type Locale = (typeof contract.locales)[number];
 
-const source = prosary.config.messages;
+const loaded = Object.fromEntries(
+  await Promise.all(
+    contract.locales.map(async (next) => [next, await bundles[next]()]),
+  ),
+) as Record<Locale, Awaited<ReturnType<(typeof bundles)[Locale]>>>;
+
+export const setLocale = (next: Locale) => prosary.apply(next, loaded[next]);
 
 export const useLocale = () => ({
   locale: computed(() => prosary.config.locale),
   locales: prosary.locales(),
   setLocale: async (next: Locale) => {
-    prosary.apply(next, await bundles[next]());
+    setLocale(next);
   },
 });
 
-export const clearLocale = () => prosary.apply(locale, source);
+export const clearLocale = () => setLocale(locale);
 
 // useRuntimeConfig: the public config the app reads.
 export const useRuntimeConfig = () => ({

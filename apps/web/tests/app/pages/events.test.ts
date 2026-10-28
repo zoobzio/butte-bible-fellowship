@@ -2,7 +2,7 @@ import type { Root } from "hast";
 
 import { describe, expect, it } from "vitest";
 
-import { setContentPages, setRoutePath, useHead } from "#imports";
+import { setContentPages, setLocale, useHead } from "#imports";
 import EventsBrowser from "~/components/EventsBrowser.vue";
 import Page from "~/pages/events/index.vue";
 import { document } from "#test/support/content";
@@ -46,8 +46,8 @@ describe("events page", () => {
     expect(wrapper.findComponent(EventsBrowser).props("events")).toEqual([]);
   });
 
-  it("titles the document after the page, whatever locale the route is in", async () => {
-    setRoutePath("/es/events");
+  it("titles the document after the page, whatever language is read", async () => {
+    setLocale("es");
     await mountPage();
     expect(useHead.mock.calls[0]![0]()).toEqual({
       title: "Events – Test Church",

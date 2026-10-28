@@ -6,6 +6,7 @@ import {
   requestedDocuments,
   setAppConfig,
   setContentPages,
+  setLocale,
   setRoutePath,
   useNuxtApp,
 } from "#imports";
@@ -99,8 +100,9 @@ describe("AppInvitation", () => {
     }
   });
 
-  it("reads the events in the visitor's locale", async () => {
-    await mountAt("/es/connect");
+  it("reads the events in the visitor's language", async () => {
+    setLocale("es");
+    await mountAt("/connect");
     expect(requestedDocuments).toEqual(["es/events.json"]);
   });
 

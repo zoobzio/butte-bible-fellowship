@@ -2,15 +2,15 @@ import { describe, expect, it } from "vitest";
 import { mount } from "@vue/test-utils";
 
 import { Menu } from "#components";
-import { setRoutePath, useNuxtApp } from "#imports";
+import { setLocale, useLocale, useNuxtApp } from "#imports";
 import LanguagePicker from "~/components/LanguagePicker.vue";
 
-const links = (wrapper: ReturnType<typeof mount>) =>
-  (
-    wrapper.findComponent(Menu).props("groups") as {
-      items: { label: string; link: { to: string } }[];
-    }[]
-  )[0]!.items.map(({ label, link }) => [label, link.to]);
+type Item = { label: string; locale: string };
+
+const menu = (wrapper: ReturnType<typeof mount>) => wrapper.findComponent(Menu);
+
+const items = (wrapper: ReturnType<typeof mount>) =>
+  (menu(wrapper).props("groups") as { items: Item[] }[])[0]!.items;
 
 describe("LanguagePicker", () => {
   it("opens from a labelled button naming the language being read", () => {
@@ -23,26 +23,25 @@ describe("LanguagePicker", () => {
     expect(trigger.text()).toBe("English");
   });
 
-  it("names the route's language on a translated page", () => {
-    setRoutePath("/es/about-us");
+  it("names the language being read, in that language", () => {
+    setLocale("es");
     expect(mount(LanguagePicker).find("button").text()).toBe("Español");
   });
 
-  it("links every language, by its own name, to the page being read", () => {
-    setRoutePath("/about-us");
-    expect(links(mount(LanguagePicker))).toEqual([
-      ["English", "/about-us"],
-      ["Español", "/es/about-us"],
-      ["Français", "/fr/about-us"],
+  it("offers every language by its own name, and none as a link", () => {
+    expect(items(mount(LanguagePicker))).toEqual([
+      { label: "English", locale: "en" },
+      { label: "Español", locale: "es" },
+      { label: "Français", locale: "fr" },
     ]);
   });
 
-  it("links back to the English page, and to each home page, without doubling the locale", () => {
-    setRoutePath("/fr");
-    expect(links(mount(LanguagePicker))).toEqual([
-      ["English", "/"],
-      ["Español", "/es"],
-      ["Français", "/fr"],
-    ]);
+  it("switches the site to the language chosen", async () => {
+    const wrapper = mount(LanguagePicker);
+    const [, spanish] = items(wrapper);
+    menu(wrapper).vm.$emit("select", spanish);
+    await wrapper.vm.$nextTick();
+    expect(useLocale().locale.value).toBe("es");
+    expect(wrapper.find("button").text()).toBe("Español");
   });
 });

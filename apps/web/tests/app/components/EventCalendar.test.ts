@@ -4,7 +4,7 @@ import { mount } from "@vue/test-utils";
 
 import type { ChurchEvent } from "@bbf/schema/types";
 
-import { setRoutePath, useNuxtApp } from "#imports";
+import { setLocale, useNuxtApp } from "#imports";
 import EventCalendar from "~/components/EventCalendar.vue";
 
 const EVENTS: ChurchEvent[] = [
@@ -187,13 +187,13 @@ describe("EventCalendar", () => {
     expect(wrapper.emitted("update:selected")).toEqual([["2026-10-05"]]);
   });
 
-  it("writes its dates and times, and links, in the route's locale", () => {
-    setRoutePath("/es/events");
+  it("writes its dates and times in the reader's language", () => {
+    setLocale("es");
     const wrapper = mountCalendar();
     expect(period(wrapper)).toBe("octubre de 2026");
     expect(wrapper.find(".event-calendar-weekdays li").text()).toBe("dom");
     expect(lines(wrapper, "2026-10-24")).toEqual([
-      { text: "17:30 Harvest Dinner", to: "/es/events/harvest-dinner" },
+      { text: "17:30 Harvest Dinner", to: "/events/harvest-dinner" },
     ]);
   });
 

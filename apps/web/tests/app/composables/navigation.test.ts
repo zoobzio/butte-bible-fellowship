@@ -50,26 +50,17 @@ describe("useNavigation", () => {
     expect(active()).toEqual([true, false, false]);
   });
 
-  it("keeps the links, and the way home, in the route's locale", () => {
-    setRoutePath("/es/visit/sunday");
-    const { home, links } = useNavigation();
-    expect(home.value).toBe("/es");
-    expect(links.value.map(({ to, active }) => [to, active])).toEqual([
-      ["/es", false],
-      ["/es/visit", true],
-      ["/es/contact", false],
-    ]);
+  it("leads home from the root", () => {
+    expect(useNavigation().home).toBe("/");
   });
 });
 
 describe("usePageBack", () => {
-  it("leads up to the page this one is under, in the route's locale", () => {
+  it("leads up to the page this one is under", () => {
     setRoutePath("/events/potluck");
     expect(usePageBack().up.value).toBe("/events");
-    setRoutePath("/es/events/potluck");
-    expect(usePageBack().up.value).toBe("/es/events");
-    setRoutePath("/es/events");
-    expect(usePageBack().up.value).toBe("/es");
+    setRoutePath("/events");
+    expect(usePageBack().up.value).toBe("/");
   });
 
   it("steps back to the page that brought the reader here", () => {

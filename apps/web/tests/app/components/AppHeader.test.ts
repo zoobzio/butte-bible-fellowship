@@ -59,8 +59,8 @@ describe("AppHeader", () => {
     ]);
   });
 
-  it("keeps a tab marked on the pages under its own, in any locale", () => {
-    setRoutePath("/es/visit/sunday");
+  it("keeps a tab marked on the pages under its own", () => {
+    setRoutePath("/visit/sunday");
     const links = mountHeader().findAll("a.site-nav-link");
     expect(links.map((link) => link.attributes("data-active"))).toEqual([
       undefined,

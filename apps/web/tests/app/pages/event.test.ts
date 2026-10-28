@@ -61,8 +61,8 @@ describe("event page", () => {
     });
   });
 
-  it("finds an event by its own slug, in any locale, with no page of its own", async () => {
-    const { wrapper } = await mountPage("/es/events/prayer-meeting");
+  it("finds an event by its own slug, with no page of its own", async () => {
+    const { wrapper } = await mountPage("/events/prayer-meeting");
     expect(wrapper.findComponent(EventArticle).props()).toEqual({
       event: PRAYER,
       page: null,

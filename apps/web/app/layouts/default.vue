@@ -2,19 +2,18 @@
 import { Body } from "#components";
 import { useHead, useLocale, useNuxtApp } from "#imports";
 
-import { useRouteLocale } from "~/composables/locale";
 import AppHeader from "~/components/AppHeader.vue";
 import AppFooter from "~/components/AppFooter.vue";
 import AppInvitation from "~/components/AppInvitation.vue";
 </script>
 
 <script setup lang="ts">
-const { locale: reading } = useRouteLocale();
 const { $t } = useNuxtApp();
 const { locale } = useLocale();
 
 // The defaults a page overrides with its own title. The language is set
-// here as well as by the prosary module, since Foundation's root sets "en".
+// here as well as by the prosary module, since the @zoobzio/nuxt layer's
+// root sets "en" over it.
 useHead(() => ({
   htmlAttrs: { lang: locale.value },
   title: $t.site.name(),
@@ -28,9 +27,9 @@ useHead(() => ({
     <main class="site-main">
       <slot />
     </main>
-    <!-- The bar reads the events in the locale it is set up in: a visitor
+    <!-- The bar reads the events in the language it is set up in: a visitor
          who changes language is handed a new one. -->
-    <AppInvitation :key="reading" />
+    <AppInvitation :key="locale" />
     <AppFooter />
   </Body>
 </template>

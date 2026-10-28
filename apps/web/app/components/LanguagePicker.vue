@@ -1,24 +1,26 @@
 <script lang="ts">
+import type { Locale } from "@bbf/prose";
+
 import { Icon, Menu } from "#components";
 import { defineMenu, useNuxtApp } from "#imports";
-import MenuLink from "~/components/MenuLink.vue";
 import { useLanguages } from "~/composables/locale";
 </script>
 
 <script setup lang="ts">
 const { $t } = useNuxtApp();
-const { current, languages } = useLanguages();
+const { current, languages, choose } = useLanguages();
 
-// Each language is a link to the page being read, in that language.
+// Each language is a choice: picking one switches the site to it in place.
 const menu = defineMenu(() => ({
   groups: [
     {
       key: "languages",
-      items: languages.value.map(({ label, to }) => ({ label, link: { to } })),
+      items: languages.value.map(({ label, locale }) => ({ label, locale })),
     },
   ],
   side: "top" as const,
   align: "end" as const,
+  onSelect: (item: { locale: Locale }) => choose(item.locale),
 }));
 </script>
 
@@ -32,9 +34,6 @@ const menu = defineMenu(() => ({
       <Icon name="languages" class="icon" />
       <span>{{ current }}</span>
     </button>
-    <template #item="{ item, settings }">
-      <MenuLink :item="item" :settings="settings" />
-    </template>
   </Menu>
 </template>
 

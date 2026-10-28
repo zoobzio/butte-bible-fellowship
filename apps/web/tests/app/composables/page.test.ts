@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
 
-import { requestedDocuments, setContentPages, setRoutePath } from "#imports";
+import {
+  requestedDocuments,
+  setContentPages,
+  setLocale,
+  setRoutePath,
+} from "#imports";
 import { usePage } from "~/composables/page";
 import { document, element } from "#test/support/content";
 
@@ -26,28 +31,24 @@ describe("usePage", () => {
 
   it("resolves the page a component names, whatever the route", async () => {
     setContentPages({ "/about-us": ABOUT });
-    setRoutePath("/es/acerca");
+    setRoutePath("/acerca");
     const { data } = await usePage("/about-us");
-    expect(requestedDocuments).toEqual(["es/about-us.json"]);
+    expect(requestedDocuments).toEqual(["en/about-us.json"]);
     expect(data.value).toEqual(PAGE);
   });
 
-  it("asks for the English page for a path with no locale", async () => {
-    setRoutePath("/about-us");
-    await usePage();
-    expect(requestedDocuments).toEqual(["en/about-us.json"]);
-  });
-
-  it("asks for the page in the locale the path leads with", async () => {
+  it("asks for the page in the language being read", async () => {
     setContentPages({ "/about-us": ABOUT });
-    setRoutePath("/es/about-us");
+    setLocale("es");
+    setRoutePath("/about-us");
     const { data } = await usePage();
     expect(requestedDocuments).toEqual(["es/about-us.json"]);
     expect(data.value).toEqual(PAGE);
   });
 
-  it("asks for a locale's home page", async () => {
-    setRoutePath("/fr");
+  it("asks for the home page as index", async () => {
+    setLocale("fr");
+    setRoutePath("/");
     await usePage();
     expect(requestedDocuments).toEqual(["fr/index.json"]);
   });

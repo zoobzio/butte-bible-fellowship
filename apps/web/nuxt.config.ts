@@ -2,12 +2,7 @@ import { defineNuxtConfig } from "nuxt/config";
 
 import { locale as source, locales } from "@bbf/prose";
 
-const targets = locales.filter((locale) => locale !== source);
-
-const localized = (locale: string, path: string) =>
-  path === "/" ? `/${locale}` : `/${locale}${path}`;
-
-const moved = { "/calendar": "/events" };
+const translated = locales.filter((locale) => locale !== source);
 
 export default defineNuxtConfig({
   compatibilityDate: "2026-08-19",
@@ -26,28 +21,16 @@ export default defineNuxtConfig({
     },
   },
 
-  hooks: {
-    "pages:extend": (pages) => {
-      const own = pages.filter((page) => page.file?.includes("/app/pages/"));
-      for (const locale of targets) {
-        for (const page of own) {
-          pages.push({
-            ...page,
-            name: `${page.name}___${locale}`,
-            path: localized(locale, page.path),
-          });
-        }
-      }
-    },
-  },
-
-  // A moved page, in every locale, sends its old address to its new one.
-  routeRules: Object.fromEntries(
-    Object.entries(moved).flatMap(([from, to]) =>
-      ["", ...targets.map((locale) => `/${locale}`)].map((prefix) => [
-        `${prefix}${from}`,
-        { redirect: { to: `${prefix}${to}`, statusCode: 301 } },
+  routeRules: {
+    // A moved page sends its old address to its new one.
+    "/calendar": { redirect: { to: "/events", statusCode: 301 } },
+    // The site once led a translated page's address with its locale. Those
+    // addresses lead to the page itself; the language is the visitor's own.
+    ...Object.fromEntries(
+      translated.flatMap((locale) => [
+        [`/${locale}`, { redirect: { to: "/", statusCode: 301 } }],
+        [`/${locale}/**`, { redirect: { to: "/**", statusCode: 301 } }],
       ]),
     ),
-  ),
+  },
 });

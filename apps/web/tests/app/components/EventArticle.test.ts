@@ -98,12 +98,12 @@ describe("EventArticle", () => {
   });
 
   it("offers the way back in its header", () => {
-    setRoutePath("/es/events/prayer-meeting");
+    setRoutePath("/events/prayer-meeting");
     const back = mountArticle(PRAYER).find(
       ".event > .page-header > a.page-header-back",
     );
     expect(back.text()).toBe($t.page.back());
-    expect(back.attributes("href")).toBe("/es/events");
+    expect(back.attributes("href")).toBe("/events");
   });
 
   it("renders what is written about the event under its picture", () => {

@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { setRoutePath, useNuxtApp } from "#imports";
+import { useNuxtApp } from "#imports";
 import HomeSermons from "~/components/HomeSermons.vue";
 import SermonGrid from "~/components/SermonGrid.vue";
 import { mountSuspended } from "@bbf/nuxt/testing/mount";
@@ -16,13 +16,12 @@ const SERMONS = ["abc123", "def456", "ghi789", "jkl012"].map(sermon);
 
 const { $t } = useNuxtApp();
 
-/** Has the site's API list these sermons, and mounts the section at a path. */
-const mountSermons = async (sermons = SERMONS, path = "/") => {
+/** Has the site's API list these sermons, and mounts the section. */
+const mountSermons = async (sermons = SERMONS) => {
   vi.stubGlobal(
     "$fetch",
     vi.fn(async () => sermons),
   );
-  setRoutePath(path);
   const { wrapper } = await mountSuspended(HomeSermons);
   return wrapper;
 };
@@ -42,12 +41,10 @@ describe("HomeSermons", () => {
     );
   });
 
-  it("links on to the sermons page, in the visitor's locale, in place of the channel", async () => {
-    const wrapper = await mountSermons(SERMONS, "/es");
+  it("links on to the sermons page in place of the channel", async () => {
+    const wrapper = await mountSermons();
     const links = wrapper.findAll(".home-sermons a.cta");
-    expect(links.map((link) => link.attributes("href"))).toEqual([
-      "/es/sermons",
-    ]);
+    expect(links.map((link) => link.attributes("href"))).toEqual(["/sermons"]);
     expect(links[0]!.text()).toBe($t.sermons.more());
   });
 

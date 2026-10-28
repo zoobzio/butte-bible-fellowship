@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { nextTick } from "vue";
 import { mount } from "@vue/test-utils";
 
-import { setRoutePath } from "#imports";
+import { setLocale, setRoutePath } from "#imports";
 import Layout from "~/layouts/default.vue";
 
 const mountLayout = async ({ path = "/" } = {}) => {
@@ -54,7 +54,7 @@ describe("default layout", () => {
     await nextTick();
     expect(invitation()).toBe(before);
 
-    setRoutePath("/es/connect");
+    setLocale("es");
     await nextTick();
     expect(invitation()).not.toBe(before);
   });

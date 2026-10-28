@@ -5,8 +5,7 @@ import type { PageItem } from "~/types/page";
 import { page as schema } from "@bbf/schema";
 import { CONTENT_URL } from "@prosary/nuxt/constant";
 
-import { useAsyncData, useRequestFetch, useRoute } from "#imports";
-import { splitLocalePath } from "~/utils/locale";
+import { useAsyncData, useLocale, useRequestFetch, useRoute } from "#imports";
 
 /** The file a page is built to, by the page's path: `/` is `index.json`. */
 const fileOf = (path: string) =>
@@ -19,32 +18,34 @@ const isNotFound = (error: unknown) =>
   (error as { status?: unknown }).status === 404;
 
 /**
- * A page, in the locale the route names. `@bbf/prose` builds every page for
- * every locale as the tree it renders to, its front matter on the root, and
- * the prosary module serves them all; the route's locale picks which, and a
- * page's path is the same in all of them. A page component asks for its own
- * page by `path`; left out, the page is the one the route names. A path
- * with no page is `null`.
+ * A page, in the reader's language. `@bbf/prose` builds every page for every
+ * locale as the tree it renders to, its front matter on the root, and the
+ * prosary module serves them all; the active locale picks which, and a
+ * page's path is the same in all of them, so a change of language fetches
+ * the page again in the new one. A page component asks for its own page by
+ * `path`; left out, the page is the one the route names. A path with no
+ * page is `null`.
  */
 export const usePage = (page?: string) => {
-  const route = splitLocalePath(useRoute().path);
-  const { locale } = route;
-  const path = page ?? route.path;
+  const { locale } = useLocale();
+  const path = page ?? useRoute().path;
   const request = useRequestFetch();
 
   return useAsyncData(
-    `page:${locale}:${path}`,
+    `page:${path}`,
     async (): Promise<PageItem | null> => {
       let body: Root;
       try {
-        body = await request<Root>(`${CONTENT_URL}/${locale}/${fileOf(path)}`, {
-          responseType: "json",
-        });
+        body = await request<Root>(
+          `${CONTENT_URL}/${locale.value}/${fileOf(path)}`,
+          { responseType: "json" },
+        );
       } catch (error) {
         if (isNotFound(error)) return null;
         throw error;
       }
       return { ...schema.parse(body.data?.matter ?? {}), body };
     },
+    { watch: [locale] },
   );
 };

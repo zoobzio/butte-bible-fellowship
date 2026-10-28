@@ -3,7 +3,7 @@ import { mount } from "@vue/test-utils";
 
 import type { ChurchEvent } from "@bbf/schema/types";
 
-import { setRoutePath, useNuxtApp } from "#imports";
+import { setLocale, useNuxtApp } from "#imports";
 import EventList from "~/components/EventList.vue";
 
 const mountList = (events: ChurchEvent[]) =>
@@ -45,17 +45,16 @@ describe("EventList", () => {
     expect(item.find("h3 + p.event-list-time").exists()).toBe(true);
   });
 
-  it("links each title to the event's page, in the route's locale", () => {
+  it("links each title to the event's page, by its slug or its title", () => {
     const event = { title: "Men’s Breakfast & Bible Study", start: "07:00" };
     expect(mountList([event]).find("h3 > a").attributes("href")).toBe(
       "/events/mens-breakfast-bible-study",
     );
-    setRoutePath("/es/events");
     expect(
       mountList([{ ...event, slug: "mens-breakfast" }])
         .find("h3 > a")
         .attributes("href"),
-    ).toBe("/es/events/mens-breakfast");
+    ).toBe("/events/mens-breakfast");
   });
 
   it("says so when there are no events, in the same card", () => {
@@ -66,8 +65,8 @@ describe("EventList", () => {
     );
   });
 
-  it("writes the time in the route's locale", () => {
-    setRoutePath("/es/events");
+  it("writes the time in the reader's language", () => {
+    setLocale("es");
     expect(listed([{ title: "Cena", start: "17:30" }])).toEqual([
       ["Cena", "17:30"],
     ]);

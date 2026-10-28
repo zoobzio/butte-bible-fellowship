@@ -4,14 +4,12 @@ import { useNuxtApp } from "#imports";
 
 import EventWeek from "~/components/EventWeek.vue";
 import { useEvents, useEventsThisWeek } from "~/composables/events";
-import { useRouteLocale } from "~/composables/locale";
 </script>
 
 <script setup lang="ts">
 defineOptions({ name: "HomeWeek" });
 
 const { $t } = useNuxtApp();
-const { localize } = useRouteLocale();
 
 // This week's events, day by day, and the way on to every event.
 const events = await useEvents();
@@ -22,7 +20,7 @@ const days = useEventsThisWeek(events);
   <section class="home-week">
     <h2>{{ $t.events.thisWeek() }}</h2>
     <EventWeek :days="days" />
-    <NuxtLink :to="localize('/events')" class="cta">
+    <NuxtLink to="/events" class="cta">
       {{ $t.events.all() }}
     </NuxtLink>
   </section>

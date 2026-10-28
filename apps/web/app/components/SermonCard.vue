@@ -2,9 +2,8 @@
 import type { Sermon } from "@bbf/schema/types";
 
 import { Icon } from "#components";
-import { computed, ref, useNuxtApp } from "#imports";
+import { computed, ref, useLocale, useNuxtApp } from "#imports";
 
-import { useRouteLocale } from "~/composables/locale";
 import { useSermonImage } from "~/composables/sermons";
 
 /** The frame's permissions: what YouTube's own embed code asks for. */
@@ -23,7 +22,7 @@ const { sermon, featured = false } = defineProps<{
 }>();
 
 const { $t } = useNuxtApp();
-const { locale } = useRouteLocale();
+const { locale } = useLocale();
 const image = useSermonImage();
 
 // The player is only loaded once the visitor asks for it: until then the

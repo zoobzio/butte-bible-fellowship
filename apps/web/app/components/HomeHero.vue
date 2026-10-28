@@ -2,8 +2,6 @@
 import type { Hero } from "@bbf/schema/types";
 
 import { NuxtLink } from "#components";
-
-import { useRouteLocale } from "~/composables/locale";
 </script>
 
 <script setup lang="ts">
@@ -11,8 +9,6 @@ defineOptions({ name: "HomeHero" });
 
 // The home page's front matter: what it opens with.
 const { hero } = defineProps<{ hero: Hero }>();
-
-const { localize } = useRouteLocale();
 </script>
 
 <template>
@@ -24,7 +20,7 @@ const { localize } = useRouteLocale();
           <em v-if="hero.highlight">{{ hero.highlight }}</em>
         </h1>
         <p v-if="hero.description">{{ hero.description }}</p>
-        <NuxtLink v-if="hero.cta" :to="localize(hero.cta.to)" class="cta">
+        <NuxtLink v-if="hero.cta" :to="hero.cta.to" class="cta">
           {{ hero.cta.label }}
         </NuxtLink>
       </div>

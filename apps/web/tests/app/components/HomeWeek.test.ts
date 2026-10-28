@@ -72,11 +72,11 @@ describe("HomeWeek", () => {
     ]);
   });
 
-  it("links on to every event, in the visitor's locale, under the week", async () => {
-    const wrapper = await mountWeek("/es");
+  it("links on to every event under the week", async () => {
+    const wrapper = await mountWeek();
     const link = wrapper.find(".home-week .event-week + a.cta");
     expect(link.text()).toBe($t.events.all());
-    expect(link.attributes("href")).toBe("/es/events");
+    expect(link.attributes("href")).toBe("/events");
   });
 
   it("has an empty week when the events cannot be read", async () => {

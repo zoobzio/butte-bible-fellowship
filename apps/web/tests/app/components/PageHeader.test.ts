@@ -52,13 +52,13 @@ describe("PageHeader", () => {
     expect(back.element.nextElementSibling).toBe(wrapper.find("h1").element);
   });
 
-  it("addresses the way back to the page this one is under, in the route's locale", () => {
-    setRoutePath("/es/events/potluck");
+  it("addresses the way back to the page this one is under", () => {
+    setRoutePath("/events/potluck");
     const wrapper = mount(PageHeader, {
-      props: { title: "Potluck", back: "Volver" },
+      props: { title: "Potluck", back: "Back" },
     });
     expect(wrapper.find(".page-header-back").attributes("href")).toBe(
-      "/es/events",
+      "/events",
     );
   });
 

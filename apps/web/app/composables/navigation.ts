@@ -8,31 +8,31 @@ import {
   onMounted,
   useAppConfig,
   useNuxtApp,
+  useRoute,
   useRouter,
 } from "#imports";
-import { useRouteLocale } from "~/composables/locale";
 import { isWithin, parentPath } from "~/utils/navigation";
 
 /**
- * The site's navigation, in the route's locale: the way home, and the
- * configured links in their order, each in the reader's words and marked
- * when the page being read is its own or one under it.
+ * The site's navigation: the way home, and the configured links in their
+ * order, each in the reader's words and marked when the page being read is
+ * its own or one under it.
  */
 export const useNavigation = (): {
-  home: ComputedRef<string>;
+  home: string;
   links: ComputedRef<NavigationItem[]>;
 } => {
   const { header } = useAppConfig();
   const { $t } = useNuxtApp();
-  const { path, localize } = useRouteLocale();
+  const route = useRoute();
 
-  const home = computed(() => localize("/"));
+  const home = "/";
 
   const links = computed(() =>
     header.links.map((link) => ({
       label: $t(link.label),
-      to: localize(link.to),
-      active: isWithin(path.value, link.to),
+      to: link.to,
+      active: isWithin(route.path, link.to),
     })),
   );
 
@@ -40,17 +40,16 @@ export const useNavigation = (): {
 };
 
 /**
- * The way back from a page: `up` is the page this one is under, in the
- * route's locale — where a link leads when no page of the site brought the
- * reader here. `leave` steps back to the page that did, as the browser's
- * own button would, so that page is found as it was left; with none, it
- * goes up.
+ * The way back from a page: `up` is the page this one is under — where a
+ * link leads when no page of the site brought the reader here. `leave`
+ * steps back to the page that did, as the browser's own button would, so
+ * that page is found as it was left; with none, it goes up.
  */
 export const usePageBack = () => {
   const router = useRouter();
-  const { path, localize } = useRouteLocale();
+  const route = useRoute();
 
-  const up = computed(() => localize(parentPath(path.value)));
+  const up = computed(() => parentPath(route.path));
 
   const leave = () => {
     if (router.options.history.state.back) {
