@@ -9,11 +9,14 @@ import type {
   TableFetchResult,
 } from "~/types/listing";
 
+import { TIME_ZONE } from "#layers/bbf/shared/constants/time";
+
 export const toTableDescriptors = <T>(
   config: TableConfig<T>,
   name: (message: AppProsaryMessage) => string,
 ): TableDescriptors<T> => ({
   ...config,
+  timeZone: TIME_ZONE,
   columns: config.columns.map((column) => ({
     ...column,
     label: name(column.label),

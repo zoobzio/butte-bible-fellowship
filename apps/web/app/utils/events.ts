@@ -3,7 +3,7 @@ import type { CalendarDay } from "~/types/events";
 import type { ChurchEvent, EventDay } from "@bbf/schema/types";
 
 import { EVENT_DAYS } from "@bbf/schema";
-import { EVENT_TIME_ZONE } from "~/constants/events";
+import { TIME_ZONE } from "#layers/bbf/shared/constants/time";
 
 // Dates are calendar days. Do date arithmetic in UTC to prevent DST shifts.
 
@@ -15,7 +15,7 @@ const toISO = (date: Date) => date.toISOString().slice(0, 10);
 
 export const churchDate = (now: Date): string => {
   const parts = new Intl.DateTimeFormat("en-US", {
-    timeZone: EVENT_TIME_ZONE,
+    timeZone: TIME_ZONE,
     year: "numeric",
     month: "2-digit",
     day: "2-digit",

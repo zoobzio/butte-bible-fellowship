@@ -1,6 +1,29 @@
 import { describe, expect, it } from "vitest";
 
-import { toFetchResult, toListingQuery } from "~/utils/listing";
+import { TIME_ZONE } from "#layers/bbf/shared/constants/time";
+import {
+  toFetchResult,
+  toListingQuery,
+  toTableDescriptors,
+} from "~/utils/listing";
+
+describe("toTableDescriptors", () => {
+  it("names each column and formats every table in the church's time zone", () => {
+    expect(
+      toTableDescriptors<{ id: number; name: string }>(
+        {
+          rowKey: "id",
+          columns: [{ key: "name", label: "admin.member.name" }],
+        },
+        (message) => `named:${message}`,
+      ),
+    ).toEqual({
+      rowKey: "id",
+      timeZone: TIME_ZONE,
+      columns: [{ key: "name", label: "named:admin.member.name" }],
+    });
+  });
+});
 
 describe("toListingQuery", () => {
   it("asks for the page and size the table is on", () => {
