@@ -571,18 +571,21 @@ importers:
       '@bbf/database':
         specifier: workspace:*
         version: link:../database
-      '@bbf/prose':
-        specifier: workspace:*
-        version: link:../prose
       '@bbf/schema':
         specifier: workspace:*
         version: link:../schema
+      '@prosary/parse':
+        specifier: 'catalog:'
+        version: 0.0.7
       bezoar:
         specifier: 'catalog:'
         version: 0.0.5
       objectively:
         specifier: 'catalog:'
         version: 0.3.0
+      rehype-slug:
+        specifier: 'catalog:'
+        version: 6.0.0
     devDependencies:
       '@bbf/toolbox':
         specifier: workspace:*

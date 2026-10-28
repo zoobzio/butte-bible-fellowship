@@ -11,8 +11,7 @@
     "./bundles": {
       "types": "./.output/bundles.d.mts",
       "import": "./.output/bundles.mjs"
-    },
-    "./parse": "./src/parse.ts"
+    }
   },
   "scripts": {
     "build": "prosary build",

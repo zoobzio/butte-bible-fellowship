@@ -14,7 +14,6 @@ prosary.config.ts  the kit config: the locales, the sources, the presets, the mo
 src/messages/      the site's interface messages, in English, one file per group
 src/messages/admin/  the admin's, the same way, under `admin`
 src/content/       the pages, in English, as Markdown
-src/parse.ts       the pipeline the pages are built with, for Markdown the API serves
 .cache/            the translation cache: each locale's translations (committed)
 .env               the model's API key, which `pnpm translate` loads (yours, not committed)
 .output/           the kit's output, every locale's (generated, not committed)
@@ -82,7 +81,10 @@ The build runs each page through `@prosary/parse` with the presets
   links to.
 
 Every page is built in the form the app renders, an HTML tree as JSON, to
-`.output/content/<locale>/<page>.json`.
+`.output/content/<locale>/<page>.json`. The Markdown the API serves, an
+event's or a sermon's body, is built the same way by `@bbf/utils`, through
+`@prosary/parse` with the same presets less `matter()`, so it renders as a
+page does; a preset added here belongs there too.
 
 ## Locales
 
@@ -126,12 +128,6 @@ quoted — the translations of the connect page's `bio` lines are.
   `Directive` and `Arguments` types. Carries no message text.
 - `@bbf/prose/bundles`: a lazy loader per locale, each resolving to that
   locale's compiled messages.
-- `@bbf/prose/parse`: `parse`, Markdown to the HTML tree, through the
-  presets `prosary.config.ts` lists — the pipeline the pages are built with,
-  for the Markdown the API serves. A bio or an event's body, stored as
-  Markdown, is read here and shaped for the wire by `@bbf/utils`, so it
-  renders as a page does. It imports the config, `@prosary/parse` and
-  `rehype-slug`, and nothing heavier: no kit, no model, no key.
 
 The pages have no export: the app's prosary module serves them from this
 package's build, as `/_prosary/content/<locale>/<page>.json`.

@@ -17,10 +17,11 @@
   },
   "dependencies": {
     "@bbf/database": "workspace:*",
-    "@bbf/prose": "workspace:*",
     "@bbf/schema": "workspace:*",
+    "@prosary/parse": "catalog:",
     "bezoar": "catalog:",
-    "objectively": "catalog:"
+    "objectively": "catalog:",
+    "rehype-slug": "catalog:"
   },
   "devDependencies": {
     "@bbf/toolbox": "workspace:*",

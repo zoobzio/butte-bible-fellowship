@@ -63,14 +63,17 @@ row's `id`, `position`, `status` and timestamps.
 
 A column that holds Markdown — a bio, an event's body — reaches the wire
 as the HTML tree the app renders, not as the string. `toHast` reads it
-through `@bbf/prose/parse`, the pipeline the pages are built with, and
-builds the schema's `hast` from the parser's tree node by node: an element's
+through `@prosary/parse` with the presets the pages are built with, `gfm()`,
+`mdc()` and `rehype-slug` as `@bbf/prose`'s `prosary.config.ts` lists them,
+less `matter()`, since a column carries no front matter; and builds the
+schema's `hast` from the parser's tree node by node: an element's
 tag, its attributes and what it holds, or a run of text. The position the
 parser kept is not built, nor is an attribute left `undefined`, nor a node
 Markdown never makes. Nothing is cast: the parser's shape goes in, the
-wire's comes out, as with any row. `toStaffMember` runs a member's `bio`
-through it, `toChurchEvent` an event's `body` and `toSermon` a sermon's;
-the body a request carries, and the column, stay Markdown.
+wire's comes out, as with any row. `toChurchEvent` runs an event's `body`
+through it and `toSermon` a sermon's; the body a request carries, and the
+column, stay Markdown. A member's `bio` is stored as the tree already, and
+`toStaffMember` checks it against the schema's `hast` as it reads it.
 
 `toEventArguments`, `toStaffArguments` and `toSermonArguments` build what
 `create` takes; an `update` takes the same and the `id` of the row it
@@ -89,8 +92,8 @@ either side fails `pnpm typecheck` here, before it reaches an app.
 
 The package exports its sources, as `@bbf/schema` does: there is nothing
 to build. `@bbf/database` and `bezoar` are imported for their types alone,
-and `@bbf/schema` for its types; what runs is `@bbf/prose/parse`, the
-Markdown pipeline, and `objectively`, the typed object helpers that keep
+and `@bbf/schema` for its types; what runs is `@prosary/parse` and
+`rehype-slug`, the Markdown pipeline, and `objectively`, the typed object helpers that keep
 the transforms free of casts.
 
 ```ts

@@ -1,10 +1,18 @@
 import type { Hast, HastElement } from "@bbf/schema/types";
 import type { Properties, RootContent } from "hast";
 
-import { parse } from "@bbf/prose/parse";
+import { definePipeline } from "@prosary/parse";
+import { gfm, mdc } from "@prosary/parse/plugins";
 import { reduce } from "objectively";
+import rehypeSlug from "rehype-slug";
 
 type HastContent = Hast["children"][number];
+
+// The presets the pages are built with, less the front matter a column
+// never carries: see `content.presets` in @bbf/prose's prosary.config.ts.
+const pipeline = definePipeline({
+  presets: [gfm(), mdc(), { rehype: [rehypeSlug] }],
+});
 
 const toProperties = (properties: Properties): HastElement["properties"] => {
   const none: HastElement["properties"] = {};
@@ -36,5 +44,5 @@ const toContent = (node: RootContent): HastContent[] => {
 
 export const toHast = (markdown: string): Hast => ({
   type: "root",
-  children: parse(markdown).children.flatMap(toContent),
+  children: pipeline.build(markdown).children.flatMap(toContent),
 });
