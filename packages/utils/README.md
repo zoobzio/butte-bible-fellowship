@@ -10,9 +10,11 @@ A transform is a pure function, typed against both packages. `dto/` takes a
 row and builds the model the API answers with: `toChurchEvent`,
 `toStaffMember`, `toSermon`. `dao/` takes an input a request carries and
 builds the arguments a query takes: `toEventArguments`,
-`toStaffArguments`, `toSermonArguments`. Nothing here touches a
-connection, a request or the runtime: an app's composable runs the query
-and hands the row or the body here.
+`toStaffArguments`, `toSermonArguments`. `vm/` takes a record the API
+answered with and builds what a form holds, and back: `toStaffForm`,
+`toStaffBody`. Nothing here touches a connection, a request or the
+runtime: an app's composable runs the query and hands the row or the body
+here, and a form hands its payload.
 
 ## Layout
 
@@ -26,17 +28,24 @@ src/dao/        an input into the arguments a query takes, one file per kind
   event.ts      toEventArguments: an EventBody into what admin.events.create takes
   staff.ts      toStaffArguments: a StaffBody into what admin.staff.create takes
   sermon.ts     toSermonArguments: a SermonBody into what admin.sermons.create takes
-src/types.ts    the rows and the arguments the transforms speak, from the contract
+src/vm/         a record into what a form holds, and a form's payload into a body
+  hast.ts       toHtml: a Hast into the HTML an editor holds; fromHtml: back
+  staff.ts      toStaffForm: a StaffRecord into a StaffForm; toStaffBody: a StaffForm into a StaffBody
+src/hast.ts     toContent: any hast tree into the schema's shape, for dto/ and vm/
+src/types.ts    the rows and the arguments the transforms speak, from the contract, and the forms
 src/index.ts    every transform
 tests/dto/      what each model is built as, from each shape of row
 tests/dao/      what each argument is written as, from each body
+tests/vm/       what a form holds from a record, and what a body is written as from a form
 tests/types.ts  the rows each transform takes and the queries its output fits
 tests/database.test.ts  the round trip, through a Postgres in memory
 ```
 
 A kind of thing has a file of its name under each direction, as it has
 under the schema's `models/` and `input/`. A transform is `to<What>`, named
-for what it builds. A new one is a function in the file of its kind, or a
+for what it builds; where two build the same thing from different sources,
+as `toHast` and `fromHtml` both build a tree, the second is named for what
+it takes. A new one is a function in the file of its kind, or a
 new file exported from that directory's `index.ts`, and the row or
 arguments type it speaks goes in `types.ts`.
 
@@ -75,6 +84,16 @@ through it and `toSermon` a sermon's; the body a request carries, and the
 column, stay Markdown. A member's `bio` is stored as the tree already, and
 `toStaffMember` checks it against the schema's `hast` as it reads it.
 
+A form holds a bio as HTML, the form an editor speaks, so `toStaffForm`
+writes the record's tree through `hast-util-to-html` and `toStaffBody`
+reads the form's string back through `hast-util-from-html`, as a fragment,
+and builds the schema's `hast` from it node by node, through the same
+`toContent` the Markdown pipeline's tree goes through: no position, no
+attribute left `undefined`, no comment or doctype. What a form leaves
+blank, a body leaves out, as a column's null is; what is written is
+trimmed. A form carries no `id` and no timestamps: those are the record's,
+and the route's.
+
 `toEventArguments`, `toStaffArguments` and `toSermonArguments` build what
 `create` takes; an `update` takes the same and the `id` of the row it
 replaces, so it is spread with one. `tests/types.ts` proves both fit, and that a row from
@@ -83,18 +102,22 @@ either side fails `pnpm typecheck` here, before it reaches an app.
 
 ## Exports
 
-- `@bbf/utils`: every transform. `@bbf/utils/dto` and `@bbf/utils/dao`
-  reach one direction, and `@bbf/utils/dto/event` and the like one file.
+- `@bbf/utils`: every transform. `@bbf/utils/dto`, `@bbf/utils/dao` and
+  `@bbf/utils/vm` reach one direction, and `@bbf/utils/dto/event` and the
+  like one file.
 - `@bbf/utils/types`: `EventRow`, `StaffRow`, `SermonRow`, the rows the
   `dto/` transforms take, and `EventArguments`, `StaffArguments`,
   `SermonArguments`, what the `dao/` transforms build, each derived from
-  the database's contract through `bezoar`.
+  the database's contract through `bezoar`; and `StaffForm`, what the
+  `vm/` transforms speak, derived from the schema's `StaffBody` with the
+  bio as a string.
 
 The package exports its sources, as `@bbf/schema` does: there is nothing
 to build. `@bbf/database` and `bezoar` are imported for their types alone,
 and `@bbf/schema` for its types; what runs is `@prosary/parse` and
-`rehype-slug`, the Markdown pipeline, and `objectively`, the typed object helpers that keep
-the transforms free of casts.
+`rehype-slug`, the Markdown pipeline, `hast-util-to-html` and
+`hast-util-from-html`, the two sides of HTML, and `objectively`, the typed
+object helpers that keep the transforms free of casts.
 
 ```ts
 // server/composables/events.ts
@@ -115,8 +138,9 @@ export const useEvents = (event: H3Event) => {
 ## Scripts
 
 - `pnpm test`: checks what each transform builds from each shape it takes,
-  and runs the round trip — a body written through `dao/` read back
-  through `dto/` — over a PGlite in memory with the migrations applied and
-  the seeds run, through `@bezoar/testing`.
+  the round trip through a form, and runs the round trip through the
+  database — a body written through `dao/` read back through `dto/` — over
+  a PGlite in memory with the migrations applied and the seeds run, through
+  `@bezoar/testing`.
 - `pnpm typecheck`: checks the transforms and the tests against
   `@bbf/database`'s build and `@bbf/schema`'s types.

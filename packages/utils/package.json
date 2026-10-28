@@ -8,6 +8,7 @@
     "./types": "./src/types.ts",
     "./dto": "./src/dto/index.ts",
     "./dao": "./src/dao/index.ts",
+    "./vm": "./src/vm/index.ts",
     "./*": "./src/*.ts",
     "./package.json": "./package.json"
   },
@@ -20,6 +21,8 @@
     "@bbf/schema": "workspace:*",
     "@prosary/parse": "catalog:",
     "bezoar": "catalog:",
+    "hast-util-from-html": "catalog:",
+    "hast-util-to-html": "catalog:",
     "objectively": "catalog:",
     "rehype-slug": "catalog:"
   },

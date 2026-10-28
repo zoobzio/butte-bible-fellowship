@@ -1,4 +1,5 @@
 import type { Contract } from "@bbf/database";
+import type { StaffBody, StaffRecord } from "@bbf/schema/types";
 import type { Arguments, Row } from "bezoar";
 
 import type {
@@ -13,6 +14,7 @@ import {
   toStaffMember,
   toStaffRecord,
 } from "../src/dto";
+import { toStaffBody, toStaffForm } from "../src/vm";
 
 declare const listed: Row<Contract, "web.events.list">;
 declare const weekly: Row<Contract, "web.events.weekly">;
@@ -73,3 +75,10 @@ export const updateSermon: Arguments<Contract, "admin.sermons.update"> = {
 // @ts-expect-error Update needs an id.
 export const updateNothing: Arguments<Contract, "admin.events.update"> =
   eventArguments;
+
+declare const staffRecord: StaffRecord;
+export const staffForm = toStaffForm(staffRecord);
+export const staffBody: StaffBody = toStaffBody(staffForm);
+
+// @ts-expect-error A form holds the bio as HTML, not a tree.
+export const noTree = toStaffBody({ ...staffForm, bio: staffRecord.bio });

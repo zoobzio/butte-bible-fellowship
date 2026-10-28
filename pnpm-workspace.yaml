@@ -34,6 +34,8 @@ catalog:
   bezoar: "0.0.5"
   h3: "^1.15.11"
   happy-dom: "^20.11.6"
+  hast-util-from-html: "^2.0.3"
+  hast-util-to-html: "^9.0.5"
   icon-sheets: "0.0.7"
   letters-patent: "0.0.4"
   nitropack: "^2.13.4"

@@ -96,6 +96,12 @@ catalogs:
     happy-dom:
       specifier: ^20.11.6
       version: 20.11.6
+    hast-util-from-html:
+      specifier: ^2.0.3
+      version: 2.0.3
+    hast-util-to-html:
+      specifier: ^9.0.5
+      version: 9.0.5
     icon-sheets:
       specifier: 0.0.7
       version: 0.0.7
@@ -580,6 +586,12 @@ importers:
       bezoar:
         specifier: 'catalog:'
         version: 0.0.5
+      hast-util-from-html:
+        specifier: 'catalog:'
+        version: 2.0.3
+      hast-util-to-html:
+        specifier: 'catalog:'
+        version: 9.0.5
       objectively:
         specifier: 'catalog:'
         version: 0.3.0
