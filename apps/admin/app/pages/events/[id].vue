@@ -9,7 +9,6 @@ import { useEventRecord } from "~/composables/events";
 <script setup lang="ts">
 definePageMeta({ middleware: "auth", auth: { scopes: ["events:read"] } });
 
-// The event is the one the address names, by id.
 const { $t } = useNuxtApp();
 const { data: record } = await useEventRecord();
 

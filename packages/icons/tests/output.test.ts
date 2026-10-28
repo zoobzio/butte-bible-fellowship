@@ -18,12 +18,10 @@ const read = (file: string) => readFileSync(`${root}${file}`, "utf8");
 
 const expectedAliases = Object.keys(config.icons).sort();
 
-/** A `./file.svg` ref names a local SVG rather than an Iconify icon. */
 const isLocal = (alias: string) => config.icons[alias]!.startsWith("./");
 const iconifyAliases = expectedAliases.filter((alias) => !isLocal(alias));
 const localAliases = expectedAliases.filter(isLocal);
 
-/** The local SVG behind an alias: its geometry and the paths it draws. */
 const local = (alias: string) => {
   const svg = read(config.icons[alias]!.slice(2));
   const [, viewBox] = /viewBox="([^"]+)"/.exec(svg)!;
@@ -31,7 +29,6 @@ const local = (alias: string) => {
   return { viewBox: viewBox!, paths };
 };
 
-/** What each alias should resolve to, read from its Iconify collection. */
 const source = (alias: string) => {
   const [collection, name] = config.icons[alias]!.split(":") as [
     string,
@@ -62,7 +59,6 @@ const expectedSymbols: Symbol[] = iconifyAliases.map((alias) => {
   return { id: alias, viewBox: `0 0 ${width} ${height}`, body };
 });
 
-/** A local symbol keeps the file's viewBox, its paths and `currentColor`. */
 const expectLocalSymbol = (symbol: Symbol | undefined, alias: string) => {
   const { viewBox, paths } = local(alias);
   expect(symbol, alias).toBeDefined();

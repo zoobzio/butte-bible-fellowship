@@ -3,7 +3,6 @@ import { describe, expect, it } from "vitest";
 
 import { toStaffMember, toStaffRecord } from "../../src/dto/staff";
 
-/** A row as `web.staff.list` returns it. */
 const ROW = {
   slug: "jane-doe",
   name: "Jane Doe",
@@ -80,7 +79,6 @@ describe("toStaffMember", () => {
   });
 });
 
-/** A row as `admin.staff.fetch` returns it: every column, the timestamps as dates. */
 const ADMIN_ROW = {
   ...ROW,
   id: 7,

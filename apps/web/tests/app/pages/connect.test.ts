@@ -25,7 +25,6 @@ const CONNECT = document(
   element("p", {}, "Visit us."),
 );
 
-// The staff come from the site's API, which the page fetches.
 const fetchStaff = vi.fn(async () => STAFF);
 
 beforeEach(() => {

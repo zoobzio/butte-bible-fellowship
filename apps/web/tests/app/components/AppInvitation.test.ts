@@ -37,7 +37,6 @@ const PRAYER = {
   day: "thursday",
   start: "10:00",
 };
-// Held once, on a Sunday.
 const DINNER = {
   title: "Harvest Dinner",
   slug: "harvest-dinner",

@@ -30,7 +30,6 @@ const EVENTS_PAGE = document({
   events: [WORSHIP, PRAYER, DINNER],
 });
 
-// What is written about the worship service: the other events have no page.
 const WORSHIP_PAGE = document(
   { title: "Worship Service – Test Church" },
   element("p", {}, "We gather to worship."),

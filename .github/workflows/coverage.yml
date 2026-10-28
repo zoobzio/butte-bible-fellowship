@@ -16,12 +16,8 @@ jobs:
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
-          # The version Vercel deploys on: `engines.node` of the app, the Root Directory.
           node-version-file: apps/web/package.json
           cache: pnpm
-      # Short-lived token for the Vercel Remote Cache, so CI shares one cache
-      # with Vercel deployments. Without a token (a fork's PR, no OIDC policy
-      # yet) turbo still runs, with the local cache only.
       - uses: vercel/setup-turborepo-remote-cache-action@v1.1.0
         continue-on-error: true
         with:

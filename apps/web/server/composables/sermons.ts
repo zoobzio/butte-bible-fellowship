@@ -4,12 +4,6 @@ import { toSermon } from "@bbf/utils";
 
 import { useDatabase } from "#layers/bbf/server/composables/database";
 
-/**
- * The sermons the site lists: the published ones, as the database holds
- * them, each in the shape the API serves. `list` is the newest, as many as
- * asked; `fetch` is one sermon by slug, with what is written about it, or
- * `null` when no published sermon has it.
- */
 export const useSermons = () => {
   const db = useDatabase();
 

@@ -1,29 +1,15 @@
-// Vitest shim for Nuxt's virtual `#imports` module: the part every app of
-// the church shares, from the layer, and what the web's own modules put
-// there besides.
-//
-// App code imports framework symbols from "#imports" (Vue APIs, Nuxt
-// composables). There is no Nuxt runtime under vitest, so the shared shim
-// re-exports the real Vue APIs and stubs the Nuxt-runtime composables.
-// Type-only imports are erased by esbuild before this module loads, so only
-// value exports matter here.
-
 import type { Root } from "hast";
 
 import { reactive } from "vue";
 import { vi } from "vitest";
 import { CONTENT_URL } from "@prosary/nuxt/constant";
 
-// `$t` and the locale are the layer's: its shim resolves the church's built
-// messages, and `setLocale` switches them.
 export * from "@bbf/nuxt/testing/imports";
 
-// useRuntimeConfig: the public config the app reads.
 export const useRuntimeConfig = () => ({
   public: { youtube: { channel: "UCtest" } },
 });
 
-// useRoute: one reactive route, moved with setRoutePath.
 const route = reactive({ path: "/" });
 
 export const setRoutePath = (path: string) => {
@@ -32,8 +18,6 @@ export const setRoutePath = (path: string) => {
 
 export const useRoute = () => route;
 
-// useRouter: a router that records where it was sent. What its history
-// holds of the page before this one is set with setRouteBack.
 const router = {
   back: vi.fn(),
   push: vi.fn(),
@@ -52,9 +36,6 @@ export const clearRouter = () => {
 
 export const useRouter = () => router;
 
-// useRequestFetch: a fetch of the pages the prosary module serves, from a
-// registry filled with setContentPages by each page's path. A page not
-// there is a 404, as a document the build does not hold is.
 const contentPages = new Map<string, Root>();
 
 export const setContentPages = (pages: Record<string, Root>) => {
@@ -64,7 +45,6 @@ export const setContentPages = (pages: Record<string, Root>) => {
   }
 };
 
-// Each document asked for, in order, by its locale and file: `es/events.json`.
 export const requestedDocuments: string[] = [];
 
 export const clearContentPages = () => {
@@ -72,7 +52,6 @@ export const clearContentPages = () => {
   requestedDocuments.length = 0;
 };
 
-/** The path of the page a document file is built from. */
 const pathOf = (file: string) => {
   const page = file.replace(/^[^/]+\//, "").replace(/\.json$/, "");
   return page === "index" ? "/" : `/${page}`;

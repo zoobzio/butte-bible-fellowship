@@ -5,7 +5,6 @@ import { useThemes } from "#layers/bbf/app/composables/themes";
 
 const primary = () => useUntheme().resolve("primary-600");
 
-/** A browser's view transition, as far as the helper reaches into it. */
 const viewTransition = () =>
   vi.fn((change: () => void | Promise<void>) => ({
     updateCallbackDone: Promise.resolve(change()),

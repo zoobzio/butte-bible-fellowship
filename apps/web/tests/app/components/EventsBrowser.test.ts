@@ -20,7 +20,6 @@ const { $t } = useNuxtApp();
 const mountBrowser = (events?: ChurchEvent[]) =>
   mount(EventsBrowser, { props: { events } });
 
-// A Sunday afternoon at the church.
 beforeEach(() => {
   vi.useFakeTimers({ now: new Date("2026-10-04T20:00:00Z"), toFake: ["Date"] });
 });

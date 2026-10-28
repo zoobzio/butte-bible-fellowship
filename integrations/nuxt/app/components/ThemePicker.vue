@@ -12,8 +12,6 @@ defineOptions({ name: "ThemePicker" });
 
 type ThemeOption = CommandOption & { value: Theme };
 
-// The button, the list and the search field are named in the reader's
-// language.
 const { $t } = useNuxtApp();
 const { themes, active, choose } = useThemes();
 
@@ -62,11 +60,7 @@ const command = defineCommand(() => ({
 </template>
 
 <style>
-/* A command palette in the design system's popover. The popover portals to
-   body, so these rules could not be scoped. */
-
-/* The command: a search field over the list, which scrolls in a height
-   that holds as the search narrows it. */
+/* Unscoped: the popover portals to body. */
 .theme-picker {
   display: flex;
   flex-direction: column;
@@ -126,7 +120,6 @@ const command = defineCommand(() => ({
   background: var(--rule);
 }
 
-/* The list is short enough to scroll back by hand. */
 .theme-picker .f-scroll-area-root > .f-button {
   display: none;
 }

@@ -10,15 +10,12 @@ import { seeds } from "../.output/seeds.mjs";
 
 let db: Awaited<ReturnType<typeof makeTestBezoar<typeof contract>>>;
 
-/** What Postgres said about a query the service refused: its `QueryError`'s cause. */
 const refusal = (call: Promise<unknown>): Promise<string> =>
   call.then(
     () => "accepted",
     (error: unknown) => String((error as { cause?: unknown }).cause),
   );
 
-// The service applies every migration and runs every seed as it comes up,
-// so a migration or a seed Postgres rejects fails here.
 beforeAll(async () => {
   db = await makeTestBezoar(contract, { queries, migrations, seeds });
 });
@@ -176,7 +173,6 @@ describe("admin.staff", () => {
     expect(created?.created_at).toBeInstanceOf(Date);
     const id = created!.id;
 
-    // What is left out is none.
     expect(await db.admin.staff.fetch.first({ id })).toMatchObject({
       summary: null,
       bio: null,
@@ -187,7 +183,6 @@ describe("admin.staff", () => {
       status: "published",
     });
 
-    // Position 0 lists first, ahead of the seeded elders.
     const list = await db.admin.staff.list();
     expect(list.map((row) => row.slug)).toEqual([
       "pastor",
@@ -254,7 +249,6 @@ describe("admin.staff", () => {
   });
 
   it("refuses a status that is not one, and a slug already taken", async () => {
-    // A status the enum lacks is refused before Postgres sees it.
     await expect(
       db.admin.staff.create({
         ...member,
@@ -280,7 +274,6 @@ describe("admin.events", () => {
     expect(created?.created_at).toBeInstanceOf(Date);
     const id = created!.id;
 
-    // What is left out is none.
     expect(await db.admin.events.fetch.first({ id })).toMatchObject({
       summary: null,
       body: null,
@@ -306,7 +299,6 @@ describe("admin.events", () => {
       (await db.web.events.list({ from: "2026-12-25" })).map((e) => e.slug),
     ).not.toContain("christmas-eve");
 
-    // Re-scheduled as weekly: the date goes, the day comes.
     const updated = await db.admin.events.update.first({
       id,
       slug: "christmas-eve",
@@ -340,7 +332,6 @@ describe("admin.events", () => {
       "wednesday",
     );
 
-    // And back to a one-off: the day and the weeks go.
     await db.admin.events.update({
       id,
       slug: "christmas-eve",
@@ -510,7 +501,6 @@ describe("admin.sermons", () => {
     expect(created?.created_at).toBeInstanceOf(Date);
     const id = created!.id;
 
-    // What is left out is none; the date is a day, not a moment.
     expect(await db.admin.sermons.fetch.first({ id })).toMatchObject({
       speaker: "Pastor Name",
       summary: null,
@@ -632,7 +622,6 @@ describe("admin.sermons", () => {
     expect(
       await refusal(db.admin.sermons.create({ ...sermon, slug: "other" })),
     ).toMatch(/sermons_video_key/);
-    // A sermon without a recording takes no video, and any number may.
     const unrecorded = await db.admin.sermons.create.first({
       ...sermon,
       slug: "unrecorded",
@@ -655,7 +644,6 @@ describe("admin.users", () => {
     expect(created?.email).toBe("pastor@example.com");
     const id = created!.id;
 
-    // Nobody is bound to the subject until they sign in.
     expect(await db.admin.users.subject.first({ sub })).toBeNull();
     expect(await db.admin.users.fetch.first({ id })).toMatchObject({
       sub: null,
@@ -680,7 +668,6 @@ describe("admin.users", () => {
       (await db.admin.users.fetch.first({ id }))?.signed_in_at,
     ).toBeInstanceOf(Date);
 
-    // A bound user is not claimed again, by this subject or another.
     expect(
       await db.admin.users.claim.first({
         sub: "other",
@@ -743,9 +730,6 @@ describe("admin.users", () => {
   });
 });
 
-// A role holds an app to its group: the service of a role offers the
-// queries the kit found it may run, and Postgres runs each as the role, so
-// what the service would not offer, the database refuses too.
 describe("roles", () => {
   type Scoped<R extends keyof typeof contract.roles> = Awaited<
     ReturnType<typeof makeTestBezoar<typeof contract, R>>

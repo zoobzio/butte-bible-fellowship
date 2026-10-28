@@ -20,7 +20,6 @@ definePageMeta({
 const { $t } = useNuxtApp();
 const route = useRoute();
 
-// The event is the one the address names.
 const event = await useEvent();
 
 if (!event.value) {
@@ -30,8 +29,6 @@ if (!event.value) {
   });
 }
 
-// What is written about it is a page of its own, at the event's address.
-// An event nothing is written about yet has only what the calendar says.
 const { data: page } = await usePage(route.path);
 
 useHead(() => ({ title: page.value?.title ?? event.value?.title }));

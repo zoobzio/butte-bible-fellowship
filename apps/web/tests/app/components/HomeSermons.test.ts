@@ -16,7 +16,6 @@ const SERMONS = ["abc123", "def456", "ghi789", "jkl012"].map(sermon);
 
 const { $t } = useNuxtApp();
 
-/** Has the site's API list these sermons, and mounts the section. */
 const mountSermons = async (sermons = SERMONS) => {
   vi.stubGlobal(
     "$fetch",

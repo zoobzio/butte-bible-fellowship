@@ -12,8 +12,6 @@ import { useSelectedDay } from "~/composables/events";
 <script setup lang="ts">
 defineOptions({ name: "EventsBrowser" });
 
-// The events page's front matter is the calendar: an editor lists the
-// events there. A page that lists none has an empty calendar.
 const { events = [] } = defineProps<{ events?: ChurchEvent[] }>();
 
 const { $t } = useNuxtApp();
@@ -38,8 +36,6 @@ const { selected, held, date } = useSelectedDay(() => events);
 </template>
 
 <style>
-/* The about page's two columns, the other way round: the calendar where the
-   article is, and the selected day's events where the contents are. */
 .events {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 16rem;
@@ -49,7 +45,6 @@ const { selected, held, date } = useSelectedDay(() => events);
   margin-inline: auto;
 }
 
-/* The header runs the width of both columns. */
 .events .page-header {
   grid-column: 1 / -1;
 }
@@ -58,8 +53,6 @@ const { selected, held, date } = useSelectedDay(() => events);
   padding-block: var(--space-7) clamp(var(--space-7), 7vw, var(--space-9));
 }
 
-/* Rides down the page with the reader once it meets the header, and
-   scrolls on its own when it is taller than the room under it. */
 .events-day {
   position: sticky;
   top: var(--header-height);
@@ -68,7 +61,6 @@ const { selected, held, date } = useSelectedDay(() => events);
   padding-block: var(--space-7) clamp(var(--space-7), 7vw, var(--space-9));
 }
 
-/* The day's date, under a label like the one over a page's contents. */
 .events-day h2 {
   display: grid;
   gap: var(--space-1);
@@ -89,7 +81,6 @@ const { selected, held, date } = useSelectedDay(() => events);
   color: var(--primary);
 }
 
-/* No room for a column beside the calendar: the day's events follow it. */
 @media (max-width: 60rem) {
   .events {
     grid-template-columns: minmax(0, 1fr);

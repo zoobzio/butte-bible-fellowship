@@ -16,26 +16,19 @@ const root = fileURLToPath(new URL("..", import.meta.url));
 const read = (file: string) => readFileSync(`${root}${file}`, "utf8");
 const json = (file: string) => JSON.parse(read(file)) as Json;
 
-// This package and aurora, through their exports: aurora's own documents and
-// build are the installed package the config points at, and our layers are
-// what the build wrote.
 const require = createRequire(`${root}package.json`);
 const resolve = (specifier: string) =>
   JSON.parse(readFileSync(require.resolve(specifier), "utf8"));
 
-/** The tokens of a document: its entries less the `$`-prefixed metadata. */
 const tokensOf = (document: Json) =>
   Object.fromEntries(
     Object.entries(document).filter(([name]) => !name.startsWith("$")),
   ) as Tokens;
 
-/** The hex of a color token's authored value. */
 const hexOf = (slot: Token) => (slot.$value as Hex).hex;
 
-// The site's palette: all eight ramps, in one file.
 const ours = tokensOf(json("src/bbf.json"));
 
-// Aurora's palette, as its own theme file authors it.
 const theirs = tokensOf(resolve("@untheme/aurora/src/themes/aurora.json"));
 
 let config: typeof import("../.output/config.mjs");
@@ -71,7 +64,6 @@ describe("package exports", () => {
     );
     expect(targets.length).toBeGreaterThan(0);
     for (const target of targets) {
-      // A wildcard export points at a directory.
       const path = target.includes("*") ? dirname(target) : target;
       expect(existsSync(`${root}${path}`), target).toBe(true);
     }
@@ -105,12 +97,11 @@ describe("theme", () => {
   });
 
   it("binds our palette as authored and everything else as aurora does", () => {
-    // Terrazzo normalizes a color it reads, so compare the hex of a ramp stop
-    // rather than the whole value.
     const upstream = aurora.config.theme.tokens as Tokens;
     for (const [token, slot] of Object.entries(config.theme.tokens)) {
       const own = ours[token];
       if (own) {
+        // Terrazzo normalizes colors. Compare the hex only.
         expect((slot.$value as Hex).hex, token).toBe(hexOf(own));
       } else {
         expect(slot.$value, token).toEqual(upstream[token]?.$value);
@@ -128,7 +119,6 @@ describe("theme", () => {
 });
 
 describe("layers", () => {
-  /** A built layer, as the build wrote it. */
   const layer = (id: string) =>
     json(`.output/layers/${id}.json`) as unknown as Layer;
 
@@ -147,8 +137,6 @@ describe("layers", () => {
   });
 
   it("hold, in our palette's layer, the stops that differ from aurora's", () => {
-    // The error, success and warning ramps are aurora's, so their stops are
-    // not in the layer, and applying it over any theme restores the site's.
     const bbf = layer("bbf");
     expect(bbf.name).toBe("Butte Bible Fellowship");
     const changed = Object.entries(ours)
@@ -212,7 +200,6 @@ describe("preset", () => {
       { $ref: "npm:/@bbf/theme/src/bbf.json" },
     ]);
     expect(Object.keys(resolver.modifiers)).toEqual(config.theme.order);
-    // The reference resolves: the package exports the document it names.
     expect(resolve("@bbf/theme/src/bbf.json")).toEqual(json("src/bbf.json"));
   });
 });

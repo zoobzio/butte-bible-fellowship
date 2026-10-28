@@ -22,9 +22,6 @@ const { entries } = defineProps<{ entries: OutlineEntry[] }>();
 
 const { $t } = useNuxtApp();
 
-// The entries whose sections are on screen are marked, and one bar down the
-// list's edge runs from the first of them to the last: as the page scrolls,
-// it travels the list.
 const active = useOutlineSpy(() => entries);
 
 const track$ = useTemplateRef<HTMLElement>("track");
@@ -37,7 +34,6 @@ const place = () => {
   );
   const first = items?.[0];
   const last = items?.[items.length - 1];
-  // With nothing on screen the bar keeps its place and fades where it is.
   if (!first || !last) return;
   marker.value = {
     top: first.offsetTop,
@@ -54,8 +50,6 @@ const markerStyle = computed(() =>
     : undefined,
 );
 
-// Placed once the marked entries are in the document, and again whenever
-// the list is laid out anew: its entries wrap as the column narrows.
 watch(active, place, { flush: "post" });
 
 onMounted(() => {
@@ -109,7 +103,6 @@ onBeforeUnmount(() => {
   color: var(--primary);
 }
 
-/* The list's left edge is a rail, and the marker rides it. */
 .toc-track {
   position: relative;
   padding-left: var(--space-4);
@@ -123,7 +116,6 @@ onBeforeUnmount(() => {
   background: var(--rule);
 }
 
-/* The bar under the header's tabs, stood on end. */
 .toc-marker {
   position: absolute;
   inset: 0 auto auto 0;
@@ -149,7 +141,6 @@ onBeforeUnmount(() => {
   list-style: none;
 }
 
-/* The design system rules every list item with a dash: not these. */
 .toc-item {
   padding-left: 0;
   font-size: var(--label-size);

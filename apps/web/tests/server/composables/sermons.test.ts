@@ -3,7 +3,6 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { service } from "@bbf/nuxt/testing/bezoar";
 import { useSermons } from "~~/server/composables/sermons";
 
-/** A row as `web.sermons.list` returns it: no body. */
 const LISTED = {
   slug: "faith-and-works",
   title: "Faith & Works",
@@ -14,7 +13,6 @@ const LISTED = {
   date: "2026-10-04",
 };
 
-/** A row as `web.sermons.fetch` returns it: the body with it. */
 const PAGE = { ...LISTED, body: "What faith does." };
 
 const list = vi.fn(async (_args: { limit: number }) => [
@@ -25,8 +23,6 @@ const first = vi.fn(async (args: { slug: string }) =>
   args.slug === PAGE.slug ? PAGE : null,
 );
 
-// The service is the stub the module's shim keeps; the sermons queries are
-// given to it here, the shape the built service has them in.
 Object.assign(service, { web: { sermons: { list, fetch: { first } } } });
 
 afterEach(() => {

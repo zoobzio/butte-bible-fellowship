@@ -1,14 +1,10 @@
 name: Preview
 
-# Preview deployments are opt-in. Vercel's Git integration only deploys
-# `main` (see apps/web/vercel.json); a PR gets a preview when it carries the
-# `preview` label, and keeps getting one for each push while the label stays.
 on:
   pull_request:
     types: [labeled, synchronize]
   workflow_dispatch:
 
-# One preview build per branch at a time; a newer push wins.
 concurrency:
   group: preview-${{ github.head_ref || github.ref_name }}
   cancel-in-progress: true
@@ -22,8 +18,7 @@ jobs:
   preview:
     name: Deploy preview
     runs-on: ubuntu-latest
-    # Manual runs always deploy. PR events deploy only when the PR is
-    # labelled `preview` and comes from this repo (a fork gets no token).
+    # Fork PRs get no secrets.
     if: >-
       github.event_name == 'workflow_dispatch' ||
       (
@@ -37,17 +32,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          # The branch's own commit, not the PR's merge commit, so Vercel
-          # attributes the deployment to the branch.
+          # Use the branch commit, not the merge commit. Vercel attributes the deployment to it.
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
-          # The version Vercel deploys on: `engines.node` of the app, the Root Directory.
           node-version-file: apps/web/package.json
           cache: pnpm
-      # Short-lived token for the Vercel Remote Cache, so the build reuses
-      # what CI and production already built.
       - uses: vercel/setup-turborepo-remote-cache-action@v1.1.0
         continue-on-error: true
         with:

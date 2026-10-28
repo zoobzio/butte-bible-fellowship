@@ -11,8 +11,6 @@ defineOptions({ name: "AppInvitation" });
 const { invitation } = useAppConfig();
 const { $t } = useNuxtApp();
 
-// The bar invites the reader to a Sunday: what happens on one is listed
-// beside the invitation.
 const events = await useEvents();
 const sunday = useEventsHeldOn(events, "sunday");
 </script>
@@ -32,9 +30,6 @@ const sunday = useEventsHeldOn(events, "sunday");
 </template>
 
 <style>
-/* A bar the width of the window, filled as the callout cards are — the
-   secondary color washed over the container surface — and ruled off from
-   the page above as they are bordered. */
 .site-invitation {
   padding-block: clamp(var(--space-7), 7vw, var(--space-8));
   border-top: 1px var(--stroke-solid)
@@ -48,13 +43,10 @@ const sunday = useEventsHeldOn(events, "sunday");
     var(--surface-container);
 }
 
-/* The footer is a bar of its own: the two stand one on the other. */
 .site-invitation + .site-footer {
   margin-top: 0;
 }
 
-/* The invitation, and to its right what it invites the reader to — the
-   Sunday — at the site's width. */
 .site-invitation-body {
   display: grid;
   grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
@@ -64,8 +56,6 @@ const sunday = useEventsHeldOn(events, "sunday");
   margin-inline: auto;
 }
 
-/* The callout's words, set as it sets them: the invitation in the display
-   face, and where to come under it. */
 .site-invitation-words {
   margin: 0;
   font-size: clamp(
@@ -88,7 +78,6 @@ const sunday = useEventsHeldOn(events, "sunday");
   color: var(--on-surface-high-contrast);
 }
 
-/* No room for the Sunday beside the invitation: it follows it. */
 @media (max-width: 60rem) {
   .site-invitation-body {
     grid-template-columns: minmax(0, 1fr);

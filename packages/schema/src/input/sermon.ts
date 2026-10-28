@@ -3,7 +3,6 @@ import { z } from "zod";
 import { slug } from "../models/slug";
 import { contentStatus } from "../models/staff";
 
-/** The path of a sermon's own page: `/sermons/{slug}`. */
 export const sermonPath = z.object({
   slug: slug.meta({
     description: "What the sermon's own page is called in its address.",
@@ -11,10 +10,8 @@ export const sermonPath = z.object({
   }),
 });
 
-/** The most sermons one request lists. */
 export const SERMONS_LIMIT = 50;
 
-/** The query of the sermons list: how many of the newest to take. */
 export const sermonsQuery = z.object({
   limit: z.coerce
     .number()
@@ -28,11 +25,6 @@ export const sermonsQuery = z.object({
     }),
 });
 
-/**
- * A sermon as it is written: what creating one takes, and what updating one
- * replaces, every field. A new sermon is a draft until the body says
- * otherwise.
- */
 export const sermonBody = z
   .object({
     slug: slug.meta({

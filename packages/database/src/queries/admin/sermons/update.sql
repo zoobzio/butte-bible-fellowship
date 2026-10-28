@@ -1,4 +1,3 @@
--- Replaces every field.
 UPDATE sermons
 SET slug = :slug,
     title = :title,

@@ -18,10 +18,7 @@ export default defineNuxtConfig({
   },
 
   routeRules: {
-    // A moved page sends its old address to its new one.
     "/calendar": { redirect: { to: "/events", statusCode: 301 } },
-    // The site once led a translated page's address with its locale. Those
-    // addresses lead to the page itself; the language is the visitor's own.
     ...Object.fromEntries(
       translated.flatMap((locale) => [
         [`/${locale}`, { redirect: { to: "/", statusCode: 301 } }],

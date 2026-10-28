@@ -1,6 +1,4 @@
--- A first sign-in: binds Google's subject to the user added by that email,
--- when none is bound yet, and takes their name and photo. The caller passes
--- only an email Google has verified.
+-- Pass only an email that Google verified.
 UPDATE users
 SET sub = :sub,
     name = :name::text,

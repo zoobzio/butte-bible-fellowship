@@ -80,7 +80,6 @@ describe("usePageBack", () => {
 });
 
 describe("useHeaderHeight", () => {
-  /** An element as tall as it is told, and a way to tell it otherwise. */
   const element = (height: number) => {
     const el = document.createElement("header");
     Object.defineProperty(el, "offsetHeight", {

@@ -8,8 +8,6 @@ import { computed, useNuxtApp } from "#imports";
 <script setup lang="ts" generic="T extends object">
 defineOptions({ name: "RecordTable" });
 
-// A table of records, a page at a time, as the design system renders it;
-// the cell the `title` names is the way to the record's editor.
 const { table, link, title } = defineProps<{
   table: TableService<T>;
   link: RecordLink<T>;
@@ -37,8 +35,6 @@ const cell = computed(() => `cell:${title}` as const);
 </template>
 
 <style>
-/* The design system's table, as the admin wears it: the toolbar over the
-   grid, the grid ruled between its rows, the pages under it. */
 .record-table .f-data-table {
   display: grid;
   gap: var(--space-4);
@@ -97,8 +93,6 @@ const cell = computed(() => `cell:${title}` as const);
   color: var(--on-surface-muted);
 }
 
-/* The toolbar's and the rows' buttons, and the page buttons under the grid:
-   the design system's plain buttons, dressed as the admin's. */
 .record-table .f-button {
   display: inline-flex;
   align-items: center;
@@ -133,7 +127,6 @@ const cell = computed(() => `cell:${title}` as const);
   color: var(--on-primary-container);
 }
 
-/* The pages: what page this is, the page buttons, and the size to show. */
 .record-table .f-data-table > .f-group:last-child {
   display: flex;
   flex-wrap: wrap;
@@ -151,8 +144,6 @@ const cell = computed(() => `cell:${title}` as const);
   gap: var(--space-1);
 }
 
-/* The size select, and the columns popover's trigger, are the design
-   system's select and popover; the select's menu portals to body. */
 .record-table .f-select-trigger {
   display: inline-flex;
   align-items: center;
@@ -166,6 +157,7 @@ const cell = computed(() => `cell:${title}` as const);
   cursor: pointer;
 }
 
+/* The select menu portals to body. Do not scope it under .record-table. */
 .f-select-content {
   min-width: 8rem;
   padding: var(--space-2);

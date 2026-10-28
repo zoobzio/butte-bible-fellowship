@@ -3,7 +3,6 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { service } from "@bbf/nuxt/testing/bezoar";
 import { useStaff } from "~~/server/composables/staff";
 
-/** A row as `admin.staff.list` and `admin.staff.fetch` return it. */
 const ROW = {
   id: 1,
   slug: "jane-doe",
@@ -20,7 +19,6 @@ const ROW = {
   updated_at: new Date("2026-10-18T09:30:00Z"),
 };
 
-/** The same, as the API serves it. */
 const RECORD = {
   id: 1,
   slug: "jane-doe",
@@ -52,8 +50,6 @@ const updated = vi.fn(async (args: { id: number; slug: string }) =>
 );
 const deleted = vi.fn(async ({ id }: { id: number }) => (id === 1 ? 1 : 0));
 
-// The service is the stub the module's shim keeps; the admin's staff queries
-// are given to it here, the shape the built service has them in.
 Object.assign(service, {
   admin: {
     staff: {

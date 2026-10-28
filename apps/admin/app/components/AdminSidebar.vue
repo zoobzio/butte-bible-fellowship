@@ -12,7 +12,6 @@ defineOptions({ name: "AdminSidebar" });
 const { $t } = useNuxtApp();
 const { tabs } = useSidebar();
 
-// The account panel stands at the foot once someone is signed in.
 const auth = useAuth();
 </script>
 
@@ -37,9 +36,6 @@ const auth = useAuth();
 </template>
 
 <style>
-/* The sidebar keeps to the top of the window as the page scrolls, the
-   brand over the sections, and never outgrows the window: its own
-   content scrolls past that. */
 .admin-sidebar {
   position: sticky;
   top: 0;
@@ -63,7 +59,6 @@ const auth = useAuth();
   text-decoration: none;
 }
 
-/* The logo is drawn in currentColor, so it takes the theme's primary. */
 .admin-brand-logo {
   flex: none;
   display: block;
@@ -91,9 +86,6 @@ const auth = useAuth();
   color: var(--primary);
 }
 
-/* The sections stand one under another. Each tab is a real link, and the
-   one whose page is being read — or a page under it — is marked. The
-   tabs' content panels hold nothing: the page is the content. */
 .admin-nav .f-tabs-list {
   display: grid;
   gap: var(--space-1);
@@ -131,14 +123,10 @@ const auth = useAuth();
   display: none;
 }
 
-/* The account panel sits at the foot of the sidebar: who is signed in, the
-   appearance controls and the way out. */
 .admin-account {
   margin-top: auto;
 }
 
-/* Small screens: the sidebar is a bar across the top, the sections in a
-   row under the brand. */
 @media (max-width: 44rem) {
   .admin-sidebar {
     width: auto;

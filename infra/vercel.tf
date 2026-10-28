@@ -1,7 +1,3 @@
-# One Vercel project per app, each rooted at its directory. The build
-# command, turbo-ignore, and which branches deploy stay in the app's
-# vercel.json, which Vercel reads at build time and which overrides these
-# settings; this is the project around it.
 locals {
   apps = {
     web = {
@@ -15,6 +11,7 @@ locals {
   }
 }
 
+# The app's vercel.json overrides these settings at build time.
 resource "vercel_project" "app" {
   for_each = local.apps
 
@@ -30,8 +27,6 @@ resource "vercel_project" "app" {
   }
 }
 
-# The database, to each app as its own user. Previews share production's
-# database for now; see README.md, "Previews".
 resource "vercel_project_environment_variable" "database_url" {
   for_each = vercel_project.app
 

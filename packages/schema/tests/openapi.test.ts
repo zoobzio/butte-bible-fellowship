@@ -26,16 +26,11 @@ import {
   staffRecord,
 } from "../src";
 
-/** A response of one shape, for the document's sake. */
 const json = (schema: unknown) => ({
   description: "OK",
   content: { "application/json": { schema } },
 });
 
-/**
- * The document the server would build from these schemas: every model as a
- * response, every input as the parameters or the body of a request.
- */
 const document = createDocument({
   openapi: "3.1.0",
   info: { title: "Butte Bible Fellowship", version: "0.0.0" },
@@ -90,7 +85,6 @@ const document = createDocument({
     "/api/pages/{slug}": {
       get: { responses: { 200: json(page) } },
     },
-    // The admin's: what it lists and edits, by id.
     "/admin/api/staff": {
       get: {
         requestParams: { query: listingQuery },
@@ -125,7 +119,6 @@ const document = createDocument({
 
 const schemas = document.components?.schemas ?? {};
 
-/** The parameters of an operation, by name. */
 const parameters = (path: string, method: "get" | "post" | "put") => {
   const operation = document.paths?.[path]?.[method];
   const list = (operation?.parameters ?? []) as Array<{

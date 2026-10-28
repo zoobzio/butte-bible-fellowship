@@ -4,16 +4,11 @@ import type { StaffDraft } from "~/types/staff";
 
 import { staffBody } from "@bbf/schema";
 
-/** A control's value as the body takes it: trimmed, and left out when empty. */
 const written = (value: string): string | undefined => {
   const text = value.trim();
   return text === "" ? undefined : text;
 };
 
-/**
- * A member as the editor holds them, from their record, or blank for a new
- * one: a draft, last in the list, with every control empty.
- */
 export const toStaffDraft = (record?: StaffRecord): StaffDraft => ({
   slug: record?.slug ?? "",
   name: record?.name ?? "",
@@ -27,11 +22,6 @@ export const toStaffDraft = (record?: StaffRecord): StaffDraft => ({
   status: record?.status ?? "draft",
 });
 
-/**
- * The body a member is written from, as the schema checks it, from what
- * the editor holds. A control left empty is left out of the body. A draft
- * the schema refuses throws its issues.
- */
 export const toStaffBody = (draft: StaffDraft): StaffBody =>
   staffBody.parse({
     slug: draft.slug.trim(),

@@ -19,7 +19,6 @@ beforeEach(() => {
   setAppConfig({ header: { links: LINKS } });
 });
 
-// The menu content is portalled to the body, so it is queried from there.
 const items = () => [
   ...document.body.querySelectorAll<HTMLElement>('[role="menuitem"]'),
 ];

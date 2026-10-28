@@ -32,8 +32,6 @@ if (!page.value) {
 
 useHead(() => ({ title: page.value?.title }));
 
-// The staff lead the page, as the site's API lists them; its body — how to
-// reach and find the church — follows them.
 const { data } = await useStaff();
 const staff = computed(() => data.value ?? []);
 </script>
@@ -59,8 +57,6 @@ const staff = computed(() => data.value ?? []);
   margin-inline: auto;
 }
 
-/* The sermon grid's columns, a little narrower: a portrait is taller than
-   a video, so the cards sit four across where the sermons sit three. */
 .connect-staff {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 13rem), 1fr));
@@ -68,8 +64,6 @@ const staff = computed(() => data.value ?? []);
   padding-top: var(--space-7);
 }
 
-/* The page sets the measure, and the header has already opened it, so the
-   article fills the page's width and runs on from the staff. */
 .connect .prose {
   width: auto;
   margin-inline: 0;

@@ -8,11 +8,6 @@ export interface PageMetrics {
   innerWidth: number;
 }
 
-/**
- * Puts the window's scroll metrics and animation frames under test control.
- * The defaults give a 3200px scroll range, so scrollY 1600 is half way.
- * Frames only run when `frame()` is called. Undo with `vi.unstubAllGlobals()`.
- */
 export const stubPage = (metrics: Partial<PageMetrics> = {}) => {
   const page: PageMetrics = {
     scrollY: 0,
@@ -47,14 +42,12 @@ export const stubPage = (metrics: Partial<PageMetrics> = {}) => {
 
   return {
     page,
-    /** Runs the frames requested so far, then lets watchers flush. */
     frame: async (time = 0) => {
       const due = [...frames.values()];
       frames.clear();
       for (const callback of due) callback(time);
       await nextTick();
     },
-    /** How many frames are waiting to run. */
     pending: () => frames.size,
     scroll: (scrollY: number) => {
       page.scrollY = scrollY;

@@ -8,7 +8,6 @@ import {
 
 import { useStaff } from "~~/server/composables/staff";
 
-/** Writes a new member from their body, and answers 201 with the record. A body that is not one is 400; one that writes nothing is 500. */
 export default defineEventHandler(async (event) => {
   const body = await readValidatedBody(event, staffBody.parse);
   const record = await useStaff().create(body);

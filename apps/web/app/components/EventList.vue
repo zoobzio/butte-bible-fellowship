@@ -9,7 +9,6 @@ import { useEventListing } from "~/composables/events";
 <script setup lang="ts">
 defineOptions({ name: "EventList" });
 
-// A day's events, in the order they are to be listed.
 const { events } = defineProps<{ events: ChurchEvent[] }>();
 
 const { $t } = useNuxtApp();
@@ -32,7 +31,6 @@ const listed = useEventListing(() => events);
 </template>
 
 <style>
-/* The home page's callout, holding the day's events one under another. */
 .event-list {
   position: relative;
   overflow: hidden;
@@ -64,8 +62,6 @@ const listed = useEventListing(() => events);
   list-style: none;
 }
 
-/* The design system rules every list item with a dash: these are ruled
-   off from one another instead. */
 .event-list li {
   padding: var(--space-4) 0;
   border-top: 1px var(--stroke-solid) var(--rule);
@@ -94,8 +90,6 @@ const listed = useEventListing(() => events);
   color: var(--on-surface-high-contrast);
 }
 
-/* The title is the way to the event's page: it reads as a title until it
-   is pointed at. */
 .event-list h3 a {
   color: inherit;
   text-decoration-color: transparent;

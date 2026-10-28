@@ -4,11 +4,6 @@ import { toStaffMember } from "@bbf/utils";
 
 import { useDatabase } from "#layers/bbf/server/composables/database";
 
-/**
- * The staff the site lists: the published members, as the database holds
- * them, each in the shape the API serves. `list` is every one in order;
- * `fetch` is one by slug, or `null` when no published member has it.
- */
 export const useStaff = () => {
   const db = useDatabase();
 

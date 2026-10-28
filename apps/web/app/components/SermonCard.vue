@@ -6,7 +6,7 @@ import { computed, ref, useLocale, useNuxtApp } from "#imports";
 
 import { useSermonImage } from "~/composables/sermons";
 
-/** The frame's permissions: what YouTube's own embed code asks for. */
+// Values from the YouTube embed code.
 const ALLOW =
   "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
 </script>
@@ -14,8 +14,6 @@ const ALLOW =
 <script setup lang="ts">
 defineOptions({ name: "SermonCard" });
 
-// A featured card is the page's highlight: the picture larger and to the
-// left, what is said about the sermon to its right.
 const { sermon, featured = false } = defineProps<{
   sermon: Sermon;
   featured?: boolean;
@@ -25,10 +23,6 @@ const { $t } = useNuxtApp();
 const { locale } = useLocale();
 const image = useSermonImage();
 
-// The player is only loaded once the visitor asks for it: until then the
-// card is the sermon's picture, and nothing is requested from YouTube's
-// player or set in the visitor's browser. A sermon not recorded has no
-// player to ask for.
 const playing = ref(false);
 
 const src = computed(() => {
@@ -37,9 +31,7 @@ const src = computed(() => {
 
 const picture = computed(() => image(sermon));
 
-// The day it was preached is a day on the calendar, not a moment: it is
-// read where it was written, in UTC, so the server and every visitor's
-// browser write the same day.
+// Format in UTC. A local time zone can shift the day.
 const preached = computed(() => {
   return new Intl.DateTimeFormat(locale.value, {
     dateStyle: "long",
@@ -137,8 +129,7 @@ const preached = computed(() => {
   cursor: pointer;
 }
 
-/* YouTube's thumbnails are 4:3 with the picture letterboxed: covering a
-   16:9 frame crops the bars away. */
+/* YouTube thumbnails are 4:3 and letterboxed. Cover crops the bars. */
 .sermon-card-frame img {
   object-fit: cover;
 }
@@ -201,8 +192,6 @@ const preached = computed(() => {
   color: var(--on-surface);
 }
 
-/* ---------- Featured — picture left, words right ---------------------- */
-
 .sermon-card-featured {
   display: grid;
   grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
@@ -225,7 +214,6 @@ const preached = computed(() => {
   letter-spacing: var(--type-headline-letter-spacing);
 }
 
-/* No room beside the picture: the words go back under it. */
 @media (max-width: 44rem) {
   .sermon-card-featured {
     grid-template-columns: minmax(0, 1fr);

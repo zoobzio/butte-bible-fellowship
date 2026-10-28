@@ -19,14 +19,12 @@ const { $t } = useNuxtApp();
 const mountContents = (entries = ENTRIES) =>
   mount(TableOfContents, { props: { entries } });
 
-/** Where each heading sits in the page, from its top. */
 const OFFSETS: Record<string, number> = {
   "our-vision": 200,
   dreams: 600,
   "god-the-father": 2400,
 };
 
-/** Puts the entries' headings in the document, placed by the page's scroll. */
 const layOut = (page: { scrollY: number }) => {
   for (const [id, offset] of Object.entries(OFFSETS)) {
     const heading = document.createElement("h2");
@@ -37,7 +35,6 @@ const layOut = (page: { scrollY: number }) => {
   }
 };
 
-/** The texts of the entries marked as on screen. */
 const marked = (wrapper: ReturnType<typeof mountContents>) =>
   wrapper.findAll("li.toc-item[data-active]").map((item) => item.text());
 

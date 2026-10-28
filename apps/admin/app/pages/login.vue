@@ -12,8 +12,6 @@ import {
 <script setup lang="ts">
 definePageMeta({ layout: false });
 
-// The page stands outside the layout, so it sets the document's language
-// itself, as the layout does for every other page.
 const { $t } = useNuxtApp();
 const { locale } = useLocale();
 useHead(() => ({
@@ -21,8 +19,6 @@ useHead(() => ({
   htmlAttrs: { lang: locale.value },
 }));
 
-// Signing in is a top-level navigation to the login action, which sends the
-// browser on to Google; Google sends it back to the page that was asked for.
 const route = useRoute();
 const redirect =
   typeof route.query.redirect === "string" ? route.query.redirect : "/";
@@ -43,7 +39,6 @@ const href = `/api/auth/login?${new URLSearchParams({ redirect })}`;
 </template>
 
 <style>
-/* The mark, the name and the one way in, in the middle of the window. */
 .admin-login {
   display: grid;
   place-content: center;

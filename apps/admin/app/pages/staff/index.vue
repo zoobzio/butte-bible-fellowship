@@ -13,7 +13,6 @@ definePageMeta({ middleware: "auth", auth: { scopes: ["staff:read"] } });
 const { $t } = useNuxtApp();
 useHead(() => ({ title: $t.admin.staff.title() }));
 
-// The table's first page is fetched on load, once.
 const { table, link } = useStaffTable();
 await useTableRequest(table);
 </script>

@@ -3,7 +3,6 @@ import { describe, expect, it } from "vitest";
 
 import { toChurchEvent, toEventRecord } from "../../src/dto/event";
 
-/** A row as `web.events.weekly` returns it: no `date` or `body` column at all. */
 const WEEKLY = {
   slug: "worship-service",
   title: "Worship Service",
@@ -17,7 +16,6 @@ const WEEKLY = {
   end_time: "11:30:00",
 };
 
-/** A row as `web.events.upcoming` returns it: no `day`, `weeks` or `body` column. */
 const ONE_OFF = {
   slug: "christmas-eve",
   title: "Christmas Eve Service",
@@ -115,7 +113,6 @@ describe("toChurchEvent", () => {
   });
 });
 
-/** A row as `admin.events.fetch` returns it: every column, the timestamps as dates. */
 const ADMIN_ROW = {
   ...WEEKLY,
   id: 3,

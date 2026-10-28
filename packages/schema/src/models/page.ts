@@ -2,7 +2,6 @@ import { z } from "zod";
 
 import { churchEvent } from "./event";
 
-/** The words and picture a page opens with, over its body. */
 export const hero = z
   .object({
     tagline: z.string().meta({ examples: ["Welcome"] }),
@@ -31,11 +30,6 @@ export const hero = z
     description: "The words and picture a page opens with, over its body.",
   });
 
-/**
- * A page's front matter: what every page carries — its title, and the
- * description search engines show — and the fields the site's pages write,
- * each optional, as one page uses some and another none.
- */
 export const page = z
   .object({
     title: z.string().meta({ examples: ["Events"] }),

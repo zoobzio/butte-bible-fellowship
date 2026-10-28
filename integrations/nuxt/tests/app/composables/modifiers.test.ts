@@ -3,7 +3,6 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { useUntheme } from "#imports";
 import { useModifiers } from "#layers/bbf/app/composables/modifiers";
 
-/** A browser's view transition, as far as the helper reaches into it. */
 const viewTransition = () =>
   vi.fn((change: () => void | Promise<void>) => ({
     updateCallbackDone: Promise.resolve(change()),

@@ -1,10 +1,5 @@
 import { z } from "zod";
 
-/**
- * What names a thing in an address: `/events/<slug>`, `/staff/<slug>`.
- * Lowercase words and digits, joined by single hyphens, as a translation
- * never changes it.
- */
 export const slug = z
   .string()
   .regex(

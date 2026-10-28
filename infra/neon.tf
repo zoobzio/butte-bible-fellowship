@@ -1,5 +1,3 @@
-# The Postgres project. One branch, `main`, is production; its default
-# role is the database's owner, and the only role Neon itself creates.
 resource "neon_project" "bbf" {
   name       = "butte-bible-fellowship"
   region_id  = var.neon_region

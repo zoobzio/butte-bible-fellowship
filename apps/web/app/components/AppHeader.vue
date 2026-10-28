@@ -12,9 +12,7 @@ defineOptions({ name: "AppHeader" });
 const { $t } = useNuxtApp();
 const { home, links } = useNavigation();
 
-// The header wraps and scales with the viewport, so its height is published
-// for what sticks under it. The ref is not named `header`: a production
-// build would hand the element to the config of that name instead.
+// Do not name this ref `header`. A production build resolves that name to a config.
 useHeaderHeight(useTemplateRef<HTMLElement>("root"));
 </script>
 
@@ -54,8 +52,6 @@ useHeaderHeight(useTemplateRef<HTMLElement>("root"));
   align-items: center;
   justify-content: space-between;
   gap: var(--space-4) var(--space-6);
-  /* The header alone runs the full viewport: the brand and the tabs stand
-     at the window's edges rather than inside the site column. */
   padding: var(--space-5) calc(var(--site-gutter) / 2) var(--space-4);
   background: color-mix(in oklab, var(--surface) 88%, transparent);
   backdrop-filter: blur(var(--blur-sm)) saturate(1.2);
@@ -78,9 +74,6 @@ useHeaderHeight(useTemplateRef<HTMLElement>("root"));
   text-decoration: none;
 }
 
-/* The logo is drawn in currentColor, so it takes the theme's primary and
-   follows it as the theme changes. It is a square of the brand's height:
-   the name and tagline beside it, as the design system measures them. */
 .site-brand-logo {
   flex: none;
   display: block;
@@ -157,8 +150,6 @@ useHeaderHeight(useTemplateRef<HTMLElement>("root"));
   transform: scaleX(1);
 }
 
-/* The tab of the page being read, or of the page that one is under: an
-   event's page keeps the events tab marked. */
 .site-nav-link[data-active] {
   color: var(--on-surface-high-contrast);
   font-weight: var(--weight-medium);
@@ -168,7 +159,6 @@ useHeaderHeight(useTemplateRef<HTMLElement>("root"));
   transform: scaleX(1);
 }
 
-/* Small screens: the tabs give way to AppMobileNav's menu button. */
 @media (max-width: 44rem) {
   .site-header {
     align-items: flex-start;

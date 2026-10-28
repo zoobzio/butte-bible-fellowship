@@ -18,7 +18,6 @@ const PRAYER = { title: "Prayer Meeting", day: "thursday", start: "10:00" };
 
 const OPEN_HOUSE = { title: "Open House", start: "all day" };
 
-// The week of October 4th: something on Sunday and Thursday, nothing between.
 const DAYS: CalendarDay[] = [
   { date: "2026-10-04", events: [WORSHIP] },
   { date: "2026-10-05", events: [] },

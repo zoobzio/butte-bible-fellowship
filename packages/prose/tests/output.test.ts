@@ -12,10 +12,6 @@ type Descriptors = Record<string, { defaultMessage: string }>;
 const root = fileURLToPath(new URL("..", import.meta.url));
 const read = (file: string) => readFileSync(`${root}${file}`, "utf8");
 
-/**
- * The files under a source directory with an extension, sorted: those in
- * its own directories among them, by their path from it.
- */
 const list = (directory: string, extension: string) =>
   readdirSync(`${root}${directory}`, { recursive: true, encoding: "utf8" })
     .filter((file) => file.endsWith(extension))
@@ -25,8 +21,6 @@ const { source: locale, targets = [] } = config.translate;
 const content =
   typeof config.content === "string" ? config.content : config.content!.dir;
 
-// Every source message by its full key: the file's path from the messages
-// directory, a dot for each slash, then its own key.
 const source = Object.fromEntries(
   list(config.messages, ".json").flatMap((file) =>
     Object.entries(
@@ -40,11 +34,9 @@ const source = Object.fromEntries(
 
 const pages = list(content, ".md");
 
-/** A page's front matter title, as written. */
 const titleOf = (page: string) =>
   /^title: (.*)$/m.exec(read(`${content}/${page}`))?.[1];
 
-/** A page as built: the tree of its body, its front matter on the root. */
 const built = (locale: string, page: string) =>
   JSON.parse(
     read(`.output/content/${locale}/${page.replace(/\.md$/, ".json")}`),
@@ -104,7 +96,6 @@ describe("bundles", () => {
       locale: index.locale,
       messages: await bundles.bundles[index.locale](),
     });
-    // The messages that take a value are formatted with one below.
     const taking = [
       "appearance.scheme",
       "footer.copyright",
@@ -207,8 +198,6 @@ describe("content", () => {
       "invite-card",
       "invite-card",
     ]);
-    // The pages quote Scripture by chapter and verse: a colon in prose
-    // is prose, never a component.
     expect(marked(locale, "about-us.md")).toEqual([]);
   });
 });

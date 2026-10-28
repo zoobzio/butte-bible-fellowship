@@ -43,21 +43,16 @@ const entries = useOutline(() => page);
   margin-inline: auto;
 }
 
-/* The header runs the width of both columns. */
 .about .page-header {
   grid-column: 1 / -1;
 }
 
-/* The grid sets the measure here, so the article fills its column, and the
-   header has already opened the page, so it starts closer under it. */
 .about .prose {
   width: auto;
   margin-inline: 0;
   padding-top: var(--space-7);
 }
 
-/* Rides down the page with the reader once it meets the header, and
-   scrolls on its own when it is taller than the room under it. */
 .about-contents {
   position: sticky;
   top: var(--header-height);
@@ -66,7 +61,6 @@ const entries = useOutline(() => page);
   padding-block: var(--space-7) clamp(var(--space-7), 7vw, var(--space-9));
 }
 
-/* No room for a column beside the article: the contents lead it instead. */
 @media (max-width: 60rem) {
   .about {
     grid-template-columns: minmax(0, 1fr);

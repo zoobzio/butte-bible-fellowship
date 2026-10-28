@@ -7,15 +7,11 @@ import { computed } from "#imports";
 <script setup lang="ts">
 defineOptions({ name: "StaffCard" });
 
-// A compact card is a line in a list of people: the window small and to
-// the left, the person's role and name beside it, and nothing more said.
 const { member, compact = false } = defineProps<{
   member: StaffMember;
   compact?: boolean;
 }>();
 
-// Without a photo the card shows the person's initials: the first letter of
-// their first and last names.
 const initials = computed(() => {
   const names = member.name.trim().split(/\s+/);
   return [names[0], names.length > 1 ? names[names.length - 1] : undefined]
@@ -52,8 +48,6 @@ const initials = computed(() => {
 </template>
 
 <style>
-/* The sermon card's shape — a picture, and what is said about it under —
-   with the picture in the arched window the about page's used to be in. */
 .staff-card {
   display: flex;
   flex-direction: column;
@@ -81,8 +75,6 @@ const initials = computed(() => {
   box-shadow: var(--elevation-mid);
 }
 
-/* What is in the window takes its shape — the arch does that — and fills
-   it. */
 .staff-card-photo,
 .staff-card-initials {
   display: grid;

@@ -21,7 +21,6 @@ const WORSHIP: ChurchEvent = {
 
 const { $t } = useNuxtApp();
 
-/** Each section's label and lines. */
 const sections = (event: ChurchEvent) =>
   mount(EventDetails, { props: { event } })
     .findAll("dl.event-details > div")

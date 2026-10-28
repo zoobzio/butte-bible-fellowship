@@ -1,6 +1,3 @@
--- The events page's calendar, as the site's content lists it: the week's
--- gatherings at 2255 Pillsbury Road, each with the page written about it,
--- published so the site has a week to show.
 INSERT INTO events (slug, title, note, summary, body, day, weeks, start_time, end_time, status) VALUES
   (
     'adult-sunday-school',

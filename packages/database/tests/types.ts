@@ -2,10 +2,6 @@ import type { Arguments, Returns, Row } from "bezoar";
 
 import type { Contract } from "../.output/index.mjs";
 
-/**
- * The types a consumer derives from the build. `pnpm typecheck` proves each
- * one against the declaration `bezoar build` wrote.
- */
 type Equal<A, B> =
   (<T>() => T extends A ? 1 : 2) extends <T>() => T extends B ? 1 : 2
     ? true
@@ -22,12 +18,9 @@ type Day =
   | "saturday";
 
 export type Checks = [
-  // A weekly event on the web always has its day; a one-off has its date.
   Assert<Equal<Row<Contract, "web.events.weekly">["day"], Day>>,
   Assert<Equal<Row<Contract, "web.events.upcoming">["date"], string>>,
-  // What a page may leave out comes back as null.
   Assert<Equal<Row<Contract, "web.staff.list">["bio"], string | null>>,
-  // An enum column reads as its labels.
   Assert<
     Equal<
       Row<Contract, "admin.staff.fetch">["status"],
@@ -35,7 +28,6 @@ export type Checks = [
     >
   >,
   Assert<Equal<Row<Contract, "web.events.weekly">["end_time"], string | null>>,
-  // What is written about an event is its own page's: the lists carry none.
   Assert<Equal<Row<Contract, "web.events.fetch">["body"], string | null>>,
   Assert<
     Equal<
@@ -49,12 +41,10 @@ export type Checks = [
       "draft" | "published" | "archived"
     >
   >,
-  // A timestamp is a Date; a time or a date is a string.
   Assert<Equal<Row<Contract, "admin.sermons.fetch">["created_at"], Date>>,
   Assert<Equal<Row<Contract, "web.sermons.list">["date"], string>>,
   Assert<Equal<Row<Contract, "web.events.weekly">["start_time"], string>>,
   Assert<Equal<Arguments<Contract, "web.sermons.list">, { limit: number }>>,
-  // A sermon not yet recorded has no video; a list carries no body.
   Assert<Equal<Row<Contract, "web.sermons.list">["video"], string | null>>,
   Assert<
     Equal<
@@ -64,7 +54,6 @@ export type Checks = [
   >,
   Assert<Equal<Row<Contract, "web.sermons.fetch">["body"], string | null>>,
   Assert<Equal<Arguments<Contract, "web.events.upcoming">, { from: string }>>,
-  // A write without RETURNING answers with the count of rows it changed.
   Assert<Equal<Returns<Contract, "admin.staff.delete">, number>>,
   Assert<
     Equal<
@@ -72,8 +61,6 @@ export type Checks = [
       { id: number; slug: string; created_at: Date }[]
     >
   >,
-  // A slot written into a column that takes null is optional and takes null,
-  // and an enum slot stays the enum.
   Assert<
     Equal<
       Arguments<Contract, "admin.events.create">["day"],
@@ -92,16 +79,14 @@ export type Checks = [
       string | null | undefined
     >
   >,
-  // A slot written into a NOT NULL column, or compared in a WHERE, is required.
   Assert<Equal<Arguments<Contract, "admin.events.create">["title"], string>>,
   Assert<Equal<Arguments<Contract, "admin.events.update">["id"], number>>,
 ];
 
-// @ts-expect-error The day of an event is one of the enum's labels.
+// @ts-expect-error Day must be an enum label.
 export const wrongDay: Arguments<Contract, "admin.events.create">["day"] =
   "funday";
 
-// What a row may do without may be left out; what it needs may not.
 export const spare: Arguments<Contract, "admin.staff.create"> = {
   slug: "x",
   name: "x",
@@ -110,7 +95,7 @@ export const spare: Arguments<Contract, "admin.staff.create"> = {
   status: "draft",
 };
 
-// @ts-expect-error A member needs a role.
+// @ts-expect-error Role is required.
 export const incomplete: Arguments<Contract, "admin.staff.create"> = {
   slug: "x",
   name: "x",

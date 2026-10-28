@@ -3,7 +3,6 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { service } from "@bbf/nuxt/testing/bezoar";
 import { useStaff } from "~~/server/composables/staff";
 
-/** A row as `web.staff.list` and `web.staff.fetch` return it. */
 const ROW = {
   slug: "jane-doe",
   name: "Jane Doe",
@@ -20,8 +19,6 @@ const first = vi.fn(async (args: { slug: string }) =>
   args.slug === ROW.slug ? ROW : null,
 );
 
-// The service is the stub the module's shim keeps; the staff queries are
-// given to it here, the shape the built service has them in.
 Object.assign(service, { web: { staff: { list, fetch: { first } } } });
 
 afterEach(() => {

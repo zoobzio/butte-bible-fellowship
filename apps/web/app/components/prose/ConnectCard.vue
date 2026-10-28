@@ -52,7 +52,6 @@ defineOptions({ name: "ConnectCard" });
   content: none;
 }
 
-/* Structured, ledger-like rows: label column, value column, hairline rules. */
 .connect-card p {
   margin: 0;
   padding-block: var(--space-3);

@@ -15,17 +15,12 @@ const ENTRIES: OutlineEntry[] = [
   { id: "core-beliefs", depth: 1, text: "Core Beliefs" },
 ];
 
-/** Where each heading sits in the page, from its top. */
 const OFFSETS: Record<string, number> = {
   "our-vision": 200,
   dreams: 600,
   "core-beliefs": 2400,
 };
 
-/**
- * Puts the headings, and a 100px site header, in the document: each heading
- * reports its place in the viewport from the page's scroll.
- */
 const layOut = (page: { scrollY: number }, ids = Object.keys(OFFSETS)) => {
   const header = document.createElement("header");
   header.className = "site-header";
@@ -81,7 +76,6 @@ describe("useOutlineSpy", () => {
     layOut(page);
     const { result } = withSetup(() => useOutlineSpy(ENTRIES));
 
-    // "Dreams" starts 50px under the viewport's top: behind the header.
     scroll(550);
     await frame();
     expect(result.value).toEqual(["dreams"]);

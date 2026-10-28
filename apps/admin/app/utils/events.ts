@@ -4,18 +4,11 @@ import type { EventDraft } from "~/types/events";
 
 import { eventBody } from "@bbf/schema";
 
-/** A control's value as the body takes it: trimmed, and left out when empty. */
 const written = (value: string): string | undefined => {
   const text = value.trim();
   return text === "" ? undefined : text;
 };
 
-/**
- * The weeks of the month as they are typed, `1, 3`, as the body lists
- * them. Nothing typed is every week, which the body says by leaving them
- * out; what is typed and is not a number stays as it is, for the schema to
- * refuse by name.
- */
 export const parseWeeks = (text: string): (number | string)[] | undefined => {
   const parts = text
     .split(/[\s,]+/)
@@ -25,10 +18,6 @@ export const parseWeeks = (text: string): (number | string)[] | undefined => {
   return parts.map((part) => (/^\d+$/.test(part) ? Number(part) : part));
 };
 
-/**
- * An event as the editor holds it, from its record, or blank for a new one:
- * a draft held once, on no date yet, with every control empty.
- */
 export const toEventDraft = (record?: EventRecord): EventDraft => ({
   slug: record?.slug ?? "",
   title: record?.title ?? "",
@@ -46,13 +35,6 @@ export const toEventDraft = (record?: EventRecord): EventDraft => ({
   status: record?.status ?? "draft",
 });
 
-/**
- * The body an event is written from, as the schema checks it, from what
- * the editor holds. The kind decides what is written: an event held once
- * is written with its date and no day, a weekly one with its day and weeks
- * and no date. A control left empty is left out. A draft the schema
- * refuses throws its issues.
- */
 export const toEventBody = (draft: EventDraft): EventBody =>
   eventBody.parse({
     slug: draft.slug.trim(),

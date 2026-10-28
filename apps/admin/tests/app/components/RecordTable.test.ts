@@ -10,10 +10,6 @@ import RecordTable from "~/components/RecordTable.vue";
 import { STAFF_TABLE } from "~/constants/staff";
 import { toTableDescriptors } from "~/utils/listing";
 
-/**
- * The staff table over the rows given, as the layer's factory builds it,
- * its columns headed in English, its fetch answering with those rows alone.
- */
 const service = (data: StaffRecord[]) => {
   const { $t } = useNuxtApp();
   const useTable = createTable<StaffRecord>("record-table", {

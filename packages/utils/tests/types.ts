@@ -14,11 +14,6 @@ import {
   toStaffRecord,
 } from "../src/dto";
 
-/**
- * What the transforms promise at the type level. `pnpm typecheck` proves
- * each against `@bbf/database`'s build and `@bbf/schema`'s types: a column
- * renamed or a field added on either side fails here, before any app.
- */
 declare const listed: Row<Contract, "web.events.list">;
 declare const weekly: Row<Contract, "web.events.weekly">;
 declare const upcoming: Row<Contract, "web.events.upcoming">;
@@ -33,30 +28,27 @@ declare const listedSermon: Row<Contract, "web.sermons.list">;
 declare const fetchedSermon: Row<Contract, "web.sermons.fetch">;
 declare const adminSermon: Row<Contract, "admin.sermons.fetch">;
 
-// Every query of a kind returns a row its transform takes.
 export const events = [listed, weekly, upcoming, fetched, adminEvent].map(
   toChurchEvent,
 );
 export const staff = [webStaff, webOne, adminStaff].map(toStaffMember);
 export const sermons = [listedSermon, fetchedSermon, adminSermon].map(toSermon);
 
-// The admin's queries, listed or fetched, return a row a record is built from.
 export const eventRecords = [adminEvent, adminEvents].map(toEventRecord);
 export const staffRecords = [adminStaff, adminStaffList].map(toStaffRecord);
 
-// @ts-expect-error The site's row has no id, status or timestamps: it is no record.
+// @ts-expect-error Site row is not a record.
 export const noRecord = toStaffRecord(webStaff);
 
-// @ts-expect-error A list's row of the site has no id either.
+// @ts-expect-error Site list row has no id.
 export const noEventRecord = toEventRecord(listed);
 
-// @ts-expect-error A row without a start is no event.
+// @ts-expect-error Start is required.
 export const noStart = toChurchEvent({ slug: "x", title: "x" });
 
-// @ts-expect-error A row without a date is no sermon.
+// @ts-expect-error Date is required.
 export const noDate = toSermon({ slug: "x", title: "x" });
 
-// What a create takes, an update takes with the id of the row it replaces.
 declare const eventArguments: ReturnType<typeof toEventArguments>;
 declare const staffArguments: ReturnType<typeof toStaffArguments>;
 declare const sermonArguments: ReturnType<typeof toSermonArguments>;
@@ -79,6 +71,6 @@ export const updateSermon: Arguments<Contract, "admin.sermons.update"> = {
   id: 1,
 };
 
-// @ts-expect-error An update needs the id of the row it replaces.
+// @ts-expect-error Update needs an id.
 export const updateNothing: Arguments<Contract, "admin.events.update"> =
   eventArguments;

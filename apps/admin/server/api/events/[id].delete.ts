@@ -8,7 +8,6 @@ import {
 
 import { useEvents } from "~~/server/composables/events";
 
-/** Deletes an event, and answers 204. An id no event has is 404. */
 export default defineEventHandler(async (event) => {
   const { id } = await getValidatedRouterParams(event, eventId.parse);
   const removed = await useEvents().remove(id);

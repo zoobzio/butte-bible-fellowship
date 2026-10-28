@@ -5,14 +5,6 @@ import { toChurchEvent } from "@bbf/utils";
 import { useDatabase } from "#layers/bbf/server/composables/database";
 import { churchDate } from "~~/server/utils/events";
 
-/**
- * The events the site lists: the published ones, as the database holds
- * them, each in the shape the API serves. `list` is the calendar's feed —
- * every repeating event, Sunday first, then the one-offs on or after a
- * date, today at the church when none is named; `weekly` and `upcoming`
- * are its two halves on their own. `fetch` is one event by slug, with what
- * is written about it, or `null` when no published event has it.
- */
 export const useEvents = () => {
   const db = useDatabase();
 

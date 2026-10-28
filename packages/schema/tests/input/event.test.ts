@@ -20,7 +20,6 @@ const ONCE = {
   start: "08:00",
 };
 
-/** The paths of the issues a value raises, for telling which field is wrong. */
 const issues = (value: unknown) =>
   eventBody
     .safeParse(value)

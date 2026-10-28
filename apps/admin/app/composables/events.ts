@@ -12,20 +12,11 @@ import { EVENTS_TABLE } from "~/constants/events";
 import { toEventBody, toEventDraft } from "~/utils/events";
 import { toTableDescriptors } from "~/utils/listing";
 
-/** The admin's API for the events, and one of them by id. */
 const ROUTE = "/api/events";
 const endpoint = (id: number): string => `${ROUTE}/${id}`;
 
-/** The way to an event's editor. */
 const link: RecordLink<EventRecord> = (record) => `/events/${record.id}`;
 
-/**
- * The events table: the events a page at a time from `/api/events`, each
- * row the way to its editor, as is the `Edit` action on it. The table is
- * built as the page is set up, its columns and its action named in the
- * reader's language of that moment; the layout sets the page up again when
- * the language changes.
- */
 export const useEventsTable = () => {
   const { $t } = useNuxtApp();
 
@@ -45,14 +36,8 @@ export const useEventsTable = () => {
   return { table: useTable(), link };
 };
 
-/** The event the route names, by id, or `null` when no event has it. */
 export const useEventRecord = () => useRecord("event", endpoint, eventRecord);
 
-/**
- * The editor of an event: over its record, which it replaces on save and
- * can delete, or over none, which it creates. Either way it leaves for the
- * list once done.
- */
 export const useEventEditor = (record: EventRecord | null) => {
   const api = useApi();
   const { $t } = useNuxtApp();

@@ -1,4 +1,3 @@
--- Replaces every field.
 UPDATE staff
 SET slug = :slug,
     name = :name,

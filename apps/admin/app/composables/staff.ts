@@ -12,20 +12,11 @@ import { STAFF_TABLE } from "~/constants/staff";
 import { toStaffBody, toStaffDraft } from "~/utils/staff";
 import { toTableDescriptors } from "~/utils/listing";
 
-/** The admin's API for the staff, and one of them by id. */
 const ROUTE = "/api/staff";
 const endpoint = (id: number): string => `${ROUTE}/${id}`;
 
-/** The way to a member's editor. */
 const link: RecordLink<StaffRecord> = (record) => `/staff/${record.id}`;
 
-/**
- * The staff table: the members a page at a time from `/api/staff`, each
- * row the way to its editor, as is the `Edit` action on it. The table is
- * built as the page is set up, its columns and its action named in the
- * reader's language of that moment; the layout sets the page up again when
- * the language changes.
- */
 export const useStaffTable = () => {
   const { $t } = useNuxtApp();
 
@@ -45,14 +36,8 @@ export const useStaffTable = () => {
   return { table: useTable(), link };
 };
 
-/** The member the route names, by id, or `null` when no member has it. */
 export const useStaffRecord = () => useRecord("staff", endpoint, staffRecord);
 
-/**
- * The editor of a member: over their record, which it replaces on save and
- * can delete, or over none, which it creates. Either way it leaves for the
- * list once done.
- */
 export const useStaffEditor = (record: StaffRecord | null) => {
   const api = useApi();
   const { $t } = useNuxtApp();

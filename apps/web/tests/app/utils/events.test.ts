@@ -22,7 +22,6 @@ import {
 
 describe("churchDate", () => {
   it("is the date at the church, not where it is asked", () => {
-    // Early on the 5th in UTC is still the evening of the 4th in California.
     expect(churchDate(new Date("2026-10-05T03:00:00Z"))).toBe("2026-10-04");
     expect(churchDate(new Date("2026-10-05T12:00:00Z"))).toBe("2026-10-05");
   });
@@ -44,7 +43,6 @@ describe("date arithmetic", () => {
 
 describe("monthOf", () => {
   it("gives a date's month in whole weeks, Sunday to Saturday", () => {
-    // October 2026 starts on a Thursday and ends on a Saturday.
     const dates = monthOf("2026-10-17");
     expect(dates.length).toBe(35);
     expect(dates[0]).toBe("2026-09-27");
@@ -52,7 +50,6 @@ describe("monthOf", () => {
   });
 
   it("gives a month as many weeks as it touches", () => {
-    // February 2026 is four whole weeks; August 2026 touches six.
     expect(monthOf("2026-02-10").length).toBe(28);
     expect(monthOf("2026-08-10").length).toBe(42);
   });
@@ -125,7 +122,6 @@ describe("occursOn", () => {
   });
 
   it("holds a dated event on its date whatever day it also names", () => {
-    // The 24th of December 2026 is a Thursday.
     const dated = event({ date: "2026-12-24", day: "sunday" });
     expect(occursOn(dated, "2026-12-24")).toBe(true);
     expect(occursOn(dated, "2026-12-27")).toBe(false);
@@ -139,7 +135,6 @@ describe("occursOn", () => {
   });
 
   it("holds an event in the weeks of the month it names", () => {
-    // October 2026's Tuesdays: the 6th, 13th, 20th and 27th.
     const some = event({ day: "tuesday", weeks: [1, 3] });
     expect(
       ["2026-10-06", "2026-10-13", "2026-10-20", "2026-10-27"].map((date) =>
@@ -183,7 +178,6 @@ describe("eventsOn", () => {
   });
 
   it("gives a day of the week the events that repeat on it, from the earliest start", () => {
-    // The potluck is held on a Sunday, but once: not what Sundays hold.
     expect(heldOn(EVENTS, "sunday").map((event) => event.title)).toEqual([
       "Open House",
       "Sunday School",

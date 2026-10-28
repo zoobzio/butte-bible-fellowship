@@ -9,10 +9,8 @@ import { useEventCalendar } from "~/composables/events";
 <script setup lang="ts">
 defineOptions({ name: "EventCalendar" });
 
-// The selected day is the page's to keep: it lists that day's events.
 const { events, selected } = defineProps<{
   events: ChurchEvent[];
-  /** The selected day's date, as `YYYY-MM-DD`. */
   selected: string;
 }>();
 
@@ -92,8 +90,6 @@ const { period, weekdays, days, move, select, reset } = useEventCalendar(
 </template>
 
 <style>
-/* ---------- The bar — the month showing, and the way to another ------- */
-
 .event-calendar-bar {
   display: flex;
   flex-wrap: wrap;
@@ -122,8 +118,6 @@ const { period, weekdays, days, move, select, reset } = useEventCalendar(
   gap: var(--space-2);
 }
 
-/* Every button is as tall as an arrow's: its icon, the room around it and
-   its border. */
 .event-calendar-button {
   display: inline-flex;
   align-items: center;
@@ -142,7 +136,6 @@ const { period, weekdays, days, move, select, reset } = useEventCalendar(
     background var(--transition-base);
 }
 
-/* An arrow alone: as tall as it is wide. */
 .event-calendar-button:has(.icon) {
   padding: 0 var(--space-2);
 }
@@ -159,8 +152,6 @@ const { period, weekdays, days, move, select, reset } = useEventCalendar(
   height: var(--space-4);
 }
 
-/* ---------- The grid — seven days across ------------------------------ */
-
 .event-calendar-weekdays,
 .event-calendar-days {
   display: grid;
@@ -170,7 +161,6 @@ const { period, weekdays, days, move, select, reset } = useEventCalendar(
   list-style: none;
 }
 
-/* The design system rules every list item with a dash: not these. */
 .event-calendar li {
   padding-left: 0;
   line-height: inherit;
@@ -180,8 +170,6 @@ const { period, weekdays, days, move, select, reset } = useEventCalendar(
   content: none;
 }
 
-/* The grid is one framed box: the days of the week along its top, on the
-   wash the day's card is painted with, and the days under them. */
 .event-calendar-grid {
   overflow: hidden;
   border: 1px var(--stroke-solid) var(--rule);
@@ -206,8 +194,6 @@ const { period, weekdays, days, move, select, reset } = useEventCalendar(
   color: var(--on-surface-muted);
 }
 
-/* One line between every two days: each day rules its right and bottom,
-   and the frame takes the last of each. */
 .event-calendar-days > li {
   border: 1px var(--stroke-solid) var(--rule);
   border-width: 0 1px 1px 0;
@@ -221,9 +207,6 @@ const { period, weekdays, days, move, select, reset } = useEventCalendar(
   border-bottom: 0;
 }
 
-/* A day holds its number and, under it, a line for each event held on it.
-   It is as tall as the tallest day of its week, so the lines between the
-   days always meet. */
 .event-calendar .event-calendar-day {
   position: relative;
   display: flow-root;
@@ -232,9 +215,7 @@ const { period, weekdays, days, move, select, reset } = useEventCalendar(
   transition: background var(--transition-fast);
 }
 
-/* A strut as tall as the day is wide keeps a day at least a square, and
-   lets it be taller: an aspect ratio on the day itself would hold it to the
-   square while a fuller day beside it stretched the week. */
+/* Do not use aspect-ratio here. A day must grow taller than a square. */
 .event-calendar .event-calendar-day::before {
   content: "";
   float: left;
@@ -246,8 +227,6 @@ const { period, weekdays, days, move, select, reset } = useEventCalendar(
   background: color-mix(in oklab, var(--primary-container) 30%, transparent);
 }
 
-/* A day of a month beside the one shown is on the same wash as the days of
-   the week. */
 .event-calendar-day[data-outside] {
   background: color-mix(
     in oklab,
@@ -260,8 +239,6 @@ const { period, weekdays, days, move, select, reset } = useEventCalendar(
   background: color-mix(in oklab, var(--primary-container) 60%, transparent);
 }
 
-/* The day's number is the button that selects it, and the button reaches
-   over the whole day: anywhere on it that is not an event selects it. */
 .event-calendar-date {
   display: grid;
   place-items: center;
@@ -288,7 +265,6 @@ const { period, weekdays, days, move, select, reset } = useEventCalendar(
   color: var(--on-surface-muted);
 }
 
-/* Today is ringed, and filled once it is the day selected. */
 .event-calendar-date[aria-current] {
   box-shadow: inset 0 0 0 1px var(--primary);
   color: var(--primary);
@@ -301,7 +277,6 @@ const { period, weekdays, days, move, select, reset } = useEventCalendar(
   font-weight: var(--weight-medium);
 }
 
-/* The events sit over the day's button, so each is its own link. */
 .event-calendar-events {
   position: relative;
   display: grid;
@@ -315,7 +290,6 @@ const { period, weekdays, days, move, select, reset } = useEventCalendar(
   min-width: 0;
 }
 
-/* One line each, however long the title: what does not fit is cut short. */
 .event-calendar-event {
   display: block;
   overflow: hidden;
@@ -341,8 +315,6 @@ const { period, weekdays, days, move, select, reset } = useEventCalendar(
   opacity: 0.55;
 }
 
-/* A phone's days are too small for words: each event is a bar, the day is
-   pressed whole, and the events are read — and followed — from its list. */
 @media (max-width: 30rem) {
   .event-calendar .event-calendar-day {
     padding: var(--space-1);

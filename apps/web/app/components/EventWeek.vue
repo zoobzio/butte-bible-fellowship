@@ -9,7 +9,6 @@ import { useEventWeek } from "~/composables/events";
 <script setup lang="ts">
 defineOptions({ name: "EventWeek" });
 
-// A week's days, in order, each with the events held on it.
 const { days } = defineProps<{ days: CalendarDay[] }>();
 
 const { $t } = useNuxtApp();
@@ -34,8 +33,6 @@ const listed = useEventWeek(() => days);
 </template>
 
 <style>
-/* A week at a glance: the days something is held on, side by side across
-   the room there is, as many to a row as fit, each headed by its date. */
 .event-week {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
@@ -45,7 +42,6 @@ const listed = useEventWeek(() => days);
   list-style: none;
 }
 
-/* The design system rules every list item with a dash: these are not. */
 .event-week li {
   padding: 0;
   line-height: 1.6;
@@ -55,8 +51,6 @@ const listed = useEventWeek(() => days);
   content: none;
 }
 
-/* A day's date, and under it what is held then, ruled off from the date
-   as the days were from one another. */
 .event-week > li {
   display: grid;
   gap: var(--space-3);
@@ -79,13 +73,10 @@ const listed = useEventWeek(() => days);
   padding: 0;
 }
 
-/* An event's title, and under it when it is held. */
 .event-week ul li {
   display: grid;
 }
 
-/* The title is the way to the event's page: it reads as a title until it
-   is pointed at. */
 .event-week a {
   color: var(--on-surface-high-contrast);
   text-decoration-color: transparent;

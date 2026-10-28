@@ -5,7 +5,6 @@ import { listing } from "./listing";
 import { slug } from "./slug";
 import { contentStatus } from "./staff";
 
-/** The days of the week an event can repeat on, Sunday first. */
 export const EVENT_DAYS = [
   "sunday",
   "monday",
@@ -16,14 +15,12 @@ export const EVENT_DAYS = [
   "saturday",
 ] as const;
 
-/** A day of the week, as an event names the one it repeats on. */
 export const eventDay = z.enum(EVENT_DAYS).meta({
   id: "EventDay",
   description: "A day of the week, as an event names the one it repeats on.",
   examples: ["sunday"],
 });
 
-/** A time of day on a 24-hour clock, `HH:MM`: `13:00`. */
 export const eventTime = z
   .string()
   .regex(/^\d{2}:\d{2}$/, "a time, as HH:MM")
@@ -33,12 +30,6 @@ export const eventTime = z
     examples: ["13:00"],
   });
 
-/**
- * An event of the church, as the API serves it. One with a `date` happens
- * once, on that date; one with a `day` instead repeats every week on that
- * day. Its times are the church's own. What is written about it, its
- * `body`, is its own page's: a list leaves it out.
- */
 export const churchEvent = z
   .object({
     slug: slug.meta({
@@ -108,18 +99,11 @@ export const churchEvent = z
       "An event of the church. One with a date happens once, on that date; one with a day instead repeats every week on that day. Its times are the church's own.",
   });
 
-/** The events the site lists: the repeating ones Sunday first, then the one-offs to come. */
 export const churchEvents = z.array(churchEvent).meta({
   description:
     "The events the site lists: the repeating ones Sunday first, then the one-offs to come.",
 });
 
-/**
- * An event of the church, as the admin reads it: every column of its row,
- * whatever its status. The `id` names it to the admin, as the slug names
- * its page to the site; the `body` is the Markdown as it was written, for
- * an editor to show, where the site's `body` is the tree.
- */
 export const eventRecord = z
   .object({
     id: z
@@ -187,7 +171,6 @@ export const eventRecord = z
       "An event of the church, as the admin reads it: every column of its row, whatever its status.",
   });
 
-/** A page of the events, as the admin lists them: the repeating ones first, then the one-offs by date, whatever their status. */
 export const eventListing = listing(eventRecord).meta({
   id: "EventListing",
   description:

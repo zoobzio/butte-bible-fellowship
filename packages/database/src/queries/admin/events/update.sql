@@ -1,5 +1,3 @@
--- Replaces every field, the kind of the event with them: a date makes it a
--- one-off, a day makes it weekly.
 UPDATE events
 SET slug = :slug,
     title = :title,

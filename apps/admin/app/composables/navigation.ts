@@ -7,13 +7,6 @@ import {
 } from "#imports";
 import { isWithin } from "~/utils/navigation";
 
-/**
- * The sidebar's sections, as tabs the route drives: one per configured
- * link, in the reader's words, each a real hyperlink to the route that
- * lists its records, and the one whose page is being read — or a page
- * under it, an editor's — marked as active. The tabs stand one under
- * another.
- */
 export const useSidebar = () => {
   const { sidebar } = useAppConfig();
   const { $t } = useNuxtApp();

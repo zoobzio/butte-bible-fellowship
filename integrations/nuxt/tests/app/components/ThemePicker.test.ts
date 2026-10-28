@@ -6,7 +6,6 @@ import { Command } from "#components";
 import { setLocale, useNuxtApp, useUntheme } from "#imports";
 import ThemePicker from "#layers/bbf/app/components/ThemePicker.vue";
 
-// The popover content is portalled to the body, so it is queried from there.
 const all = (selector: string) => [
   ...document.body.querySelectorAll<HTMLElement>(selector),
 ];

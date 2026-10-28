@@ -9,15 +9,6 @@ import { toEventArguments, toEventRecord } from "@bbf/utils";
 import { useDatabase } from "#layers/bbf/server/composables/database";
 import { paginate } from "~~/server/utils/listing";
 
-/**
- * The events as the admin edits them: every event whatever its status,
- * each in the shape the API serves. `list` is one page of them, the
- * repeating ones Sunday first and then the one-offs by date; `fetch` is one
- * by id, or `null` when no event has it. `create` writes an event from its
- * body and hands back the record, or `null` should nothing be written; `update` replaces every field of one, the
- * kind of the event with them, or hands back `null` when no event has the
- * id; `remove` deletes one, and says whether there was one to delete.
- */
 export const useEvents = () => {
   const db = useDatabase();
 

@@ -25,8 +25,6 @@ const { channel } = useRuntimeConfig().public.youtube;
         :sermon="sermon"
       />
     </div>
-    <!-- The way on from the list: the channel, unless what holds the grid
-         hands it another. -->
     <slot>
       <NuxtLink
         :to="`https://www.youtube.com/channel/${channel}/videos`"

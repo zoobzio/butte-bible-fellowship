@@ -8,7 +8,6 @@ import {
 
 import { useStaff } from "~~/server/composables/staff";
 
-/** Deletes a member, and answers 204. An id no member has is 404. */
 export default defineEventHandler(async (event) => {
   const { id } = await getValidatedRouterParams(event, staffId.parse);
   const removed = await useStaff().remove(id);

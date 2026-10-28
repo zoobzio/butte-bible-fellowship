@@ -35,8 +35,6 @@ export default defineNuxtConfig({
 
   bezoar: { build: "@bbf/database" },
 
-  // The church's words, the site's and the admin's: `$t` on every app, in
-  // the reader's language.
   prosary: { build: "@bbf/prose" },
 
   $development: {

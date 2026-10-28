@@ -3,7 +3,6 @@ import { z } from "zod";
 import { slug } from "../models/slug";
 import { contentStatus } from "../models/staff";
 
-/** The path of one staff member: `/staff/{slug}`. */
 export const staffPath = z.object({
   slug: slug.meta({
     description: "What names them in an address.",
@@ -11,7 +10,6 @@ export const staffPath = z.object({
   }),
 });
 
-/** The path of one staff member to the admin: `/staff/{id}`, by their row's number. */
 export const staffId = z.object({
   id: z.coerce
     .number()
@@ -23,11 +21,6 @@ export const staffId = z.object({
     }),
 });
 
-/**
- * A staff member as they are written: what creating one takes, and what
- * updating one replaces, every field. A new member is a draft until the
- * body says otherwise.
- */
 export const staffBody = z
   .object({
     slug: slug.meta({

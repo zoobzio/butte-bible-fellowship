@@ -28,13 +28,11 @@ const day = (wrapper: Calendar, date: string) =>
     return day.find("time").attributes("datetime") === date;
   })!;
 
-/** The dates of the days whose buttons match a selector. */
 const dates = (wrapper: Calendar, selector = "") =>
   wrapper
     .findAll(`.event-calendar-date${selector} time`)
     .map((time) => time.attributes("datetime"));
 
-/** A day's events as the calendar lists them: each line's words and link. */
 const lines = (wrapper: Calendar, date: string) =>
   day(wrapper, date)
     .findAll("a.event-calendar-event")
@@ -53,7 +51,6 @@ const press = async (wrapper: Calendar, label: string) => {
   await button.trigger("click");
 };
 
-// A Monday afternoon at the church.
 beforeEach(() => {
   vi.useFakeTimers({ now: new Date("2026-10-05T20:00:00Z"), toFake: ["Date"] });
 });
@@ -200,7 +197,6 @@ describe("EventCalendar", () => {
   it("takes today from the browser once mounted, at the church's date", async () => {
     const wrapper = mountCalendar();
     expect(dates(wrapper, "[aria-current]")).toEqual(["2026-10-05"]);
-    // The page was rendered on the 5th and is opened on the 7th.
     vi.setSystemTime(new Date("2026-10-07T20:00:00Z"));
     const later = mountCalendar();
     await nextTick();

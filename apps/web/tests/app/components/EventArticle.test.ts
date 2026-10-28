@@ -42,7 +42,6 @@ const OPEN_HOUSE: ChurchEvent = {
   start: "all day",
 };
 
-// What is written about the worship service.
 const WORSHIP_PAGE: PageItem = {
   title: "Worship Service – Test Church",
   body: document(
@@ -56,7 +55,6 @@ const { $t } = useNuxtApp();
 const mountArticle = (event: ChurchEvent, page: PageItem | null = null) =>
   mount(EventArticle, { props: { event, page } });
 
-/** The header's props. */
 const header = (wrapper: VueWrapper) =>
   wrapper.findComponent(PageHeader).props();
 

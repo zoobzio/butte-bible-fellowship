@@ -9,9 +9,6 @@ defineOptions({ name: "InviteCard" });
 </template>
 
 <style>
-/* An invitation: who it is to, and what it says to them. Filled as the
-   invitation bar is — the secondary color washed over the container
-   surface — and edged as the connect cards are. */
 .invite-card {
   position: relative;
   overflow: hidden;
@@ -48,13 +45,10 @@ defineOptions({ name: "InviteCard" });
   box-shadow: var(--elevation-mid);
 }
 
-/* Who the invitation is to, over what it says: the prose's third heading,
-   starting at the top of the card. */
 .invite-card h3 {
   margin: 0 0 var(--space-3);
 }
 
-/* What it says fills the card, and ends with it. */
 .invite-card p {
   margin: 0;
   line-height: 1.7;

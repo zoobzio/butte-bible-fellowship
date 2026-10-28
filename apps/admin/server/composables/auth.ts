@@ -14,15 +14,8 @@ import { AUTH_PREFIX, GRANTS } from "~~/server/constants/auth";
 import { requiredScope } from "~~/server/utils/auth";
 import { useDatabase } from "#layers/bbf/server/composables/database";
 
-/** The schema over `@bbf/patents`: what every auth action proves the user against. */
 export const schema = defineSchema<Contract>(config.contract);
 
-/**
- * The bridge: Google says who signed in, the `users` table what they may
- * do. A user is found by Google's subject; the first time they sign in,
- * by the email they were added with, when Google has verified it, which
- * binds the subject to them. Anyone else is signed in with no grants.
- */
 export const bridge: Bridge<GoogleClaims, Contract> = async (claims) => {
   const db = useDatabase();
   let user = await db.admin.users.subject.first({ sub: claims.sub });
@@ -48,15 +41,6 @@ export const bridge: Bridge<GoogleClaims, Contract> = async (claims) => {
   };
 };
 
-/**
- * Sign-in for the admin. `provider` is Google sign-in for one request,
- * over the OAuth client and the session secret the runtime config names;
- * Google sends the browser back to the callback action at the origin the
- * request came in on, which the OAuth client must list among its redirect
- * URIs. `user` is who is signed in on a request, or `null`. `authorize`
- * holds an API request to the scope it needs: 401 for nobody, 403 for
- * anyone short of it.
- */
 export const useAuthentication = () => {
   const provider = (event: H3Event) => {
     const { google, sessionSecret } = useRuntimeConfig(event);
@@ -66,6 +50,7 @@ export const useAuthentication = () => {
         event,
         clientId: google.clientId,
         clientSecret: google.clientSecret,
+        // The OAuth client must list this URI as a redirect URI.
         redirectUri: `${getRequestURL(event).origin}${AUTH_PREFIX}/callback`,
         secret: sessionSecret,
       },

@@ -7,10 +7,6 @@ import type { InvitationConfig } from "~/types/invitation";
 import { defineAppConfig } from "#imports";
 import { emailHref, phoneHref } from "~/utils/contact";
 
-// The site's words live in `@bbf/prose`: a `label` or `title` here is the
-// key of a message there, checked against its contract and resolved with
-// `$t(message)` where it is rendered.
-
 const header: HeaderConfig = {
   links: [
     { label: "navigation.about", to: "/about-us" },
@@ -59,8 +55,6 @@ const invitation: InvitationConfig = {
   address: contact.address,
 };
 
-// Until an event's page has a picture of its own, it is pictured by the
-// church — the home page's picture.
 const events: EventsConfig = {
   image: "/images/church.jpg",
 };

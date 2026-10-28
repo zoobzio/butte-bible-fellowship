@@ -9,7 +9,6 @@ import EventList from "~/components/EventList.vue";
 const mountList = (events: ChurchEvent[]) =>
   mount(EventList, { props: { events } });
 
-/** Each listed event's words, part by part. */
 const listed = (events: ChurchEvent[]) =>
   mountList(events)
     .findAll(".event-list > ol > li")

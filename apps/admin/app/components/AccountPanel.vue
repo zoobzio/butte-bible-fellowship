@@ -13,7 +13,6 @@ defineOptions({ name: "AccountPanel" });
 
 const { $t } = useNuxtApp();
 
-// Who is signed in, and the way out: the session ends, then the login page.
 const auth = useAuth();
 const signOut = async () => {
   await auth.logout();
@@ -31,8 +30,6 @@ const signOut = async () => {
         {{ auth.current.email }}
       </span>
     </div>
-    <!-- The language and appearance controls are the layer's, each named
-         in the reader's language. -->
     <div
       class="account-controls"
       role="group"
@@ -51,8 +48,6 @@ const signOut = async () => {
 </template>
 
 <style>
-/* The panel: who is signed in, the language and appearance controls, and
-   the way out, one under another, ruled off from the sections above. */
 .account-panel {
   display: grid;
   gap: var(--space-3);
@@ -80,8 +75,6 @@ const signOut = async () => {
   white-space: nowrap;
 }
 
-/* The language, color mode, theme and settings controls sit together in a
-   row. Each opens its panel above itself, clear of the window's foot. */
 .account-controls {
   display: flex;
   align-items: center;

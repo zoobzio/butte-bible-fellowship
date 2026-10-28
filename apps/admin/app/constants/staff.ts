@@ -4,12 +4,6 @@ import type { TableConfig } from "~/types/listing";
 
 import { CONTENT_STATUSES } from "@bbf/schema";
 
-/**
- * The staff table: a member to a row, in the order the site lists them, the
- * name pinned as the way to the editor. The search is left off: the list is
- * short, and the queries do not filter. Each column is headed by a message
- * of `@bbf/prose`, by key.
- */
 export const STAFF_TABLE: TableConfig<StaffRecord> = {
   rowKey: "id",
   searchable: false,

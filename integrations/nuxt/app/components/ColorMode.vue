@@ -7,8 +7,6 @@ import { useColorMode } from "#layers/bbf/app/composables/theme";
 <script setup lang="ts">
 defineOptions({ name: "ColorMode" });
 
-// The button's name says which scheme a press switches to, in the reader's
-// language.
 const { $t } = useNuxtApp();
 const { mode, other, toggle } = useColorMode();
 </script>

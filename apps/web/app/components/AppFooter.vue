@@ -18,7 +18,6 @@ const { $t } = useNuxtApp();
 
 const year = new Date().getFullYear();
 
-/** A line's text: its message in the active locale, or its text as written. */
 const text = (line: FooterLine) => {
   return "label" in line ? $t(line.label) : line.text;
 };
@@ -27,10 +26,6 @@ const text = (line: FooterLine) => {
 <template>
   <footer class="site-footer">
     <div class="site-footer-grid">
-      <!-- The verse's column is headed by the church's name, as the others
-           are by their titles. The reference is marked up as Markdown marks
-           one up in a page's own quotes, so the verse reads here as it would
-           in the prose. -->
       <div class="site-footer-verse">
         <p>
           <strong>{{ $t.site.name() }}</strong>
@@ -60,8 +55,6 @@ const text = (line: FooterLine) => {
     </div>
 
     <div class="site-footer-legal">
-      <!-- The language and appearance controls are the layer's, each named
-           in the reader's language. -->
       <div class="site-footer-controls">
         <LanguagePicker />
         <ColorMode />
@@ -95,8 +88,6 @@ const text = (line: FooterLine) => {
   opacity: 0.85;
 }
 
-/* The verse takes half the footer, and the columns stand together at its
-   far edge, each as wide as what it holds. */
 .site-footer-grid {
   display: flex;
   gap: var(--space-6) var(--space-8);
@@ -108,17 +99,12 @@ const text = (line: FooterLine) => {
   flex: none;
 }
 
-/* The verse is as tall as its words, however far the columns beside it
-   run: its rule does not follow them down. */
 .site-footer-verse {
   flex: 0 1 50%;
   align-self: start;
   margin: 0 auto 0 0;
 }
 
-/* The quote mark the prose hangs over a blockquote rises above it, so the
-   verse stands further under its heading than a column's lines do under
-   theirs: the mark clears the name. */
 .site-footer-verse > p {
   margin: 0;
 }
@@ -127,7 +113,6 @@ const text = (line: FooterLine) => {
   margin: var(--space-6) 0 0;
 }
 
-/* A column's lines: the verse's words are the quote's to set. */
 .site-footer-col > p {
   margin: 0 0 var(--space-2);
   line-height: 1.7;
@@ -147,8 +132,6 @@ const text = (line: FooterLine) => {
   color: var(--primary);
 }
 
-/* No room for the verse beside the columns: it leads them, and they stand
-   two across under it, then one under another. */
 @media (max-width: 60rem) {
   .site-footer-grid {
     display: grid;
@@ -166,7 +149,6 @@ const text = (line: FooterLine) => {
   }
 }
 
-/* The legal strip carries the controls on the left, copyright right. */
 .site-footer-legal {
   display: flex;
   align-items: center;
@@ -185,8 +167,6 @@ const text = (line: FooterLine) => {
   text-align: right;
 }
 
-/* The language, mode, theme and settings controls sit together on the
-   left. */
 .site-footer-controls {
   display: flex;
   align-items: center;

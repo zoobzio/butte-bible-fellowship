@@ -34,7 +34,6 @@ useHead(() => ({ title: page.value?.title }));
 
 const { data: sermons } = await useSermons();
 
-// The newest sermon leads the page from its header; the grid lists the rest.
 const latest = computed(() => sermons.value?.[0]);
 const rest = computed(() => sermons.value?.slice(1) ?? []);
 </script>

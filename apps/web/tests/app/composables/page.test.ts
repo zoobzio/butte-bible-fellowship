@@ -11,7 +11,6 @@ import { document, element } from "#test/support/content";
 
 const ABOUT = document({ title: "About" }, element("p", {}, "Modern wisdom…"));
 
-// The page as `usePage` hands it: its front matter over its body.
 const PAGE = { title: "About", body: ABOUT };
 
 describe("usePage", () => {

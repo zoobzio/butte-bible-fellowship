@@ -3,12 +3,6 @@ import { z } from "zod";
 import { hast } from "./hast";
 import { slug } from "./slug";
 
-/**
- * A sermon preached at the church, as the API serves it. Its `date` is the
- * day it was preached, its `video` YouTube's id for its recording when it
- * has one. What is written about it, its `body`, is its own page's: a list
- * leaves it out.
- */
 export const sermon = z
   .object({
     slug: slug.meta({
@@ -64,7 +58,6 @@ export const sermon = z
       "A sermon preached at the church: the day it was preached, who preached it, and its recording on the church's YouTube channel.",
   });
 
-/** The sermons the site lists, newest first. */
 export const sermons = z.array(sermon).meta({
   description: "The sermons the site lists, newest first.",
 });

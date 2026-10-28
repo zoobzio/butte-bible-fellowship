@@ -3,7 +3,6 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { service } from "@bbf/nuxt/testing/bezoar";
 import { useEvents } from "~~/server/composables/events";
 
-/** A row as `web.events.list` and `web.events.weekly` return it: no body. */
 const WEEKLY = {
   slug: "worship-service",
   title: "Worship Service",
@@ -18,7 +17,6 @@ const WEEKLY = {
   end_time: "11:30:00",
 };
 
-/** A row as `web.events.upcoming` returns it. */
 const ONE_OFF = {
   slug: "christmas-eve",
   title: "Christmas Eve Service",
@@ -31,7 +29,6 @@ const ONE_OFF = {
   end_time: null,
 };
 
-/** A row as `web.events.fetch` returns it: the body with it. */
 const PAGE = { ...WEEKLY, body: "We gather." };
 
 const list = vi.fn(async (_args: { from: string }) => [WEEKLY, ONE_OFF]);
@@ -41,8 +38,6 @@ const first = vi.fn(async (args: { slug: string }) =>
   args.slug === PAGE.slug ? PAGE : null,
 );
 
-// The service is the stub the module's shim keeps; the events queries are
-// given to it here, the shape the built service has them in.
 Object.assign(service, {
   web: { events: { list, weekly, upcoming, fetch: { first } } },
 });
@@ -78,7 +73,6 @@ describe("useEvents", () => {
   });
 
   it("lists from today at the church when no date is asked", async () => {
-    // Late on a Saturday night in UTC: still Saturday in Chico.
     vi.useFakeTimers({
       now: new Date("2026-10-04T03:00:00Z"),
       toFake: ["Date"],

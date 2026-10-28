@@ -9,15 +9,6 @@ import { toStaffArguments, toStaffRecord } from "@bbf/utils";
 import { useDatabase } from "#layers/bbf/server/composables/database";
 import { paginate } from "~~/server/utils/listing";
 
-/**
- * The staff as the admin edits them: every member whatever their status,
- * each in the shape the API serves. `list` is one page of them in their
- * order; `fetch` is one by id, or `null` when no member has it. `create`
- * writes a member from their body and hands back the record,
- * or `null` should nothing be written; `update`
- * replaces every field of one, or hands back `null` when no member has the
- * id; `remove` deletes one, and says whether there was one to delete.
- */
 export const useStaff = () => {
   const db = useDatabase();
 

@@ -5,18 +5,14 @@ import type { ChurchEvent, EventDay } from "@bbf/schema/types";
 import { EVENT_DAYS } from "@bbf/schema";
 import { EVENT_TIME_ZONE } from "~/constants/events";
 
-// A date here is a day on the calendar, written `YYYY-MM-DD`, and not a
-// moment: the arithmetic is done in UTC, where every day is the same length,
-// so no time zone or daylight saving shifts it.
+// Dates are calendar days. Do date arithmetic in UTC to prevent DST shifts.
 
 const DAY = 24 * 60 * 60 * 1000;
 
-/** A date's day, as the moment it starts in UTC. */
 export const toDate = (date: string) => new Date(`${date}T00:00:00Z`);
 
 const toISO = (date: Date) => date.toISOString().slice(0, 10);
 
-/** The date at the church at a moment, wherever it is being asked. */
 export const churchDate = (now: Date): string => {
   const parts = new Intl.DateTimeFormat("en-US", {
     timeZone: EVENT_TIME_ZONE,
@@ -31,21 +27,14 @@ export const churchDate = (now: Date): string => {
 export const addDays = (date: string, days: number) =>
   toISO(new Date(toDate(date).getTime() + days * DAY));
 
-/** The first of the month a number of months from a date's own. */
 export const addMonths = (date: string, months: number) => {
   const first = toDate(`${date.slice(0, 7)}-01`);
   first.setUTCMonth(first.getUTCMonth() + months);
   return toISO(first);
 };
 
-/** The Sunday a date's week starts on. */
 const startOfWeek = (date: string) => addDays(date, -toDate(date).getUTCDay());
 
-/**
- * The dates the calendar shows for a date's month: the month in whole
- * weeks, Sunday to Saturday — so it opens and closes with the days of its
- * neighbors that share those weeks.
- */
 export const monthOf = (date: string): string[] => {
   const end = addDays(startOfWeek(addDays(addMonths(date, 1), -1)), 6);
   const dates: string[] = [];
@@ -59,17 +48,14 @@ export const monthOf = (date: string): string[] => {
   return dates;
 };
 
-/** The dates of a date's week, Sunday to Saturday. */
 export const weekOf = (date: string): string[] => {
   const start = startOfWeek(date);
   return Array.from({ length: 7 }, (_, days) => addDays(start, days));
 };
 
-/** A date that falls on a day of the week: what a formatter names the day by. */
 export const dateOfDay = (day: EventDay) =>
   addDays("1970-01-04", EVENT_DAYS.indexOf(day));
 
-/** A time of day written `HH:MM`, in minutes — `null` when it is not one. */
 export const minutes = (time: string | undefined): number | null => {
   const match = /^(\d{1,2}):(\d{2})$/.exec(time?.trim() ?? "");
   if (!match) return null;
@@ -77,14 +63,8 @@ export const minutes = (time: string | undefined): number | null => {
   return hours < 24 && mins < 60 ? hours * 60 + mins : null;
 };
 
-/** A time of day, in minutes, as a moment a formatter set to UTC can be handed. */
 export const toTime = (time: number) => new Date(time * 60 * 1000);
 
-/**
- * What an event's page is called in its address: its own slug, or one made
- * from its title — lowercase, without accents, a hyphen for every run of
- * anything that is not a letter or a number.
- */
 export const slugOf = (event: ChurchEvent): string => {
   if (event.slug) return event.slug;
   return event.title
@@ -95,15 +75,8 @@ export const slugOf = (event: ChurchEvent): string => {
     .replace(/^-|-$/g, "");
 };
 
-/** Where an event's own page is. */
 export const pathOf = (event: ChurchEvent) => `/events/${slugOf(event)}`;
 
-/**
- * Whether an event is held on a date. One with a date of its own is held
- * then and only then. One with a day of the week is held on every such day,
- * or — given `weeks` — on those of the month's: the third Tuesday is the
- * Tuesday that falls on the 15th to the 21st.
- */
 export const occursOn = (event: ChurchEvent, date: string): boolean => {
   if (event.date) return event.date.slice(0, 10) === date;
   const day = toDate(date);
@@ -112,28 +85,19 @@ export const occursOn = (event: ChurchEvent, date: string): boolean => {
   return event.weeks.includes(Math.ceil(day.getUTCDate() / 7));
 };
 
-/** Events from the earliest start: one whose start cannot be read leads. */
 const byStart = (events: ChurchEvent[]) => {
   const start = (event: ChurchEvent) => minutes(event.start) ?? -1;
   return events.toSorted((a, b) => start(a) - start(b));
 };
 
-/** The events held on a date, from the earliest start. */
 export const eventsOn = (events: ChurchEvent[], date: string) =>
   byStart(events.filter((event) => occursOn(event, date)));
 
-/**
- * The events that repeat on a day of the week, from the earliest start:
- * what happens on a Sunday. One held in some weeks of the month only is
- * among them.
- */
 export const heldOn = (events: ChurchEvent[], day: EventDay) =>
   byStart(events.filter((event) => !event.date && event.day === day));
 
-/** The days the calendar shows for a date's month, each with its events. */
 export const calendar = (events: ChurchEvent[], date: string): CalendarDay[] =>
   monthOf(date).map((day) => ({ date: day, events: eventsOn(events, day) }));
 
-/** The days of a date's week, each with its events. */
 export const week = (events: ChurchEvent[], date: string): CalendarDay[] =>
   weekOf(date).map((day) => ({ date: day, events: eventsOn(events, day) }));

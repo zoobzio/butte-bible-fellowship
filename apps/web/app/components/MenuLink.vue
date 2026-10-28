@@ -10,10 +10,6 @@ import { NuxtLink } from "#components";
 </script>
 
 <script setup lang="ts" generic="T extends MenuItem">
-// The design system renders a menu's link items as plain anchors, which
-// the router does not see. This item takes the menu's own settings for the
-// part and renders the link through NuxtLink, so choosing it navigates in
-// place like every other link on the site.
 const { item, settings } = defineProps<{
   item: T;
   settings: MenuPassthrough<T>;

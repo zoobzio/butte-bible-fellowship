@@ -4,13 +4,8 @@ import { hast } from "./hast";
 import { listing } from "./listing";
 import { slug } from "./slug";
 
-/** The statuses a piece of content passes through: written, live, kept. */
 export const CONTENT_STATUSES = ["draft", "published", "archived"] as const;
 
-/**
- * Whether a piece of content reaches the site: a draft is being written, a
- * published one is live, an archived one is kept but no longer shown.
- */
 export const contentStatus = z.enum(CONTENT_STATUSES).meta({
   id: "ContentStatus",
   description:
@@ -18,7 +13,6 @@ export const contentStatus = z.enum(CONTENT_STATUSES).meta({
   examples: ["published"],
 });
 
-/** Someone who serves the church, as the site lists them. */
 export const staffMember = z
   .object({
     slug: slug.meta({
@@ -59,17 +53,10 @@ export const staffMember = z
     description: "Someone who serves the church, as the site lists them.",
   });
 
-/** The staff the site lists, in their order. */
 export const staffMembers = z.array(staffMember).meta({
   description: "The staff the site lists, in their order.",
 });
 
-/**
- * Someone who serves the church, as the admin reads them: every column of
- * their row, whatever their status. The `id` names them to the admin, as
- * the slug names them to the site; the `bio` is the Markdown as it was
- * written, for an editor to show, where the site's `bio` is the tree.
- */
 export const staffRecord = z
   .object({
     id: z
@@ -128,7 +115,6 @@ export const staffRecord = z
       "Someone who serves the church, as the admin reads them: every column of their row, whatever their status.",
   });
 
-/** A page of the staff, as the admin lists them: in their order, whatever their status. */
 export const staffListing = listing(staffRecord).meta({
   id: "StaffListing",
   description:

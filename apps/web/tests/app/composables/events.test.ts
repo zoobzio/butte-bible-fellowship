@@ -80,7 +80,6 @@ afterEach(() => {
 
 describe("useToday", () => {
   it("is the date at the church", () => {
-    // Early on the 5th in UTC is still the evening of the 4th in California.
     vi.useFakeTimers({
       now: new Date("2026-10-05T03:00:00Z"),
       toFake: ["Date"],
@@ -93,7 +92,6 @@ describe("useToday", () => {
       now: new Date("2026-10-07T20:00:00Z"),
       toFake: ["Date"],
     });
-    // What the server rendered, days before, comes with the page.
     useState("events:today", () => "2026-10-01");
     expect(withSetup(useToday).result.value).toBe("2026-10-07");
   });
@@ -290,7 +288,6 @@ describe("useEventListing", () => {
 });
 
 describe("useEventWeek", () => {
-  // The week of October 4th: something on Sunday and Thursday, nothing between.
   const PRAYER: ChurchEvent = {
     title: "Prayer Meeting",
     day: "thursday",
@@ -410,13 +407,11 @@ describe("useEventCalendar", () => {
     return { ...result, onSelect, picked };
   };
 
-  /** The dates of the days a mark is set on. */
   const marked = (
     days: ReturnType<typeof setUp>["days"],
     mark: "today" | "selected" | "outside",
   ) => days.value.filter((day) => day[mark]).map((day) => day.date);
 
-  // A Monday afternoon at the church.
   beforeEach(() => {
     vi.useFakeTimers({
       now: new Date("2026-10-05T20:00:00Z"),
@@ -564,7 +559,6 @@ describe("useEventsHeldOn", () => {
     day: "thursday",
     start: "10:00",
   };
-  // Held once, on a Sunday.
   const SUNDAY_DINNER: ChurchEvent = { ...DINNER, date: "2026-10-18" };
 
   it("is what repeats on a day of the week, from the earliest start", () => {
@@ -593,10 +587,8 @@ describe("useEventsThisWeek", () => {
     day: "thursday",
     start: "10:00",
   };
-  // Held once, the week after the one the tests are in.
   const NEXT_WEEK: ChurchEvent = { ...DINNER, date: "2026-10-14" };
 
-  // A Tuesday at the church: its week is Sunday the 4th to Saturday the 10th.
   beforeEach(() => {
     vi.useFakeTimers({
       now: new Date("2026-10-06T19:00:00Z"),
@@ -637,10 +629,8 @@ describe("useEventsThisWeek", () => {
     day: "thursday",
     start: "10:00",
   };
-  // Held once, the week after the one the tests are in.
   const NEXT_WEEK: ChurchEvent = { ...DINNER, date: "2026-10-14" };
 
-  // A Tuesday at the church: its week is Sunday the 4th to Saturday the 10th.
   beforeEach(() => {
     vi.useFakeTimers({
       now: new Date("2026-10-06T19:00:00Z"),
@@ -716,7 +706,6 @@ describe("useEvent", () => {
 describe("useSelectedDay", () => {
   const EVENTS = [WORSHIP, SCHOOL, DINNER];
 
-  // A Sunday afternoon at the church.
   beforeEach(() => {
     vi.useFakeTimers({
       now: new Date("2026-10-04T20:00:00Z"),

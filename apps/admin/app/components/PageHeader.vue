@@ -5,8 +5,6 @@ import { NuxtLink } from "#components";
 <script setup lang="ts">
 defineOptions({ name: "PageHeader" });
 
-// A page's title, and the one thing it offers to do beside it — `New
-// member`, say — where it leads.
 const { title, to, action } = defineProps<{
   title: string;
   to?: string;

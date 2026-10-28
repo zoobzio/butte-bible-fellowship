@@ -19,7 +19,4 @@ terraform {
       version = "~> 3.9"
     }
   }
-
-  # State is local until a backend is chosen. See README.md, "State".
-  # backend "s3" {}
 }

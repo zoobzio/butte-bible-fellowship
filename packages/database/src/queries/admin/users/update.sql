@@ -1,5 +1,3 @@
--- Replaces what the admin edits: the email and the role. Changing the
--- email unbinds the user from Google until they sign in with the new one.
 UPDATE users
 SET email = lower(:email::text),
     role = :role,

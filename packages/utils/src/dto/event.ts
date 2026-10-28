@@ -3,25 +3,12 @@ import type { ChurchEvent, EventRecord } from "@bbf/schema/types";
 import { toHast } from "./hast";
 import type { EventRecordRow, EventRow } from "../types";
 
-/** A time as Postgres writes it, `HH:MM:SS`, as the API says it, `HH:MM`. */
+// Postgres returns `HH:MM:SS`. The API uses `HH:MM`.
 const toEventTime = (time: string): string => time.slice(0, 5);
 
-/**
- * The weeks of the month a row names, as the model lists them. Null is every
- * week, which the model says by leaving them out; a null among them names
- * no week, and is dropped.
- */
 const toWeeks = (weeks: EventRow["weeks"]): number[] | undefined =>
   weeks?.filter((week): week is number => week !== null);
 
-/**
- * An event as the API serves it, from a row of the events. A column the
- * row has null in, or a list's row has not, the event leaves out; the body,
- * written as Markdown, goes out as the tree the app renders; its times lose
- * their seconds, as `start_time` and `end_time` are written to the minute.
- * An admin row's `id`, `status` and timestamps keep it, and are not what
- * the site shows: the model carries none of them.
- */
 export const toChurchEvent = (row: EventRow): ChurchEvent => ({
   slug: row.slug,
   title: row.title,
@@ -37,13 +24,6 @@ export const toChurchEvent = (row: EventRow): ChurchEvent => ({
   end: row.end_time === null ? undefined : toEventTime(row.end_time),
 });
 
-/**
- * An event as the admin reads it, from a row of the admin's queries. A
- * column the row has null in, the record leaves out; the body stays the
- * Markdown it was written as, for an editor to show; its times lose their
- * seconds as the site's do; the id and status come along, and the
- * timestamps as moments in UTC.
- */
 export const toEventRecord = (row: EventRecordRow): EventRecord => ({
   id: row.id,
   slug: row.slug,

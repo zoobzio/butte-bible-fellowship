@@ -4,11 +4,6 @@ import { useAsyncData, useRoute } from "#imports";
 import { useApi } from "~/composables/api";
 import { isNotFound } from "~/utils/errors";
 
-/**
- * The record the route names, by the id its path ends with, from the
- * admin's own API, checked against what the record is. An id that is not
- * one, or one no record has, is `null`: the page says so.
- */
 export const useRecord = <T>(
   kind: string,
   path: (id: number) => string,

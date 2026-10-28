@@ -1,5 +1,2 @@
--- The admin app: the full set of reads and writes over the content tables,
--- and the users who may sign in to it. Each id is an identity column, which
--- Postgres fills without a privilege on its sequence, so the tables are the
--- whole of the grant.
+-- Identity columns need no sequence grant.
 GRANT SELECT, INSERT, UPDATE, DELETE ON staff, events, sermons, users TO admin;

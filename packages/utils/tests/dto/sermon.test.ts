@@ -3,7 +3,6 @@ import { describe, expect, it } from "vitest";
 
 import { toSermon } from "../../src/dto/sermon";
 
-/** A row as `web.sermons.list` returns it: no `body` column at all. */
 const ROW = {
   slug: "faith-and-works",
   title: "Faith & Works",

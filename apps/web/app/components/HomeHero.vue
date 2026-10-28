@@ -7,7 +7,6 @@ import { NuxtLink } from "#components";
 <script setup lang="ts">
 defineOptions({ name: "HomeHero" });
 
-// The home page's front matter: what it opens with.
 const { hero } = defineProps<{ hero: Hero }>();
 </script>
 
@@ -32,7 +31,6 @@ const { hero } = defineProps<{ hero: Hero }>();
 </template>
 
 <style>
-/* The content, and to its right the window its picture is in. */
 .home-hero-body {
   position: relative;
   z-index: 1;
@@ -68,8 +66,6 @@ const { hero } = defineProps<{ hero: Hero }>();
   margin: 0;
 }
 
-/* The staff card's arched window, holding its shape with or without a
-   picture: until the page names one, it stands empty in its place. */
 .home-hero-media {
   overflow: hidden;
   aspect-ratio: 4 / 5;
@@ -80,7 +76,6 @@ const { hero } = defineProps<{ hero: Hero }>();
   box-shadow: var(--elevation-low);
 }
 
-/* The picture fills the window; the arch gives it the window's shape. */
 .home-hero-media img {
   display: block;
   width: 100%;
@@ -88,8 +83,6 @@ const { hero } = defineProps<{ hero: Hero }>();
   object-fit: cover;
 }
 
-/* No room for a column beside the content: the window follows it, no
-   wider than it stood beside it. */
 @media (max-width: 60rem) {
   .home-hero-body {
     grid-template-columns: minmax(0, 1fr);
@@ -99,12 +92,6 @@ const { hero } = defineProps<{ hero: Hero }>();
   }
 }
 
-/* ---------- Motion — slow enough to feel like weather ---------------- */
-
-/* The hero rises in, each part a step after the last, unless the reader —
-   or the system — has asked for less motion. The pace, the step and the
-   easing are the axis's: expressive motion spreads the steps and lets each
-   part overshoot its place before it settles. */
 @media (prefers-reduced-motion: no-preference) {
   html:not([data-motion="reduced"]) .home-hero-content > *,
   html:not([data-motion="reduced"]) .home-hero-media {

@@ -10,7 +10,6 @@ import { STATUS_OPTIONS } from "~/constants/editor";
 <script setup lang="ts">
 defineOptions({ name: "StaffEditor" });
 
-// The member to edit, or none: a new one.
 const { record } = defineProps<{ record: StaffRecord | null }>();
 
 const { $t } = useNuxtApp();

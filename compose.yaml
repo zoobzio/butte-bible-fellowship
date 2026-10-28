@@ -1,25 +1,5 @@
-# The local environment: one Postgres, and the site and the admin app on it
-# together, so a change made in one shows in the other. `make dev` runs it
-# detached, `make up` in the foreground.
-#
-# `pnpm dev` on the host gives each app a Postgres of its own, in the
-# process; here both connect to `db` instead, through the `pg` driver, as
-# the one superuser. The layer's development config has each app apply the
-# migrations, the roles and the seeds as it starts, under bezoar's advisory
-# locks, so the two may start together. Each app then takes its role on
-# every statement, as it does on the host.
-#
-# The checkout is bind-mounted over /app, node_modules included, so the dev
-# servers watch the files you edit and hot-reload as they would on the
-# host. Run `pnpm install` on the host first (`make dev` does); a change to a
-# package's sources is built by its `prepare` script, as on the host.
-
 name: bbf
 
-# The apps run as the container's root. Under a rootless Docker that is
-# the user who ran `docker compose`, so what the dev servers write into the
-# checkout is theirs; under a rootful daemon add `user: "1000:1000"` (your
-# own uid and gid) to each app so the files are not root's.
 x-app: &app
   build: tools/docker
   working_dir: /app
@@ -61,9 +41,6 @@ services:
     command: pnpm --filter @bbf/admin dev --host 0.0.0.0
     ports:
       - "3001:3001"
-    # Google sign-in and the session secret, from the admin's own `.env`;
-    # see `apps/admin/.env.example`. The app starts without them, but no
-    # one can sign in.
     env_file:
       - path: apps/admin/.env
         required: false

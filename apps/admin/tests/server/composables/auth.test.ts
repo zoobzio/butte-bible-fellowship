@@ -7,13 +7,10 @@ import { bridge, schema } from "~~/server/composables/auth";
 import { GRANTS as grants } from "~~/server/constants/auth";
 import { requiredScope } from "~~/server/utils/auth";
 
-// Vitest hoists the mock over the imports: the composable reads its
-// runtime config from Nitro, which is not here.
 vi.mock("nitropack/runtime", () => ({ useRuntimeConfig: () => ({}) }));
 
 const SUB = "104958204857204857204";
 
-/** Google's ID token claims for a verified account. */
 const CLAIMS = {
   iss: "https://accounts.google.com",
   aud: "client",
@@ -26,7 +23,6 @@ const CLAIMS = {
   picture: "https://example.com/pastor.jpg",
 };
 
-/** A user as `admin.users.subject` and `admin.users.claim` return one. */
 const USER = {
   id: 1,
   email: "pastor@example.com",

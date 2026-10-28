@@ -13,7 +13,6 @@ definePageMeta({ middleware: "auth", auth: { scopes: ["events:read"] } });
 const { $t } = useNuxtApp();
 useHead(() => ({ title: $t.admin.events.title() }));
 
-// The table's first page is fetched on load, once.
 const { table, link } = useEventsTable();
 await useTableRequest(table);
 </script>

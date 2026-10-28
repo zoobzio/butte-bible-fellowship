@@ -4,7 +4,6 @@ import { eventDay, eventTime } from "../models/event";
 import { slug } from "../models/slug";
 import { contentStatus } from "../models/staff";
 
-/** The path of an event's own page: `/events/{slug}`. */
 export const eventPath = z.object({
   slug: slug.meta({
     description: "What the event's own page is called in its address.",
@@ -12,7 +11,6 @@ export const eventPath = z.object({
   }),
 });
 
-/** The path of one event to the admin: `/events/{id}`, by its row's number. */
 export const eventId = z.object({
   id: z.coerce
     .number()
@@ -24,7 +22,6 @@ export const eventId = z.object({
     }),
 });
 
-/** The query of the events list: from which date the one-offs are listed. */
 export const eventsQuery = z.object({
   from: z.iso
     .date()
@@ -36,13 +33,6 @@ export const eventsQuery = z.object({
     }),
 });
 
-/**
- * An event as it is written: what creating one takes, and what updating one
- * replaces, every field. It happens once, on its `date`, or repeats every
- * week on its `day`: one of the two, never both. Only a repeating event
- * picks its `weeks`, and an `end` comes after its `start`. A new event is a
- * draft until the body says otherwise.
- */
 export const eventBody = z
   .object({
     slug: slug.meta({

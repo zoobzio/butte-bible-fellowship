@@ -34,8 +34,6 @@ const { when, where, questions } = useEventDetails(() => event);
 </template>
 
 <style>
-/* The card the events page lists a day's events in, holding what there is
-   to know of one: when, where, and who to ask. */
 .event-details {
   position: relative;
   overflow: hidden;
@@ -62,8 +60,6 @@ const { when, where, questions } = useEventDetails(() => event);
   background: var(--gradient-signature);
 }
 
-/* Each answer is ruled off from the one before it, as the events of a day
-   are. */
 .event-details > div {
   padding: var(--space-4) 0;
   border-top: 1px var(--stroke-solid) var(--rule);
@@ -78,7 +74,6 @@ const { when, where, questions } = useEventDetails(() => event);
   padding-bottom: 0;
 }
 
-/* The question, said as the label over a page's contents is. */
 .event-details dt {
   margin: 0 0 var(--space-1);
   font: var(--type-title);
@@ -89,7 +84,6 @@ const { when, where, questions } = useEventDetails(() => event);
   color: var(--primary);
 }
 
-/* An address is one long word: it breaks where the card ends. */
 .event-details dd {
   margin: 0;
   line-height: 1.6;

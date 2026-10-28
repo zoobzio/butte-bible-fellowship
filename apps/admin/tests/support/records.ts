@@ -1,6 +1,5 @@
 import type { EventRecord, StaffRecord } from "@bbf/schema/types";
 
-/** A member as the admin's API serves them. */
 export const STAFF: StaffRecord = {
   id: 1,
   slug: "jane-doe",
@@ -15,7 +14,6 @@ export const STAFF: StaffRecord = {
   updatedAt: "2026-10-18T09:30:00.000Z",
 };
 
-/** A weekly event as the admin's API serves it. */
 export const WORSHIP: EventRecord = {
   id: 3,
   slug: "worship-service",
@@ -30,7 +28,6 @@ export const WORSHIP: EventRecord = {
   updatedAt: "2026-10-18T09:30:00.000Z",
 };
 
-/** A one-off event as the admin's API serves it. */
 export const DINNER: EventRecord = {
   id: 4,
   slug: "harvest-dinner",

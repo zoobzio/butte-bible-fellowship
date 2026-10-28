@@ -18,7 +18,6 @@ const PRAYER = {
   day: "thursday",
   start: "10:00",
 };
-// Held once, the week after the one the tests are in.
 const DINNER = {
   title: "Harvest Dinner",
   slug: "harvest-dinner",
@@ -44,7 +43,6 @@ const mountWeek = async (
 };
 
 beforeEach(() => {
-  // A Tuesday at the church: its week is Sunday the 4th to Saturday the 10th.
   vi.useFakeTimers({
     now: new Date("2026-10-06T19:00:00Z"),
     toFake: ["Date"],

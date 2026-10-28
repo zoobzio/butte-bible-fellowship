@@ -12,7 +12,6 @@ defineOptions({ name: "LanguagePicker" });
 const { $t } = useNuxtApp();
 const { current, languages, choose } = useLanguages();
 
-// Each language is a choice: picking one switches the app to it in place.
 const menu = defineMenu(() => ({
   groups: [
     {
@@ -40,8 +39,6 @@ const menu = defineMenu(() => ({
 </template>
 
 <style>
-/* The language button names the language beside its icon, so it widens
-   the toggle button's square padding. */
 .theme-toggle.language-toggle {
   padding-inline: var(--space-3);
 }

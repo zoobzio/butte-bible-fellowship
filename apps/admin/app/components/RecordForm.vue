@@ -7,8 +7,6 @@ defineOptions({ name: "RecordForm" });
 
 const { $t } = useNuxtApp();
 
-// The form an editor's controls stand in: what it is doing, what went wrong,
-// and whether there is a record to delete. The controls are slotted in.
 const { saving, removing, error, removable } = defineProps<{
   saving: boolean;
   removing: boolean;
@@ -58,8 +56,6 @@ const emit = defineEmits<{
   max-width: 44rem;
 }
 
-/* The controls, two to a row where there is room, each labelled over its
-   input; a wide one — a bio, a body — takes the row. */
 .record-form-fields {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
@@ -118,7 +114,6 @@ const emit = defineEmits<{
   color: var(--on-surface-muted);
 }
 
-/* A choice between a few ways, each a radio with its words beside it. */
 .record-form-choices {
   display: grid;
   gap: var(--space-2);

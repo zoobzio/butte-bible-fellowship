@@ -11,7 +11,6 @@ defineOptions({ name: "HomeSermons" });
 
 const { $t } = useNuxtApp();
 
-// The three newest sermons close the page: the sermons page has the rest.
 const recent = await useRecentSermons();
 </script>
 
@@ -27,7 +26,6 @@ const recent = await useRecentSermons();
 </template>
 
 <style>
-/* The week's own margin has already set the sermons off from it. */
 .home-sermons {
   margin-top: clamp(var(--space-8), 8vw, var(--space-9));
 }

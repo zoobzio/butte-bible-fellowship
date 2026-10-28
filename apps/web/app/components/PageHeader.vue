@@ -10,7 +10,6 @@ defineOptions({ name: "PageHeader" });
 const { title, description, back } = defineProps<{
   title: string;
   description?: string;
-  /** The label of a link back to the page that brought the reader here. */
   back?: string;
 }>();
 
@@ -19,8 +18,6 @@ const { up, leave } = usePageBack();
 
 <template>
   <header class="page-header">
-    <!-- A click that opens the link elsewhere — a new tab, a new window —
-         is left to the browser: it has the address to open. -->
     <a
       v-if="back"
       :href="up"
@@ -40,12 +37,10 @@ const { up, leave } = usePageBack();
 </template>
 
 <style>
-/* The header fills whatever holds it: the page sets the measure. */
 .page-header {
   padding-top: clamp(var(--space-7), 7vw, var(--space-9));
 }
 
-/* The way back, over the title: as quiet as a tab of the site's header. */
 .page-header-back {
   display: inline-flex;
   align-items: center;

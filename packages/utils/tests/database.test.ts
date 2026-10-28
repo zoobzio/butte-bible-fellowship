@@ -30,8 +30,6 @@ import {
 
 let db: Awaited<ReturnType<typeof makeTestBezoar<typeof contract>>>;
 
-// The transforms, proved against the database itself: what a body writes
-// through `dao/` reads back through `dto/` as the thing the body described.
 beforeAll(async () => {
   db = await makeTestBezoar(contract, { queries, migrations, seeds });
 });
@@ -87,12 +85,10 @@ describe("events", () => {
     const created = await db.admin.events.create.first(toEventArguments(body));
     const id = created!.id;
 
-    // The body is stored as it was written, and the lists leave it out.
     expect(await db.admin.events.fetch.first({ id })).toMatchObject({
       body: "Come **early**.",
     });
 
-    // The admin reads it back whole, the body still as written.
     const record = toEventRecord((await db.admin.events.fetch.first({ id }))!);
     expect(record).toMatchObject({
       id,
@@ -120,7 +116,6 @@ describe("events", () => {
       },
     ]);
 
-    // Its own page carries the body, as the tree.
     const page = await db.web.events.fetch.first({ slug: "christmas-eve" });
     expect(toChurchEvent(page!)).toEqual({
       ...toChurchEvent(upcoming[0]!),
@@ -146,7 +141,6 @@ describe("events", () => {
       },
     });
 
-    // Updated as weekly from a body: the date goes, the day and weeks come.
     const weekly = eventBody.parse({
       slug: "christmas-eve",
       title: "Advent Evening",
@@ -201,12 +195,10 @@ describe("staff", () => {
     const created = await db.admin.staff.create.first(toStaffArguments(body));
     const id = created!.id;
 
-    // The bio is stored as it was written, and served as the tree.
     expect(await db.admin.staff.fetch.first({ id })).toMatchObject({
       bio: "Serving **since 2010**.",
     });
 
-    // The admin reads them back whole, the bio still as written.
     const record = toStaffRecord((await db.admin.staff.fetch.first({ id }))!);
     expect(record).toMatchObject({
       id,
@@ -284,7 +276,6 @@ describe("sermons", () => {
     );
     const id = created!.id;
 
-    // The body is stored as it was written, and the list leaves it out.
     expect(await db.admin.sermons.fetch.first({ id })).toMatchObject({
       body: "What **faith** does.",
     });
@@ -299,7 +290,6 @@ describe("sermons", () => {
     });
     expect(sermon.safeParse(listed).success).toBe(true);
 
-    // Its own page carries the body, as the tree.
     const page = await db.web.sermons.fetch.first({ slug: "faith-and-works" });
     expect(toSermon(page!)).toEqual({
       ...listed,
@@ -327,7 +317,6 @@ describe("sermons", () => {
     const row = await db.admin.sermons.fetch.first({ id });
     expect(toSermon(row!)).toEqual(toSermon(page!));
 
-    // Updated from a body that names no video: the video goes.
     const unrecorded = sermonBody.parse({
       slug: "faith-and-works",
       title: "Faith and Works",

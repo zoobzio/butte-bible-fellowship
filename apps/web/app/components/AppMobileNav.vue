@@ -34,7 +34,6 @@ const menu = defineMenu(() => ({
 </template>
 
 <style>
-/* The tabs collapse behind a menu button on small screens. */
 .site-nav-mobile {
   display: none;
 }

@@ -1,6 +1,5 @@
 import { z } from "zod";
 
-/** What an element's attribute holds: a string, a number, a flag, or a list of tokens such as class names. */
 const hastPropertyValue = z.union([
   z.string(),
   z.number(),
@@ -9,7 +8,6 @@ const hastPropertyValue = z.union([
   z.array(z.union([z.string(), z.number()])),
 ]);
 
-/** A run of text in the tree. */
 export const hastText = z
   .object({
     type: z.literal("text"),
@@ -17,11 +15,6 @@ export const hastText = z
   })
   .meta({ id: "HastText", description: "A run of text." });
 
-/**
- * An HTML element: its tag, its attributes as `hast` names them —
- * `className` for `class`, `dataDirective` for `data-directive` — and what
- * it holds.
- */
 export const hastElement = z
   .object({
     type: z.literal("element"),
@@ -41,12 +34,6 @@ export const hastElement = z
     description: "An HTML element: its tag, its attributes, and what it holds.",
   });
 
-/**
- * Rich text as the API serves it: the HTML syntax tree
- * ([hast](https://github.com/syntax-tree/hast)) a Markdown column is built
- * to, the same tree the site's pages are built to, which the app renders
- * with its own components. Elements and text, with no positions.
- */
 export const hast = z
   .object({
     type: z.literal("root"),

@@ -10,7 +10,6 @@ import { DAY_OPTIONS, KIND_OPTIONS, STATUS_OPTIONS } from "~/constants/editor";
 <script setup lang="ts">
 defineOptions({ name: "EventEditor" });
 
-// The event to edit, or none: a new one.
 const { record } = defineProps<{ record: EventRecord | null }>();
 
 const { $t } = useNuxtApp();

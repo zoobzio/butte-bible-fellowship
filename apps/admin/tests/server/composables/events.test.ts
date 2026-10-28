@@ -3,7 +3,6 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { service } from "@bbf/nuxt/testing/bezoar";
 import { useEvents } from "~~/server/composables/events";
 
-/** A row as `admin.events.list` and `admin.events.fetch` return it. */
 const ROW = {
   id: 3,
   slug: "worship-service",
@@ -23,7 +22,6 @@ const ROW = {
   updated_at: new Date("2026-10-18T09:30:00Z"),
 };
 
-/** The same, as the API serves it. */
 const RECORD = {
   id: 3,
   slug: "worship-service",

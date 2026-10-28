@@ -9,7 +9,6 @@ import { useStaffRecord } from "~/composables/staff";
 <script setup lang="ts">
 definePageMeta({ middleware: "auth", auth: { scopes: ["staff:read"] } });
 
-// The member is the one the address names, by id.
 const { $t } = useNuxtApp();
 const { data: record } = await useStaffRecord();
 

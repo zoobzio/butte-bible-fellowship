@@ -42,8 +42,6 @@ useHead(() => ({ title: page.value?.title }));
 </template>
 
 <style>
-/* The page keeps the site's measure, as every page does: the hero, the
-   article, the week and the sermons each fill it. */
 .home {
   width: min(100% - var(--site-gutter), var(--site-width));
   margin-inline: auto;

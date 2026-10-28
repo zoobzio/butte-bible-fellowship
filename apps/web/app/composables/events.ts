@@ -38,11 +38,6 @@ import {
   week,
 } from "~/utils/events";
 
-/**
- * Today's date at the church, as `YYYY-MM-DD`. It is the server's until the
- * page is in a browser: a page rendered ahead of time says what day it was
- * then, and is put right once mounted. Everything that asks shares the one.
- */
 export const useToday = (): Ref<string> => {
   const today = useState("events:today", () => churchDate(new Date()));
 
@@ -53,32 +48,18 @@ export const useToday = (): Ref<string> => {
   return today;
 };
 
-/**
- * The events, in the reader's language: the events page's front matter is
- * the calendar, and it is read whichever page asks. An events page that
- * cannot be read has none.
- */
 export const useEvents = async (): Promise<ComputedRef<ChurchEvent[]>> => {
   const { data } = await usePage("/events");
 
   return computed(() => data.value?.events ?? []);
 };
 
-/**
- * The events that repeat on a day of the week, from the earliest start:
- * what happens on a Sunday. One held in some weeks of the month only is
- * among them.
- */
 export const useEventsHeldOn = (
   events: MaybeRefOrGetter<ChurchEvent[]>,
   day: MaybeRefOrGetter<EventDay>,
 ): ComputedRef<ChurchEvent[]> =>
   computed(() => heldOn(toValue(events), toValue(day)));
 
-/**
- * The days of this week, Sunday to Saturday, each with the events held on
- * it: the week today is in, whenever today is.
- */
 export const useEventsThisWeek = (
   events: MaybeRefOrGetter<ChurchEvent[]>,
 ): ComputedRef<CalendarDay[]> => {
@@ -87,11 +68,6 @@ export const useEventsThisWeek = (
   return computed(() => week(toValue(events), today.value));
 };
 
-/**
- * The event the route names: one of the events, found by the slug the
- * address ends with. None when no event has it, or the events cannot be
- * read.
- */
 export const useEvent = async (): Promise<
   ComputedRef<ChurchEvent | undefined>
 > => {
@@ -104,11 +80,6 @@ export const useEvent = async (): Promise<
   });
 };
 
-/**
- * Says a date written `YYYY-MM-DD` in the reader's language, as the options
- * ask. A date is a day on the calendar and not a moment, so it is read
- * where it was written, in UTC.
- */
 export const useEventDate = (options: Intl.DateTimeFormatOptions) => {
   const { locale } = useLocale();
 
@@ -120,20 +91,9 @@ export const useEventDate = (options: Intl.DateTimeFormatOptions) => {
   return (date: string): string => format.value.format(toDate(date));
 };
 
-/**
- * Every space in a formatted time a plain one. A formatter sets thin and
- * no-break spaces about a time — `10:00 – 11:30 AM` — and which it sets
- * depends on the ICU it was built with: the server's and a browser's are
- * not the same build, and the words the server renders would not match the
- * browser's own. Plain spaces are the same everywhere.
- */
+// ICU builds differ in their spaces. Plain spaces keep server and browser output the same.
 const plain = (text: string): string => text.replace(/\s/g, " ");
 
-/**
- * A time of day's formatter, in the reader's language: one time, or a range
- * from one to another. The time is formatted as written — the church's own,
- * whatever the visitor's zone — and spaced the same wherever it is rendered.
- */
 const useTimeFormat = () => {
   const { locale } = useLocale();
 
@@ -153,10 +113,6 @@ const useTimeFormat = () => {
   };
 };
 
-/**
- * Says when an event starts, in the reader's language. An event whose start
- * cannot be read has no time to say.
- */
 export const useEventStart = () => {
   const format = useTimeFormat();
 
@@ -166,10 +122,6 @@ export const useEventStart = () => {
   };
 };
 
-/**
- * Says when an event is held, in the reader's language: its start, and its end
- * when it has one. An event whose start cannot be read has no time to say.
- */
 export const useEventTime = () => {
   const format = useTimeFormat();
 
@@ -183,12 +135,6 @@ export const useEventTime = () => {
   };
 };
 
-/**
- * Says which days an event is held on, in the reader's language: the one date
- * of an event held once, or the day of the week one repeats on — and, for
- * one held only in some of the month's weeks, which of them. An event with
- * neither a date nor a day has no days to say.
- */
 export const useEventDays = () => {
   const { $t } = useNuxtApp();
   const { locale } = useLocale();
@@ -212,15 +158,10 @@ export const useEventDays = () => {
   };
 };
 
-/** The way to an event's page. */
 export const useEventLink = () => {
   return (event: ChurchEvent): string => pathOf(event);
 };
 
-/**
- * Sets an event as a list does: its title and note, when it is held, and
- * the way to its page.
- */
 const useListing = () => {
   const link = useEventLink();
   const time = useEventTime();
@@ -233,10 +174,6 @@ const useListing = () => {
   });
 };
 
-/**
- * Events as a list sets them, in the order they were handed: what the
- * home page's callout and the invitation's schedule show.
- */
 export const useEventListing = (
   events: MaybeRefOrGetter<ChurchEvent[]>,
 ): ComputedRef<EventListing[]> => {
@@ -245,12 +182,6 @@ export const useEventListing = (
   return computed(() => toValue(events).map(listing));
 };
 
-/**
- * A week's days as the home page lists them: the days something is held
- * on, in order, each with its date in a few words — `Sun, Oct 4` — and its
- * events as a list sets them. A day nothing is held on has nothing to say,
- * and is left out.
- */
 export const useEventWeek = (
   days: MaybeRefOrGetter<CalendarDay[]>,
 ): ComputedRef<DayListing[]> => {
@@ -272,13 +203,6 @@ export const useEventWeek = (
   );
 };
 
-/**
- * What there is to know of an event: when it is held — its days, then its
- * time, whichever it says — where, and who to ask. An event that names no
- * place of its own is held at the church, and the church's office answers
- * questions about every event: its phone number to call, and its email to
- * write to.
- */
 export const useEventDetails = (event: MaybeRefOrGetter<ChurchEvent>) => {
   const { contact } = useAppConfig();
   const days = useEventDays();
@@ -300,14 +224,6 @@ export const useEventDetails = (event: MaybeRefOrGetter<ChurchEvent>) => {
   return { when, where, questions };
 };
 
-/**
- * The calendar, a month at a time: the month it shows, named in the route's
- * locale, headed by the days of the week, and its days each with the events
- * held on it. Until the visitor moves it, the month is today's, whenever
- * today is. The selected day is the page's to keep: `select` asks it to
- * select a day — and turns to the day's month when it is of a month beside
- * the one shown — and `reset` comes back to today and asks for it.
- */
 export const useEventCalendar = (
   events: MaybeRefOrGetter<ChurchEvent[]>,
   selected: MaybeRefOrGetter<string>,
@@ -322,7 +238,6 @@ export const useEventCalendar = (
   const weekday = useEventDate({ weekday: "short" });
   const day = useEventDate({ weekday: "long", month: "long", day: "numeric" });
 
-  // The month the calendar is showing, by a date in it.
   const moved = ref<string | null>(null);
   const shown = computed(() => moved.value ?? today.value);
 
@@ -352,7 +267,6 @@ export const useEventCalendar = (
       })),
       today: cell.date === today.value,
       selected: cell.date === toValue(selected),
-      // The month's weeks open and close with days of the months beside it.
       outside: cell.date.slice(0, 7) !== shown.value.slice(0, 7),
     })),
   );
@@ -366,12 +280,6 @@ export const useEventCalendar = (
   return { period, weekdays, days, move, select, reset };
 };
 
-/**
- * The day whose events the events page lists beside its calendar. Until the
- * visitor picks one, that is today, whenever today is: `selected` is the
- * day's date, to read and to set; `held` the events held on it, from the
- * earliest start; and `date` the day said in the route's locale.
- */
 export const useSelectedDay = (events: MaybeRefOrGetter<ChurchEvent[]>) => {
   const today = useToday();
   const format = useEventDate({
@@ -394,11 +302,6 @@ export const useSelectedDay = (events: MaybeRefOrGetter<ChurchEvent[]>) => {
   return { selected, held, date };
 };
 
-/**
- * An event's own page: what its header says under its name — the days it
- * is held on, its time, and its note, whichever of them it has — and its
- * picture, its page's or the church's until the page names one.
- */
 export const useEventArticle = (
   event: MaybeRefOrGetter<ChurchEvent>,
   page: MaybeRefOrGetter<PageItem | null | undefined>,

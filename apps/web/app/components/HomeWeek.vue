@@ -11,7 +11,6 @@ defineOptions({ name: "HomeWeek" });
 
 const { $t } = useNuxtApp();
 
-// This week's events, day by day, and the way on to every event.
 const events = await useEvents();
 const days = useEventsThisWeek(events);
 </script>
@@ -27,7 +26,6 @@ const days = useEventsThisWeek(events);
 </template>
 
 <style>
-/* The article's own padding has already set the week off from it. */
 .home-week h2 {
   margin-top: 0;
 }

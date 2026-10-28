@@ -9,9 +9,6 @@ defineOptions({ name: "InviteGrid" });
 </template>
 
 <style>
-/* The invitations, a card each, in a row under the welcome: three across
-   where there is room, and one under another where there is not. They
-   close the article, so the article's own padding sets the week off. */
 .invite-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));

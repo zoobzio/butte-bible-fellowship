@@ -11,9 +11,6 @@ import AppInvitation from "~/components/AppInvitation.vue";
 const { $t } = useNuxtApp();
 const { locale } = useLocale();
 
-// The defaults a page overrides with its own title. The language is set
-// here as well as by the prosary module, since the @zoobzio/nuxt layer's
-// root sets "en" over it.
 useHead(() => ({
   htmlAttrs: { lang: locale.value },
   title: $t.site.name(),
@@ -27,8 +24,6 @@ useHead(() => ({
     <main class="site-main">
       <slot />
     </main>
-    <!-- The bar reads the events in the language it is set up in: a visitor
-         who changes language is handed a new one. -->
     <AppInvitation :key="locale" />
     <AppFooter />
   </Body>

@@ -6,8 +6,6 @@ import { mount } from "@vue/test-utils";
 import { setAppConfig, useLocale, useNuxtApp } from "#imports";
 import AppFooter from "~/components/AppFooter.vue";
 
-// The first column's lines are plain, a message and a literal; the second's
-// are links, a literal and a message.
 const FOOTER: FooterConfig = {
   columns: [
     {
