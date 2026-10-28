@@ -11,9 +11,12 @@ import { readFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import { resolve } from "node:path";
 
-import { reactive, ref, type Ref } from "vue";
+import { computed, reactive, ref, type Ref } from "vue";
 import { vi } from "vitest";
+import { makeProsary } from "prosary";
 import { makeUntheme } from "untheme";
+import { contract, locale } from "@bbf/prose";
+import { bundles } from "@bbf/prose/bundles";
 import theme from "@bbf/theme/config";
 import { layers } from "@bbf/theme/layers";
 
@@ -23,8 +26,43 @@ export * from "vue";
 // The design system's definition constructors the layer's own components
 // use, as the @zoobzio/nuxt layer registers them.
 export { defineCommand } from "@zoobzio/vue/definitions/command";
+export { defineMenu } from "@zoobzio/vue/definitions/menu";
 export { definePopover } from "@zoobzio/vue/definitions/popover";
 export { defineSegmentedControl } from "@zoobzio/vue/definitions/segmented-control";
+
+// useNuxtApp: the app, as far as the layer's components reach into it —
+// `$t`, the real resolver over the church's built messages, in the source
+// locale. An app's shim spreads this into its own, with what its modules
+// put on the app besides.
+const prosary = makeProsary(
+  contract,
+  reactive({ locale, messages: await bundles[locale]() }),
+);
+
+export const useNuxtApp = () => ({ $t: prosary.createResolver() });
+
+// useLocale: the service's one locale, as the module exposes it. Every
+// locale's bundle is loaded up front, so a test switches language in one
+// step with setLocale, and the service switches as the module's does.
+type Locale = (typeof contract.locales)[number];
+
+const loaded = Object.fromEntries(
+  await Promise.all(
+    contract.locales.map(async (next) => [next, await bundles[next]()]),
+  ),
+) as Record<Locale, Awaited<ReturnType<(typeof bundles)[Locale]>>>;
+
+export const setLocale = (next: Locale) => prosary.apply(next, loaded[next]);
+
+export const useLocale = () => ({
+  locale: computed(() => prosary.config.locale),
+  locales: prosary.locales(),
+  setLocale: async (next: Locale) => {
+    setLocale(next);
+  },
+});
+
+export const clearLocale = () => setLocale(locale);
 
 // useState dedupes by key — two calls with the same key share one ref. Keep a
 // keyed registry, cleared between tests by tests/setup.ts.

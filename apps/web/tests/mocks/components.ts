@@ -6,10 +6,6 @@ import { defineComponent, h } from "vue";
 
 export * from "@bbf/nuxt/testing/components";
 
-// The design system's components the web's own components use, real: the
-// tests exercise them.
-export { default as Menu } from "@zoobzio/vue/components/menu.vue";
-
 // Prose: a placeholder for the prosary module's document renderer that
 // keeps the tree it was given.
 export const Prose = defineComponent({

@@ -1,5 +1,5 @@
 import type { listing } from "@bbf/schema";
-import type { TableOptions, UseTable } from "#imports";
+import type { AppProsaryMessage, TableOptions, UseTable } from "#imports";
 import type { z } from "zod";
 
 /**
@@ -14,12 +14,30 @@ export type RecordLink<T> = (record: T) => string;
 
 /**
  * What a table of records is, apart from how it fetches and what its
- * actions do: its columns, its key, and how it shows them.
+ * actions do: its columns, its key, and how it shows them, as the design
+ * system's factory takes them.
  */
-export type TableConfig<T> = Omit<
+export type TableDescriptors<T> = Omit<
   TableOptions<T>,
   "fetch" | "actions" | "bulkActions" | "initial"
 >;
+
+/** A column as the admin configures it: headed by a message of `@bbf/prose`, by key. */
+export type TableColumn<T> = Omit<
+  TableDescriptors<T>["columns"][number],
+  "label"
+> & {
+  label: AppProsaryMessage;
+};
+
+/**
+ * A table as the admin configures it: the descriptors, each column headed
+ * by a message rather than its words, resolved in the reader's language as
+ * the table is built.
+ */
+export type TableConfig<T> = Omit<TableDescriptors<T>, "columns"> & {
+  columns: TableColumn<T>[];
+};
 
 /** The fetch a table runs, as the design system's layer takes it. */
 export type TableFetch<T> = TableOptions<T>["fetch"];

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { languageName } from "~/utils/locale";
+import { languageName } from "#layers/bbf/app/utils/locale";
 
 describe("languageName", () => {
   it("names a language in that language, capitalized", () => {

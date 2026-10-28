@@ -110,19 +110,19 @@ describe("AppFooter", () => {
     );
   });
 
-  it("names the layer's appearance controls in the reader's language", async () => {
+  it("shows the layer's language and appearance controls, named in the reader's language", async () => {
     await useLocale().setLocale("es");
-    const controls = mount(AppFooter, {
-      global: { stubs: { LanguagePicker: true } },
-    }).find(".site-footer-controls");
+    const controls = mount(AppFooter).find(".site-footer-controls");
     const labels = controls
       .findAll("button")
       .map((button) => button.attributes("aria-label"));
     expect(labels).toEqual([
+      $t.language.open(),
       $t.appearance.scheme({ mode: "dark" }),
       $t.appearance.open(),
       $t.appearance.settings(),
     ]);
     expect(labels).not.toContain("Switch to dark mode");
+    expect(controls.find(".language-toggle").text()).toBe("Español");
   });
 });

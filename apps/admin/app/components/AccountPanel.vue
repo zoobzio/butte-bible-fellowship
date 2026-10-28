@@ -1,14 +1,17 @@
 <script lang="ts">
 import { Icon } from "#components";
-import { navigateTo, useAuth } from "#imports";
+import { navigateTo, useAuth, useNuxtApp } from "#imports";
 
 import ColorMode from "#layers/bbf/app/components/ColorMode.vue";
+import LanguagePicker from "#layers/bbf/app/components/LanguagePicker.vue";
 import ThemePicker from "#layers/bbf/app/components/ThemePicker.vue";
 import ThemeSettings from "#layers/bbf/app/components/ThemeSettings.vue";
 </script>
 
 <script setup lang="ts">
 defineOptions({ name: "AccountPanel" });
+
+const { $t } = useNuxtApp();
 
 // Who is signed in, and the way out: the session ends, then the login page.
 const auth = useAuth();
@@ -28,21 +31,28 @@ const signOut = async () => {
         {{ auth.current.email }}
       </span>
     </div>
-    <div class="account-controls" role="group" aria-label="Appearance">
+    <!-- The language and appearance controls are the layer's, each named
+         in the reader's language. -->
+    <div
+      class="account-controls"
+      role="group"
+      :aria-label="$t.admin.account.appearance()"
+    >
+      <LanguagePicker />
       <ColorMode />
       <ThemePicker />
       <ThemeSettings />
     </div>
     <button type="button" class="account-action" @click="signOut">
       <Icon name="log-out" class="account-action-icon" aria-hidden="true" />
-      Sign out
+      {{ $t.admin.account.signOut() }}
     </button>
   </div>
 </template>
 
 <style>
-/* The panel: who is signed in, the appearance controls, and the way out,
-   one under another, ruled off from the sections above. */
+/* The panel: who is signed in, the language and appearance controls, and
+   the way out, one under another, ruled off from the sections above. */
 .account-panel {
   display: grid;
   gap: var(--space-3);
@@ -70,8 +80,8 @@ const signOut = async () => {
   white-space: nowrap;
 }
 
-/* The color mode, theme and settings controls sit together in a row. Each
-   opens its panel above itself, clear of the window's foot. */
+/* The language, color mode, theme and settings controls sit together in a
+   row. Each opens its panel above itself, clear of the window's foot. */
 .account-controls {
   display: flex;
   align-items: center;

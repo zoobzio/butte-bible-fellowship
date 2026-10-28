@@ -3,19 +3,21 @@ import type { StaffRecord } from "@bbf/schema/types";
 import { describe, expect, it } from "vitest";
 import { flushPromises, mount } from "@vue/test-utils";
 
-import { createTable } from "#imports";
+import { createTable, useNuxtApp } from "#imports";
 import { STAFF } from "#test/support/records";
 import { withSetup } from "@bbf/nuxt/testing/mount";
 import RecordTable from "~/components/RecordTable.vue";
 import { STAFF_TABLE } from "~/constants/staff";
+import { toTableDescriptors } from "~/utils/listing";
 
 /**
  * The staff table over the rows given, as the layer's factory builds it,
- * its fetch answering with those rows alone.
+ * its columns headed in English, its fetch answering with those rows alone.
  */
 const service = (data: StaffRecord[]) => {
+  const { $t } = useNuxtApp();
   const useTable = createTable<StaffRecord>("record-table", {
-    ...STAFF_TABLE,
+    ...toTableDescriptors(STAFF_TABLE, (message) => $t(message)),
     fetch: async () => ({ data, total: data.length, pageCount: 1 }),
   });
   return withSetup(() => useTable()).result;

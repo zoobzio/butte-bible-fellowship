@@ -1,18 +1,27 @@
 <script lang="ts">
 import { Body } from "#components";
+import { useHead, useLocale } from "#imports";
 
 import AdminSidebar from "~/components/AdminSidebar.vue";
 </script>
 
 <script setup lang="ts">
 defineOptions({ name: "Default" });
+
+// The language is set on the document here as well as by the prosary
+// module, since the @zoobzio/nuxt layer's root sets "en" over it.
+const { locale } = useLocale();
+useHead(() => ({ htmlAttrs: { lang: locale.value } }));
 </script>
 
 <template>
   <Body>
     <div class="admin-shell">
       <AdminSidebar />
-      <main class="admin-main">
+      <!-- A page names its table's columns and its delete prompt in the
+           language it is set up in: one who changes language is handed the
+           page set up again in the new one. -->
+      <main :key="locale" class="admin-main">
         <slot />
       </main>
     </div>

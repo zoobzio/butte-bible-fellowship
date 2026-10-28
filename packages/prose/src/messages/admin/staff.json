@@ -1,0 +1,14 @@
+{
+  "title": {
+    "defaultMessage": "Staff",
+    "description": "The title of the page that lists the staff members."
+  },
+  "new": {
+    "defaultMessage": "New member",
+    "description": "The link to the editor of a new staff member, and the title of that page."
+  },
+  "notFound": {
+    "defaultMessage": "Staff member not found",
+    "description": "The error shown when an address names a staff member that does not exist."
+  }
+}

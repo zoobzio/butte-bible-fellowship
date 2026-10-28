@@ -10,6 +10,7 @@ import { defineComponent, h } from "vue";
 
 // The design system's components, real: the tests exercise them.
 export { default as Command } from "@zoobzio/vue/components/command.vue";
+export { default as Menu } from "@zoobzio/vue/components/menu.vue";
 export { default as Popover } from "@zoobzio/vue/components/popover.vue";
 export { default as SegmentedControl } from "@zoobzio/vue/components/segmented-control.vue";
 

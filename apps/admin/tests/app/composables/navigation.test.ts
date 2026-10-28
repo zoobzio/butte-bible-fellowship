@@ -1,14 +1,14 @@
 import { beforeEach, describe, expect, it } from "vitest";
 
-import { setAppConfig, setRoutePath } from "#imports";
+import { setAppConfig, setLocale, setRoutePath, useNuxtApp } from "#imports";
 import { useSidebar } from "~/composables/navigation";
 
 beforeEach(() => {
   setAppConfig({
     sidebar: {
       links: [
-        { label: "Staff", to: "/staff" },
-        { label: "Events", to: "/events" },
+        { label: "admin.navigation.staff", to: "/staff" },
+        { label: "admin.navigation.events", to: "/events" },
       ],
     },
   });
@@ -22,6 +22,16 @@ describe("useSidebar", () => {
       { value: "/events", label: "Events", link: { to: "/events" } },
     ]);
     expect(tabs.value.pt).toEqual({ root: { orientation: "vertical" } });
+  });
+
+  it("names each section in the reader's language", () => {
+    const { tabs } = useSidebar();
+    setLocale("es");
+    const { $t } = useNuxtApp();
+    expect(tabs.value.tabs.map((tab) => tab.label)).toEqual([
+      $t.admin.navigation.staff(),
+      $t.admin.navigation.events(),
+    ]);
   });
 
   it("marks the section whose page is being read, or a page under it", () => {

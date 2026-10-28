@@ -1,12 +1,25 @@
 <script lang="ts">
 import { Body, Icon } from "#components";
-import { definePageMeta, useHead, useRoute } from "#imports";
+import {
+  definePageMeta,
+  useHead,
+  useLocale,
+  useNuxtApp,
+  useRoute,
+} from "#imports";
 </script>
 
 <script setup lang="ts">
 definePageMeta({ layout: false });
 
-useHead({ title: "Sign in" });
+// The page stands outside the layout, so it sets the document's language
+// itself, as the layout does for every other page.
+const { $t } = useNuxtApp();
+const { locale } = useLocale();
+useHead(() => ({
+  title: $t.admin.login.title(),
+  htmlAttrs: { lang: locale.value },
+}));
 
 // Signing in is a top-level navigation to the login action, which sends the
 // browser on to Google; Google sends it back to the page that was asked for.
@@ -20,9 +33,11 @@ const href = `/api/auth/login?${new URLSearchParams({ redirect })}`;
   <Body>
     <main class="admin-login">
       <Icon name="logo" class="admin-login-logo" aria-hidden="true" />
-      <h1 class="admin-login-title">Butte Bible Fellowship</h1>
-      <p class="admin-login-tag">Admin</p>
-      <a :href="href" class="admin-login-action">Sign in with Google</a>
+      <h1 class="admin-login-title">{{ $t.site.name() }}</h1>
+      <p class="admin-login-tag">{{ $t.admin.site.tag() }}</p>
+      <a :href="href" class="admin-login-action">{{
+        $t.admin.login.google()
+      }}</a>
     </main>
   </Body>
 </template>

@@ -1,5 +1,5 @@
 <script lang="ts">
-import { definePageMeta, useHead } from "#imports";
+import { definePageMeta, useHead, useNuxtApp } from "#imports";
 
 import PageHeader from "~/components/PageHeader.vue";
 import RecordTable from "~/components/RecordTable.vue";
@@ -10,7 +10,8 @@ import { useStaffTable } from "~/composables/staff";
 <script setup lang="ts">
 definePageMeta({ middleware: "auth", auth: { scopes: ["staff:read"] } });
 
-useHead({ title: "Staff" });
+const { $t } = useNuxtApp();
+useHead(() => ({ title: $t.admin.staff.title() }));
 
 // The table's first page is fetched on load, once.
 const { table, link } = useStaffTable();
@@ -18,6 +19,10 @@ await useTableRequest(table);
 </script>
 
 <template>
-  <PageHeader title="Staff" to="/staff/new" action="New member" />
+  <PageHeader
+    :title="$t.admin.staff.title()"
+    to="/staff/new"
+    :action="$t.admin.staff.new()"
+  />
   <RecordTable :table="table" :link="link" title="name" />
 </template>

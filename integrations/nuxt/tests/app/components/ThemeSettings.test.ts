@@ -3,7 +3,7 @@ import { nextTick } from "vue";
 import { mount } from "@vue/test-utils";
 
 import { SegmentedControl } from "#components";
-import { useUntheme } from "#imports";
+import { setLocale, useNuxtApp, useUntheme } from "#imports";
 import ThemeSettings from "#layers/bbf/app/components/ThemeSettings.vue";
 
 // The popover content is portalled to the body, so it is queried from there.
@@ -106,16 +106,18 @@ describe("ThemeSettings", () => {
     ).toEqual(["on", "off"]);
   });
 
-  it("takes its name from the app, for its button and its panel", async () => {
-    const wrapper = mount(ThemeSettings, {
-      props: { label: "Apariencia" },
-      attachTo: document.body,
-    });
-    expect(wrapper.find("button").attributes("aria-label")).toBe("Apariencia");
+  it("names its button and its panel in the reader's language", async () => {
+    setLocale("es");
+    const { $t } = useNuxtApp();
+    expect($t.appearance.settings()).not.toBe("Appearance settings");
+    const wrapper = mount(ThemeSettings, { attachTo: document.body });
+    expect(wrapper.find("button").attributes("aria-label")).toBe(
+      $t.appearance.settings(),
+    );
     await wrapper.find("button").trigger("click");
     await vi.waitFor(() => expect(popover()).not.toBeNull());
     expect(
       popover()!.querySelector(".theme-settings")!.getAttribute("aria-label"),
-    ).toBe("Apariencia");
+    ).toBe($t.appearance.settings());
   });
 });

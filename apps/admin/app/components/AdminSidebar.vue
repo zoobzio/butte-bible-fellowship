@@ -1,6 +1,6 @@
 <script lang="ts">
 import { Icon, NuxtLink, Tabs } from "#components";
-import { useAuth } from "#imports";
+import { useAuth, useNuxtApp } from "#imports";
 
 import AccountPanel from "~/components/AccountPanel.vue";
 import { useSidebar } from "~/composables/navigation";
@@ -9,6 +9,7 @@ import { useSidebar } from "~/composables/navigation";
 <script setup lang="ts">
 defineOptions({ name: "AdminSidebar" });
 
+const { $t } = useNuxtApp();
 const { tabs } = useSidebar();
 
 // The account panel stands at the foot once someone is signed in.
@@ -20,12 +21,12 @@ const auth = useAuth();
     <NuxtLink to="/" class="admin-brand">
       <Icon name="logo" class="admin-brand-logo" aria-hidden="true" />
       <span class="admin-brand-text">
-        <span class="admin-brand-name">Butte Bible Fellowship</span>
-        <span class="admin-brand-tag">Admin</span>
+        <span class="admin-brand-name">{{ $t.site.name() }}</span>
+        <span class="admin-brand-tag">{{ $t.admin.site.tag() }}</span>
       </span>
     </NuxtLink>
 
-    <nav class="admin-nav" aria-label="Sections">
+    <nav class="admin-nav" :aria-label="$t.admin.navigation.label()">
       <Tabs v-bind="tabs" />
     </nav>
 

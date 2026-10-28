@@ -3,7 +3,7 @@ import { mount } from "@vue/test-utils";
 
 import { Menu } from "#components";
 import { setLocale, useLocale, useNuxtApp } from "#imports";
-import LanguagePicker from "~/components/LanguagePicker.vue";
+import LanguagePicker from "#layers/bbf/app/components/LanguagePicker.vue";
 
 type Item = { label: string; locale: string };
 
@@ -36,7 +36,7 @@ describe("LanguagePicker", () => {
     ]);
   });
 
-  it("switches the site to the language chosen", async () => {
+  it("switches the app to the language chosen", async () => {
     const wrapper = mount(LanguagePicker);
     const [, spanish] = items(wrapper);
     menu(wrapper).vm.$emit("select", spanish);

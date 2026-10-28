@@ -10,8 +10,8 @@ beforeEach(() => {
   setAppConfig({
     sidebar: {
       links: [
-        { label: "Staff", to: "/staff" },
-        { label: "Events", to: "/events" },
+        { label: "admin.navigation.staff", to: "/staff" },
+        { label: "admin.navigation.events", to: "/events" },
       ],
     },
   });

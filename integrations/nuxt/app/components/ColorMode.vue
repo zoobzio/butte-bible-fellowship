@@ -1,19 +1,15 @@
 <script lang="ts">
-import type { ColorModeLabels } from "#layers/bbf/app/types/theme";
-
 import { Icon } from "#components";
+import { useNuxtApp } from "#imports";
 import { useColorMode } from "#layers/bbf/app/composables/theme";
 </script>
 
 <script setup lang="ts">
 defineOptions({ name: "ColorMode" });
 
-// The button's name says which scheme a press switches to. An app that
-// speaks another language names it in that one.
-const {
-  labels = { light: "Switch to light mode", dark: "Switch to dark mode" },
-} = defineProps<{ labels?: ColorModeLabels }>();
-
+// The button's name says which scheme a press switches to, in the reader's
+// language.
+const { $t } = useNuxtApp();
 const { mode, other, toggle } = useColorMode();
 </script>
 
@@ -21,7 +17,7 @@ const { mode, other, toggle } = useColorMode();
   <button
     type="button"
     class="theme-toggle"
-    :aria-label="labels[other]"
+    :aria-label="$t.appearance.scheme({ mode: other })"
     @click="toggle"
   >
     <Icon :name="mode === 'dark' ? 'sun' : 'moon'" class="icon" />

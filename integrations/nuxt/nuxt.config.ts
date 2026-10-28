@@ -22,6 +22,7 @@ export default defineNuxtConfig({
     "@icon-sheets/nuxt",
     "@untheme/nuxt",
     "@bezoar/nuxt",
+    "@prosary/nuxt",
   ],
 
   imports: { autoImport: false },
@@ -33,6 +34,10 @@ export default defineNuxtConfig({
   untheme: { preset: "@bbf/theme" },
 
   bezoar: { build: "@bbf/database" },
+
+  // The church's words, the site's and the admin's: `$t` on every app, in
+  // the reader's language.
+  prosary: { build: "@bbf/prose" },
 
   $development: {
     bezoar: { driver: "pglite", migrate: true, roles: true, seed: true },

@@ -54,8 +54,8 @@ describe("failure", () => {
     );
     const silent = new Error("silent");
     silent.message = "";
-    expect(failure(silent)).toBe("Something went wrong.");
-    expect(failure("?")).toBe("Something went wrong.");
-    expect(failure(undefined)).toBe("Something went wrong.");
+    expect(failure(silent)).toBeUndefined();
+    expect(failure("?")).toBeUndefined();
+    expect(failure(undefined)).toBeUndefined();
   });
 });

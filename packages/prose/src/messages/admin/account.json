@@ -1,0 +1,10 @@
+{
+  "appearance": {
+    "defaultMessage": "Appearance",
+    "description": "The accessible name of the group of controls over the admin's language, color scheme and theme."
+  },
+  "signOut": {
+    "defaultMessage": "Sign out",
+    "description": "The button that ends the session."
+  }
+}

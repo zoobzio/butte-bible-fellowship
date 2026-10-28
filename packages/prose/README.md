@@ -1,6 +1,7 @@
 # @bbf/prose
 
-The site's words: its interface messages and its pages, built by
+The church's words: the site's interface messages and its pages, and the
+admin's interface messages, built by
 [`@prosary/kit`](https://github.com/zoobzio/prosary/tree/main/packages/kit)
 into a typed contract, a bundle of compiled messages per locale, and each
 page as the tree the app renders — what the
@@ -10,7 +11,8 @@ page as the tree the app renders — what the
 
 ```
 prosary.config.ts  the kit config: the locales, the sources, the presets, the model
-src/messages/      the interface messages, in English, one file per group
+src/messages/      the site's interface messages, in English, one file per group
+src/messages/admin/  the admin's, the same way, under `admin`
 src/content/       the pages, in English, as Markdown
 src/parse.ts       the pipeline the pages are built with, for Markdown the API serves
 .cache/            the translation cache: each locale's translations (committed)
@@ -19,9 +21,14 @@ src/parse.ts       the pipeline the pages are built with, for Markdown the API s
 ```
 
 Each message file is a FormatJS message-descriptor document, and its keys
-nest under its name: `home` in `navigation.json` is the message
-`navigation.home`, called as `$t.navigation.home()`. The `description` beside
-each message is the note a translator reads.
+nest under its path: `home` in `navigation.json` is the message
+`navigation.home`, called as `$t.navigation.home()`, and `save` in
+`admin/editor.json` is `admin.editor.save`. The `description` beside each
+message is the note a translator reads.
+
+The site's messages stand at the top level; the admin's under `admin/`.
+`appearance.json` and `language.json` name the controls both apps offer,
+through the `@bbf/nuxt` layer.
 
 | File              | Messages                                                 |
 | ----------------- | -------------------------------------------------------- |
@@ -35,6 +42,19 @@ each message is the note a translator reads.
 | `sermons.json`    | the sermons page: its header, play button, channel link  |
 | `events.json`     | the events pages, an event’s days, the home page’s week  |
 | `connect.json`    | the connect page: its header                             |
+
+| File                    | Messages                                                         |
+| ----------------------- | ---------------------------------------------------------------- |
+| `admin/site.json`       | what the admin is: the line under the church's name              |
+| `admin/navigation.json` | the sidebar: its accessible name and its sections                |
+| `admin/login.json`      | the login page                                                   |
+| `admin/account.json`    | the account panel: its controls' group and the way out           |
+| `admin/editor.json`     | what every editor shares: its buttons, prompts, fields, statuses |
+| `admin/events.json`     | the events section: its pages' titles and not found              |
+| `admin/event.json`      | an event's fields, and the hints under them                      |
+| `admin/days.json`       | the days of the week an event repeats on                         |
+| `admin/staff.json`      | the staff section: its pages' titles and not found               |
+| `admin/member.json`     | a staff member's fields, and the hints under them                |
 
 Messages are ICU MessageFormat, where an ASCII apostrophe is the escape
 character — write a typographic one (`You’re`), as the pages already do.
@@ -127,20 +147,21 @@ const prosary = makeProsary(contract, {
 prosary.format("navigation.home"); // "Home"
 ```
 
-## In the app
+## In the apps
 
-The web app hands the build to `@prosary/nuxt` in `nuxt.config.ts` —
-`prosary: { build: "@bbf/prose" }` — which provides `$t` on the Nuxt app and
-serves the pages. A component calls a message it names
-(`$t.navigation.open()`); data carries one by key, typed as
+The `@bbf/nuxt` layer hands the build to `@prosary/nuxt` —
+`prosary: { build: "@bbf/prose" }` — which provides `$t` on the Nuxt app of
+every app that extends the layer, and serves the pages. A component calls a
+message it names (`$t.navigation.open()`); data carries one by key, typed as
 `AppProsaryMessage`, and resolves it where it renders (`$t(link.label)`).
-The header and footer in `app.config.ts` are data of that kind. Nuxt reads
-the built output when it loads its config, so restart `pnpm dev` after
-rebuilding this package.
+The web's header and footer and the admin's sidebar, in each app's
+`app.config.ts`, are data of that kind. Nuxt reads the built output when it
+loads its config, so restart `pnpm dev` after rebuilding this package.
 
-The locale is in the route: English at `/about-us`, Spanish at
-`/es/about-us`. The app adds each target locale's routes from this package's
-`locales`, so listing a new one here is all it takes.
+The locale is the visitor's own: the module picks it from their cookie, else
+their browser's languages, and the layer's `LanguagePicker` switches it in
+place. Listing a new locale under `translate.targets` is all it takes to
+offer it in both apps.
 
 A page reaches the app through `usePage`, which fetches the page the route
 names in the route's locale, checks its front matter against

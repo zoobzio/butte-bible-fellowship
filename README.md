@@ -68,17 +68,20 @@ to date, or let CI do it on the pull request.
 
 ## Language
 
-The site's interface text lives in [`@bbf/prose`](packages/prose) as
-[prosary](https://github.com/zoobzio/prosary) messages, not in components.
-`@prosary/nuxt` provides `$t` on the Nuxt app; `app.config.ts` names the
-header's and footer's messages by key.
+The church's interface text lives in [`@bbf/prose`](packages/prose) as
+[prosary](https://github.com/zoobzio/prosary) messages, not in components:
+the site's at the top level, the admin's under `admin/`. The `@bbf/nuxt`
+layer provides `$t` on the Nuxt app of both; each app's `app.config.ts`
+names its navigation's messages by key.
 
-English is at the routes as written (`/about-us`); every other locale has the
-same pages under its prefix (`/es/about-us`). The route decides the
-language: a global middleware switches prosary to the locale the path names,
-`usePage` fetches that locale's page, and `useRouteLocale` keeps links inside
-it. The language button in the footer links to the page being read in each
-language.
+The language is the visitor's own, not the route's: the prosary module picks
+it from their cookie, else from the languages their browser asks for, and
+renders the page in it. The layer's `LanguagePicker` — in the site's footer
+and the admin's account panel — switches it in place and keeps the choice in
+the cookie. The site's old `/es/…` addresses redirect to the page itself.
+
+English is the only language authored. CI translates what the other locales
+are missing on every pull request and commits the result; see the package.
 
 ## Architecture
 
@@ -92,8 +95,9 @@ export default defineNuxtConfig({
 });
 ```
 
-The layer sets up the icons, theme, fonts, stylesheet and database service
-every app shares, and holds the server code and test support they share;
+The layer sets up the icons, theme, fonts, stylesheet, words and database
+service every app shares, and holds the language and appearance controls,
+the server code and the test support they share;
 see [`integrations/`](integrations). The design system disables
 auto-imports, so everything is imported explicitly — its modules come in
 through the package's subpath exports:

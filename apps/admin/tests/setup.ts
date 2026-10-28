@@ -3,6 +3,7 @@ import { afterEach, beforeEach, vi } from "vitest";
 import {
   clearAppConfig,
   clearAuth,
+  clearLocale,
   clearNuxtApp,
   clearNuxtStateRegistry,
   clearRouter,
@@ -17,6 +18,7 @@ beforeEach(() => {
   clearNuxtApp();
   clearAppConfig();
   clearAuth();
+  clearLocale();
   clearUntheme();
   setRoutePath("/");
   clearRouter();

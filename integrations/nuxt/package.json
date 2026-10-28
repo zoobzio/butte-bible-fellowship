@@ -21,13 +21,16 @@
     "@bbf/assets": "workspace:*",
     "@bbf/database": "workspace:*",
     "@bbf/icons": "workspace:*",
+    "@bbf/prose": "workspace:*",
     "@bbf/theme": "workspace:*",
     "@bezoar/nuxt": "catalog:",
     "@icon-sheets/nuxt": "catalog:",
     "@nuxt/fonts": "catalog:",
+    "@prosary/nuxt": "catalog:",
     "@untheme/nuxt": "catalog:",
     "@zoobzio/nuxt": "catalog:",
     "@zoobzio/vue": "catalog:",
+    "prosary": "catalog:",
     "untheme": "catalog:"
   },
   "devDependencies": {

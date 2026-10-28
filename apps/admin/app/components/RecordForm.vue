@@ -1,5 +1,11 @@
+<script lang="ts">
+import { useNuxtApp } from "#imports";
+</script>
+
 <script setup lang="ts">
 defineOptions({ name: "RecordForm" });
+
+const { $t } = useNuxtApp();
 
 // The form an editor's controls stand in: what it is doing, what went wrong,
 // and whether there is a record to delete. The controls are slotted in.
@@ -30,7 +36,7 @@ const emit = defineEmits<{
         class="record-form-save"
         :disabled="saving || removing"
       >
-        {{ saving ? "Saving…" : "Save" }}
+        {{ saving ? $t.admin.editor.saving() : $t.admin.editor.save() }}
       </button>
       <button
         v-if="removable"
@@ -39,7 +45,7 @@ const emit = defineEmits<{
         :disabled="saving || removing"
         @click="emit('remove')"
       >
-        {{ removing ? "Deleting…" : "Delete" }}
+        {{ removing ? $t.admin.editor.deleting() : $t.admin.editor.delete() }}
       </button>
     </div>
   </form>

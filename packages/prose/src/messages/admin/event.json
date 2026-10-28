@@ -1,0 +1,70 @@
+{
+  "title": {
+    "defaultMessage": "Title",
+    "description": "The label of the field, and the heading of the table column, for an event's title."
+  },
+  "held": {
+    "defaultMessage": "Held",
+    "description": "The legend of the choice between an event held once and one that repeats every week."
+  },
+  "once": {
+    "defaultMessage": "Held once, on a date",
+    "description": "The choice of an event held once."
+  },
+  "weekly": {
+    "defaultMessage": "Repeats every week",
+    "description": "The choice of an event that repeats every week."
+  },
+  "date": {
+    "defaultMessage": "Date",
+    "description": "The label of the field, and the heading of the table column, for the date of an event held once."
+  },
+  "day": {
+    "defaultMessage": "Day",
+    "description": "The label of the field, and the heading of the table column, for the day of the week a repeating event is held on."
+  },
+  "weeks": {
+    "defaultMessage": "Weeks",
+    "description": "The label of the field for which weeks of the month a repeating event is held in."
+  },
+  "weeksHint": {
+    "defaultMessage": "Which of the month’s weeks, as 1, 3. Empty is every week.",
+    "description": "The hint under the weeks field: how the weeks are written, and what an empty field means."
+  },
+  "start": {
+    "defaultMessage": "Start",
+    "description": "The label of the field, and the heading of the table column, for the time an event starts."
+  },
+  "end": {
+    "defaultMessage": "End",
+    "description": "The label of the field for the time an event ends."
+  },
+  "location": {
+    "defaultMessage": "Location",
+    "description": "The label of the field for where an event is held."
+  },
+  "locationHint": {
+    "defaultMessage": "Empty is at the church.",
+    "description": "The hint under the location field: what an empty field means."
+  },
+  "image": {
+    "defaultMessage": "Image URL",
+    "description": "The label of the field for the address of an event's picture."
+  },
+  "note": {
+    "defaultMessage": "Note",
+    "description": "The label of the field for the few words shown under an event's title in a list."
+  },
+  "noteHint": {
+    "defaultMessage": "A few words under its title in a list.",
+    "description": "The hint under the note field: where the note is shown."
+  },
+  "body": {
+    "defaultMessage": "Body",
+    "description": "The label of the field for the text of an event's own page."
+  },
+  "bodyHint": {
+    "defaultMessage": "Markdown, for its own page.",
+    "description": "The hint under the body field: how the body is written, and where it is shown."
+  }
+}

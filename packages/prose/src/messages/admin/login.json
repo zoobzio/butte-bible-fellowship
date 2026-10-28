@@ -1,0 +1,10 @@
+{
+  "title": {
+    "defaultMessage": "Sign in",
+    "description": "The title of the admin's login page."
+  },
+  "google": {
+    "defaultMessage": "Sign in with Google",
+    "description": "The button on the login page that signs in through Google."
+  }
+}

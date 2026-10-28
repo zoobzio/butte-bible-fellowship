@@ -3,7 +3,7 @@ import { nextTick } from "vue";
 import { mount } from "@vue/test-utils";
 
 import { Command } from "#components";
-import { useUntheme } from "#imports";
+import { setLocale, useNuxtApp, useUntheme } from "#imports";
 import ThemePicker from "#layers/bbf/app/components/ThemePicker.vue";
 
 // The popover content is portalled to the body, so it is queried from there.
@@ -98,18 +98,21 @@ describe("ThemePicker", () => {
     expect(useUntheme().config.patch).toEqual({});
   });
 
-  it("takes its names from the app", async () => {
-    const labels = { open: "Elegir", themes: "Temas", search: "Buscar…" };
-    const wrapper = mount(ThemePicker, {
-      props: { labels },
-      attachTo: document.body,
-    });
-    expect(wrapper.find("button").attributes("aria-label")).toBe("Elegir");
+  it("names itself in the reader's language", async () => {
+    setLocale("es");
+    const { $t } = useNuxtApp();
+    expect($t.appearance.open()).not.toBe("Choose a theme");
+    const wrapper = mount(ThemePicker, { attachTo: document.body });
+    expect(wrapper.find("button").attributes("aria-label")).toBe(
+      $t.appearance.open(),
+    );
     await wrapper.find("button").trigger("click");
     await vi.waitFor(() => expect(popover()).not.toBeNull());
     expect(
       popover()!.querySelector(".theme-picker")!.getAttribute("aria-label"),
-    ).toBe("Temas");
-    expect(document.body.querySelector("input")!.placeholder).toBe("Buscar…");
+    ).toBe($t.appearance.themes());
+    expect(document.body.querySelector("input")!.placeholder).toBe(
+      $t.appearance.search(),
+    );
   });
 });

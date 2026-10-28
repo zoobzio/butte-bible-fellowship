@@ -1,9 +1,9 @@
 <script lang="ts">
 import type { CommandOption } from "#imports";
-import type { Theme, ThemePickerLabels } from "#layers/bbf/app/types/theme";
+import type { Theme } from "#layers/bbf/app/types/theme";
 
 import { Command, Icon, Popover } from "#components";
-import { defineCommand, definePopover } from "#imports";
+import { defineCommand, definePopover, useNuxtApp } from "#imports";
 import { useThemes } from "#layers/bbf/app/composables/themes";
 </script>
 
@@ -12,16 +12,9 @@ defineOptions({ name: "ThemePicker" });
 
 type ThemeOption = CommandOption & { value: Theme };
 
-// The names of the button, the list and the search field. An app that
-// speaks another language names them in that one.
-const {
-  labels = {
-    open: "Choose a theme",
-    themes: "Themes",
-    search: "Search themes…",
-  },
-} = defineProps<{ labels?: ThemePickerLabels }>();
-
+// The button, the list and the search field are named in the reader's
+// language.
+const { $t } = useNuxtApp();
 const { themes, active, choose } = useThemes();
 
 const options: ThemeOption[] = themes.map(({ id, name }) => ({
@@ -32,9 +25,9 @@ const options: ThemeOption[] = themes.map(({ id, name }) => ({
 const popover = definePopover({ side: "top", align: "start" });
 
 const command = defineCommand(() => ({
-  groups: [{ key: "themes", label: labels.themes, options }],
+  groups: [{ key: "themes", label: $t.appearance.themes(), options }],
   modelValue: options.filter((option) => option.value === active.value),
-  placeholder: labels.search,
+  placeholder: $t.appearance.search(),
   "onUpdate:modelValue": ([option] = []) => {
     if (option) {
       choose(option.value);
@@ -46,7 +39,11 @@ const command = defineCommand(() => ({
 <template>
   <Popover v-bind="popover">
     <template #trigger>
-      <button type="button" class="theme-toggle" :aria-label="labels.open">
+      <button
+        type="button"
+        class="theme-toggle"
+        :aria-label="$t.appearance.open()"
+      >
         <Icon name="palette" class="icon" />
       </button>
     </template>
@@ -54,7 +51,7 @@ const command = defineCommand(() => ({
       <Command
         v-bind="command"
         class="theme-picker"
-        :aria-label="labels.themes"
+        :aria-label="$t.appearance.themes()"
       >
         <template #inputIcon>
           <Icon name="search" class="icon" />

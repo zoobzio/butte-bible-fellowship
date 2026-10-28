@@ -15,9 +15,8 @@ const options = (
   draft: { name: "Jane" },
   body: (draft: Draft) => ({ name: draft.name.trim() }),
   save: vi.fn(async () => ({})),
-  remove: vi.fn(async () => ({})),
+  remove: { confirm: "Delete Jane?", run: vi.fn(async () => ({})) },
   back: "/staff",
-  confirm: "Delete Jane?",
   ...overrides,
 });
 
@@ -76,6 +75,20 @@ describe("useEditor", () => {
     expect(editor.error.value).toBe("name: too short");
   });
 
+  it("says what went wrong in its own words when the error has none", async () => {
+    const editor = useEditor(
+      options({
+        save: vi.fn(async () => {
+          const silent = new Error("silent");
+          silent.message = "";
+          throw silent;
+        }),
+      }),
+    );
+    await editor.submit();
+    expect(editor.error.value).toBe("Something went wrong.");
+  });
+
   it("keeps the editor open with what the server refused", async () => {
     const editor = useEditor(
       options({
@@ -98,20 +111,24 @@ describe("useEditor", () => {
   it("asks before it deletes, and does nothing when told no", async () => {
     const confirm = vi.fn(() => false);
     vi.stubGlobal("confirm", confirm);
-    const remove = vi.fn(async () => ({}));
-    const editor = useEditor(options({ remove }));
+    const run = vi.fn(async () => ({}));
+    const editor = useEditor(
+      options({ remove: { confirm: "Delete Jane?", run } }),
+    );
     await editor.destroy();
     expect(confirm).toHaveBeenCalledWith("Delete Jane?");
-    expect(remove).not.toHaveBeenCalled();
+    expect(run).not.toHaveBeenCalled();
     expect(useRouter().push).not.toHaveBeenCalled();
   });
 
   it("deletes when told yes, then leaves for the list", async () => {
     vi.stubGlobal("confirm", () => true);
-    const remove = vi.fn(async () => ({}));
-    const editor = useEditor(options({ remove }));
+    const run = vi.fn(async () => ({}));
+    const editor = useEditor(
+      options({ remove: { confirm: "Delete Jane?", run } }),
+    );
     await editor.destroy();
-    expect(remove).toHaveBeenCalledTimes(1);
+    expect(run).toHaveBeenCalledTimes(1);
     expect(useRouter().push).toHaveBeenCalledWith("/staff");
     expect(editor.removing.value).toBe(false);
   });
@@ -120,9 +137,12 @@ describe("useEditor", () => {
     vi.stubGlobal("confirm", () => true);
     const editor = useEditor(
       options({
-        remove: vi.fn(async () => {
-          throw new Error("database unavailable");
-        }),
+        remove: {
+          confirm: "Delete Jane?",
+          run: vi.fn(async () => {
+            throw new Error("database unavailable");
+          }),
+        },
       }),
     );
     await editor.destroy();

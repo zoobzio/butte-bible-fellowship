@@ -2,6 +2,7 @@ import { enableAutoUnmount } from "@vue/test-utils";
 import { afterEach, beforeEach } from "vitest";
 import {
   clearAppConfig,
+  clearLocale,
   clearNuxtStateRegistry,
   clearUntheme,
   useHead,
@@ -11,6 +12,7 @@ import {
 beforeEach(() => {
   clearNuxtStateRegistry();
   clearAppConfig();
+  clearLocale();
   clearUntheme();
   useHead.mockClear();
 });

@@ -1,0 +1,14 @@
+{
+  "title": {
+    "defaultMessage": "Events",
+    "description": "The title of the page that lists the events."
+  },
+  "new": {
+    "defaultMessage": "New event",
+    "description": "The link to the editor of a new event, and the title of that page."
+  },
+  "notFound": {
+    "defaultMessage": "Event not found",
+    "description": "The error shown when an address names an event that does not exist."
+  }
+}

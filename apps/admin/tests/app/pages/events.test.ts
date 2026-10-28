@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { mount } from "@vue/test-utils";
 
-import { setRoutePath, useHead } from "#imports";
+import { setRoutePath } from "#imports";
 import EventEditor from "~/components/EventEditor.vue";
 import PageHeader from "~/components/PageHeader.vue";
 import RecordTable from "~/components/RecordTable.vue";
@@ -9,6 +9,7 @@ import Index from "~/pages/events/index.vue";
 import New from "~/pages/events/new.vue";
 import Editor from "~/pages/events/[id].vue";
 import { DINNER, WORSHIP } from "#test/support/records";
+import { head } from "#test/support/head";
 import { mountSuspended } from "@bbf/nuxt/testing/mount";
 
 describe("events page", () => {
@@ -31,7 +32,7 @@ describe("events page", () => {
       query: { page: 1, size: 25 },
     });
     expect(table.props("table").data).toEqual([WORSHIP, DINNER]);
-    expect(useHead).toHaveBeenCalledWith({ title: "Events" });
+    expect(head()).toEqual({ title: "Events" });
   });
 });
 

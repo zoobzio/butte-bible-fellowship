@@ -30,9 +30,10 @@ export const isNotFound = (error: unknown): boolean => statusOf(error) === 404;
  * What went wrong, in a line for the editor to show. A body the schema
  * refused, here or on the server, says each issue with the field it is
  * in: `email: Invalid email address`. Anything else says what it can —
- * the server's message, or the error's own.
+ * the server's message, or the error's own — and nothing when there is
+ * none, for the editor to say in its own words.
  */
-export const failure = (error: unknown): string => {
+export const failure = (error: unknown): string | undefined => {
   const payload = isObject(error) ? error.data : undefined;
   const issues =
     issuesOf(error) ?? issuesOf(isObject(payload) ? payload.data : undefined);
@@ -47,5 +48,5 @@ export const failure = (error: unknown): string => {
     return payload.message;
   }
   if (error instanceof Error && error.message) return error.message;
-  return "Something went wrong.";
+  return undefined;
 };

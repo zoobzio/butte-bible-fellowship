@@ -2,7 +2,7 @@
 import type { RecordLink, TableService } from "~/types/listing";
 
 import { NuxtLink, Table } from "#components";
-import { computed } from "#imports";
+import { computed, useNuxtApp } from "#imports";
 </script>
 
 <script setup lang="ts" generic="T extends object">
@@ -16,6 +16,8 @@ const { table, link, title } = defineProps<{
   title: keyof T & string;
 }>();
 
+const { $t } = useNuxtApp();
+
 const cell = computed(() => `cell:${title}` as const);
 </script>
 
@@ -28,7 +30,7 @@ const cell = computed(() => `cell:${title}` as const);
         </NuxtLink>
       </template>
       <template #empty>
-        <span class="record-table-empty">Nothing here yet.</span>
+        <span class="record-table-empty">{{ $t.admin.editor.empty() }}</span>
       </template>
     </Table>
   </div>

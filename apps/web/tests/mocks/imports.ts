@@ -10,50 +10,13 @@
 
 import type { Root } from "hast";
 
-import { computed, reactive } from "vue";
+import { reactive } from "vue";
 import { vi } from "vitest";
-import { makeProsary } from "prosary";
 import { CONTENT_URL } from "@prosary/nuxt/constant";
-import { contract, locale } from "@bbf/prose";
-import { bundles } from "@bbf/prose/bundles";
 
+// `$t` and the locale are the layer's: its shim resolves the church's built
+// messages, and `setLocale` switches them.
 export * from "@bbf/nuxt/testing/imports";
-
-// The design system's definition constructors the web's own components
-// use, as the @zoobzio/nuxt layer registers them.
-export { defineMenu } from "@zoobzio/vue/definitions/menu";
-
-// useNuxtApp: the app, as far as the tests reach into it — `$t`, the real
-// resolver over the site's built messages, in the source locale.
-const prosary = makeProsary(
-  contract,
-  reactive({ locale, messages: await bundles[locale]() }),
-);
-
-export const useNuxtApp = () => ({ $t: prosary.createResolver() });
-
-// useLocale: the service's one locale, as the module exposes it. Every
-// locale's bundle is loaded up front, so a test switches language in one
-// step with setLocale, and the service switches as the module's does.
-type Locale = (typeof contract.locales)[number];
-
-const loaded = Object.fromEntries(
-  await Promise.all(
-    contract.locales.map(async (next) => [next, await bundles[next]()]),
-  ),
-) as Record<Locale, Awaited<ReturnType<(typeof bundles)[Locale]>>>;
-
-export const setLocale = (next: Locale) => prosary.apply(next, loaded[next]);
-
-export const useLocale = () => ({
-  locale: computed(() => prosary.config.locale),
-  locales: prosary.locales(),
-  setLocale: async (next: Locale) => {
-    setLocale(next);
-  },
-});
-
-export const clearLocale = () => setLocale(locale);
 
 // useRuntimeConfig: the public config the app reads.
 export const useRuntimeConfig = () => ({

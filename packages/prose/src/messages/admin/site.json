@@ -1,0 +1,6 @@
+{
+  "tag": {
+    "defaultMessage": "Admin",
+    "description": "The line under the church's name in the admin's sidebar and on its login page: what this app is."
+  }
+}

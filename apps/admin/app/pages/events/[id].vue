@@ -1,5 +1,5 @@
 <script lang="ts">
-import { createError, definePageMeta, useHead } from "#imports";
+import { createError, definePageMeta, useHead, useNuxtApp } from "#imports";
 
 import EventEditor from "~/components/EventEditor.vue";
 import PageHeader from "~/components/PageHeader.vue";
@@ -10,10 +10,11 @@ import { useEventRecord } from "~/composables/events";
 definePageMeta({ middleware: "auth", auth: { scopes: ["events:read"] } });
 
 // The event is the one the address names, by id.
+const { $t } = useNuxtApp();
 const { data: record } = await useEventRecord();
 
 if (!record.value) {
-  throw createError({ statusCode: 404, message: "Event not found" });
+  throw createError({ statusCode: 404, message: $t.admin.events.notFound() });
 }
 
 useHead(() => ({ title: record.value?.title }));

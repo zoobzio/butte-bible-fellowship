@@ -1,14 +1,22 @@
-import { computed, defineTabs, useAppConfig, useRoute } from "#imports";
+import {
+  computed,
+  defineTabs,
+  useAppConfig,
+  useNuxtApp,
+  useRoute,
+} from "#imports";
 import { isWithin } from "~/utils/navigation";
 
 /**
  * The sidebar's sections, as tabs the route drives: one per configured
- * link, each a real hyperlink to the route that lists its records, and the
- * one whose page is being read — or a page under it, an editor's — marked
- * as active. The tabs stand one under another.
+ * link, in the reader's words, each a real hyperlink to the route that
+ * lists its records, and the one whose page is being read — or a page
+ * under it, an editor's — marked as active. The tabs stand one under
+ * another.
  */
 export const useSidebar = () => {
   const { sidebar } = useAppConfig();
+  const { $t } = useNuxtApp();
   const route = useRoute();
 
   const active = computed(
@@ -18,7 +26,7 @@ export const useSidebar = () => {
   const tabs = defineTabs(() => ({
     tabs: sidebar.links.map((link) => ({
       value: link.to,
-      label: link.label,
+      label: $t(link.label),
       link: { to: link.to },
     })),
     modelValue: active.value,

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { setLocale, useLocale, useNuxtApp } from "#imports";
-import { useLanguages } from "~/composables/locale";
+import { useLanguages } from "#layers/bbf/app/composables/locale";
 
 describe("useLanguages", () => {
   it("names the language being read, in that language", () => {
@@ -26,12 +26,12 @@ describe("useLanguages", () => {
     ]);
   });
 
-  it("switches the site to the language chosen", async () => {
+  it("switches the app to the language chosen", async () => {
     const { choose } = useLanguages();
     await choose("es");
     expect(useLocale().locale.value).toBe("es");
-    expect(useNuxtApp().$t.navigation.about()).toBe("Quiénes somos");
+    expect(useNuxtApp().$t.language.open()).not.toBe("Change language");
     await choose("en");
-    expect(useNuxtApp().$t.navigation.about()).toBe("About Us");
+    expect(useNuxtApp().$t.language.open()).toBe("Change language");
   });
 });

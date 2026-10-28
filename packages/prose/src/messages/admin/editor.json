@@ -1,0 +1,66 @@
+{
+  "save": {
+    "defaultMessage": "Save",
+    "description": "The button that saves the record being edited."
+  },
+  "saving": {
+    "defaultMessage": "Saving…",
+    "description": "The save button while the save is under way."
+  },
+  "delete": {
+    "defaultMessage": "Delete",
+    "description": "The button that deletes the record being edited."
+  },
+  "deleting": {
+    "defaultMessage": "Deleting…",
+    "description": "The delete button while the deletion is under way."
+  },
+  "confirm": {
+    "defaultMessage": "Delete {name}? This cannot be undone.",
+    "description": "The question asked before a record is deleted. `name` is the record's title or name."
+  },
+  "failed": {
+    "defaultMessage": "Something went wrong.",
+    "description": "What the editor says when a save or a deletion fails and the error carries no message of its own."
+  },
+  "empty": {
+    "defaultMessage": "Nothing here yet.",
+    "description": "What a table of records shows when there are none."
+  },
+  "edit": {
+    "defaultMessage": "Edit",
+    "description": "The action on a table's row that opens the record's editor."
+  },
+  "slug": {
+    "defaultMessage": "Slug",
+    "description": "The label of the field for a record's slug: the last part of its page's address."
+  },
+  "slugHint": {
+    "defaultMessage": "Lowercase words joined by hyphens.",
+    "description": "The hint under the slug field: how a slug is written."
+  },
+  "status": {
+    "defaultMessage": "Status",
+    "description": "The label of the field, and the heading of the table column, for whether a record is a draft, published or archived."
+  },
+  "draft": {
+    "defaultMessage": "Draft",
+    "description": "The status of a record not yet shown on the site."
+  },
+  "published": {
+    "defaultMessage": "Published",
+    "description": "The status of a record shown on the site."
+  },
+  "archived": {
+    "defaultMessage": "Archived",
+    "description": "The status of a record taken off the site and kept."
+  },
+  "summary": {
+    "defaultMessage": "Summary",
+    "description": "The label of the field for a record's one-line summary."
+  },
+  "updated": {
+    "defaultMessage": "Updated",
+    "description": "The heading of the table column for when a record was last changed."
+  }
+}

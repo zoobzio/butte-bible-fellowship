@@ -1,0 +1,30 @@
+{
+  "sunday": {
+    "defaultMessage": "Sunday",
+    "description": "A day of the week, as the event editor offers it."
+  },
+  "monday": {
+    "defaultMessage": "Monday",
+    "description": "A day of the week, as the event editor offers it."
+  },
+  "tuesday": {
+    "defaultMessage": "Tuesday",
+    "description": "A day of the week, as the event editor offers it."
+  },
+  "wednesday": {
+    "defaultMessage": "Wednesday",
+    "description": "A day of the week, as the event editor offers it."
+  },
+  "thursday": {
+    "defaultMessage": "Thursday",
+    "description": "A day of the week, as the event editor offers it."
+  },
+  "friday": {
+    "defaultMessage": "Friday",
+    "description": "A day of the week, as the event editor offers it."
+  },
+  "saturday": {
+    "defaultMessage": "Saturday",
+    "description": "A day of the week, as the event editor offers it."
+  }
+}

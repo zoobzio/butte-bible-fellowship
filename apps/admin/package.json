@@ -17,6 +17,7 @@
     "@bbf/database": "workspace:*",
     "@bbf/nuxt": "workspace:*",
     "@bbf/patents": "workspace:*",
+    "@bbf/prose": "workspace:*",
     "@bbf/schema": "workspace:*",
     "@bbf/theme": "workspace:*",
     "@bbf/utils": "workspace:*",

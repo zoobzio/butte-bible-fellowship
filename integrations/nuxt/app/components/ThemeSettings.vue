@@ -1,16 +1,14 @@
 <script lang="ts">
 import { Icon, Popover, SegmentedControl } from "#components";
-import { definePopover, defineSegmentedControl } from "#imports";
+import { definePopover, defineSegmentedControl, useNuxtApp } from "#imports";
 import { useModifiers } from "#layers/bbf/app/composables/modifiers";
 </script>
 
 <script setup lang="ts">
 defineOptions({ name: "ThemeSettings" });
 
-// The name of the button and of the panel it opens. An app that speaks
-// another language names them in that one.
-const { label = "Appearance settings" } = defineProps<{ label?: string }>();
-
+// The button and the panel it opens are named in the reader's language.
+const { $t } = useNuxtApp();
 const { settings, selection, set } = useModifiers();
 
 const popover = definePopover({ side: "top", align: "start" });
@@ -38,12 +36,20 @@ const controls = settings.map(({ id, name, contexts }) => {
 <template>
   <Popover v-bind="popover">
     <template #trigger>
-      <button type="button" class="theme-toggle" :aria-label="label">
+      <button
+        type="button"
+        class="theme-toggle"
+        :aria-label="$t.appearance.settings()"
+      >
         <Icon name="sliders" class="icon" />
       </button>
     </template>
     <template #content>
-      <div class="theme-settings" role="group" :aria-label="label">
+      <div
+        class="theme-settings"
+        role="group"
+        :aria-label="$t.appearance.settings()"
+      >
         <div
           v-for="{ id, name, control } in controls"
           :key="id"

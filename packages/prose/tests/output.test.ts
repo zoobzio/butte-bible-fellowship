@@ -25,13 +25,14 @@ const { source: locale, targets = [] } = config.translate;
 const content =
   typeof config.content === "string" ? config.content : config.content!.dir;
 
-// Every source message by its full key: the file's name, then its own key.
+// Every source message by its full key: the file's path from the messages
+// directory, a dot for each slash, then its own key.
 const source = Object.fromEntries(
   list(config.messages, ".json").flatMap((file) =>
     Object.entries(
       JSON.parse(read(`${config.messages}/${file}`)) as Descriptors,
     ).map(([key, descriptor]) => [
-      `${file.slice(0, -".json".length)}.${key}`,
+      `${file.slice(0, -".json".length).replaceAll("/", ".")}.${key}`,
       descriptor.defaultMessage,
     ]),
   ),
@@ -112,6 +113,7 @@ describe("bundles", () => {
       "events.weekly",
       "events.monthly",
       "events.week",
+      "admin.editor.confirm",
     ];
     for (const [key, message] of Object.entries(source)) {
       if (!taking.includes(key)) {
@@ -145,6 +147,9 @@ describe("bundles", () => {
     expect(
       [1, 2, 3, 4, 5].map((week) => prosary.format("events.week", { week })),
     ).toEqual(["first", "second", "third", "fourth", "fifth"]);
+    expect(
+      prosary.format("admin.editor.confirm", { name: "Harvest Dinner" }),
+    ).toBe("Delete Harvest Dinner? This cannot be undone.");
   });
 });
 

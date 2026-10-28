@@ -10,7 +10,10 @@
 
 import { reactive, ref } from "vue";
 import { vi } from "vitest";
-import { useAsyncData } from "@bbf/nuxt/testing/imports";
+import {
+  useAsyncData,
+  useNuxtApp as useLayerNuxtApp,
+} from "@bbf/nuxt/testing/imports";
 
 export * from "@bbf/nuxt/testing/imports";
 
@@ -19,9 +22,10 @@ export * from "@bbf/nuxt/testing/imports";
 export { defineTabs } from "@zoobzio/vue/definitions/tabs";
 export { createTable } from "@zoobzio/nuxt/factories/table";
 
-// useNuxtApp: the app, as far as the design system's widgets reach into it —
-// a logger per service, which records nothing, and the hooks a service emits
-// its events through, which record what was emitted.
+// useNuxtApp: the app, as far as the admin reaches into it — `$t`, from the
+// layer's shim, and what the design system's widgets reach for: a logger
+// per service, which records nothing, and the hooks a service emits its
+// events through, which record what was emitted.
 const logger = {
   level: ref("info"),
   backlog: ref([]),
@@ -37,6 +41,7 @@ export const callHook = vi.fn(async () => {});
 export const addHooks = vi.fn(() => () => {});
 
 export const useNuxtApp = () => ({
+  ...useLayerNuxtApp(),
   $log: logger,
   $logger: () => logger,
   callHook,

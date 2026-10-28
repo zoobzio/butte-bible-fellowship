@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { mount } from "@vue/test-utils";
 
-import { useUntheme } from "#imports";
+import { setLocale, useNuxtApp, useUntheme } from "#imports";
 import ColorMode from "#layers/bbf/app/components/ColorMode.vue";
 
 const icon = (wrapper: ReturnType<typeof mount>) =>
@@ -34,11 +34,17 @@ describe("ColorMode", () => {
     expect(useUntheme().config.input.color).toBe("light");
   });
 
-  it("takes its names from the app, by the scheme it switches to", async () => {
-    const labels = { light: "Modo claro", dark: "Modo oscuro" };
-    const wrapper = mount(ColorMode, { props: { labels } });
-    expect(wrapper.attributes("aria-label")).toBe("Modo oscuro");
+  it("names itself in the reader's language, by the scheme it switches to", async () => {
+    setLocale("es");
+    const { $t } = useNuxtApp();
+    const wrapper = mount(ColorMode);
+    expect(wrapper.attributes("aria-label")).toBe(
+      $t.appearance.scheme({ mode: "dark" }),
+    );
+    expect(wrapper.attributes("aria-label")).not.toBe("Switch to dark mode");
     await wrapper.trigger("click");
-    expect(wrapper.attributes("aria-label")).toBe("Modo claro");
+    expect(wrapper.attributes("aria-label")).toBe(
+      $t.appearance.scheme({ mode: "light" }),
+    );
   });
 });

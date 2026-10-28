@@ -1,5 +1,5 @@
 <script lang="ts">
-import { definePageMeta, useHead } from "#imports";
+import { definePageMeta, useHead, useNuxtApp } from "#imports";
 
 import PageHeader from "~/components/PageHeader.vue";
 import StaffEditor from "~/components/StaffEditor.vue";
@@ -8,10 +8,11 @@ import StaffEditor from "~/components/StaffEditor.vue";
 <script setup lang="ts">
 definePageMeta({ middleware: "auth", auth: { scopes: ["staff:write"] } });
 
-useHead({ title: "New member" });
+const { $t } = useNuxtApp();
+useHead(() => ({ title: $t.admin.staff.new() }));
 </script>
 
 <template>
-  <PageHeader title="New member" />
+  <PageHeader :title="$t.admin.staff.new()" />
   <StaffEditor :record="null" />
 </template>

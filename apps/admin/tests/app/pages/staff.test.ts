@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { mount } from "@vue/test-utils";
 
-import { setRoutePath, useHead } from "#imports";
+import { setRoutePath } from "#imports";
 import PageHeader from "~/components/PageHeader.vue";
 import RecordTable from "~/components/RecordTable.vue";
 import StaffEditor from "~/components/StaffEditor.vue";
@@ -9,6 +9,7 @@ import Index from "~/pages/staff/index.vue";
 import New from "~/pages/staff/new.vue";
 import Editor from "~/pages/staff/[id].vue";
 import { STAFF } from "#test/support/records";
+import { head } from "#test/support/head";
 import { mountSuspended } from "@bbf/nuxt/testing/mount";
 
 describe("staff page", () => {
@@ -31,7 +32,7 @@ describe("staff page", () => {
       query: { page: 1, size: 25 },
     });
     expect(table.props("table").data).toEqual([STAFF]);
-    expect(useHead).toHaveBeenCalledWith({ title: "Staff" });
+    expect(head()).toEqual({ title: "Staff" });
   });
 });
 
@@ -40,7 +41,7 @@ describe("new member page", () => {
     const wrapper = mount(New, { global: { stubs: { StaffEditor: true } } });
     expect(wrapper.findComponent(PageHeader).props("title")).toBe("New member");
     expect(wrapper.findComponent(StaffEditor).props("record")).toBeNull();
-    expect(useHead).toHaveBeenCalledWith({ title: "New member" });
+    expect(head()).toEqual({ title: "New member" });
   });
 });
 
@@ -55,7 +56,7 @@ describe("member page", () => {
     expect(error).toBeUndefined();
     expect(wrapper.findComponent(PageHeader).props("title")).toBe("Jane Doe");
     expect(wrapper.findComponent(StaffEditor).props("record")).toEqual(STAFF);
-    expect(useHead.mock.calls[0]![0]()).toEqual({ title: "Jane Doe" });
+    expect(head()).toEqual({ title: "Jane Doe" });
   });
 
   it("throws a 404 when no member has the id", async () => {

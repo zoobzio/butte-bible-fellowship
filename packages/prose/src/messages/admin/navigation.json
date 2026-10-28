@@ -1,0 +1,14 @@
+{
+  "label": {
+    "defaultMessage": "Sections",
+    "description": "The accessible name of the admin's sidebar navigation: the list of the kinds of content it edits."
+  },
+  "staff": {
+    "defaultMessage": "Staff",
+    "description": "The sidebar link to the list of staff members."
+  },
+  "events": {
+    "defaultMessage": "Events",
+    "description": "The sidebar link to the list of events."
+  }
+}

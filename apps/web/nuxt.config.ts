@@ -9,10 +9,6 @@ export default defineNuxtConfig({
 
   extends: ["@bbf/nuxt"],
 
-  modules: ["@prosary/nuxt"],
-
-  prosary: { build: "@bbf/prose" },
-
   bezoar: { role: "web" },
 
   runtimeConfig: {

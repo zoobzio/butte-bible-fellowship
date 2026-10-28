@@ -1,16 +1,18 @@
 <script lang="ts">
-import type { Locale } from "@bbf/prose";
+import type { AppProsaryLocale } from "#imports";
 
 import { Icon, Menu } from "#components";
 import { defineMenu, useNuxtApp } from "#imports";
-import { useLanguages } from "~/composables/locale";
+import { useLanguages } from "#layers/bbf/app/composables/locale";
 </script>
 
 <script setup lang="ts">
+defineOptions({ name: "LanguagePicker" });
+
 const { $t } = useNuxtApp();
 const { current, languages, choose } = useLanguages();
 
-// Each language is a choice: picking one switches the site to it in place.
+// Each language is a choice: picking one switches the app to it in place.
 const menu = defineMenu(() => ({
   groups: [
     {
@@ -20,7 +22,7 @@ const menu = defineMenu(() => ({
   ],
   side: "top" as const,
   align: "end" as const,
-  onSelect: (item: { locale: Locale }) => choose(item.locale),
+  onSelect: (item: { locale: AppProsaryLocale }) => choose(item.locale),
 }));
 </script>
 
