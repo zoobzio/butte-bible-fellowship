@@ -3,6 +3,7 @@ import type {
   StaffListing,
   StaffQuery,
   StaffRecord,
+  StaffSort,
 } from "@bbf/schema/types";
 
 import { toStaffArguments, toStaffRecord } from "@bbf/utils";
@@ -26,6 +27,29 @@ const toSearch = (query: StaffQuery) => ({
   created_on: query.createdAtOn ?? null,
 });
 
+/**
+ * The column of the row each sort key names.
+ */
+const SORT_COLUMNS: Record<StaffSort, string> = {
+  name: "name",
+  role: "role",
+  status: "status",
+  email: "email",
+  phone: "phone",
+  createdAt: "created_at",
+  updatedAt: "updated_at",
+};
+
+/**
+ * The order as the list query takes it: the column asked for, ascending
+ * unless told otherwise. Asked for nothing, the site's order: by role,
+ * then by name, which the query falls back to after any sort.
+ */
+const toOrder = (query: StaffQuery) => ({
+  sort: SORT_COLUMNS[query.sort ?? "role"],
+  direction: query.direction ?? "asc",
+});
+
 export const useStaff = () => {
   const db = useDatabase();
 
@@ -34,6 +58,7 @@ export const useStaff = () => {
     const [rows, counted] = await Promise.all([
       db.admin.staff.list({
         ...search,
+        ...toOrder(query),
         size: query.size,
         offset: (query.page - 1) * query.size,
       }),

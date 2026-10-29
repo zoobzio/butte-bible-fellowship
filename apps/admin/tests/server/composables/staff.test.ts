@@ -68,6 +68,10 @@ const NONE: Search = {
   created_on: null,
 };
 
+type Order = { sort: string; direction: string };
+
+const ORDER: Order = { sort: "role", direction: "asc" };
+
 const matches = (search: Search) => (row: (typeof ROWS)[number]) =>
   (search.q === null ||
     row.name.toLowerCase().includes(search.q.toLowerCase())) &&
@@ -78,8 +82,10 @@ const list = vi.fn(
   async ({
     size,
     offset,
+    sort: _sort,
+    direction: _direction,
     ...search
-  }: Search & { size: number; offset: number }) =>
+  }: Search & Order & { size: number; offset: number }) =>
     ROWS.filter(matches(search)).slice(offset, offset + size),
 );
 const counted = vi.fn(async (search: Search) => ({
@@ -121,13 +127,48 @@ describe("useStaff", () => {
       items: [RECORD],
       total: 2,
     });
-    expect(list).toHaveBeenCalledWith({ ...NONE, size: 1, offset: 0 });
+    expect(list).toHaveBeenCalledWith({
+      ...NONE,
+      ...ORDER,
+      size: 1,
+      offset: 0,
+    });
     expect(counted).toHaveBeenCalledWith(NONE);
     expect(await useStaff().list({ page: 2, size: 1 })).toEqual({
       items: [{ ...RECORD, id: 2, name: "John Roe" }],
       total: 2,
     });
-    expect(list).toHaveBeenLastCalledWith({ ...NONE, size: 1, offset: 1 });
+    expect(list).toHaveBeenLastCalledWith({
+      ...NONE,
+      ...ORDER,
+      size: 1,
+      offset: 1,
+    });
+  });
+
+  it("asks for the sort the query names, by the row's column, ascending unless told", async () => {
+    await useStaff().list({ page: 1, size: 25, sort: "updatedAt" });
+    expect(list).toHaveBeenLastCalledWith({
+      ...NONE,
+      sort: "updated_at",
+      direction: "asc",
+      size: 25,
+      offset: 0,
+    });
+    await useStaff().list({
+      page: 1,
+      size: 25,
+      sort: "email",
+      direction: "desc",
+    });
+    expect(list).toHaveBeenLastCalledWith({
+      ...NONE,
+      sort: "email",
+      direction: "desc",
+      size: 25,
+      offset: 0,
+    });
+    expect(counted).toHaveBeenLastCalledWith(NONE);
   });
 
   it("hands the database the search, and null for each part left out or empty", async () => {
@@ -139,6 +180,7 @@ describe("useStaff", () => {
     await useStaff().list({ page: 1, size: 25, q: "", role: "pastor" });
     expect(list).toHaveBeenLastCalledWith({
       ...NONE,
+      ...ORDER,
       role: "pastor",
       size: 25,
       offset: 0,

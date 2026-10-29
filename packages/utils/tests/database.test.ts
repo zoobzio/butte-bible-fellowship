@@ -254,6 +254,8 @@ describe("staff", () => {
           size: 25,
           offset: 0,
           tz: "America/Los_Angeles",
+          sort: "role",
+          direction: "asc",
         })
       )
         .map(toStaffRecord)

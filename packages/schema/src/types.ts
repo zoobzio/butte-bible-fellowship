@@ -1,9 +1,15 @@
 import type { z } from "zod";
 
 import type { eventBody, eventId, eventPath, eventsQuery } from "./input/event";
-import type { listingQuery } from "./input/listing";
+import type { listingQuery, sortDirection } from "./input/listing";
 import type { sermonBody, sermonPath, sermonsQuery } from "./input/sermon";
-import type { staffBody, staffForm, staffId, staffQuery } from "./input/staff";
+import type {
+  staffBody,
+  staffForm,
+  staffId,
+  staffQuery,
+  staffSort,
+} from "./input/staff";
 import type {
   churchEvent,
   churchEvents,
@@ -73,9 +79,13 @@ export type EventsQuery = z.infer<typeof eventsQuery>;
 
 export type ListingQuery = z.infer<typeof listingQuery>;
 
+export type SortDirection = z.infer<typeof sortDirection>;
+
 export type EventBody = z.infer<typeof eventBody>;
 
 export type StaffId = z.infer<typeof staffId>;
+
+export type StaffSort = z.infer<typeof staffSort>;
 
 export type StaffQuery = z.infer<typeof staffQuery>;
 

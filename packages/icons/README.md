@@ -28,7 +28,14 @@ centred in it — cut from the traced logo, whose lettering does not survive
 icon sizes. Its `viewBox` is the disc's own bounds, so the disc fills
 whatever box it is given. `@bbf/assets` renders the favicon from it.
 
-Only icons the site actually uses are defined. Add an alias when you need it.
+The config extends `@zoobzio/icons`, the foundation design system's own
+contract, so every alias its components draw by default — `refresh`,
+`columns`, `sort-asc`, the editor's marks — is in the sprite without being
+named here. An alias declared here again rebinds the preset's, as `search`
+does, and the preset's `prefix` is inherited.
+
+Only icons the site itself uses are defined here. Add an alias when you
+need it.
 
 ## Exports
 

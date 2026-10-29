@@ -1,9 +1,13 @@
 import { describe, expect, it } from "vitest";
 
+import { z } from "zod";
+
 import {
   LISTING_DEFAULT_SIZE,
   LISTING_MAX_SIZE,
   listingQuery,
+  SORT_DIRECTIONS,
+  sorting,
 } from "../../src/input/listing";
 
 describe("listingQuery", () => {
@@ -36,5 +40,30 @@ describe("listingQuery", () => {
     expect(listingQuery.parse({ size: "100" }).size).toBe(100);
     expect(listingQuery.safeParse({ size: "101" }).success).toBe(false);
     expect(listingQuery.safeParse({ size: "0" }).success).toBe(false);
+  });
+});
+
+describe("sorting", () => {
+  const sorted = listingQuery.extend(sorting(z.enum(["name", "updatedAt"])));
+
+  it("takes one of the columns named, and a direction, each optional", () => {
+    expect(SORT_DIRECTIONS).toEqual(["asc", "desc"]);
+    expect(sorted.parse({})).toEqual({ page: 1, size: 25 });
+    expect(sorted.parse({ sort: "name" })).toEqual({
+      page: 1,
+      size: 25,
+      sort: "name",
+    });
+    expect(sorted.parse({ sort: "updatedAt", direction: "desc" })).toEqual({
+      page: 1,
+      size: 25,
+      sort: "updatedAt",
+      direction: "desc",
+    });
+  });
+
+  it("refuses a column not named, or a direction that is neither way", () => {
+    expect(sorted.safeParse({ sort: "email" }).success).toBe(false);
+    expect(sorted.safeParse({ direction: "down" }).success).toBe(false);
   });
 });

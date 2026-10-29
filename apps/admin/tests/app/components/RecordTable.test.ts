@@ -43,8 +43,22 @@ describe("RecordTable", () => {
       "Name",
       "Role",
       "Status",
+      "Email",
+      "Phone",
       "Updated",
     ]);
+  });
+
+  it("sorts by a heading when it is clicked, and marks the sorted one", async () => {
+    const wrapper = await mountTable([STAFF]);
+    const heading = wrapper
+      .findAll(".f-th")
+      .find((th) => th.text() === "Email")!;
+    expect(heading.classes()).toContain("f-data-table-sortable");
+    expect(heading.classes()).not.toContain("f-data-table-sorted");
+    await heading.find("button").trigger("click");
+    await flushPromises();
+    expect(heading.classes()).toContain("f-data-table-sorted");
   });
 
   it("offers the search box, worded by the app's prose", async () => {

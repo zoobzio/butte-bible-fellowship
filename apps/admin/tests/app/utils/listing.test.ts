@@ -113,6 +113,19 @@ describe("toListingQuery", () => {
     });
   });
 
+  it("carries the sort as its column and its direction, once a column is sorted", () => {
+    expect(
+      toListingQuery({
+        page: 1,
+        pageSize: 25,
+        sortField: "updatedAt",
+        sortDirection: "desc",
+        query: "",
+        filters: [],
+      }),
+    ).toEqual({ page: 1, size: 25, sort: "updatedAt", direction: "desc" });
+  });
+
   it("names an operator filter by its column and its operator", () => {
     expect(
       toListingQuery({

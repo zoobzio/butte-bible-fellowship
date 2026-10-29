@@ -1,7 +1,11 @@
 import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
+import { createRequire } from "node:module";
+import { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { aliases as presetAliases } from "@zoobzio/icons";
+import { contract as preset } from "@zoobzio/icons/config";
 import { beforeAll, describe, expect, it } from "vitest";
 
 import config from "../icon-sheets.config";
@@ -16,11 +20,25 @@ type Symbol = { id: string; viewBox: string; body: string };
 const root = fileURLToPath(new URL("..", import.meta.url));
 const read = (file: string) => readFileSync(`${root}${file}`, "utf8");
 
-const expectedAliases = Object.keys(config.icons).sort();
+/*
+ * The config composes over the foundation's icons: every alias of the
+ * preset is kept as the preset draws it, unless the config declares it
+ * again, and the config's own land on top.
+ */
+const presetRoot = dirname(
+  createRequire(import.meta.url).resolve("@zoobzio/icons/package.json"),
+);
+const presetSprite = readFileSync(`${presetRoot}/.output/sprite.svg`, "utf8");
+
+const ownAliases = Object.keys(config.icons).sort();
+const inheritedAliases = presetAliases
+  .filter((alias) => !(alias in config.icons))
+  .sort();
+const expectedAliases = [...inheritedAliases, ...ownAliases].sort();
 
 const isLocal = (alias: string) => config.icons[alias]!.startsWith("./");
-const iconifyAliases = expectedAliases.filter((alias) => !isLocal(alias));
-const localAliases = expectedAliases.filter(isLocal);
+const iconifyAliases = ownAliases.filter((alias) => !isLocal(alias));
+const localAliases = ownAliases.filter(isLocal);
 
 const local = (alias: string) => {
   const svg = read(config.icons[alias]!.slice(2));
@@ -45,6 +63,9 @@ const source = (alias: string) => {
   };
 };
 
+const byId = (list: Symbol[]) =>
+  Object.fromEntries(list.map((symbol) => [symbol.id, symbol]));
+
 const symbols = (svg: string): Symbol[] =>
   [
     ...svg.matchAll(/<symbol id="([^"]+)" viewBox="([^"]+)">(.*?)<\/symbol>/gs),
@@ -59,6 +80,8 @@ const expectedSymbols: Symbol[] = iconifyAliases.map((alias) => {
   return { id: alias, viewBox: `0 0 ${width} ${height}`, body };
 });
 
+const presetSymbols = byId(symbols(presetSprite));
+
 const expectLocalSymbol = (symbol: Symbol | undefined, alias: string) => {
   const { viewBox, paths } = local(alias);
   expect(symbol, alias).toBeDefined();
@@ -66,9 +89,6 @@ const expectLocalSymbol = (symbol: Symbol | undefined, alias: string) => {
   expect(symbol!.body).toContain('fill="currentColor"');
   for (const path of paths) expect(symbol!.body).toContain(path);
 };
-
-const byId = (list: Symbol[]) =>
-  Object.fromEntries(list.map((symbol) => [symbol.id, symbol]));
 
 let index: typeof import("../.output/index.mjs");
 let contract: typeof import("../.output/config.mjs");
@@ -108,8 +128,11 @@ describe("package exports", () => {
 });
 
 describe("index", () => {
-  it("lists every configured alias", () => {
+  it("lists every configured alias, the preset's with the config's own", () => {
     expect([...index.aliases].sort()).toEqual(expectedAliases);
+    expect(inheritedAliases.length).toBeGreaterThan(0);
+    expect(ownAliases).toContain("search");
+    expect(presetAliases).toContain("search");
   });
 
   it("recognises aliases and nothing else", () => {
@@ -152,6 +175,14 @@ describe("config", () => {
     }
   });
 
+  it("keeps a preset alias left alone as the preset resolved it", () => {
+    for (const alias of inheritedAliases) {
+      expect(contract.contract.icons[alias], alias).toEqual(
+        preset.icons[alias as keyof typeof preset.icons],
+      );
+    }
+  });
+
   it("resolves a local ref to the SVG file it names", () => {
     expect(localAliases).toContain("logo");
     for (const alias of localAliases) {
@@ -179,6 +210,9 @@ describe("sprite", () => {
       expect(found[symbol.id], symbol.id).toEqual(symbol);
     }
     for (const alias of localAliases) expectLocalSymbol(found[alias], alias);
+    for (const alias of inheritedAliases) {
+      expect(found[alias], alias).toEqual(presetSymbols[alias]);
+    }
   };
 
   it("holds one symbol per alias, drawn from its Iconify icon or file", () => {

@@ -51,7 +51,7 @@ const command = defineCommand(() => ({
         class="theme-picker"
         :aria-label="$t.appearance.themes()"
       >
-        <template #inputIcon>
+        <template #inputPrepend>
           <Icon name="search" class="icon" />
         </template>
       </Command>

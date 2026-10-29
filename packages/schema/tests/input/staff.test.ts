@@ -5,6 +5,7 @@ import {
   staffForm,
   staffId,
   staffQuery,
+  STAFF_SORT_KEYS,
 } from "../../src/input/staff";
 
 const MEMBER = { name: "Jane Doe", role: "elder" };
@@ -46,6 +47,26 @@ describe("staffQuery", () => {
   it("takes only a role and a status the staff are written in", () => {
     expect(staffQuery.safeParse({ role: "deacon" }).success).toBe(false);
     expect(staffQuery.safeParse({ status: "live" }).success).toBe(false);
+  });
+
+  it("sorts by a column of the record, either way", () => {
+    expect(STAFF_SORT_KEYS).toEqual([
+      "name",
+      "role",
+      "status",
+      "email",
+      "phone",
+      "createdAt",
+      "updatedAt",
+    ]);
+    expect(staffQuery.parse({ sort: "email", direction: "desc" })).toEqual({
+      page: 1,
+      size: 25,
+      sort: "email",
+      direction: "desc",
+    });
+    expect(staffQuery.safeParse({ sort: "bio" }).success).toBe(false);
+    expect(staffQuery.safeParse({ sort: "id" }).success).toBe(false);
   });
 
   it("takes a day each member was changed or added before, after or on, as YYYY-MM-DD", () => {

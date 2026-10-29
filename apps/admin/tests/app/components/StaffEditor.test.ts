@@ -69,7 +69,8 @@ describe("StaffEditor", () => {
   it("saves without the browser's own checks, and leaves the form's title to the page", () => {
     const wrapper = mount(StaffEditor, { props: { record: STAFF } });
     expect(wrapper.find("form").attributes("novalidate")).toBeDefined();
-    expect(wrapper.find(".f-data-form-title").text()).toBe("Jane Doe");
+    expect(wrapper.find(".f-data-form-title").exists()).toBe(false);
+    expect(wrapper.text()).not.toContain("Jane Doe");
   });
 
   it("writes what is typed as a new member", async () => {

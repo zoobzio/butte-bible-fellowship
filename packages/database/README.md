@@ -58,8 +58,11 @@ takes the newest published sermons, as many as asked, and
 
 `admin.staff` has `list`, `fetch`, `create`, `update` and `delete`, over
 every member whatever their status, and `count` beside `list`. `list` is
-one page, `size` rows from `offset`, in the site's order; `count` is how
-many rows the same search holds in all. Each takes the search the admin
+one page, `size` rows from `offset`, sorted by the column `sort` names —
+`name`, `role`, `status`, `email`, `phone`, `created_at` or `updated_at` —
+in `direction`, `asc` or `desc`, a null last either way, and then in the
+site's order, by role and name, so `role` ascending is the site's order
+itself; `count` is how many rows the same search holds in all. Each takes the search the admin
 app's table commits, every part of it optional: `q`, text the name must
 carry whatever its case; `role`; `status`; and a day each member was last
 changed or added `before`, `after` or `on`, as `updated_before` and the

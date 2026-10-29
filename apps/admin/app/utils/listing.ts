@@ -68,9 +68,16 @@ export const toTableDescriptors = <T>(
 const keyOf = ({ key, op }: TableFetchParams["filters"][number]): string =>
   op === undefined ? key : `${key}${op.charAt(0).toUpperCase()}${op.slice(1)}`;
 
+/**
+ * What a table asks the API for: the page, the free text as `q`, one
+ * column filter per key, and the sort as `sort` and `direction` once a
+ * column is sorted. Unsorted, the API lists in its own order.
+ */
 export const toListingQuery = ({
   page,
   pageSize,
+  sortField,
+  sortDirection,
   query,
   filters,
 }: TableFetchParams): ListingRequest => ({
@@ -78,6 +85,7 @@ export const toListingQuery = ({
   page,
   size: pageSize,
   ...(query === "" ? {} : { q: query }),
+  ...(sortField === null ? {} : { sort: sortField, direction: sortDirection }),
 });
 
 export const toFetchResult = <T>(

@@ -23,6 +23,10 @@ describe("useStaffTable", () => {
       "name",
       "role",
       "status",
+      "email",
+      "phone",
+      "summary",
+      "photo",
       "updatedAt",
       "createdAt",
     ]);
@@ -30,11 +34,26 @@ describe("useStaffTable", () => {
       "name",
       "role",
       "status",
+      "email",
+      "phone",
       "updatedAt",
     ]);
     expect(table.filterableColumns.map((column) => column.key)).toEqual([
       "role",
       "status",
+      "updatedAt",
+      "createdAt",
+    ]);
+    expect(
+      table.columns
+        .filter((column) => column.sortable)
+        .map((column) => column.key),
+    ).toEqual([
+      "name",
+      "role",
+      "status",
+      "email",
+      "phone",
       "updatedAt",
       "createdAt",
     ]);
@@ -113,6 +132,23 @@ describe("useStaffTable", () => {
     });
   });
 
+  it("sorts the staff by a column, from the first page, and the other way on a second ask", async () => {
+    const fetch = vi.fn(async () => ({ items: [STAFF], total: 1 }));
+    vi.stubGlobal("$fetch", fetch);
+    const { result } = withSetup(() => useStaffTable());
+    result.table.goToPage(2);
+    result.table.sortBy("updatedAt");
+    await flushPromises();
+    expect(fetch).toHaveBeenLastCalledWith("/api/staff", {
+      query: { page: 1, size: 25, sort: "updatedAt", direction: "asc" },
+    });
+    result.table.sortBy("updatedAt");
+    await flushPromises();
+    expect(fetch).toHaveBeenLastCalledWith("/api/staff", {
+      query: { page: 1, size: 25, sort: "updatedAt", direction: "desc" },
+    });
+  });
+
   it("offers an edit of each row that opens the member's editor", () => {
     const { result } = withSetup(() => useStaffTable());
     const [edit] = result.table.actions;
@@ -146,7 +182,6 @@ describe("useStaffEditor", () => {
   it("is the staff form, blank for a new member: a draft, with no role, and no delete", () => {
     const editor = useStaffEditor(null);
     expect(editor.form.id).toBe("staff");
-    expect(editor.form.config.title).toBe("New member");
     expect(editor.form.config.fields.map((field) => field.key)).toEqual([
       "name",
       "role",
@@ -163,7 +198,6 @@ describe("useStaffEditor", () => {
 
   it("opens on a member's record, the bio as HTML, with a delete", () => {
     const editor = useStaffEditor(STAFF);
-    expect(editor.form.config.title).toBe("Jane Doe");
     expect(editor.form.payload).toEqual({
       ...BODY,
       bio: "<p>Has served since 2010.</p>",

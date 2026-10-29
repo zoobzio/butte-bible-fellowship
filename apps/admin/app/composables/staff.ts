@@ -62,6 +62,7 @@ export const useStaffRecord = () => useRecord("staff", endpoint, staffRecord);
 /**
  * The form of one member: a new one when there is no record. The form's
  * store is shared under its id, so each visit starts over from the record.
+ * The form carries no title of its own: the page's header names the member.
  * A save that fails reports through `error`, which the next submit clears.
  */
 export const useStaffEditor = (record: StaffRecord | null) => {
@@ -70,7 +71,6 @@ export const useStaffEditor = (record: StaffRecord | null) => {
   const { $t } = useNuxtApp();
 
   const useForm = createForm<StaffForm>("staff", {
-    title: record?.name ?? $t.admin.staff.new(),
     fields: [
       {
         type: "text",

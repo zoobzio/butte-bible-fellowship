@@ -2,7 +2,7 @@ import { z } from "zod";
 
 import { hast } from "../models/hast";
 import { contentStatus, staffRole } from "../models/staff";
-import { listingQuery } from "./listing";
+import { listingQuery, sorting } from "./listing";
 
 export const staffId = z.object({
   id: z.coerce
@@ -24,7 +24,23 @@ const day = (what: string) =>
       examples: ["2026-10-17"],
     });
 
+export const STAFF_SORT_KEYS = [
+  "name",
+  "role",
+  "status",
+  "email",
+  "phone",
+  "createdAt",
+  "updatedAt",
+] as const;
+
+export const staffSort = z.enum(STAFF_SORT_KEYS).meta({
+  description: "A column of the staff the admin may sort them by.",
+  examples: ["name"],
+});
+
 export const staffQuery = listingQuery.extend({
+  ...sorting(staffSort),
   role: staffRole.optional().meta({
     description: "The role the members listed hold. Left out, every role.",
   }),

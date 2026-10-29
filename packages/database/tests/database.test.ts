@@ -187,7 +187,7 @@ describe("admin.staff", () => {
     });
 
     const tz = "America/Los_Angeles";
-    const page = { size: 25, offset: 0, tz };
+    const page = { size: 25, offset: 0, tz, sort: "role", direction: "asc" };
     const today = new Intl.DateTimeFormat("en-CA", {
       timeZone: tz,
       dateStyle: "short",
@@ -220,10 +220,12 @@ describe("admin.staff", () => {
         })
       )?.total,
     ).toBe(3);
-    expect(await db.admin.staff.list({ size: 2, offset: 2, tz })).toHaveLength(
-      2,
+    expect(
+      await db.admin.staff.list({ ...page, size: 2, offset: 2 }),
+    ).toHaveLength(2);
+    expect(await db.admin.staff.list({ ...page, size: 2, offset: 4 })).toEqual(
+      [],
     );
-    expect(await db.admin.staff.list({ size: 2, offset: 4, tz })).toEqual([]);
 
     expect(
       (await db.admin.staff.count.first({ tz, created_on: today }))?.total,
@@ -237,6 +239,37 @@ describe("admin.staff", () => {
     expect(
       await db.admin.staff.list({ ...page, created_before: today }),
     ).toEqual([]);
+
+    // The sort asked for, a null last either way, then the site's order.
+    expect(
+      (await db.admin.staff.list({ ...page, direction: "desc" })).map(
+        (r) => r.name,
+      ),
+    ).toEqual(["Elder Name", "Elder Name", "Elder Name", "Pastor Name"]);
+    expect(
+      (await db.admin.staff.list({ ...page, sort: "name" })).map((r) => r.name),
+    ).toEqual(["Elder Name", "Elder Name", "Elder Name", "Pastor Name"]);
+    expect(
+      (
+        await db.admin.staff.list({ ...page, sort: "name", direction: "desc" })
+      ).map((r) => r.name),
+    ).toEqual(["Pastor Name", "Elder Name", "Elder Name", "Elder Name"]);
+    for (const direction of ["asc", "desc"]) {
+      expect(
+        (await db.admin.staff.list({ ...page, sort: "email", direction })).map(
+          (r) => r.email,
+        ),
+      ).toEqual(["pastor@example.com", null, null, null]);
+    }
+    expect(
+      (
+        await db.admin.staff.list({
+          ...page,
+          sort: "created_at",
+          direction: "desc",
+        })
+      ).map((r) => r.name),
+    ).toEqual(["Pastor Name", "Elder Name", "Elder Name", "Elder Name"]);
 
     const updated = await db.admin.staff.update.first({
       ...member,
@@ -286,6 +319,8 @@ describe("admin.staff", () => {
         size: 25,
         offset: 0,
         tz: "America/Los_Angeles",
+        sort: "role",
+        direction: "asc",
       }),
     ).toHaveLength(5);
     expect((await db.web.staff.list()).map((row) => row.name)).toEqual([

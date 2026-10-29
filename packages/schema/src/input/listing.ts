@@ -4,6 +4,28 @@ export const LISTING_MAX_SIZE = 100;
 
 export const LISTING_DEFAULT_SIZE = 25;
 
+export const SORT_DIRECTIONS = ["asc", "desc"] as const;
+
+export const sortDirection = z.enum(SORT_DIRECTIONS).meta({
+  description: "Which way a listing is sorted: ascending or descending.",
+});
+
+/**
+ * The sort a listing takes, over the columns `field` names: the column,
+ * and the direction. Left out, the listing is in its own order, and a
+ * column named without a direction is ascending.
+ */
+export const sorting = <T extends z.ZodType<string>>(field: T) => ({
+  sort: field.optional().meta({
+    description:
+      "The column the items are sorted by. Left out, the items are in their own order.",
+  }),
+  direction: sortDirection.optional().meta({
+    description: "Which way the items are sorted. Left out, ascending.",
+    examples: ["asc"],
+  }),
+});
+
 export const listingQuery = z.object({
   page: z.coerce
     .number()

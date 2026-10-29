@@ -22,6 +22,7 @@ import {
   staffListing,
   staffMember,
   staffMembers,
+  staffQuery,
   staffRecord,
 } from "../src";
 
@@ -85,7 +86,7 @@ const document = createDocument(
       },
       "/admin/api/staff": {
         get: {
-          requestParams: { query: listingQuery },
+          requestParams: { query: staffQuery },
           responses: { 200: json(staffListing) },
         },
       },
@@ -354,6 +355,31 @@ describe("the requests", () => {
       in: "query",
       schema: { minimum: 1, maximum: 100, default: 25 },
     });
+  });
+
+  it("take the staff's sort as a column and a direction, each optional", () => {
+    const { sort, direction } = parameters("/admin/api/staff", "get");
+    expect(sort).toMatchObject({
+      in: "query",
+      schema: {
+        type: "string",
+        enum: [
+          "name",
+          "role",
+          "status",
+          "email",
+          "phone",
+          "createdAt",
+          "updatedAt",
+        ],
+      },
+    });
+    expect(sort?.required).toBeUndefined();
+    expect(direction).toMatchObject({
+      in: "query",
+      schema: { type: "string", enum: ["asc", "desc"] },
+    });
+    expect(direction?.required).toBeUndefined();
   });
 
   it("take a record's id in the path, required, as a number from one", () => {

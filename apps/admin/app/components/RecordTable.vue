@@ -301,6 +301,30 @@ const pt = computed(() => ({
   color: var(--on-primary-container);
 }
 
+/*
+ * A sortable heading is a button, set as the other headings are; sorted,
+ * it reads darker and carries the direction's icon after its label.
+ */
+.record-table .f-th .f-data-table-header-btn {
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-variant-caps: inherit;
+  letter-spacing: inherit;
+}
+
+.record-table .f-th .f-data-table-header-btn:hover:not(:disabled) {
+  border-color: transparent;
+  background: transparent;
+  color: var(--on-surface-high-contrast);
+}
+
+.record-table .f-th.f-data-table-sorted {
+  color: var(--on-surface-high-contrast);
+}
+
 .record-table .f-data-table > .f-group:last-child {
   display: flex;
   flex-wrap: wrap;
