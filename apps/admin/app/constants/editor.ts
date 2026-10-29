@@ -1,12 +1,7 @@
 import type { ContentStatus, EventDay, StaffRole } from "@bbf/schema/types";
-import type { AppProsaryMessage } from "#imports";
 
+import type { Choice } from "~/types/editor";
 import type { EventKind } from "~/types/events";
-
-interface Choice<T extends string> {
-  value: T;
-  label: AppProsaryMessage;
-}
 
 export const STATUS_OPTIONS: Choice<ContentStatus>[] = [
   { value: "draft", label: "admin.editor.draft" },

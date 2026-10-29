@@ -330,34 +330,4 @@ const pt = computed(() => ({
   font: var(--type-label);
   cursor: pointer;
 }
-
-/* The select menu portals to body. Do not scope it under .record-table. */
-.f-select-content {
-  min-width: 8rem;
-  padding: var(--space-2);
-  background: var(--surface-container);
-  border: 1px var(--stroke-solid) var(--rule);
-  border-radius: var(--shape-md);
-  box-shadow: var(--elevation-mid);
-  z-index: 60;
-}
-
-.f-select-item {
-  padding: var(--space-2) var(--space-3);
-  border-radius: var(--shape-sm);
-  color: var(--on-surface);
-  font: var(--type-label);
-  cursor: pointer;
-  outline: none;
-}
-
-.f-select-item[data-highlighted] {
-  background: color-mix(in oklab, var(--primary-container) 40%, transparent);
-  color: var(--on-surface-high-contrast);
-}
-
-.f-select-item[data-state="checked"] {
-  color: var(--primary);
-  font-weight: var(--weight-medium);
-}
 </style>

@@ -1,6 +1,4 @@
-import type { StaffBody, StaffRecord } from "@bbf/schema/types";
-
-import type { StaffForm } from "../types";
+import type { StaffBody, StaffForm, StaffRecord } from "@bbf/schema/types";
 
 import { fromHtml, toHtml } from "./hast";
 

@@ -71,3 +71,20 @@ export const staffBody = z
     description:
       "A staff member as they are written: what creating one takes, and what updating one replaces.",
   });
+
+export const staffForm = staffBody
+  .omit({ bio: true })
+  .extend({
+    name: z
+      .string()
+      .trim()
+      .min(1)
+      .meta({ examples: ["Jane Doe"] }),
+    bio: z.string().optional().meta({
+      description: "Their bio in full, as the HTML the admin's editor holds.",
+    }),
+  })
+  .meta({
+    description:
+      "A staff member as the admin's form holds them: the body, with the bio as HTML and the name trimmed.",
+  });

@@ -1,5 +1,4 @@
 import type { Contract } from "@bbf/database";
-import type { StaffBody } from "@bbf/schema/types";
 import type { Arguments, Row } from "bezoar";
 
 type EventColumns = Row<Contract, "web.events.fetch">;
@@ -25,5 +24,3 @@ export type EventArguments = Arguments<Contract, "admin.events.create">;
 export type StaffArguments = Arguments<Contract, "admin.staff.create">;
 
 export type SermonArguments = Arguments<Contract, "admin.sermons.create">;
-
-export type StaffForm = Omit<StaffBody, "bio"> & { bio?: string };

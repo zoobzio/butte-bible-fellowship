@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
 
-import { staffBody, staffId, staffQuery } from "../../src/input/staff";
+import {
+  staffBody,
+  staffForm,
+  staffId,
+  staffQuery,
+} from "../../src/input/staff";
 
 const MEMBER = { name: "Jane Doe", role: "elder" };
 
@@ -104,5 +109,36 @@ describe("staffBody", () => {
     expect(
       staffBody.safeParse({ ...MEMBER, bio: "## Jane\n\nHas served." }).success,
     ).toBe(false);
+  });
+});
+
+describe("staffForm", () => {
+  it("is the body, with the bio as the HTML the editor holds", () => {
+    const value = {
+      ...MEMBER,
+      summary: "Has served since 2010.",
+      bio: "<p>Has served since 2010.</p>",
+      email: "jane@example.com",
+      status: "published",
+    };
+    expect(staffForm.parse(value)).toEqual(value);
+    expect(staffForm.safeParse({ ...MEMBER, bio: BIO }).success).toBe(false);
+  });
+
+  it("writes a member as a draft when not told otherwise", () => {
+    expect(staffForm.parse(MEMBER)).toEqual({ ...MEMBER, status: "draft" });
+  });
+
+  it("trims the name, and needs one left", () => {
+    expect(staffForm.parse({ ...MEMBER, name: " Jane Doe " }).name).toBe(
+      "Jane Doe",
+    );
+    expect(staffForm.safeParse({ ...MEMBER, name: "   " }).success).toBe(false);
+  });
+
+  it("checks a field on its own, as a form does as it is left", () => {
+    expect(staffForm.shape.email.safeParse("jane").success).toBe(false);
+    expect(staffForm.shape.email.safeParse(undefined).success).toBe(true);
+    expect(staffForm.shape.role.safeParse(undefined).success).toBe(false);
   });
 });
