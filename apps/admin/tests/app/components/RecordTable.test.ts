@@ -1,6 +1,6 @@
 import type { StaffRecord } from "@bbf/schema/types";
 
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { flushPromises, mount } from "@vue/test-utils";
 
 import { createTable, useNuxtApp } from "#imports";
@@ -66,6 +66,38 @@ describe("RecordTable", () => {
     const input = wrapper.find(".f-data-table-search .f-autocomplete-input");
     expect(input.exists()).toBe(true);
     expect(input.attributes("placeholder")).toBe("Search…");
+  });
+
+  it("opens a panel of options under the search box when it takes focus", async () => {
+    // The panel windows its rows by the viewport's measured height, which
+    // happy-dom lays out as nothing: hand it one, and keep the resize
+    // observer from taking it back.
+    const view = document.defaultView!;
+    const Observer = view.ResizeObserver;
+    view.ResizeObserver = class {
+      observe() {}
+      unobserve() {}
+      disconnect() {}
+    } as unknown as typeof ResizeObserver;
+    const height = vi
+      .spyOn(HTMLElement.prototype, "offsetHeight", "get")
+      .mockReturnValue(256);
+    try {
+      const wrapper = await mountTable([STAFF]);
+      const input = wrapper.find(".f-data-table-search .f-autocomplete-input");
+      await input.trigger("focus");
+      await flushPromises();
+      const viewport = wrapper.find(
+        ".f-autocomplete-content > .f-autocomplete-viewport",
+      );
+      expect(viewport.exists()).toBe(true);
+      expect(
+        viewport.findAll(".f-autocomplete-item").map((item) => item.text()),
+      ).toEqual(["Role", "Status", "Updated", "Created"]);
+    } finally {
+      height.mockRestore();
+      view.ResizeObserver = Observer;
+    }
   });
 
   it("makes the title cell of each row the way to the record's editor", async () => {

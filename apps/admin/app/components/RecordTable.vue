@@ -2,7 +2,7 @@
 import type { RecordLink, TableService } from "~/types/listing";
 
 import { NuxtLink, Table } from "#components";
-import { computed, useNuxtApp } from "#imports";
+import { computed, useNuxtApp, useTemplateRef } from "#imports";
 </script>
 
 <script setup lang="ts" generic="T extends object">
@@ -18,13 +18,38 @@ const { $t } = useNuxtApp();
 
 const cell = computed(() => `cell:${title}` as const);
 
+const el = useTemplateRef<HTMLElement>("el");
+
+const rootFontSize = () =>
+  Number.parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+
+/**
+ * A length token of the theme as the table sees it, in pixels. The
+ * search's active panel is virtualized: its rows are placed by an estimate
+ * until measured, and reka memoizes a row's element on its highlight state
+ * alone, so a corrected position lands only when that row is next
+ * highlighted. The rows take the token's height, so the estimate is exact
+ * and nothing is left to correct.
+ */
+const length = (name: string) => {
+  const value = el.value
+    ? getComputedStyle(el.value).getPropertyValue(name).trim()
+    : "";
+  const number = Number.parseFloat(value);
+  if (Number.isNaN(number)) return 32;
+  return value.endsWith("rem") ? number * rootFontSize() : number;
+};
+
 const pt = computed(() => ({
-  search: { placeholder: $t.admin.editor.search() },
+  search: {
+    placeholder: $t.admin.editor.search(),
+    pt: { virtualizer: { estimateSize: () => length("--space-6") } },
+  },
 }));
 </script>
 
 <template>
-  <div class="record-table">
+  <div ref="el" class="record-table">
     <Table :service="table" :pt="pt">
       <template #[cell]="{ row }: { row: T }">
         <NuxtLink :to="link(row)" class="record-table-link">
@@ -165,7 +190,15 @@ const pt = computed(() => ({
   z-index: 60;
 }
 
-.record-table .f-autocomplete-content > .f-group {
+/*
+ * The trail's panels are groups; the active panel is the viewport, which
+ * windows its rows. Those rows are positioned absolutely and so give the
+ * viewport no width of its own: it must be sized here.
+ */
+.record-table .f-autocomplete-content > .f-group,
+.record-table .f-autocomplete-viewport {
+  box-sizing: border-box;
+  flex: 0 0 auto;
   min-width: 10rem;
   padding: var(--space-2);
   background: var(--surface-container);
@@ -174,27 +207,15 @@ const pt = computed(() => ({
   box-shadow: var(--elevation-mid);
 }
 
-.record-table .f-autocomplete-content > .f-group + .f-group {
+.record-table .f-autocomplete-content > * + * {
   margin-left: -1px;
 }
 
 /* A long panel, the days say, scrolls within itself. */
-.record-table .f-autocomplete-content .f-scroll-area-viewport {
+.record-table .f-autocomplete-viewport {
+  width: 16rem;
   max-height: 16rem;
-}
-
-.record-table .f-autocomplete-content .f-scroll-area-scrollbar {
-  display: flex;
-  width: var(--space-2);
-  padding: 1px;
-  user-select: none;
-  touch-action: none;
-}
-
-.record-table .f-autocomplete-content .f-scroll-area-thumb {
-  flex: 1;
-  border-radius: var(--shape-sm);
-  background: var(--on-surface-muted);
+  scrollbar-width: thin;
 }
 
 .record-table .f-autocomplete-content .f-button,
@@ -203,7 +224,8 @@ const pt = computed(() => ({
   align-items: center;
   box-sizing: border-box;
   width: 100%;
-  padding: var(--space-2) var(--space-3);
+  height: var(--space-6);
+  padding: 0 var(--space-3);
   border: none;
   border-radius: var(--shape-sm);
   background: transparent;
@@ -212,6 +234,13 @@ const pt = computed(() => ({
   text-align: left;
   cursor: pointer;
   outline: none;
+}
+
+.record-table .f-autocomplete-item .f-span {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .record-table .f-autocomplete-content .f-button[aria-current],
