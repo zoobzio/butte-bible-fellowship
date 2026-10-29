@@ -3,7 +3,7 @@ import { createError, definePageMeta, useHead, useNuxtApp } from "#imports";
 
 import PageHeader from "~/components/PageHeader.vue";
 import StaffEditor from "~/components/StaffEditor.vue";
-import { useStaffRecord } from "~/composables/staff";
+import { useStaffRecord } from "~/composables/staff/record";
 </script>
 
 <script setup lang="ts">

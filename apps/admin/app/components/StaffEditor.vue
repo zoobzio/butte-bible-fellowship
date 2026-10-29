@@ -3,7 +3,7 @@ import type { StaffRecord } from "@bbf/schema/types";
 
 import { Form } from "#components";
 import { useNuxtApp } from "#imports";
-import { useStaffEditor } from "~/composables/staff";
+import { useStaffEditor } from "~/composables/staff/editor";
 </script>
 
 <script setup lang="ts">

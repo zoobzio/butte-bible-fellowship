@@ -4,7 +4,7 @@ import { definePageMeta, useHead, useNuxtApp } from "#imports";
 import PageHeader from "~/components/PageHeader.vue";
 import RecordTable from "~/components/RecordTable.vue";
 import { useTableRequest } from "~/composables/listing";
-import { useStaffTable } from "~/composables/staff";
+import { useStaffTable } from "~/composables/staff/table";
 </script>
 
 <script setup lang="ts">

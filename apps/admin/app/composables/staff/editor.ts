@@ -1,32 +1,13 @@
 import type { StaffForm, StaffRecord } from "@bbf/schema/types";
 
-import type { RecordLink } from "~/types/listing";
-
-import { staffForm, staffListing, staffRecord } from "@bbf/schema";
+import { staffForm } from "@bbf/schema";
 import { toStaffBody, toStaffForm } from "@bbf/utils/vm";
-import {
-  createForm,
-  createTable,
-  navigateTo,
-  ref,
-  useNuxtApp,
-  useRouter,
-} from "#imports";
+import { createForm, ref, useNuxtApp, useRouter } from "#imports";
 import { useApi } from "~/composables/api";
-import { useListingFetch } from "~/composables/listing";
-import { useRecord } from "~/composables/records";
+import { BACK, ROUTE, endpoint } from "~/composables/staff/routes";
 import { ROLE_OPTIONS, STATUS_OPTIONS } from "~/constants/editor";
-import { FILTER_DAYS } from "~/constants/listing";
-import { STAFF_TABLE } from "~/constants/staff";
 import { toOptions } from "~/utils/editor";
 import { failure } from "~/utils/errors";
-import { recentDays, toTableDescriptors, withDays } from "~/utils/listing";
-
-const ROUTE = "/api/staff";
-const BACK = "/staff";
-const endpoint = (id: number): string => `${ROUTE}/${id}`;
-
-const link: RecordLink<StaffRecord> = (record) => `/staff/${record.id}`;
 
 /**
  * An optional field once cleared: the control writes an empty string, the
@@ -34,30 +15,6 @@ const link: RecordLink<StaffRecord> = (record) => `/staff/${record.id}`;
  */
 const blank = (value: string | undefined): string | undefined =>
   value?.trim() === "" ? undefined : value;
-
-export const useStaffTable = () => {
-  const { $t } = useNuxtApp();
-
-  const useTable = createTable<StaffRecord>("staff", {
-    ...toTableDescriptors(
-      withDays(STAFF_TABLE, recentDays(FILTER_DAYS)),
-      (message) => $t(message),
-    ),
-    fetch: useListingFetch(ROUTE, staffListing),
-    actions: {
-      edit: {
-        label: $t.admin.editor.edit(),
-        action: (record) => {
-          navigateTo(link(record));
-        },
-      },
-    },
-  });
-
-  return { table: useTable(), link };
-};
-
-export const useStaffRecord = () => useRecord("staff", endpoint, staffRecord);
 
 /**
  * The form of one member: a new one when there is no record. The form's
