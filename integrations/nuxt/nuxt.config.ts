@@ -2,10 +2,6 @@ import { fileURLToPath } from "node:url";
 
 import { defineNuxtConfig } from "nuxt/config";
 
-import { prefix } from "@bbf/icons";
-import icons from "@bbf/icons/config";
-import sets from "@bbf/icons/sets";
-
 const assets = fileURLToPath(
   new URL("src", import.meta.resolve("@bbf/assets/package.json")),
 );
@@ -29,7 +25,7 @@ export default defineNuxtConfig({
 
   components: { dirs: [] },
 
-  iconSheets: { ...icons, sets, prefix },
+  iconSheets: { preset: "@bbf/icons" },
 
   untheme: { preset: "@bbf/theme" },
 

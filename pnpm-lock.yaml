@@ -19,11 +19,11 @@ catalogs:
       specifier: 0.0.5
       version: 0.0.5
     '@icon-sheets/kit':
-      specifier: 0.0.7
-      version: 0.0.7
+      specifier: 0.0.8
+      version: 0.0.8
     '@icon-sheets/nuxt':
-      specifier: 0.0.7
-      version: 0.0.7
+      specifier: 0.0.8
+      version: 0.0.8
     '@iconify-json/lucide':
       specifier: ^1.2.138
       version: 1.2.138
@@ -79,14 +79,17 @@ catalogs:
       specifier: ^2.4.11
       version: 2.4.11
     '@zoobzio/editor':
-      specifier: 0.0.7
-      version: 0.0.7
+      specifier: 0.0.13
+      version: 0.0.13
+    '@zoobzio/icons':
+      specifier: 0.0.13
+      version: 0.0.13
     '@zoobzio/nuxt':
-      specifier: 0.0.10
-      version: 0.0.10
+      specifier: 0.0.13
+      version: 0.0.13
     '@zoobzio/vue':
-      specifier: 0.0.10
-      version: 0.0.10
+      specifier: 0.0.13
+      version: 0.0.13
     bezoar:
       specifier: 0.0.5
       version: 0.0.5
@@ -103,8 +106,8 @@ catalogs:
       specifier: ^9.0.5
       version: 9.0.5
     icon-sheets:
-      specifier: 0.0.7
-      version: 0.0.7
+      specifier: 0.0.8
+      version: 0.0.8
     letters-patent:
       specifier: 0.0.4
       version: 0.0.4
@@ -208,13 +211,13 @@ importers:
         version: 0.0.4(@nuxt/schema@4.6.1)(confbox@0.3.1)(dotenv@17.4.2)(giget@3.3.1)(jiti@2.7.0)(magic-string@1.4.3)(mlly@1.8.2)(rolldown@1.2.14)(unplugin@3.4.0(esbuild@0.28.2)(rolldown@1.2.14)(rollup@4.62.4)(vite@8.3.4(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(yaml@2.9.1)))
       '@zoobzio/editor':
         specifier: 'catalog:'
-        version: 0.0.7(happy-dom@20.11.6)
+        version: 0.0.13(happy-dom@20.11.6)
       '@zoobzio/nuxt':
         specifier: 'catalog:'
-        version: 0.0.10(@nuxt/schema@4.6.1)(confbox@0.3.1)(dotenv@17.4.2)(giget@3.3.1)(happy-dom@20.11.6)(jiti@2.7.0)(magic-string@1.4.3)(mlly@1.8.2)(rolldown@1.2.14)(unplugin@3.4.0(esbuild@0.28.2)(rolldown@1.2.14)(rollup@4.62.4)(vite@8.3.4(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(yaml@2.9.1)))(vue@3.5.41(typescript@5.9.3))
+        version: 0.0.13(@nuxt/schema@4.6.1)(confbox@0.3.1)(dotenv@17.4.2)(giget@3.3.1)(happy-dom@20.11.6)(jiti@2.7.0)(magic-string@1.4.3)(mlly@1.8.2)(rolldown@1.2.14)(typescript@5.9.3)(unplugin@3.4.0(esbuild@0.28.2)(rolldown@1.2.14)(rollup@4.62.4)(vite@8.3.4(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(yaml@2.9.1)))(vue@3.5.41(typescript@5.9.3))
       '@zoobzio/vue':
         specifier: 'catalog:'
-        version: 0.0.10(happy-dom@20.11.6)(vue@3.5.41(typescript@5.9.3))
+        version: 0.0.13(happy-dom@20.11.6)(vue@3.5.41(typescript@5.9.3))
       bezoar:
         specifier: 'catalog:'
         version: 0.0.5
@@ -302,7 +305,7 @@ importers:
         version: 0.0.7(@nuxt/schema@4.6.1)(@prosary/kit@0.0.7(@prosary/translate@0.0.7(@ai-sdk/anthropic@4.0.82(zod@4.6.5))))(confbox@0.3.1)(dotenv@17.4.2)(giget@3.3.1)(jiti@2.7.0)(magic-string@1.4.3)(mlly@1.8.2)(rolldown@1.2.14)(typescript@5.9.3)(unplugin@3.4.0(esbuild@0.28.2)(rolldown@1.2.14)(rollup@4.62.4)(vite@8.3.4(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(yaml@2.9.1)))
       '@zoobzio/vue':
         specifier: 'catalog:'
-        version: 0.0.10(happy-dom@20.11.6)(vue@3.5.41(typescript@5.9.3))
+        version: 0.0.13(happy-dom@20.11.6)(vue@3.5.41(typescript@5.9.3))
       bezoar:
         specifier: 'catalog:'
         version: 0.0.5
@@ -378,7 +381,7 @@ importers:
         version: 0.0.5(@nuxt/schema@4.6.1)(confbox@0.3.1)(dotenv@17.4.2)(giget@3.3.1)(jiti@2.7.0)(magic-string@1.4.3)(mlly@1.8.2)(rolldown@1.2.14)(unplugin@3.4.0(esbuild@0.28.2)(rolldown@1.2.14)(rollup@4.62.4)(vite@8.3.4(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(yaml@2.9.1)))
       '@icon-sheets/nuxt':
         specifier: 'catalog:'
-        version: 0.0.7(@nuxt/schema@4.6.1)(confbox@0.3.1)(dotenv@17.4.2)(giget@3.3.1)(jiti@2.7.0)(magic-string@1.4.3)(mlly@1.8.2)(rolldown@1.2.14)(typescript@5.9.3)(unplugin@3.4.0(esbuild@0.28.2)(rolldown@1.2.14)(rollup@4.62.4)(vite@8.3.4(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(yaml@2.9.1)))
+        version: 0.0.8(@nuxt/schema@4.6.1)(confbox@0.3.1)(dotenv@17.4.2)(giget@3.3.1)(jiti@2.7.0)(magic-string@1.4.3)(mlly@1.8.2)(rolldown@1.2.14)(typescript@5.9.3)(unplugin@3.4.0(esbuild@0.28.2)(rolldown@1.2.14)(rollup@4.62.4)(vite@8.3.4(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(yaml@2.9.1)))
       '@nuxt/fonts':
         specifier: 'catalog:'
         version: 0.14.0(@nuxt/schema@4.6.1)(confbox@0.3.1)(db0@0.3.4(@electric-sql/pglite@0.5.10))(dotenv@17.4.2)(esbuild@0.28.2)(giget@3.3.1)(ioredis@5.11.1)(jiti@2.7.0)(magic-string@1.4.3)(mlly@1.8.2)(rolldown@1.2.14)(rollup@4.62.4)(vite@8.3.4(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(yaml@2.9.1))
@@ -390,10 +393,10 @@ importers:
         version: 0.6.0(@nuxt/schema@4.6.1)(confbox@0.3.1)(dotenv@17.4.2)(giget@3.3.1)(jiti@2.7.0)(magic-string@1.4.3)(mlly@1.8.2)(rolldown@1.2.14)(typescript@5.9.3)(unplugin@3.4.0(esbuild@0.28.2)(rolldown@1.2.14)(rollup@4.62.4)(vite@8.3.4(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(yaml@2.9.1)))
       '@zoobzio/nuxt':
         specifier: 'catalog:'
-        version: 0.0.10(@nuxt/schema@4.6.1)(confbox@0.3.1)(dotenv@17.4.2)(giget@3.3.1)(happy-dom@20.11.6)(jiti@2.7.0)(magic-string@1.4.3)(mlly@1.8.2)(rolldown@1.2.14)(unplugin@3.4.0(esbuild@0.28.2)(rolldown@1.2.14)(rollup@4.62.4)(vite@8.3.4(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(yaml@2.9.1)))(vue@3.5.41(typescript@5.9.3))
+        version: 0.0.13(@nuxt/schema@4.6.1)(confbox@0.3.1)(dotenv@17.4.2)(giget@3.3.1)(happy-dom@20.11.6)(jiti@2.7.0)(magic-string@1.4.3)(mlly@1.8.2)(rolldown@1.2.14)(typescript@5.9.3)(unplugin@3.4.0(esbuild@0.28.2)(rolldown@1.2.14)(rollup@4.62.4)(vite@8.3.4(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(yaml@2.9.1)))(vue@3.5.41(typescript@5.9.3))
       '@zoobzio/vue':
         specifier: 'catalog:'
-        version: 0.0.10(happy-dom@20.11.6)(vue@3.5.41(typescript@5.9.3))
+        version: 0.0.13(happy-dom@20.11.6)(vue@3.5.41(typescript@5.9.3))
       prosary:
         specifier: 'catalog:'
         version: 0.0.7
@@ -461,13 +464,16 @@ importers:
 
   packages/icons:
     dependencies:
+      '@zoobzio/icons':
+        specifier: 'catalog:'
+        version: 0.0.13
       icon-sheets:
         specifier: 'catalog:'
-        version: 0.0.7
+        version: 0.0.8
     devDependencies:
       '@icon-sheets/kit':
         specifier: 'catalog:'
-        version: 0.0.7
+        version: 0.0.8
       '@iconify-json/lucide':
         specifier: 'catalog:'
         version: 1.2.138
@@ -1302,30 +1308,27 @@ packages:
     resolution: {integrity: sha512-bV0Tgo9K4hfPCek+aMAn81RppFKv2ySDQeMoSZuvTASywNTnVJCArCZE2FWqpvIatKu7VMRLWlR1EazvVhDyhQ==}
     engines: {node: '>=18.18'}
 
-  '@icon-sheets/catalog@0.0.7':
-    resolution: {integrity: sha512-NYyJ/kguVHEvDSnRsCiu38NmGeRdv7T1wEqu0+3PwOGBty/mUv2sUixGpJBulEqcrc5MZjy9dMELlRgSY4KmzQ==}
+  '@icon-sheets/catalog@0.0.8':
+    resolution: {integrity: sha512-mUjTkvQuAZ+F8jvjRQYXAoZcgTFiCWIJQgkMi1rhZaWcoE5tltX+Mk6eB6TFplDAQ8RRxCaGTGbmoi/keIUgAw==}
 
-  '@icon-sheets/core@0.0.7':
-    resolution: {integrity: sha512-5Kta2uDQyA7/tc46iIrXqsJyk0zVtW5E9+bwdYrN685Cedt4EFqr2B+xNdWXiUkvWxS7woSR16Tg2eBliMGy+g==}
+  '@icon-sheets/core@0.0.8':
+    resolution: {integrity: sha512-XI05n7en+HHWhnCGKwK1puR8vGFzj2ophPX8u695a3DljH8j62APr1CjexXH3eUyKy8wi4Qu9MM9V977OQuEPA==}
 
-  '@icon-sheets/iconify@0.0.7':
-    resolution: {integrity: sha512-xFMrmBok+Oq9WQH4GV4HfIE1KyQR2CB3jxJiIavgEI59COeokWUAeeP1KwfaHHoo6IZCK6TAeQhmt8B3bvftyA==}
-
-  '@icon-sheets/kit@0.0.7':
-    resolution: {integrity: sha512-gEJEJRV7gTrNE4YqZZSdOXcTWyxS94vDexJFjemxwld1b2G3tRqFphayFpoHcY917jQU73AyUZ8ODdkC/OLJ9A==}
+  '@icon-sheets/kit@0.0.8':
+    resolution: {integrity: sha512-0QtOGOmQ9hJ9zBQwa1DrKonZTTwcrwTRZrRp7wA8k4mghIOHHwCIo/JTtLkVBuFbH+6kMbArhXSx/tpTxIgaAA==}
     hasBin: true
 
-  '@icon-sheets/nuxt@0.0.7':
-    resolution: {integrity: sha512-TJaxYVfFUzZFfYb+vxRr+x/5geKlWnMsePKEWOPh65H0V1tOMxyalEvd1V0loXVERHMefI2d+BbnJFFQFznVGQ==}
+  '@icon-sheets/nuxt@0.0.8':
+    resolution: {integrity: sha512-J/kOj59dRY14uhcduj1XWIK7f1yDSO063Yb6jjZk/uWpfSsMuPJL8aOvUTZECvrszsLGIAaP9FEilK1u1o2XGQ==}
 
-  '@icon-sheets/schema@0.0.7':
-    resolution: {integrity: sha512-O6nT2awpRg9tlwullmAmxlQwGI5kxN5tMpbvkK7sn1qMxf7i/zxkJ6ZtD6FSnJSzed/cV1+eLTTpPNrG/zI5VQ==}
+  '@icon-sheets/schema@0.0.8':
+    resolution: {integrity: sha512-PzuFCuJNKIsDdNpRPjNJM18lCP9aMu2zq9Ag0NTOu/XRGwwYIgo3GN29QPT8Gatr1dSNEzXh+ha8BXHHGS4ROQ==}
 
-  '@icon-sheets/svg@0.0.7':
-    resolution: {integrity: sha512-n8VIi2Y6sLLjYEvUgdiKY//4mGdIxowOq5H3sEj9c+yNJuFC1A/CJzloB8ub5Mko0iIwA0yPuDqDTZ1G1rIKHQ==}
+  '@icon-sheets/svg@0.0.8':
+    resolution: {integrity: sha512-ru8yGO67LD2Ef5dCqh0FgOZ2FcjwkEklPRXmYeWSAJIHQlpIBGm9YScT7YTRdOIrmPItRfDsPjaEwGDyzvzG2Q==}
 
-  '@icon-sheets/utils@0.0.7':
-    resolution: {integrity: sha512-BdOwaLu71k2l9Q7/msWXU+YYfIoVaXrdeO129ZoYZtbSA7UsJPx6xqDJZef13c9r5cAPCk1i8Q5cs6WvyWNQRw==}
+  '@icon-sheets/utils@0.0.8':
+    resolution: {integrity: sha512-fxU0MPxO7tlRXcdCMB5M1kFJ/wTswXS5bZ6TiIOUOV4GD0lsefyY0N62zbuz4xh/unyYfKjSFYA7+0H4j8DkPQ==}
 
   '@iconify-json/lucide@1.2.138':
     resolution: {integrity: sha512-+J5+/6HOZsN6sG5PGNxGLcB0UCJtKrH2TPTNeSeXukRzR1C9QRocHaFjLRhoc14zE+XS2ss1i7QWPfunKpYHaQ==}
@@ -2723,38 +2726,35 @@ packages:
   '@workflow/serde@4.1.0':
     resolution: {integrity: sha512-pav4F2BoirECWR7Nf1TKt+2eETcBj7jj4cBefQ8VXQCA6NPkaKeLfj/zMgi+3zYV5ZIBT4GuUiphsj0/b9hPQQ==}
 
-  '@zoobzio/browser@0.0.10':
-    resolution: {integrity: sha512-6EBNEiXA0nqnn7SiiJUHHXwy52NakULZ1XBZji71YgtF9kHMxS+2GK1lVCmOFrfqtzgNGyqZLTjjIE1mOYWXDw==}
+  '@zoobzio/browser@0.0.13':
+    resolution: {integrity: sha512-LGOlIURIA0MlaU+qqAB4/gAbLoww6dhhIE+vv74fMYJZSYqtTHpvoH8RGITZYU0gEBMhn//ILZ3Ggq+qKgvtVQ==}
 
-  '@zoobzio/code@0.0.10':
-    resolution: {integrity: sha512-X2oRvF6j+Mpxt/7x0FaO5GUaidihewpRApkxdQhheC8O6Nli6u18AQeVp/h1pQiuWBU24um7amADvEU31Pp/dg==}
+  '@zoobzio/code@0.0.13':
+    resolution: {integrity: sha512-ynWYg3xMEuddSHuBgPpbCOlPYpCV0RvlxF3rLMPrQtqLWDdf6+/aWlGuglOE1IMnhrsNNCMa/SCyYHwUUiFbzA==}
 
-  '@zoobzio/editor@0.0.10':
-    resolution: {integrity: sha512-DIplv2jPHD8p3NwBQ0GFBim8t0sQiLoxZlH1qp2ezuteKr4nKh+bcXDI43Lvb09pzQpGAs1rAUlUL1JpdiC97A==}
+  '@zoobzio/editor@0.0.13':
+    resolution: {integrity: sha512-sIH+cTQTVwU+1qzR5ekFqnUnlw6w8ATn3s3UDZ/7lGneipzObst39y5lwJIEJFuSgk9tl/4oEUy8TJSnddneRQ==}
 
-  '@zoobzio/editor@0.0.7':
-    resolution: {integrity: sha512-3SFVFGYjG/eCXoLb81gNRfGQy1KyR7zYfgS7oisVw3xrcGhawKNUoNRjFtveO6SzmGvNK2eBmfO980wWp3kSqQ==}
+  '@zoobzio/form@0.0.13':
+    resolution: {integrity: sha512-5GgvUZOPaFwmcHS8JpKrPuCeW6iyxN/+gp8FkUKoDfiILzJdegZfvC9fpQiICYlWZQkOXadPfs6MFlF2P9B+jA==}
 
-  '@zoobzio/form@0.0.10':
-    resolution: {integrity: sha512-CKizgwN9XrhQez7dBpsJQkQF3zheWnyRK2Z4kpOmTtIM7M0uD0Z0kLHruZFUF/scrOkk1Cp/zRDGQbPRCWs6WQ==}
+  '@zoobzio/icons@0.0.13':
+    resolution: {integrity: sha512-T3ts1eY1n6D2SEVQEQI7PZlgjXg77lxLcHDP14GjhVrw5WoI38Hl5/gg3nG3y44145/w/EAaGnVSINVqiqXf2A==}
 
-  '@zoobzio/kit@0.0.10':
-    resolution: {integrity: sha512-Oyk9GGKGwVnymDJFwXLN0ZFRHrlbLZJv+OCTjmzFKWafeOJHBI4VLQzTAV6+r+j5pYkk74QGjRO+wPtWcazyvA==}
+  '@zoobzio/kit@0.0.13':
+    resolution: {integrity: sha512-7I7f6Ss1tzwL6N9Q7sE68VHg1s0jmHBuqGsldwBFyRmmklstKG+otC/h22eYv82ndlo9xX5qjBkE8m+5F+gsxg==}
 
-  '@zoobzio/kit@0.0.7':
-    resolution: {integrity: sha512-l978x/E4RasuRwPAHVkgn2s1M6PpGOSYoMRyIpPbcrXBO30Zfl9hhUO7xX+qUeB1uhwP1/WO0NhFpitP0sh9Xw==}
+  '@zoobzio/nuxt@0.0.13':
+    resolution: {integrity: sha512-0xRV+A+0WMyFsT6EIpArKHaewktbVVJ8vaOwl2PGeV56DZOmQgjeQKMn3/hBaWskQ/DdO158uBvGQTkdPpTnvw==}
 
-  '@zoobzio/nuxt@0.0.10':
-    resolution: {integrity: sha512-32opNO2Md0RB/q9/Sf3J6bhG91MVsXqUyu+1IYrGpbiROPR3fRf4wOGig4K4RTyUe5pUo+f6M2wXyhsp6MCBMQ==}
+  '@zoobzio/query@0.0.13':
+    resolution: {integrity: sha512-P4hlq7uR9/jbAONAcBLGYRI9jtvw++peJbp1vaYvFSvZH2pkbcwCe1iShsEPw2FkCgK9eKqqYa/XNxwKArgrAw==}
 
-  '@zoobzio/query@0.0.10':
-    resolution: {integrity: sha512-XXwiK2K1lm79NKJeks81qaWI6ftyTjkR4lh3fPQVwFpaoRg3ccAfXvt7sA4uHuSxLhUC5pkTPYW0MVSjqsTCGA==}
+  '@zoobzio/table@0.0.13':
+    resolution: {integrity: sha512-g7Nj9KMc7VM+fU3urO4gJ8ojXwiffkHMkCo6sTxOk9m9Xu6bBf5E5RyX5I1ro2Xbu1/QBBAsuba2uCG2ofX3+A==}
 
-  '@zoobzio/table@0.0.10':
-    resolution: {integrity: sha512-Qdwd9Q/mUkJziVDb7NfMWEHnP3coq5D8NLXovNGq7cZLj2V/jMD1sFGfPx1wg4Rjg2muSpei9CFOHRGZfnwo7A==}
-
-  '@zoobzio/vue@0.0.10':
-    resolution: {integrity: sha512-uWQBZMEfRq37qEtlC3FZBnkCNbPLP532fMFjuSrVZ+6+GFKY5lK6163nOt+B0Hgjg5uno4HPasfIuwTBLuR5Eg==}
+  '@zoobzio/vue@0.0.13':
+    resolution: {integrity: sha512-v36rsRV+ke5u2F+2Y/ZMVvbQzx9DPlo7ZnJN+qcYlnJkNrm3bAierrdqe52T5UFcp9HJC9dDDtfIoeww6b7pIw==}
     peerDependencies:
       vue: ^3.5.0
 
@@ -3700,8 +3700,8 @@ packages:
     resolution: {integrity: sha512-AXcZb6vzzrFAUE61HnN4mpLqd/cSIwNQjtNWR0euPm6y0iqx3G4gOXaIDdtdDwZmhwe82LA6+zinmW4UBWVePQ==}
     engines: {node: '>=16.17.0'}
 
-  icon-sheets@0.0.7:
-    resolution: {integrity: sha512-IFxWjz12DJqYoCGjgXac5u3/RTc2aIZ6OwzNapVIm6E2Nht5cCc9AKHahnVpte3XMWZxU2s8Ll34QhZF+W/7Cw==}
+  icon-sheets@0.0.8:
+    resolution: {integrity: sha512-YeQE7lROHobsZB6g65z55FnTV2ZDzWEU+hKzNOtVB3yJe6eCwycDF9T/blQUnEGO1ARSNE3jOtshuzapg2DTkQ==}
 
   ieee754@1.2.1:
     resolution: {integrity: sha512-dcyqhDvX1C46lXZcVqCpK+FtMRQVdIMN6/Df5js2zouUsqG7I6sFxitIC+7KYK29KdXOLHdu9zL4sFnoVQnqaA==}
@@ -4465,9 +4465,6 @@ packages:
 
   package-json-from-dist@1.0.1:
     resolution: {integrity: sha512-UEZIS3/by4OC8vL3P2dTXRETpebLI2NiI5vIrjaD/5UtrkFX/tNbwjTSRAGC/+7CAo2pIcBaRgWmcBBHcsaCIw==}
-
-  package-manager-detector@1.8.0:
-    resolution: {integrity: sha512-yQA4H19AmPEoMUeavPMDIe1higySl/gH/yaQrkT/s07Qp+7pp2hYz30N3z2l5BkjVkF9Ow6o0wjJamm2y7Sn0A==}
 
   package-manager-detector@1.9.0:
     resolution: {integrity: sha512-zAMfbta9nPA8AKkA4WdmNAT8R8s6Dk0/xwPsqNnRidMFcLo1YkLuPDTgs2f64XdzS8vbLNnoJ+uUIkgbz7oRHA==}
@@ -5897,7 +5894,7 @@ snapshots:
 
   '@antfu/install-pkg@2.0.1':
     dependencies:
-      package-manager-detector: 1.8.0
+      package-manager-detector: 1.9.0
       tinyexec: 1.3.1
 
   '@babel/code-frame@7.29.7':
@@ -6540,38 +6537,32 @@ snapshots:
   '@humanwhocodes/retry@0.4.3':
     optional: true
 
-  '@icon-sheets/catalog@0.0.7':
+  '@icon-sheets/catalog@0.0.8':
     dependencies:
-      '@icon-sheets/schema': 0.0.7
+      '@icon-sheets/schema': 0.0.8
       objectively: 0.1.1
 
-  '@icon-sheets/core@0.0.7':
+  '@icon-sheets/core@0.0.8':
     dependencies:
-      '@icon-sheets/schema': 0.0.7
-      '@icon-sheets/utils': 0.0.7
+      '@icon-sheets/schema': 0.0.8
+      '@icon-sheets/utils': 0.0.8
       objectively: 0.1.1
 
-  '@icon-sheets/iconify@0.0.7':
+  '@icon-sheets/kit@0.0.8':
     dependencies:
-      '@icon-sheets/schema': 0.0.7
-      '@iconify/types': 2.0.0
+      '@icon-sheets/schema': 0.0.8
+      '@icon-sheets/svg': 0.0.8
+      '@icon-sheets/utils': 0.0.8
       '@iconify/utils': 3.1.7
+      jiti: 2.7.0
       objectively: 0.1.1
 
-  '@icon-sheets/kit@0.0.7':
+  '@icon-sheets/nuxt@0.0.8(@nuxt/schema@4.6.1)(confbox@0.3.1)(dotenv@17.4.2)(giget@3.3.1)(jiti@2.7.0)(magic-string@1.4.3)(mlly@1.8.2)(rolldown@1.2.14)(typescript@5.9.3)(unplugin@3.4.0(esbuild@0.28.2)(rolldown@1.2.14)(rollup@4.62.4)(vite@8.3.4(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(yaml@2.9.1)))':
     dependencies:
-      '@icon-sheets/iconify': 0.0.7
-      '@icon-sheets/schema': 0.0.7
-      '@icon-sheets/svg': 0.0.7
-      '@icon-sheets/utils': 0.0.7
-      jiti: 2.7.0
-
-  '@icon-sheets/nuxt@0.0.7(@nuxt/schema@4.6.1)(confbox@0.3.1)(dotenv@17.4.2)(giget@3.3.1)(jiti@2.7.0)(magic-string@1.4.3)(mlly@1.8.2)(rolldown@1.2.14)(typescript@5.9.3)(unplugin@3.4.0(esbuild@0.28.2)(rolldown@1.2.14)(rollup@4.62.4)(vite@8.3.4(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(yaml@2.9.1)))':
-    dependencies:
-      '@icon-sheets/kit': 0.0.7
-      '@nuxt/kit': 4.6.1(@nuxt/schema@4.6.1)(confbox@0.3.1)(dotenv@17.4.2)(giget@3.3.1)(jiti@2.7.0)(magic-string@1.4.3)(mlly@1.8.2)(rolldown@1.2.14)(unplugin@3.4.0(esbuild@0.28.2)(rolldown@1.2.14)(rollup@4.62.4)(vite@8.3.4(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(yaml@2.9.1)))
+      '@icon-sheets/kit': 0.0.8
+      '@nuxt/kit': 4.6.2(@nuxt/schema@4.6.1)(confbox@0.3.1)(dotenv@17.4.2)(giget@3.3.1)(jiti@2.7.0)(magic-string@1.4.3)(mlly@1.8.2)(rolldown@1.2.14)(unplugin@3.4.0(esbuild@0.28.2)(rolldown@1.2.14)(rollup@4.62.4)(vite@8.3.4(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(yaml@2.9.1)))
       h3: 1.15.11
-      icon-sheets: 0.0.7
+      icon-sheets: 0.0.8
       objectively: 0.1.1
       vue: 3.5.44(typescript@5.9.3)
     transitivePeerDependencies:
@@ -6587,19 +6578,19 @@ snapshots:
       - typescript
       - unplugin
 
-  '@icon-sheets/schema@0.0.7':
+  '@icon-sheets/schema@0.0.8':
     dependencies:
       '@iconify/types': 2.0.0
       objectively: 0.1.1
 
-  '@icon-sheets/svg@0.0.7':
+  '@icon-sheets/svg@0.0.8':
     dependencies:
-      '@icon-sheets/schema': 0.0.7
+      '@icon-sheets/schema': 0.0.8
       '@iconify/utils': 3.1.7
 
-  '@icon-sheets/utils@0.0.7':
+  '@icon-sheets/utils@0.0.8':
     dependencies:
-      '@icon-sheets/schema': 0.0.7
+      '@icon-sheets/schema': 0.0.8
       objectively: 0.1.1
 
   '@iconify-json/lucide@1.2.138':
@@ -8466,67 +8457,56 @@ snapshots:
 
   '@workflow/serde@4.1.0': {}
 
-  '@zoobzio/browser@0.0.10':
+  '@zoobzio/browser@0.0.13':
     dependencies:
-      '@zoobzio/kit': 0.0.10
+      '@zoobzio/kit': 0.0.13
       objectively: 0.3.0
 
-  '@zoobzio/code@0.0.10':
+  '@zoobzio/code@0.0.13':
     dependencies:
       '@codemirror/commands': 6.11.1
       '@codemirror/state': 6.7.6
       '@codemirror/view': 6.43.15
-      '@zoobzio/kit': 0.0.10
+      '@zoobzio/kit': 0.0.13
 
-  '@zoobzio/editor@0.0.10(happy-dom@20.11.6)':
+  '@zoobzio/editor@0.0.13(happy-dom@20.11.6)':
     dependencies:
       '@tiptap/core': 3.32.0(@tiptap/pm@3.32.0)
       '@tiptap/html': 3.32.0(@tiptap/core@3.32.0(@tiptap/pm@3.32.0))(@tiptap/pm@3.32.0)(happy-dom@20.11.6)
       '@tiptap/pm': 3.32.0
       '@tiptap/starter-kit': 3.32.0
       '@types/hast': 3.0.5
-      '@zoobzio/kit': 0.0.10
+      '@zoobzio/kit': 0.0.13
       hast-util-from-html: 2.0.3
       hast-util-to-html: 9.0.5
     transitivePeerDependencies:
       - happy-dom
 
-  '@zoobzio/editor@0.0.7(happy-dom@20.11.6)':
+  '@zoobzio/form@0.0.13':
     dependencies:
-      '@tiptap/core': 3.32.0(@tiptap/pm@3.32.0)
-      '@tiptap/html': 3.32.0(@tiptap/core@3.32.0(@tiptap/pm@3.32.0))(@tiptap/pm@3.32.0)(happy-dom@20.11.6)
-      '@tiptap/pm': 3.32.0
-      '@tiptap/starter-kit': 3.32.0
-      '@types/hast': 3.0.5
-      '@zoobzio/kit': 0.0.7
-      hast-util-from-html: 2.0.3
-      hast-util-to-html: 9.0.5
-    transitivePeerDependencies:
-      - happy-dom
-
-  '@zoobzio/form@0.0.10':
-    dependencies:
-      '@zoobzio/kit': 0.0.10
+      '@zoobzio/kit': 0.0.13
       objectively: 0.3.0
       zod: 4.6.5
 
-  '@zoobzio/kit@0.0.10':
+  '@zoobzio/icons@0.0.13':
+    dependencies:
+      icon-sheets: 0.0.8
+
+  '@zoobzio/kit@0.0.13':
     dependencies:
       objectively: 0.3.0
 
-  '@zoobzio/kit@0.0.7':
+  '@zoobzio/nuxt@0.0.13(@nuxt/schema@4.6.1)(confbox@0.3.1)(dotenv@17.4.2)(giget@3.3.1)(happy-dom@20.11.6)(jiti@2.7.0)(magic-string@1.4.3)(mlly@1.8.2)(rolldown@1.2.14)(typescript@5.9.3)(unplugin@3.4.0(esbuild@0.28.2)(rolldown@1.2.14)(rollup@4.62.4)(vite@8.3.4(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(yaml@2.9.1)))(vue@3.5.41(typescript@5.9.3))':
     dependencies:
-      objectively: 0.3.0
-
-  '@zoobzio/nuxt@0.0.10(@nuxt/schema@4.6.1)(confbox@0.3.1)(dotenv@17.4.2)(giget@3.3.1)(happy-dom@20.11.6)(jiti@2.7.0)(magic-string@1.4.3)(mlly@1.8.2)(rolldown@1.2.14)(unplugin@3.4.0(esbuild@0.28.2)(rolldown@1.2.14)(rollup@4.62.4)(vite@8.3.4(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(yaml@2.9.1)))(vue@3.5.41(typescript@5.9.3))':
-    dependencies:
+      '@icon-sheets/nuxt': 0.0.8(@nuxt/schema@4.6.1)(confbox@0.3.1)(dotenv@17.4.2)(giget@3.3.1)(jiti@2.7.0)(magic-string@1.4.3)(mlly@1.8.2)(rolldown@1.2.14)(typescript@5.9.3)(unplugin@3.4.0(esbuild@0.28.2)(rolldown@1.2.14)(rollup@4.62.4)(vite@8.3.4(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(yaml@2.9.1)))
       '@nuxt/kit': 4.6.2(@nuxt/schema@4.6.1)(confbox@0.3.1)(dotenv@17.4.2)(giget@3.3.1)(jiti@2.7.0)(magic-string@1.4.3)(mlly@1.8.2)(rolldown@1.2.14)(unplugin@3.4.0(esbuild@0.28.2)(rolldown@1.2.14)(rollup@4.62.4)(vite@8.3.4(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(yaml@2.9.1)))
-      '@zoobzio/browser': 0.0.10
-      '@zoobzio/code': 0.0.10
-      '@zoobzio/editor': 0.0.10(happy-dom@20.11.6)
-      '@zoobzio/form': 0.0.10
-      '@zoobzio/table': 0.0.10
-      '@zoobzio/vue': 0.0.10(happy-dom@20.11.6)(vue@3.5.41(typescript@5.9.3))
+      '@zoobzio/browser': 0.0.13
+      '@zoobzio/code': 0.0.13
+      '@zoobzio/editor': 0.0.13(happy-dom@20.11.6)
+      '@zoobzio/form': 0.0.13
+      '@zoobzio/icons': 0.0.13
+      '@zoobzio/table': 0.0.13
+      '@zoobzio/vue': 0.0.13(happy-dom@20.11.6)(vue@3.5.41(typescript@5.9.3))
       ltrl-http: 0.0.20
       objectively: 0.3.0
       reka-ui: 2.10.3(vue@3.5.41(typescript@5.9.3))
@@ -8542,30 +8522,31 @@ snapshots:
       - mlly
       - oxc-parser
       - rolldown
+      - typescript
       - unplugin
       - vue
 
-  '@zoobzio/query@0.0.10':
+  '@zoobzio/query@0.0.13':
     dependencies:
-      '@zoobzio/kit': 0.0.10
+      '@zoobzio/kit': 0.0.13
       objectively: 0.3.0
 
-  '@zoobzio/table@0.0.10':
+  '@zoobzio/table@0.0.13':
     dependencies:
-      '@zoobzio/kit': 0.0.10
-      '@zoobzio/query': 0.0.10
+      '@zoobzio/kit': 0.0.13
+      '@zoobzio/query': 0.0.13
       objectively: 0.3.0
 
-  '@zoobzio/vue@0.0.10(happy-dom@20.11.6)(vue@3.5.41(typescript@5.9.3))':
+  '@zoobzio/vue@0.0.13(happy-dom@20.11.6)(vue@3.5.41(typescript@5.9.3))':
     dependencies:
       '@internationalized/date': 3.12.3
-      '@zoobzio/browser': 0.0.10
-      '@zoobzio/code': 0.0.10
-      '@zoobzio/editor': 0.0.10(happy-dom@20.11.6)
-      '@zoobzio/form': 0.0.10
-      '@zoobzio/kit': 0.0.10
-      '@zoobzio/query': 0.0.10
-      '@zoobzio/table': 0.0.10
+      '@zoobzio/browser': 0.0.13
+      '@zoobzio/code': 0.0.13
+      '@zoobzio/editor': 0.0.13(happy-dom@20.11.6)
+      '@zoobzio/form': 0.0.13
+      '@zoobzio/kit': 0.0.13
+      '@zoobzio/query': 0.0.13
+      '@zoobzio/table': 0.0.13
       defu: 6.1.7
       objectively: 0.3.0
       reka-ui: 2.10.3(vue@3.5.41(typescript@5.9.3))
@@ -9600,13 +9581,13 @@ snapshots:
 
   human-signals@5.0.0: {}
 
-  icon-sheets@0.0.7:
+  icon-sheets@0.0.8:
     dependencies:
-      '@icon-sheets/catalog': 0.0.7
-      '@icon-sheets/core': 0.0.7
-      '@icon-sheets/schema': 0.0.7
-      '@icon-sheets/svg': 0.0.7
-      '@icon-sheets/utils': 0.0.7
+      '@icon-sheets/catalog': 0.0.8
+      '@icon-sheets/core': 0.0.8
+      '@icon-sheets/schema': 0.0.8
+      '@icon-sheets/svg': 0.0.8
+      '@icon-sheets/utils': 0.0.8
 
   ieee754@1.2.1: {}
 
@@ -10946,8 +10927,6 @@ snapshots:
     optional: true
 
   package-json-from-dist@1.0.1: {}
-
-  package-manager-detector@1.8.0: {}
 
   package-manager-detector@1.9.0: {}
 

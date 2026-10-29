@@ -1,8 +1,9 @@
-import { defineConfig } from "@icon-sheets/kit";
+import { defineConfig, preset } from "@icon-sheets/kit";
 
 export default defineConfig({
   id: "bbf",
   name: "Butte Bible Fellowship",
+  extends: [preset("@zoobzio/icons")],
   icons: {
     "chevron-left": "lucide:chevron-left",
     "chevron-right": "lucide:chevron-right",
