@@ -47,6 +47,13 @@ describe("RecordTable", () => {
     ]);
   });
 
+  it("offers the search box, worded by the app's prose", async () => {
+    const wrapper = await mountTable([STAFF]);
+    const input = wrapper.find(".f-data-table-search .f-autocomplete-input");
+    expect(input.exists()).toBe(true);
+    expect(input.attributes("placeholder")).toBe("Search…");
+  });
+
   it("makes the title cell of each row the way to the record's editor", async () => {
     const wrapper = await mountTable([
       STAFF,

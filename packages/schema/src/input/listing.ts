@@ -24,4 +24,13 @@ export const listingQuery = z.object({
       description: "How many items to a page. Left out, twenty-five.",
       examples: [25],
     }),
+  q: z
+    .string()
+    .trim()
+    .optional()
+    .meta({
+      description:
+        "Free text the items are searched for, without regard to case. Left out or empty, every item.",
+      examples: ["jane"],
+    }),
 });

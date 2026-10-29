@@ -2,6 +2,7 @@ import { z } from "zod";
 
 import { hast } from "../models/hast";
 import { contentStatus, staffRole } from "../models/staff";
+import { listingQuery } from "./listing";
 
 export const staffId = z.object({
   id: z.coerce
@@ -12,6 +13,31 @@ export const staffId = z.object({
       description: "What names them to the admin: their row's number.",
       examples: [1],
     }),
+});
+
+const day = (what: string) =>
+  z.iso
+    .date()
+    .optional()
+    .meta({
+      description: `${what}, as YYYY-MM-DD, in the church's own time. Left out, any day.`,
+      examples: ["2026-10-17"],
+    });
+
+export const staffQuery = listingQuery.extend({
+  role: staffRole.optional().meta({
+    description: "The role the members listed hold. Left out, every role.",
+  }),
+  status: contentStatus.optional().meta({
+    description:
+      "The status the members listed are in. Left out, every status.",
+  }),
+  updatedAtBefore: day("The day the members listed were last changed before"),
+  updatedAtAfter: day("The day the members listed were last changed after"),
+  updatedAtOn: day("The day the members listed were last changed on"),
+  createdAtBefore: day("The day the members listed were added before"),
+  createdAtAfter: day("The day the members listed were added after"),
+  createdAtOn: day("The day the members listed were added on"),
 });
 
 export const staffBody = z

@@ -42,7 +42,49 @@ const RECORD = {
 
 const ROWS = [ROW, { ...ROW, id: 2, name: "John Roe" }];
 
-const list = vi.fn(async () => ROWS);
+type Search = {
+  q: string | null;
+  role: "pastor" | "elder" | "staff" | null;
+  status: "draft" | "published" | "archived" | null;
+  tz: string;
+  updated_before: string | null;
+  updated_after: string | null;
+  updated_on: string | null;
+  created_before: string | null;
+  created_after: string | null;
+  created_on: string | null;
+};
+
+const NONE: Search = {
+  q: null,
+  role: null,
+  status: null,
+  tz: "America/Los_Angeles",
+  updated_before: null,
+  updated_after: null,
+  updated_on: null,
+  created_before: null,
+  created_after: null,
+  created_on: null,
+};
+
+const matches = (search: Search) => (row: (typeof ROWS)[number]) =>
+  (search.q === null ||
+    row.name.toLowerCase().includes(search.q.toLowerCase())) &&
+  (search.role === null || row.role === search.role) &&
+  (search.status === null || row.status === search.status);
+
+const list = vi.fn(
+  async ({
+    size,
+    offset,
+    ...search
+  }: Search & { size: number; offset: number }) =>
+    ROWS.filter(matches(search)).slice(offset, offset + size),
+);
+const counted = vi.fn(async (search: Search) => ({
+  total: ROWS.filter(matches(search)).length,
+}));
 const fetched = vi.fn(async ({ id }: { id: number }) =>
   id === 3
     ? { ...ROW, id: 3, name: "New", status: "draft" as const }
@@ -58,6 +100,7 @@ Object.assign(service, {
   admin: {
     staff: {
       list,
+      count: { first: counted },
       fetch: { first: fetched },
       create: { first: created },
       update: { first: updated },
@@ -67,22 +110,70 @@ Object.assign(service, {
 });
 
 afterEach(() => {
-  for (const query of [list, fetched, created, updated, deleted]) {
+  for (const query of [list, counted, fetched, created, updated, deleted]) {
     query.mockClear();
   }
 });
 
 describe("useStaff", () => {
-  it("lists one page of the staff as the API serves them, and counts them all", async () => {
+  it("asks the database for one page of the staff, and for how many there are in all", async () => {
     expect(await useStaff().list({ page: 1, size: 1 })).toEqual({
       items: [RECORD],
       total: 2,
     });
+    expect(list).toHaveBeenCalledWith({ ...NONE, size: 1, offset: 0 });
+    expect(counted).toHaveBeenCalledWith(NONE);
     expect(await useStaff().list({ page: 2, size: 1 })).toEqual({
       items: [{ ...RECORD, id: 2, name: "John Roe" }],
       total: 2,
     });
-    expect(list).toHaveBeenCalledTimes(2);
+    expect(list).toHaveBeenLastCalledWith({ ...NONE, size: 1, offset: 1 });
+  });
+
+  it("hands the database the search, and null for each part left out or empty", async () => {
+    expect(await useStaff().list({ page: 1, size: 25, q: "ROE" })).toEqual({
+      items: [{ ...RECORD, id: 2, name: "John Roe" }],
+      total: 1,
+    });
+    expect(counted).toHaveBeenLastCalledWith({ ...NONE, q: "ROE" });
+    await useStaff().list({ page: 1, size: 25, q: "", role: "pastor" });
+    expect(list).toHaveBeenLastCalledWith({
+      ...NONE,
+      role: "pastor",
+      size: 25,
+      offset: 0,
+    });
+    await useStaff().list({ page: 1, size: 25, status: "draft" });
+    expect(counted).toHaveBeenLastCalledWith({ ...NONE, status: "draft" });
+  });
+
+  it("hands the database each day asked for, read in the church's time zone", async () => {
+    await useStaff().list({
+      page: 1,
+      size: 25,
+      updatedAtBefore: "2026-10-17",
+      updatedAtAfter: "2026-10-01",
+      updatedAtOn: "2026-10-10",
+      createdAtBefore: "2026-09-17",
+      createdAtAfter: "2026-09-01",
+      createdAtOn: "2026-09-10",
+    });
+    expect(counted).toHaveBeenLastCalledWith({
+      ...NONE,
+      updated_before: "2026-10-17",
+      updated_after: "2026-10-01",
+      updated_on: "2026-10-10",
+      created_before: "2026-09-17",
+      created_after: "2026-09-01",
+      created_on: "2026-09-10",
+    });
+  });
+
+  it("counts nothing when the database says nothing", async () => {
+    counted.mockResolvedValueOnce(null as never);
+    expect(
+      await useStaff().list({ page: 1, size: 25, role: "pastor" }),
+    ).toEqual({ items: [], total: 0 });
   });
 
   it("fetches one member by id, or nothing", async () => {

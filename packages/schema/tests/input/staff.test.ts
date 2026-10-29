@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { staffBody, staffId } from "../../src/input/staff";
+import { staffBody, staffId, staffQuery } from "../../src/input/staff";
 
 const MEMBER = { name: "Jane Doe", role: "elder" };
 
@@ -22,6 +22,47 @@ describe("staffId", () => {
     expect(staffId.safeParse({ id: "0" }).success).toBe(false);
     expect(staffId.safeParse({ id: "1.5" }).success).toBe(false);
     expect(staffId.safeParse({ id: "jane-doe" }).success).toBe(false);
+  });
+});
+
+describe("staffQuery", () => {
+  it("is the listing query, with a role and a status to narrow it", () => {
+    expect(staffQuery.parse({})).toEqual({ page: 1, size: 25 });
+    expect(
+      staffQuery.parse({
+        page: "2",
+        q: "jane",
+        role: "elder",
+        status: "draft",
+      }),
+    ).toEqual({ page: 2, size: 25, q: "jane", role: "elder", status: "draft" });
+  });
+
+  it("takes only a role and a status the staff are written in", () => {
+    expect(staffQuery.safeParse({ role: "deacon" }).success).toBe(false);
+    expect(staffQuery.safeParse({ status: "live" }).success).toBe(false);
+  });
+
+  it("takes a day each member was changed or added before, after or on, as YYYY-MM-DD", () => {
+    expect(
+      staffQuery.parse({
+        updatedAtBefore: "2026-10-17",
+        updatedAtAfter: "2026-10-01",
+        updatedAtOn: "2026-10-10",
+        createdAtBefore: "2026-09-17",
+        createdAtAfter: "2026-09-01",
+        createdAtOn: "2026-09-10",
+      }),
+    ).toMatchObject({
+      updatedAtBefore: "2026-10-17",
+      createdAtOn: "2026-09-10",
+    });
+    expect(staffQuery.safeParse({ updatedAtOn: "yesterday" }).success).toBe(
+      false,
+    );
+    expect(staffQuery.safeParse({ createdAtAfter: "10/01/2026" }).success).toBe(
+      false,
+    );
   });
 });
 

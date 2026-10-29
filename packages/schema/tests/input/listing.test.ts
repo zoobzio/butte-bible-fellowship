@@ -19,6 +19,12 @@ describe("listingQuery", () => {
     });
   });
 
+  it("carries the free text trimmed, or none", () => {
+    expect(listingQuery.parse({ q: "  jane " }).q).toBe("jane");
+    expect(listingQuery.parse({ q: "" }).q).toBe("");
+    expect(listingQuery.parse({})).not.toHaveProperty("q");
+  });
+
   it("counts pages from one", () => {
     expect(listingQuery.safeParse({ page: "0" }).success).toBe(false);
     expect(listingQuery.safeParse({ page: "1.5" }).success).toBe(false);

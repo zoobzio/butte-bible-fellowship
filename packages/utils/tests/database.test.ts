@@ -249,7 +249,15 @@ describe("staff", () => {
       (await db.web.staff.list()).map(toStaffMember).map((m) => m.name),
     ).not.toContain("Draft");
     expect(
-      (await db.admin.staff.list()).map(toStaffRecord).map((m) => m.name),
+      (
+        await db.admin.staff.list({
+          size: 25,
+          offset: 0,
+          tz: "America/Los_Angeles",
+        })
+      )
+        .map(toStaffRecord)
+        .map((m) => m.name),
     ).toContain("Draft");
     expect(await db.admin.staff.delete({ id: created!.id })).toBe(1);
   });

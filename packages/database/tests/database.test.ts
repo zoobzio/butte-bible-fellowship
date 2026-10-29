@@ -79,8 +79,8 @@ describe("the build", () => {
       "web.sermons.list",
       "web.staff.list",
     ]);
-    expect(names.filter((name) => name.startsWith("admin."))).toHaveLength(22);
-    expect(names).toHaveLength(29);
+    expect(names.filter((name) => name.startsWith("admin."))).toHaveLength(23);
+    expect(names).toHaveLength(30);
   });
 });
 
@@ -186,14 +186,57 @@ describe("admin.staff", () => {
       status: "published",
     });
 
-    const list = await db.admin.staff.list();
+    const tz = "America/Los_Angeles";
+    const page = { size: 25, offset: 0, tz };
+    const today = new Intl.DateTimeFormat("en-CA", {
+      timeZone: tz,
+      dateStyle: "short",
+    }).format(new Date());
+    const list = await db.admin.staff.list(page);
     expect(list.map((row) => row.name)).toEqual([
       "Pastor Name",
       "Elder Name",
       "Elder Name",
       "Elder Name",
     ]);
+    expect((await db.admin.staff.count.first({ tz }))?.total).toBe(4);
     expect((await db.web.staff.list())[0]?.name).toBe("Pastor Name");
+
+    expect(
+      (await db.admin.staff.list({ ...page, q: "PASTOR" })).map((r) => r.name),
+    ).toEqual(["Pastor Name"]);
+    expect(
+      (await db.admin.staff.list({ ...page, role: "elder" })).map(
+        (r) => r.name,
+      ),
+    ).toEqual(["Elder Name", "Elder Name", "Elder Name"]);
+    expect(await db.admin.staff.list({ ...page, status: "draft" })).toEqual([]);
+    expect(
+      (
+        await db.admin.staff.count.first({
+          tz,
+          role: "elder",
+          status: "published",
+        })
+      )?.total,
+    ).toBe(3);
+    expect(await db.admin.staff.list({ size: 2, offset: 2, tz })).toHaveLength(
+      2,
+    );
+    expect(await db.admin.staff.list({ size: 2, offset: 4, tz })).toEqual([]);
+
+    expect(
+      (await db.admin.staff.count.first({ tz, created_on: today }))?.total,
+    ).toBe(4);
+    expect(
+      (await db.admin.staff.count.first({ tz, updated_before: today }))?.total,
+    ).toBe(0);
+    expect(
+      (await db.admin.staff.count.first({ tz, updated_after: today }))?.total,
+    ).toBe(0);
+    expect(
+      await db.admin.staff.list({ ...page, created_before: today }),
+    ).toEqual([]);
 
     const updated = await db.admin.staff.update.first({
       ...member,
@@ -238,7 +281,13 @@ describe("admin.staff", () => {
       status: "archived",
     });
 
-    expect(await db.admin.staff.list()).toHaveLength(5);
+    expect(
+      await db.admin.staff.list({
+        size: 25,
+        offset: 0,
+        tz: "America/Los_Angeles",
+      }),
+    ).toHaveLength(5);
     expect((await db.web.staff.list()).map((row) => row.name)).toEqual([
       "Elder Name",
       "Elder Name",
@@ -771,7 +820,7 @@ describe("roles", () => {
       names.filter(
         (name) =>
           !name.startsWith("admin.users.") &&
-          /\.(fetch|list|upcoming|weekly)$/.test(name),
+          /\.(count|fetch|list|upcoming|weekly)$/.test(name),
       ),
     );
   });

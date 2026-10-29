@@ -57,8 +57,15 @@ takes the newest published sermons, as many as asked, and
 `body`, as an event's does.
 
 `admin.staff` has `list`, `fetch`, `create`, `update` and `delete`, over
-every member whatever their status. `admin.events` and `admin.sermons` have
-the same, by `id`.
+every member whatever their status, and `count` beside `list`. `list` is
+one page, `size` rows from `offset`, in the site's order; `count` is how
+many rows the same search holds in all. Each takes the search the admin
+app's table commits, every part of it optional: `q`, text the name must
+carry whatever its case; `role`; `status`; and a day each member was last
+changed or added `before`, `after` or `on`, as `updated_before` and the
+like. Left out or null, a part narrows nothing. The days are read in `tz`,
+the church's IANA time zone, which every search passes. `admin.events` and `admin.sermons` have `list`, `fetch`,
+`create`, `update` and `delete`, by `id`.
 
 `admin.users` has the same, and two more for signing in. A user is added
 by their email and a `user_role` — `admin` or `editor`, the roles of

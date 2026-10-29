@@ -6,10 +6,11 @@ import { CONTENT_STATUSES, STAFF_ROLES } from "@bbf/schema";
 
 export const STAFF_TABLE: TableConfig<StaffRecord> = {
   rowKey: "id",
-  searchable: false,
+  searchable: true,
   pinnedColumns: ["name"],
+  defaultColumnOrder: ["name", "role", "status", "updatedAt"],
   columns: [
-    { key: "name", label: "admin.member.name" },
+    { key: "name", label: "admin.member.name", filterable: false },
     {
       key: "role",
       label: "admin.member.role",
@@ -23,5 +24,6 @@ export const STAFF_TABLE: TableConfig<StaffRecord> = {
       enumValues: [...CONTENT_STATUSES],
     },
     { key: "updatedAt", label: "admin.editor.updated", type: "datetime" },
+    { key: "createdAt", label: "admin.editor.created", type: "datetime" },
   ],
 };

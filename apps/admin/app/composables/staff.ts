@@ -9,9 +9,10 @@ import { useApi } from "~/composables/api";
 import { useEditor } from "~/composables/editor";
 import { useListingFetch } from "~/composables/listing";
 import { useRecord } from "~/composables/records";
+import { FILTER_DAYS } from "~/constants/listing";
 import { STAFF_TABLE } from "~/constants/staff";
 import { toStaffBody, toStaffDraft } from "~/utils/staff";
-import { toTableDescriptors } from "~/utils/listing";
+import { recentDays, toTableDescriptors, withDays } from "~/utils/listing";
 
 const ROUTE = "/api/staff";
 const endpoint = (id: number): string => `${ROUTE}/${id}`;
@@ -26,7 +27,10 @@ export const useStaffTable = () => {
   const { $t } = useNuxtApp();
 
   const useTable = createTable<StaffRecord>("staff", {
-    ...toTableDescriptors(STAFF_TABLE, (message) => $t(message)),
+    ...toTableDescriptors(
+      withDays(STAFF_TABLE, recentDays(FILTER_DAYS)),
+      (message) => $t(message),
+    ),
     fetch: useListingFetch(ROUTE, staffListing),
     actions: {
       edit: {

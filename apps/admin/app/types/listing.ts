@@ -1,10 +1,17 @@
 import type { listing } from "@bbf/schema";
+import type { ListingQuery } from "@bbf/schema/types";
 import type { AppProsaryMessage, TableOptions, UseTable } from "#imports";
 import type { z } from "zod";
 
 export type Listing<T> = z.infer<ReturnType<typeof listing<z.ZodType<T>>>>;
 
 export type RecordLink<T> = (record: T) => string;
+
+/**
+ * What a table asks the API for: the page, the free text as `q`, and one
+ * column filter per key, each as the value the table committed.
+ */
+export type ListingRequest = ListingQuery & Record<string, string | number>;
 
 export type TableDescriptors<T> = Omit<
   TableOptions<T>,
