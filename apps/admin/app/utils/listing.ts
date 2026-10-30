@@ -35,7 +35,8 @@ export const recentDays = (count: number, now = new Date()): string[] => {
 
 /**
  * The config with `days` as the values each date column's filter offers,
- * for the search to list, narrow and complete.
+ * for the search to list, narrow and complete. The operators are the
+ * column's own.
  */
 export const withDays = <T>(
   config: TableConfig<T>,
@@ -44,7 +45,7 @@ export const withDays = <T>(
   ...config,
   columns: config.columns.map((column) =>
     column.type === "date" || column.type === "datetime"
-      ? { ...column, enumValues: days }
+      ? { ...column, values: days }
       : column,
   ),
 });

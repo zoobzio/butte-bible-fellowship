@@ -107,7 +107,16 @@ describe("RecordTable", () => {
       expect(viewport.exists()).toBe(true);
       expect(
         viewport.findAll(".f-autocomplete-item").map((item) => item.text()),
-      ).toEqual(["Role", "Status", "Updated", "Created"]);
+      ).toEqual([
+        "Role",
+        "Status",
+        "Email",
+        "Phone",
+        "Summary",
+        "Photo URL",
+        "Updated",
+        "Created",
+      ]);
     } finally {
       height.mockRestore();
       view.ResizeObserver = Observer;

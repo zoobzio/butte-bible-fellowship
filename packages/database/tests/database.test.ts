@@ -211,20 +211,70 @@ describe("admin.staff", () => {
     expect(await db.admin.staff.list({ ...page, q: "\\" })).toEqual([]);
     expect(await db.admin.staff.list({ ...page, q: "r N" })).toHaveLength(4);
     expect(
-      (await db.admin.staff.list({ ...page, role: "elder" })).map(
+      (await db.admin.staff.list({ ...page, role_is: "elder" })).map(
         (r) => r.name,
       ),
     ).toEqual(["Elder Name", "Elder Name", "Elder Name"]);
-    expect(await db.admin.staff.list({ ...page, status: "draft" })).toEqual([]);
+    expect(
+      (await db.admin.staff.list({ ...page, role_not: "elder" })).map(
+        (r) => r.name,
+      ),
+    ).toEqual(["Pastor Name"]);
+    expect(await db.admin.staff.list({ ...page, status_is: "draft" })).toEqual(
+      [],
+    );
+    expect(
+      await db.admin.staff.list({ ...page, status_not: "published" }),
+    ).toEqual([]);
     expect(
       (
         await db.admin.staff.list({
           ...page,
-          role: "elder",
-          status: "published",
+          role_is: "elder",
+          status_is: "published",
+          status_not: "archived",
         })
       ).map((r) => r.total),
     ).toEqual([3, 3, 3]);
+
+    // The text is looked for in the email, the phone and the summary too.
+    expect(
+      (await db.admin.staff.list({ ...page, q: "@EXAMPLE" })).map(
+        (r) => r.name,
+      ),
+    ).toEqual(["Pastor Name"]);
+    expect(await db.admin.staff.list({ ...page, q: "how long" })).toHaveLength(
+      3,
+    );
+
+    // An optional column present or missing, an empty one counted as missing.
+    expect(
+      (await db.admin.staff.list({ ...page, photo: "present" })).map(
+        (r) => r.name,
+      ),
+    ).toEqual(["Pastor Name"]);
+    expect(
+      await db.admin.staff.list({ ...page, email: "missing" }),
+    ).toHaveLength(3);
+    expect(
+      await db.admin.staff.list({ ...page, summary: "missing" }),
+    ).toHaveLength(1);
+    expect(await db.admin.staff.list({ ...page, phone: "present" })).toEqual(
+      [],
+    );
+    await db.admin.staff.update({
+      id,
+      ...member,
+      summary: null,
+      bio: null,
+      phone: "",
+    });
+    expect(await db.admin.staff.list({ ...page, phone: "present" })).toEqual(
+      [],
+    );
+    expect(
+      await db.admin.staff.list({ ...page, phone: "missing" }),
+    ).toHaveLength(4);
     // A page is `size` rows from `offset`, each carrying the whole count.
     expect(
       (await db.admin.staff.list({ ...page, size: 2, offset: 2 })).map(

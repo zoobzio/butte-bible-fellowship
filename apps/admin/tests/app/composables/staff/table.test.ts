@@ -37,6 +37,10 @@ describe("useStaffTable", () => {
     expect(table.filterableColumns.map((column) => column.key)).toEqual([
       "role",
       "status",
+      "email",
+      "phone",
+      "summary",
+      "photo",
       "updatedAt",
       "createdAt",
     ]);
@@ -69,18 +73,18 @@ describe("useStaffTable", () => {
       expect(query.fields[key]?.values).toHaveLength(FILTER_DAYS);
       expect(query.fields[key]?.values?.[0]).toBe(today);
     }
-    query.setDraft(`Updated: on: ${today!.slice(0, 7)}`);
+    query.setDraft(`Updated: on ${today!.slice(0, 7)}`);
     expect(query.stage).toBe("value");
     expect(query.items.length).toBeGreaterThan(0);
     expect(query.items.length).toBeLessThanOrEqual(31);
     expect(query.hint).toBe(today!.slice(7));
-    query.setDraft(`Updated: on: ${today}`);
+    query.setDraft(`Updated: on ${today}`);
     query.submit();
     expect(query.filters).toEqual([
       { key: "updatedAt", op: "on", value: today },
     ]);
     // An older day is not offered, and is taken as typed all the same.
-    query.setDraft("Created: before: 2019-05-04");
+    query.setDraft("Created: before 2019-05-04");
     expect(query.items).toEqual([]);
     query.submit();
     expect(query.filters).toContainEqual({
@@ -88,6 +92,38 @@ describe("useStaffTable", () => {
       op: "before",
       value: "2019-05-04",
     });
+  });
+
+  it("offers the role and the status held or not, a bare value the one held, and each optional column present or missing", () => {
+    vi.stubGlobal(
+      "$fetch",
+      vi.fn(async () => ({ items: [], total: 0 })),
+    );
+    const { result } = withSetup(() => useStaffTable());
+    const { query } = result.table;
+    expect(query.fields.role?.operators).toEqual(["is", "not"]);
+    expect(query.fields.status?.values).toEqual([
+      "draft",
+      "published",
+      "archived",
+    ]);
+    query.setDraft("Status: not archived");
+    query.submit();
+    query.add({ kind: "filter", key: "role", value: "elder" });
+    expect(query.filters).toEqual([
+      { key: "status", op: "not", value: "archived" },
+      { key: "role", op: "is", value: "elder" },
+    ]);
+    for (const key of ["email", "phone", "summary", "photo"]) {
+      expect(query.fields[key]?.operators).toBeUndefined();
+      expect(query.fields[key]?.values).toEqual(["present", "missing"]);
+    }
+    const photo = query.fields.photo!.label;
+    query.setDraft(`${photo}: mis`);
+    expect(query.hint).toBe("sing");
+    query.setDraft(`${photo}: missing`);
+    query.submit();
+    expect(query.filters).toContainEqual({ key: "photo", value: "missing" });
   });
 
   it("fetches a page of the staff from the admin's API", async () => {
@@ -112,6 +148,13 @@ describe("useStaffTable", () => {
     result.table.query.add({ kind: "filter", key: "role", value: "elder" });
     result.table.query.add({
       kind: "filter",
+      key: "status",
+      op: "not",
+      value: "archived",
+    });
+    result.table.query.add({ kind: "filter", key: "photo", value: "missing" });
+    result.table.query.add({
+      kind: "filter",
       key: "updatedAt",
       op: "after",
       value: "2026-10-01",
@@ -122,7 +165,9 @@ describe("useStaffTable", () => {
         page: 1,
         size: 25,
         q: "jane",
-        role: "elder",
+        roleIs: "elder",
+        statusNot: "archived",
+        photo: "missing",
         updatedAtAfter: "2026-10-01",
       },
     });

@@ -64,11 +64,14 @@ in `direction`, `asc` or `desc`, a null last either way, and then in the
 site's order, by role and name, so `role` ascending is the site's order
 itself; each row carries `total`, how many rows the whole search holds, so
 a page and its count are one query. It takes the search the admin
-app's table commits, every part of it optional: `q`, text the name must
-carry whatever its case, taken as typed, so a `%` or `_` is the character
-and not a wildcard; `role`; `status`; and a day each member was last
-changed or added `before`, `after` or `on`, as `updated_before` and the
-like. Left out or null, a part narrows nothing. The days are read in `tz`,
+app's table commits, every part of it optional: `q`, text the name, the
+email, the phone or the summary must carry whatever its case, taken as
+typed, so a `%` or `_` is the character and not a wildcard; a role held,
+`role_is`, or not held, `role_not`, and a status the same, `status_is` and
+`status_not`; whether the `email`, `phone`, `summary` or `photo` is filled
+in, `present` or `missing`, an empty one counted as missing; and a day each
+member was last changed or added `before`, `after` or `on`, as
+`updated_before` and the like. Left out or null, a part narrows nothing. The days are read in `tz`,
 the church's IANA time zone, which every search passes. `admin.events` and `admin.sermons` have `list`, `fetch`,
 `create`, `update` and `delete`, by `id`.
 

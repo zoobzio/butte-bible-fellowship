@@ -16,6 +16,9 @@ export default defineConfig({
     languages: "lucide:languages",
     "log-out": "lucide:log-out",
     logo: "./src/logo.svg",
+    // The table search's icon, rebound from the preset's wand to a magnifier
+    // over code brackets: a search that takes a grammar.
+    magic: "lucide:search-code",
     mail: "lucide:mail",
     menu: "lucide:menu",
     moon: "lucide:moon",

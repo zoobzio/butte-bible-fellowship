@@ -32,21 +32,52 @@ describe("staffId", () => {
 });
 
 describe("staffQuery", () => {
-  it("is the listing query, with a role and a status to narrow it", () => {
+  it("is the listing query, with a role and a status held or not to narrow it", () => {
     expect(staffQuery.parse({})).toEqual({ page: 1, size: 25 });
     expect(
       staffQuery.parse({
         page: "2",
         q: "jane",
-        role: "elder",
-        status: "draft",
+        roleIs: "elder",
+        statusNot: "archived",
       }),
-    ).toEqual({ page: 2, size: 25, q: "jane", role: "elder", status: "draft" });
+    ).toEqual({
+      page: 2,
+      size: 25,
+      q: "jane",
+      roleIs: "elder",
+      statusNot: "archived",
+    });
+    expect(
+      staffQuery.parse({ roleNot: "pastor", statusIs: "draft" }),
+    ).toMatchObject({ roleNot: "pastor", statusIs: "draft" });
   });
 
   it("takes only a role and a status the staff are written in", () => {
-    expect(staffQuery.safeParse({ role: "deacon" }).success).toBe(false);
-    expect(staffQuery.safeParse({ status: "live" }).success).toBe(false);
+    expect(staffQuery.safeParse({ roleIs: "deacon" }).success).toBe(false);
+    expect(staffQuery.safeParse({ roleNot: "deacon" }).success).toBe(false);
+    expect(staffQuery.safeParse({ statusIs: "live" }).success).toBe(false);
+    expect(staffQuery.safeParse({ statusNot: "live" }).success).toBe(false);
+    expect(staffQuery.safeParse({ role: "elder" }).success).toBe(true);
+    expect(staffQuery.parse({ role: "elder" })).toEqual({ page: 1, size: 25 });
+  });
+
+  it("takes whether each optional column is present or missing", () => {
+    expect(
+      staffQuery.parse({
+        email: "present",
+        phone: "missing",
+        summary: "present",
+        photo: "missing",
+      }),
+    ).toMatchObject({
+      email: "present",
+      phone: "missing",
+      summary: "present",
+      photo: "missing",
+    });
+    expect(staffQuery.safeParse({ photo: "yes" }).success).toBe(false);
+    expect(staffQuery.safeParse({ email: "" }).success).toBe(false);
   });
 
   it("sorts by a column of the record, either way", () => {

@@ -156,7 +156,7 @@
   );
 }
 
-/* The filter's field: the search icon, the input, the forms' focus ring. */
+/* The filter's field: the search icon and the input. Focused, its border alone marks it. */
 .f-listbox-root > .f-group {
   display: flex;
   align-items: center;
@@ -169,8 +169,6 @@
 }
 
 .f-listbox-root > .f-group:focus-within {
-  outline: var(--border-focus);
-  outline-offset: var(--space-1);
   border-color: var(--primary);
 }
 

@@ -60,28 +60,30 @@
   border-color: var(--primary);
 }
 
+/* The icon leads the whole field, before any chip. */
+.f-data-table-search > svg {
+  color: var(--on-surface-muted);
+}
+
 /*
- * The input's group: the icon, the input with the hint over it, and the
- * key that focuses it, in three columns. The hint and the input share the
- * middle one, so the hint's glyphs land where the typed ones do.
+ * The input's group: the input with the hint over it, and the key that
+ * focuses it, in two columns. The hint and the input share the first, so
+ * the hint's glyphs land where the typed ones do; the key, placed on its
+ * own, takes the second.
  */
 .f-data-table-search > .f-group {
   position: relative;
   display: grid;
   flex: 1;
-  grid-template-columns: auto minmax(8rem, 1fr) auto;
+  grid-template-columns: minmax(8rem, 1fr) auto;
   align-items: center;
   gap: var(--space-2);
   min-width: 8rem;
 }
 
-.f-data-table-search > .f-group > svg {
-  color: var(--on-surface-muted);
-}
-
 .f-autocomplete-input,
 .f-data-table-search > .f-group > .f-group[aria-hidden] {
-  grid-area: 1 / 2;
+  grid-area: 1 / 1;
   box-sizing: border-box;
   width: 100%;
   min-width: 0;

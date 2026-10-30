@@ -51,7 +51,7 @@ describe("withDays", () => {
       },
       ["2026-10-28", "2026-10-27"],
     );
-    expect(config.columns.map((column) => column.enumValues)).toEqual([
+    expect(config.columns.map((column) => column.values)).toEqual([
       undefined,
       ["2026-10-28", "2026-10-27"],
       ["2026-10-28", "2026-10-27"],

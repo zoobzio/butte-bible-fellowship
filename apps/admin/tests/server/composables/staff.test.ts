@@ -42,10 +42,20 @@ const RECORD = {
 
 const ROWS = [ROW, { ...ROW, id: 2, name: "John Roe" }];
 
+type Role = "pastor" | "elder" | "staff";
+type Status = "draft" | "published" | "archived";
+type Presence = "present" | "missing";
+
 type Search = {
   q: string | null;
-  role: "pastor" | "elder" | "staff" | null;
-  status: "draft" | "published" | "archived" | null;
+  role_is: Role | null;
+  role_not: Role | null;
+  status_is: Status | null;
+  status_not: Status | null;
+  email: Presence | null;
+  phone: Presence | null;
+  summary: Presence | null;
+  photo: Presence | null;
   tz: string;
   updated_before: string | null;
   updated_after: string | null;
@@ -57,8 +67,14 @@ type Search = {
 
 const NONE: Search = {
   q: null,
-  role: null,
-  status: null,
+  role_is: null,
+  role_not: null,
+  status_is: null,
+  status_not: null,
+  email: null,
+  phone: null,
+  summary: null,
+  photo: null,
   tz: "America/Los_Angeles",
   updated_before: null,
   updated_after: null,
@@ -75,8 +91,12 @@ const ORDER: Order = { sort: "role", direction: "asc" };
 const matches = (search: Search) => (row: (typeof ROWS)[number]) =>
   (search.q === null ||
     row.name.toLowerCase().includes(search.q.toLowerCase())) &&
-  (search.role === null || row.role === search.role) &&
-  (search.status === null || row.status === search.status);
+  (search.role_is === null || row.role === search.role_is) &&
+  (search.role_not === null || row.role !== search.role_not) &&
+  (search.status_is === null || row.status === search.status_is) &&
+  (search.status_not === null || row.status !== search.status_not) &&
+  (search.email === null ||
+    (row.email !== null) === (search.email === "present"));
 
 /* A page of the search, each row carrying how many the search holds. */
 const list = vi.fn(
@@ -191,19 +211,51 @@ describe("useStaff", () => {
       items: [{ ...RECORD, id: 2, name: "John Roe" }],
       total: 1,
     });
-    await useStaff().list({ page: 1, size: 25, q: "", role: "pastor" });
+    await useStaff().list({ page: 1, size: 25, q: "", roleIs: "pastor" });
     expect(list).toHaveBeenLastCalledWith({
       ...NONE,
       ...ORDER,
-      role: "pastor",
+      role_is: "pastor",
       size: 25,
       offset: 0,
     });
-    await useStaff().list({ page: 1, size: 25, status: "draft" });
+    await useStaff().list({
+      page: 1,
+      size: 25,
+      roleNot: "pastor",
+      statusIs: "draft",
+      statusNot: "archived",
+    });
     expect(list).toHaveBeenLastCalledWith({
       ...NONE,
       ...ORDER,
-      status: "draft",
+      role_not: "pastor",
+      status_is: "draft",
+      status_not: "archived",
+      size: 25,
+      offset: 0,
+    });
+  });
+
+  it("hands the database whether each optional column is to be present or missing", async () => {
+    expect(
+      await useStaff().list({ page: 1, size: 25, email: "missing" }),
+    ).toEqual({ items: [], total: 0 });
+    await useStaff().list({
+      page: 1,
+      size: 25,
+      email: "present",
+      phone: "missing",
+      summary: "present",
+      photo: "missing",
+    });
+    expect(list).toHaveBeenLastCalledWith({
+      ...NONE,
+      ...ORDER,
+      email: "present",
+      phone: "missing",
+      summary: "present",
+      photo: "missing",
       size: 25,
       offset: 0,
     });
@@ -236,11 +288,11 @@ describe("useStaff", () => {
 
   it("counts nothing when the search finds nothing", async () => {
     expect(
-      await useStaff().list({ page: 1, size: 25, role: "pastor" }),
+      await useStaff().list({ page: 1, size: 25, roleIs: "pastor" }),
     ).toEqual({ items: [], total: 0 });
     expect(list).toHaveBeenCalledTimes(1);
     expect(
-      await useStaff().list({ page: 2, size: 25, role: "pastor" }),
+      await useStaff().list({ page: 2, size: 25, roleIs: "pastor" }),
     ).toEqual({ items: [], total: 0 });
     expect(list).toHaveBeenCalledTimes(3);
   });

@@ -2,7 +2,7 @@ import { z } from "zod";
 
 import { hast } from "../models/hast";
 import { contentStatus, staffRole } from "../models/staff";
-import { listingQuery, sorting } from "./listing";
+import { listingQuery, presence, sorting } from "./listing";
 
 export const staffId = z.object({
   id: z.coerce
@@ -39,15 +39,30 @@ export const staffSort = z.enum(STAFF_SORT_KEYS).meta({
   examples: ["name"],
 });
 
+const has = (what: string) =>
+  presence.optional().meta({
+    description: `Whether the members listed have ${what}. Left out, either way.`,
+  });
+
 export const staffQuery = listingQuery.extend({
   ...sorting(staffSort),
-  role: staffRole.optional().meta({
+  roleIs: staffRole.optional().meta({
     description: "The role the members listed hold. Left out, every role.",
   }),
-  status: contentStatus.optional().meta({
+  roleNot: staffRole.optional().meta({
+    description: "A role the members listed do not hold. Left out, none.",
+  }),
+  statusIs: contentStatus.optional().meta({
     description:
       "The status the members listed are in. Left out, every status.",
   }),
+  statusNot: contentStatus.optional().meta({
+    description: "A status the members listed are not in. Left out, none.",
+  }),
+  email: has("an email"),
+  phone: has("a phone"),
+  summary: has("a summary"),
+  photo: has("a photo"),
   updatedAtBefore: day("The day the members listed were last changed before"),
   updatedAtAfter: day("The day the members listed were last changed after"),
   updatedAtOn: day("The day the members listed were last changed on"),

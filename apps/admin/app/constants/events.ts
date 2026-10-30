@@ -15,7 +15,7 @@ export const EVENTS_TABLE: TableConfig<EventRecord> = {
       label: "admin.event.day",
       icon: "calendar-days",
       type: "enum",
-      enumValues: [...EVENT_DAYS],
+      values: [...EVENT_DAYS],
     },
     { key: "date", label: "admin.event.date", icon: "calendar", type: "date" },
     { key: "start", label: "admin.event.start", icon: "clock" },
@@ -24,7 +24,7 @@ export const EVENTS_TABLE: TableConfig<EventRecord> = {
       label: "admin.editor.status",
       icon: "badge",
       type: "enum",
-      enumValues: [...CONTENT_STATUSES],
+      values: [...CONTENT_STATUSES],
     },
     {
       key: "updatedAt",

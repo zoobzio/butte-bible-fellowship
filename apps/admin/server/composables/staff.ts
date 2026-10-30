@@ -16,8 +16,14 @@ import { useDatabase } from "#layers/bbf/server/composables/database";
  */
 const toSearch = (query: StaffQuery) => ({
   q: query.q === undefined || query.q === "" ? null : query.q,
-  role: query.role ?? null,
-  status: query.status ?? null,
+  role_is: query.roleIs ?? null,
+  role_not: query.roleNot ?? null,
+  status_is: query.statusIs ?? null,
+  status_not: query.statusNot ?? null,
+  email: query.email ?? null,
+  phone: query.phone ?? null,
+  summary: query.summary ?? null,
+  photo: query.photo ?? null,
   tz: TIME_ZONE,
   updated_before: query.updatedAtBefore ?? null,
   updated_after: query.updatedAtAfter ?? null,
