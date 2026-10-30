@@ -55,10 +55,8 @@
   background: color-mix(in oklab, var(--primary-container) 30%, transparent);
 }
 
-/* The ring is the input's own: a chip or the panel focused, it is not drawn. */
+/* Focused, the field's border alone marks it: no ring, as a chip or the panel focused draws none. */
 .f-data-table-search:has(.f-autocomplete-input:focus) {
-  outline: var(--border-focus);
-  outline-offset: var(--space-1);
   border-color: var(--primary);
 }
 

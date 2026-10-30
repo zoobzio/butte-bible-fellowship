@@ -53,18 +53,26 @@ const toOrder = (query: StaffQuery) => ({
 export const useStaff = () => {
   const db = useDatabase();
 
+  /**
+   * One page of the search, and how many rows the whole search holds,
+   * which every row of the page carries. A page past the end carries no
+   * row to read it from, so the first row of the search is asked for it
+   * then, and nothing found means nothing held.
+   */
   const list = async (query: StaffQuery): Promise<StaffListing> => {
-    const search = toSearch(query);
-    const [rows, counted] = await Promise.all([
-      db.admin.staff.list({
-        ...search,
-        ...toOrder(query),
-        size: query.size,
-        offset: (query.page - 1) * query.size,
-      }),
-      db.admin.staff.count.first(search),
-    ]);
-    return { items: rows.map(toStaffRecord), total: counted?.total ?? 0 };
+    const search = { ...toSearch(query), ...toOrder(query) };
+    const rows = await db.admin.staff.list({
+      ...search,
+      size: query.size,
+      offset: (query.page - 1) * query.size,
+    });
+    const total =
+      rows[0]?.total ??
+      (query.page === 1
+        ? 0
+        : ((await db.admin.staff.list({ ...search, size: 1, offset: 0 }))[0]
+            ?.total ?? 0));
+    return { items: rows.map(toStaffRecord), total };
   };
 
   const fetch = async (id: number): Promise<StaffRecord | null> => {

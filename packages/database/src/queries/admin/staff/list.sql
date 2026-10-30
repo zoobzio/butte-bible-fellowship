@@ -1,6 +1,7 @@
-SELECT id, name, role, summary, bio, photo, email, phone, status, created_at, updated_at
+SELECT id, name, role, summary, bio, photo, email, phone, status, created_at, updated_at,
+  count(*) OVER ()::int AS total
 FROM staff
-WHERE (:q::text IS NULL OR name ILIKE '%' || :q::text || '%')
+WHERE (:q::text IS NULL OR name ILIKE '%' || replace(replace(replace(:q::text, '\', '\\'), '%', '\%'), '_', '\_') || '%')
   AND (:role::staff_role IS NULL OR role = :role::staff_role)
   AND (:status::content_status IS NULL OR status = :status::content_status)
   AND (:updated_before::date IS NULL OR (updated_at AT TIME ZONE :tz::text)::date < :updated_before::date)

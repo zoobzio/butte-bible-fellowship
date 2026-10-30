@@ -79,8 +79,8 @@ describe("the build", () => {
       "web.sermons.list",
       "web.staff.list",
     ]);
-    expect(names.filter((name) => name.startsWith("admin."))).toHaveLength(23);
-    expect(names).toHaveLength(30);
+    expect(names.filter((name) => name.startsWith("admin."))).toHaveLength(22);
+    expect(names).toHaveLength(29);
   });
 });
 
@@ -199,12 +199,17 @@ describe("admin.staff", () => {
       "Elder Name",
       "Elder Name",
     ]);
-    expect((await db.admin.staff.count.first({ tz }))?.total).toBe(4);
+    expect(list.map((row) => row.total)).toEqual([4, 4, 4, 4]);
     expect((await db.web.staff.list())[0]?.name).toBe("Pastor Name");
 
     expect(
       (await db.admin.staff.list({ ...page, q: "PASTOR" })).map((r) => r.name),
     ).toEqual(["Pastor Name"]);
+    // The text is taken as typed: a wildcard of LIKE is the character itself.
+    expect(await db.admin.staff.list({ ...page, q: "%" })).toEqual([]);
+    expect(await db.admin.staff.list({ ...page, q: "_" })).toEqual([]);
+    expect(await db.admin.staff.list({ ...page, q: "\\" })).toEqual([]);
+    expect(await db.admin.staff.list({ ...page, q: "r N" })).toHaveLength(4);
     expect(
       (await db.admin.staff.list({ ...page, role: "elder" })).map(
         (r) => r.name,
@@ -213,29 +218,32 @@ describe("admin.staff", () => {
     expect(await db.admin.staff.list({ ...page, status: "draft" })).toEqual([]);
     expect(
       (
-        await db.admin.staff.count.first({
-          tz,
+        await db.admin.staff.list({
+          ...page,
           role: "elder",
           status: "published",
         })
-      )?.total,
-    ).toBe(3);
+      ).map((r) => r.total),
+    ).toEqual([3, 3, 3]);
+    // A page is `size` rows from `offset`, each carrying the whole count.
     expect(
-      await db.admin.staff.list({ ...page, size: 2, offset: 2 }),
-    ).toHaveLength(2);
+      (await db.admin.staff.list({ ...page, size: 2, offset: 2 })).map(
+        (r) => r.total,
+      ),
+    ).toEqual([4, 4]);
     expect(await db.admin.staff.list({ ...page, size: 2, offset: 4 })).toEqual(
       [],
     );
 
     expect(
-      (await db.admin.staff.count.first({ tz, created_on: today }))?.total,
-    ).toBe(4);
+      await db.admin.staff.list({ ...page, created_on: today }),
+    ).toHaveLength(4);
     expect(
-      (await db.admin.staff.count.first({ tz, updated_before: today }))?.total,
-    ).toBe(0);
+      await db.admin.staff.list({ ...page, updated_before: today }),
+    ).toEqual([]);
     expect(
-      (await db.admin.staff.count.first({ tz, updated_after: today }))?.total,
-    ).toBe(0);
+      await db.admin.staff.list({ ...page, updated_after: today }),
+    ).toEqual([]);
     expect(
       await db.admin.staff.list({ ...page, created_before: today }),
     ).toEqual([]);
@@ -855,7 +863,7 @@ describe("roles", () => {
       names.filter(
         (name) =>
           !name.startsWith("admin.users.") &&
-          /\.(count|fetch|list|upcoming|weekly)$/.test(name),
+          /\.(fetch|list|upcoming|weekly)$/.test(name),
       ),
     );
   });

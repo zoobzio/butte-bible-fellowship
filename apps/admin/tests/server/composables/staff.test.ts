@@ -78,6 +78,7 @@ const matches = (search: Search) => (row: (typeof ROWS)[number]) =>
   (search.role === null || row.role === search.role) &&
   (search.status === null || row.status === search.status);
 
+/* A page of the search, each row carrying how many the search holds. */
 const list = vi.fn(
   async ({
     size,
@@ -85,12 +86,13 @@ const list = vi.fn(
     sort: _sort,
     direction: _direction,
     ...search
-  }: Search & Order & { size: number; offset: number }) =>
-    ROWS.filter(matches(search)).slice(offset, offset + size),
+  }: Search & Order & { size: number; offset: number }) => {
+    const found = ROWS.filter(matches(search));
+    return found
+      .slice(offset, offset + size)
+      .map((row) => ({ ...row, total: found.length }));
+  },
 );
-const counted = vi.fn(async (search: Search) => ({
-  total: ROWS.filter(matches(search)).length,
-}));
 const fetched = vi.fn(async ({ id }: { id: number }) =>
   id === 3
     ? { ...ROW, id: 3, name: "New", status: "draft" as const }
@@ -106,7 +108,6 @@ Object.assign(service, {
   admin: {
     staff: {
       list,
-      count: { first: counted },
       fetch: { first: fetched },
       create: { first: created },
       update: { first: updated },
@@ -116,13 +117,13 @@ Object.assign(service, {
 });
 
 afterEach(() => {
-  for (const query of [list, counted, fetched, created, updated, deleted]) {
+  for (const query of [list, fetched, created, updated, deleted]) {
     query.mockClear();
   }
 });
 
 describe("useStaff", () => {
-  it("asks the database for one page of the staff, and for how many there are in all", async () => {
+  it("asks the database for one page of the staff, which carries how many there are in all", async () => {
     expect(await useStaff().list({ page: 1, size: 1 })).toEqual({
       items: [RECORD],
       total: 2,
@@ -133,7 +134,7 @@ describe("useStaff", () => {
       size: 1,
       offset: 0,
     });
-    expect(counted).toHaveBeenCalledWith(NONE);
+    expect(list).toHaveBeenCalledTimes(1);
     expect(await useStaff().list({ page: 2, size: 1 })).toEqual({
       items: [{ ...RECORD, id: 2, name: "John Roe" }],
       total: 2,
@@ -143,6 +144,21 @@ describe("useStaff", () => {
       ...ORDER,
       size: 1,
       offset: 1,
+    });
+  });
+
+  it("asks the first row for the total when the page is past the end", async () => {
+    expect(await useStaff().list({ page: 3, size: 1, q: "o" })).toEqual({
+      items: [],
+      total: 2,
+    });
+    expect(list).toHaveBeenCalledTimes(2);
+    expect(list).toHaveBeenLastCalledWith({
+      ...NONE,
+      ...ORDER,
+      q: "o",
+      size: 1,
+      offset: 0,
     });
   });
 
@@ -168,7 +184,6 @@ describe("useStaff", () => {
       size: 25,
       offset: 0,
     });
-    expect(counted).toHaveBeenLastCalledWith(NONE);
   });
 
   it("hands the database the search, and null for each part left out or empty", async () => {
@@ -176,7 +191,6 @@ describe("useStaff", () => {
       items: [{ ...RECORD, id: 2, name: "John Roe" }],
       total: 1,
     });
-    expect(counted).toHaveBeenLastCalledWith({ ...NONE, q: "ROE" });
     await useStaff().list({ page: 1, size: 25, q: "", role: "pastor" });
     expect(list).toHaveBeenLastCalledWith({
       ...NONE,
@@ -186,7 +200,13 @@ describe("useStaff", () => {
       offset: 0,
     });
     await useStaff().list({ page: 1, size: 25, status: "draft" });
-    expect(counted).toHaveBeenLastCalledWith({ ...NONE, status: "draft" });
+    expect(list).toHaveBeenLastCalledWith({
+      ...NONE,
+      ...ORDER,
+      status: "draft",
+      size: 25,
+      offset: 0,
+    });
   });
 
   it("hands the database each day asked for, read in the church's time zone", async () => {
@@ -200,8 +220,11 @@ describe("useStaff", () => {
       createdAtAfter: "2026-09-01",
       createdAtOn: "2026-09-10",
     });
-    expect(counted).toHaveBeenLastCalledWith({
+    expect(list).toHaveBeenLastCalledWith({
       ...NONE,
+      ...ORDER,
+      size: 25,
+      offset: 0,
       updated_before: "2026-10-17",
       updated_after: "2026-10-01",
       updated_on: "2026-10-10",
@@ -211,11 +234,15 @@ describe("useStaff", () => {
     });
   });
 
-  it("counts nothing when the database says nothing", async () => {
-    counted.mockResolvedValueOnce(null as never);
+  it("counts nothing when the search finds nothing", async () => {
     expect(
       await useStaff().list({ page: 1, size: 25, role: "pastor" }),
     ).toEqual({ items: [], total: 0 });
+    expect(list).toHaveBeenCalledTimes(1);
+    expect(
+      await useStaff().list({ page: 2, size: 25, role: "pastor" }),
+    ).toEqual({ items: [], total: 0 });
+    expect(list).toHaveBeenCalledTimes(3);
   });
 
   it("fetches one member by id, or nothing", async () => {
