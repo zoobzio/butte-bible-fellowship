@@ -14,6 +14,7 @@ src/css/index.css      the entry: imports the rest, in order
 src/css/base.css       site properties, reset, page shell, links
 src/css/prose.css      the measure, headings, body copy, quotes, images, tables
 src/css/components.css the call to action, toggle button and Foundation's parts
+src/css/table.css      Foundation's data table: toolbar, search, card, pagination
 src/css/fonts.css      the font stacks, where @nuxt/fonts can see them
 ```
 
@@ -51,8 +52,10 @@ export default defineNuxtConfig({
 It styles what any page of the site shares: the semantic elements, the
 classes Markdown content wears (`.prose`, `.prose-figure`,
 `.prose-aside-image`, `.events-table`), the controls more than one component
-uses (`.cta`, `.theme-toggle`) and Foundation's unstyled parts (menu, popover,
-listbox, toggle group). Every value is a `@bbf/theme` variable, read
+uses (`.cta`, `.theme-toggle`), Foundation's unstyled parts (menu, popover,
+command, toggle group, checkbox) and its data table (`.f-data-table`: the
+search, the column manager, the card of rows and the pagination), scoped to
+the table's root so any app that lists records gets the same table. Every value is a `@bbf/theme` variable, read
 through the roles each modifier axis rebinds, but for the site properties
 `base.css` declares: the display face, the site's measure, and the few
 things aurora has no token for — the rule (`--rule`), the signature stripe

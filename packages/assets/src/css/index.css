@@ -1,5 +1,6 @@
 @import "./base.css";
 @import "./prose.css";
 @import "./components.css";
+@import "./table.css";
 /* Keep last. Its longhands must override the font shorthands above. */
 @import "./fonts.css";

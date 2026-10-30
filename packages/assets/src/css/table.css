@@ -1,0 +1,544 @@
+/*
+ * Foundation's data table, as every app lists its records: the toolbar of
+ * search, column manager and refresh over a card of rows, the pagination
+ * under it. Each rule is scoped to the table's own root so a Fab, chip or
+ * select elsewhere keeps its own dress. The layer's icons are bare `svg`
+ * elements, and its reset lays an `svg` out as a block: every part that
+ * holds one is a flex box here, so an icon sits in line with its label.
+ */
+
+.f-data-table {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.f-data-table svg {
+  flex: none;
+  width: var(--space-4);
+  height: var(--space-4);
+}
+
+/* The toolbar: the search takes the width the controls after it leave. */
+.f-data-table-toolbar {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+}
+
+.f-data-table-toolbar > .f-button {
+  min-height: calc(var(--space-6) + 2 * var(--space-1) + 2px);
+}
+
+/*
+ * The search: chips and the input in one field, which reads as the
+ * toolbar's buttons do on hover and on focus. The panels hang under it.
+ */
+.f-data-table-search {
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1);
+  min-width: 0;
+  padding: var(--space-1) var(--space-2);
+  border: 1px var(--stroke-solid) var(--rule);
+  border-radius: var(--shape-sm);
+  background: var(--surface);
+  transition:
+    border-color var(--transition-fast),
+    background var(--transition-fast);
+}
+
+.f-data-table-search:hover {
+  border-color: color-mix(in oklab, var(--primary) 65%, transparent);
+  background: color-mix(in oklab, var(--primary-container) 30%, transparent);
+}
+
+/* The ring is the input's own: a chip or the panel focused, it is not drawn. */
+.f-data-table-search:has(.f-autocomplete-input:focus) {
+  outline: var(--border-focus);
+  outline-offset: var(--space-1);
+  border-color: var(--primary);
+}
+
+/*
+ * The input's group: the icon, the input with the hint over it, and the
+ * key that focuses it, in three columns. The hint and the input share the
+ * middle one, so the hint's glyphs land where the typed ones do.
+ */
+.f-data-table-search > .f-group {
+  position: relative;
+  display: grid;
+  flex: 1;
+  grid-template-columns: auto minmax(8rem, 1fr) auto;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 8rem;
+}
+
+.f-data-table-search > .f-group > svg {
+  color: var(--on-surface-muted);
+}
+
+.f-autocomplete-input,
+.f-data-table-search > .f-group > .f-group[aria-hidden] {
+  grid-area: 1 / 2;
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  height: var(--space-6);
+  margin: 0;
+  padding: 0;
+  border: none;
+  font: var(--type-label);
+  line-height: var(--space-6);
+  letter-spacing: normal;
+}
+
+.f-autocomplete-input {
+  display: block;
+  background: transparent;
+  color: var(--on-surface-high-contrast);
+  outline: none;
+}
+
+.f-autocomplete-input::placeholder {
+  color: var(--on-surface-muted);
+}
+
+.f-data-table-search > .f-group > .f-group[aria-hidden] {
+  overflow: hidden;
+  white-space: pre;
+  pointer-events: none;
+}
+
+/* The typed part, unseen, holds the completion's place. */
+.f-data-table-search > .f-group > .f-group[aria-hidden] .f-span:first-child {
+  color: transparent;
+}
+
+.f-data-table-search > .f-group > .f-group[aria-hidden] .f-span:last-child {
+  color: var(--on-surface-muted);
+}
+
+/* The key hint, a keycap; it steps aside once the input has focus. */
+.f-data-table .f-kbd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--space-5);
+  height: var(--space-5);
+  padding: 0 var(--space-1);
+  border: 1px var(--stroke-solid) var(--rule);
+  border-radius: var(--shape-sm);
+  color: var(--on-surface-muted);
+  font-size: var(--label-size);
+  line-height: 1;
+}
+
+.f-data-table-search:has(.f-autocomplete-input:focus) .f-kbd {
+  visibility: hidden;
+}
+
+@media (hover: none) {
+  .f-data-table .f-kbd {
+    display: none;
+  }
+}
+
+.f-data-table .f-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  height: var(--space-6);
+  padding: 0 var(--space-2);
+  border: none;
+  border-radius: var(--shape-sm);
+  background: var(--primary-container);
+  color: var(--on-primary-container);
+  font: var(--type-label);
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+.f-data-table .f-chip > svg {
+  width: var(--space-3);
+  height: var(--space-3);
+}
+
+.f-data-table .f-chip:hover {
+  background: color-mix(in oklab, var(--primary-container) 75%, transparent);
+}
+
+/*
+ * The panels sit side by side under the input, following it past the
+ * chips, each its own box: the path taken on the left, one chosen item
+ * per panel, and the options of the step being typed on the right. The
+ * row itself has no box, so a tall panel does not stretch the ones before
+ * it. Reka writes `flex-direction: column` inline on the content, hence
+ * the override.
+ */
+.f-data-table .f-autocomplete-content {
+  position: absolute;
+  top: calc(100% + var(--space-2));
+  left: calc(-1 * var(--space-2));
+  flex-direction: row !important;
+  align-items: flex-start;
+  z-index: 60;
+}
+
+/*
+ * The trail's panels are groups; the active panel is the viewport, which
+ * windows its rows. Those rows are positioned absolutely and so give the
+ * viewport no width of its own: it must be sized here.
+ */
+.f-data-table .f-autocomplete-content > .f-group,
+.f-data-table .f-autocomplete-viewport {
+  box-sizing: border-box;
+  flex: 0 0 auto;
+  min-width: 10rem;
+  padding: var(--space-2);
+  background: var(--surface-container);
+  border: 1px var(--stroke-solid) var(--rule);
+  border-radius: var(--shape-md);
+  box-shadow: var(--elevation-mid);
+}
+
+.f-data-table .f-autocomplete-content > * + * {
+  margin-left: -1px;
+}
+
+/*
+ * A long panel, the days say, scrolls within itself. The panel is the
+ * scroller's root; the element that scrolls is its viewport, so the
+ * height is capped there.
+ */
+.f-data-table .f-autocomplete-viewport {
+  width: 16rem;
+}
+
+.f-data-table .f-autocomplete-viewport .f-scroll-area-viewport {
+  max-height: 16rem;
+}
+
+.f-data-table .f-autocomplete-viewport .f-scroll-area-thumb {
+  background: var(--rule);
+  border-radius: var(--shape-full);
+}
+
+/* The scroller offers a way back to the top; a short panel has no use for it. */
+.f-data-table .f-autocomplete-viewport > .f-button {
+  display: none;
+}
+
+.f-data-table .f-autocomplete-content .f-button,
+.f-data-table .f-autocomplete-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  box-sizing: border-box;
+  width: 100%;
+  height: var(--space-6);
+  padding: 0 var(--space-3);
+  border: none;
+  border-radius: var(--shape-sm);
+  background: transparent;
+  color: var(--on-surface);
+  font: var(--type-label);
+  text-align: left;
+  cursor: pointer;
+  outline: none;
+}
+
+.f-data-table .f-autocomplete-content .f-button .f-span,
+.f-data-table .f-autocomplete-item .f-span {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.f-data-table .f-autocomplete-content .f-button > svg:last-child,
+.f-data-table .f-autocomplete-item > svg:last-child {
+  color: var(--on-surface-muted);
+}
+
+.f-data-table .f-autocomplete-content .f-button[aria-current],
+.f-data-table .f-autocomplete-item[data-highlighted] {
+  background: color-mix(in oklab, var(--primary-container) 40%, transparent);
+  color: var(--on-surface-high-contrast);
+}
+
+/* The controls: the Fabs of the toolbar and the pagination, outlined. */
+.f-data-table .f-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border: 1px var(--stroke-solid) var(--rule);
+  border-radius: var(--shape-sm);
+  background: transparent;
+  color: var(--on-surface);
+  font: var(--type-label);
+  cursor: pointer;
+  transition:
+    color var(--transition-fast),
+    border-color var(--transition-fast),
+    background var(--transition-fast);
+}
+
+.f-data-table .f-button:has(> svg:only-child) {
+  padding: var(--space-2);
+}
+
+.f-data-table .f-button:hover:not(:disabled) {
+  color: var(--on-surface-high-contrast);
+  border-color: color-mix(in oklab, var(--primary) 65%, transparent);
+  background: color-mix(in oklab, var(--primary-container) 30%, transparent);
+}
+
+.f-data-table .f-button:disabled {
+  color: var(--on-surface-muted);
+  cursor: default;
+}
+
+.f-data-table .f-button[aria-current="page"] {
+  background: var(--primary-container);
+  border-color: transparent;
+  color: var(--on-primary-container);
+}
+
+/*
+ * The table, a card: a border around it, the headings on a darker ground.
+ * The borders are kept apart so the card's corners can round; the cells
+ * draw the rules between rows themselves.
+ */
+.f-data-table .f-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  border: 1px var(--stroke-solid) var(--rule);
+  border-radius: var(--shape-md);
+  background: var(--surface);
+  font-size: var(--body-size);
+  transition: opacity var(--transition-fast);
+}
+
+.f-data-table-loading .f-table {
+  opacity: 0.6;
+}
+
+.f-data-table .f-th,
+.f-data-table .f-td {
+  padding: var(--space-3);
+  border-bottom: 1px var(--stroke-solid) var(--rule);
+  text-align: left;
+  vertical-align: middle;
+}
+
+.f-data-table .f-th {
+  background: var(--surface-container);
+  font: var(--type-label);
+  font-variant-caps: all-small-caps;
+  letter-spacing: calc(var(--type-label-letter-spacing) * 2);
+  color: var(--on-surface-muted);
+  white-space: nowrap;
+}
+
+.f-data-table .f-th:first-child {
+  border-top-left-radius: calc(var(--shape-md) - 1px);
+}
+
+.f-data-table .f-th:last-child {
+  border-top-right-radius: calc(var(--shape-md) - 1px);
+}
+
+.f-data-table .f-tbody .f-tr:last-child .f-td {
+  border-bottom: none;
+}
+
+.f-data-table .f-tbody .f-tr:last-child .f-td:first-child {
+  border-bottom-left-radius: calc(var(--shape-md) - 1px);
+}
+
+.f-data-table .f-tbody .f-tr:last-child .f-td:last-child {
+  border-bottom-right-radius: calc(var(--shape-md) - 1px);
+}
+
+/*
+ * A heading: its label, sortable as a button, and its drag handle after,
+ * shown as the pointer comes over the cell. Sorted, the label reads darker
+ * and carries the direction's icon.
+ */
+.f-data-table-header-wrap {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.f-data-table-header,
+.f-data-table .f-th .f-data-table-header-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--space-5);
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-variant-caps: inherit;
+  letter-spacing: inherit;
+}
+
+/* A heading's icon leads its label, a shade lighter than the text. */
+.f-data-table-header > svg:first-child,
+.f-data-table .f-th .f-data-table-header-btn > svg:first-child {
+  color: var(--on-surface-muted);
+}
+
+.f-data-table .f-th .f-data-table-header-btn:hover:not(:disabled) {
+  border-color: transparent;
+  background: transparent;
+  color: var(--on-surface-high-contrast);
+}
+
+.f-data-table .f-th.f-data-table-sorted {
+  color: var(--on-surface-high-contrast);
+}
+
+.f-data-table-drag-handle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: auto;
+  padding: var(--space-1);
+  border-radius: var(--shape-sm);
+  color: var(--on-surface-muted);
+  opacity: 0;
+  cursor: grab;
+  transition:
+    opacity var(--transition-fast),
+    background var(--transition-fast),
+    color var(--transition-fast);
+}
+
+.f-data-table .f-th:hover .f-data-table-drag-handle,
+.f-data-table .f-th:focus-within .f-data-table-drag-handle,
+.f-data-table-dragging .f-data-table-drag-handle {
+  opacity: 1;
+}
+
+.f-data-table-drag-handle:hover {
+  background: color-mix(in oklab, var(--primary-container) 40%, transparent);
+  color: var(--on-surface-high-contrast);
+}
+
+.f-data-table .f-th.f-data-table-dragging {
+  opacity: 0.5;
+  cursor: grabbing;
+}
+
+/* The drop side: a bar on the edge of the cell the column will land by. */
+.f-data-table .f-th.f-data-table-drop-left {
+  box-shadow: inset 2px 0 0 var(--primary);
+}
+
+.f-data-table .f-th.f-data-table-drop-right {
+  box-shadow: inset -2px 0 0 var(--primary);
+}
+
+.f-data-table .f-tbody .f-tr:hover .f-td {
+  background: color-mix(in oklab, var(--primary-container) 25%, transparent);
+}
+
+.f-data-table .f-tbody .f-tr.f-data-table-selected .f-td {
+  background: color-mix(in oklab, var(--primary-container) 40%, transparent);
+}
+
+.f-data-table .f-td .f-img {
+  max-height: var(--space-7);
+  border-radius: var(--shape-sm);
+}
+
+.f-data-table-empty .f-td {
+  padding: var(--space-6) var(--space-3);
+  color: var(--on-surface-muted);
+  text-align: center;
+}
+
+.f-data-table-select {
+  width: 1%;
+}
+
+.f-data-table-actions {
+  width: 1%;
+  text-align: right;
+}
+
+.f-data-table-bulk-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--on-surface-muted);
+  font-size: var(--label-size);
+}
+
+.f-data-table-bulk-actions-count {
+  margin-right: auto;
+}
+
+/* The pagination: the count on the left, the pages and the size on the right. */
+.f-data-table > .f-group:last-child {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  color: var(--on-surface-muted);
+  font-size: var(--label-size);
+}
+
+.f-data-table > .f-group:last-child .f-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.f-data-table .f-select-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border: 1px var(--stroke-solid) var(--rule);
+  border-radius: var(--shape-sm);
+  background: transparent;
+  color: var(--on-surface);
+  font: var(--type-label);
+  cursor: pointer;
+  transition: border-color var(--transition-fast);
+}
+
+/* The layer draws the `expand` icon after the display; it reads muted. */
+.f-data-table .f-select-trigger > svg {
+  color: var(--on-surface-muted);
+}
+
+.f-data-table .f-select-trigger:hover {
+  border-color: color-mix(in oklab, var(--primary) 65%, transparent);
+}
+
+/* Narrow, the card scrolls sideways rather than squeezing its columns. */
+@media (max-width: 44rem) {
+  .f-data-table .f-table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+  }
+}

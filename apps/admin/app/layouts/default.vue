@@ -31,6 +31,8 @@ useHead(() => ({ htmlAttrs: { lang: locale.value } }));
 }
 
 .admin-main {
+  width: min(100%, calc(var(--page-width) + 2 * var(--space-7)));
+  margin-inline: auto;
   padding: var(--space-7) var(--space-7) var(--space-9);
 }
 

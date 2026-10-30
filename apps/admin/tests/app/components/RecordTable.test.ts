@@ -49,6 +49,20 @@ describe("RecordTable", () => {
     ]);
   });
 
+  it("leads each heading with its column's icon", async () => {
+    const wrapper = await mountTable([STAFF]);
+    expect(
+      wrapper.findAll(".f-th svg use").map((use) => use.attributes("href")),
+    ).toEqual([
+      "#user",
+      "#briefcase",
+      "#badge",
+      "#mail",
+      "#phone",
+      "#calendar-clock",
+    ]);
+  });
+
   it("sorts by a heading when it is clicked, and marks the sorted one", async () => {
     const wrapper = await mountTable([STAFF]);
     const heading = wrapper

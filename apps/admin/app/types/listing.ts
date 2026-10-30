@@ -1,6 +1,11 @@
 import type { listing } from "@bbf/schema";
 import type { ListingQuery } from "@bbf/schema/types";
-import type { AppProsaryMessage, TableOptions, UseTable } from "#imports";
+import type {
+  AppProsaryMessage,
+  IconAlias,
+  TableOptions,
+  UseTable,
+} from "#imports";
 import type { z } from "zod";
 
 export type Listing<T> = z.infer<ReturnType<typeof listing<z.ZodType<T>>>>;
@@ -18,11 +23,17 @@ export type TableDescriptors<T> = Omit<
   "fetch" | "actions" | "bulkActions" | "initial"
 >;
 
+/**
+ * A column as the app configures it: its label as a message of the prose,
+ * and an icon the heading, the search's field option and the column
+ * manager's item all lead with.
+ */
 export type TableColumn<T> = Omit<
   TableDescriptors<T>["columns"][number],
   "label"
 > & {
   label: AppProsaryMessage;
+  icon?: IconAlias;
 };
 
 export type TableConfig<T> = Omit<TableDescriptors<T>, "columns"> & {
