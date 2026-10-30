@@ -50,12 +50,18 @@ export const withDays = <T>(
   ),
 });
 
+/**
+ * The config as the table takes it: each column named by the prose, the
+ * search's text option named by it too, and every table formatted in the
+ * church's time zone.
+ */
 export const toTableDescriptors = <T>(
   config: TableConfig<T>,
   name: (message: AppProsaryMessage) => string,
 ): TableDescriptors<T> => ({
   ...config,
   timeZone: TIME_ZONE,
+  textLabel: name("admin.editor.text"),
   columns: config.columns.map((column) => ({
     ...column,
     label: name(column.label),

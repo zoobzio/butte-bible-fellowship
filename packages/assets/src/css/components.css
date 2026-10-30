@@ -261,6 +261,13 @@
   margin-left: auto;
 }
 
+/* A disabled item fades and cannot be picked. */
+.f-listbox-item[data-disabled] {
+  opacity: 0.5;
+  cursor: default;
+  pointer-events: none;
+}
+
 .f-listbox-item[data-highlighted] {
   background: color-mix(in oklab, var(--primary-container) 40%, transparent);
   color: var(--on-surface-high-contrast);

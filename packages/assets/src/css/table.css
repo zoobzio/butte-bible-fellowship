@@ -339,6 +339,21 @@
   vertical-align: middle;
 }
 
+/*
+ * A cell keeps to one line, and what will not fit ends in an ellipsis.
+ * The `max-width: 0` keeps a cell's content out of its column's intrinsic
+ * width, so the columns share the card rather than stretch to the longest
+ * value; the select and actions columns, sized to their own controls, are
+ * left out. Narrow, where the card scrolls sideways instead, the cap is
+ * lifted so the columns size to their content again.
+ */
+.f-data-table .f-td:not(.f-data-table-select, .f-data-table-actions) {
+  max-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
 .f-data-table .f-th {
   background: var(--surface-container);
   font: var(--type-label);
@@ -540,5 +555,9 @@
     overflow-x: auto;
     white-space: nowrap;
     -webkit-overflow-scrolling: touch;
+  }
+
+  .f-data-table .f-td {
+    max-width: none;
   }
 }

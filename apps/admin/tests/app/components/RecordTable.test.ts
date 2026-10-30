@@ -108,6 +108,7 @@ describe("RecordTable", () => {
       expect(
         viewport.findAll(".f-autocomplete-item").map((item) => item.text()),
       ).toEqual([
+        "Search",
         "Role",
         "Status",
         "Email",
