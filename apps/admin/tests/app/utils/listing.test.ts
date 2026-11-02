@@ -60,7 +60,7 @@ describe("withDays", () => {
 });
 
 describe("toTableDescriptors", () => {
-  it("names each column and the search's text option, and formats every table in the church's time zone", () => {
+  it("names each column and the search's text literal, and formats every table in the church's time zone", () => {
     expect(
       toTableDescriptors<{ id: number; name: string }>(
         {
@@ -72,7 +72,9 @@ describe("toTableDescriptors", () => {
     ).toEqual({
       rowKey: "id",
       timeZone: TIME_ZONE,
-      textLabel: "named:admin.editor.text",
+      literals: {
+        text: { label: "named:admin.editor.text", open: '"', close: '"' },
+      },
       columns: [{ key: "name", label: "named:admin.member.name" }],
     });
   });

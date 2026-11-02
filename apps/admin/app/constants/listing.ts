@@ -20,3 +20,12 @@ export const DATE_DEFAULT_OPERATOR = "on";
 export const MATCH_OPERATORS = ["is", "not"] as const;
 
 export const MATCH_DEFAULT_OPERATOR = "is";
+
+/**
+ * The key of the text literal of a table's search, the one the table reads
+ * as the fetch's free text, and the quote the text is typed between: the
+ * query's own text literal, with the option named by the prose.
+ */
+export const TEXT_LITERAL_KEY = "text";
+
+export const TEXT_QUOTE = '"';

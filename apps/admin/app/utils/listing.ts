@@ -10,6 +10,7 @@ import type {
 } from "~/types/listing";
 
 import { TIME_ZONE } from "#layers/bbf/shared/constants/time";
+import { TEXT_LITERAL_KEY, TEXT_QUOTE } from "~/constants/listing";
 
 const DAY = 86_400_000;
 
@@ -52,8 +53,9 @@ export const withDays = <T>(
 
 /**
  * The config as the table takes it: each column named by the prose, the
- * search's text option named by it too, and every table formatted in the
- * church's time zone.
+ * search's text literal named by it too (the quoted free text the table
+ * reads as the fetch's query, under the `text` key it reads it from), and
+ * every table formatted in the church's time zone.
  */
 export const toTableDescriptors = <T>(
   config: TableConfig<T>,
@@ -61,7 +63,13 @@ export const toTableDescriptors = <T>(
 ): TableDescriptors<T> => ({
   ...config,
   timeZone: TIME_ZONE,
-  textLabel: name("admin.editor.text"),
+  literals: {
+    [TEXT_LITERAL_KEY]: {
+      label: name("admin.editor.text"),
+      open: TEXT_QUOTE,
+      close: TEXT_QUOTE,
+    },
+  },
   columns: config.columns.map((column) => ({
     ...column,
     label: name(column.label),

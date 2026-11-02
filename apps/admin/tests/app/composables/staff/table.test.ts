@@ -144,7 +144,7 @@ describe("useStaffTable", () => {
     vi.stubGlobal("$fetch", fetch);
     const { result } = withSetup(() => useStaffTable());
     result.table.goToPage(2);
-    result.table.query.add({ kind: "text", value: "jane" });
+    result.table.query.add({ kind: "literal", key: "text", value: "jane" });
     result.table.query.add({ kind: "filter", key: "role", value: "elder" });
     result.table.query.add({
       kind: "filter",
