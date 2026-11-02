@@ -129,7 +129,7 @@ describe("toListingQuery", () => {
     ).toEqual({ page: 1, size: 25, sort: "updatedAt", direction: "desc" });
   });
 
-  it("names an operator filter by its column and its operator", () => {
+  it("names an operator filter by its column and its operator, each word of it capitalised", () => {
     expect(
       toListingQuery({
         page: 1,
@@ -139,14 +139,18 @@ describe("toListingQuery", () => {
         query: "",
         filters: [
           { key: "updatedAt", op: "before", value: "2026-10-17" },
-          { key: "createdAt", op: "on", value: "2026-10-01" },
+          { key: "createdAt", op: "on or after", value: "2026-10-01" },
+          { key: "name", op: "not contains", value: "doe" },
+          { key: "email", op: "starts with", value: "jane" },
         ],
       }),
     ).toEqual({
       page: 1,
       size: 25,
       updatedAtBefore: "2026-10-17",
-      createdAtOn: "2026-10-01",
+      createdAtOnOrAfter: "2026-10-01",
+      nameNotContains: "doe",
+      emailStartsWith: "jane",
     });
   });
 });

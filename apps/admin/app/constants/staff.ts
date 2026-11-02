@@ -9,6 +9,8 @@ import {
   DATE_OPERATORS,
   MATCH_DEFAULT_OPERATOR,
   MATCH_OPERATORS,
+  TEXT_DEFAULT_OPERATOR,
+  TEXT_OPERATORS,
 } from "~/constants/listing";
 
 /** A filter on a column with a set of values: the value held, or one not. */
@@ -17,14 +19,29 @@ const matching = {
   defaultOperator: MATCH_DEFAULT_OPERATOR,
 };
 
-/** A filter on a day: before, after or on it. The days come at runtime. */
+/**
+ * A filter on a text column: the text held or not, carried or not, or
+ * started or ended with.
+ */
+const textual = {
+  operators: TEXT_OPERATORS,
+  defaultOperator: TEXT_DEFAULT_OPERATOR,
+};
+
+/**
+ * A filter on an optional text column: the text filters, and under is and
+ * not, whether the column is filled in, which the search offers.
+ */
+const optional = { ...textual, values: [...PRESENCES] };
+
+/**
+ * A filter on a day: before, after, on, on or after, or on or before it.
+ * The days come at runtime.
+ */
 const dated = {
   operators: DATE_OPERATORS,
   defaultOperator: DATE_DEFAULT_OPERATOR,
 };
-
-/** A filter on an optional column: whether it is filled in. */
-const filled = { values: [...PRESENCES] };
 
 /**
  * The staff as the admin lists them: every column of a member's record a
@@ -32,9 +49,10 @@ const filled = { values: [...PRESENCES] };
  * contact details are shown at first; the summary, the photo and the day
  * added wait in the column manager. A column the API sorts by is
  * sortable. The free text searches the name, the email, the phone, the
- * summary and the bio, so the name offers no filter of its own; each
- * optional column filters on whether it is filled in, the role and the
- * status on a value held or not, and the days on before, after or on.
+ * summary and the bio; beside it, each text column filters on the text it
+ * holds, carries, starts or ends with, an optional one on whether it is
+ * filled in too, the role and the status on a value held or not, and the
+ * days on before, after or on, or on or after or on or before.
  */
 export const STAFF_TABLE: TableConfig<StaffRecord> = {
   rowKey: "id",
@@ -46,8 +64,8 @@ export const STAFF_TABLE: TableConfig<StaffRecord> = {
       key: "name",
       label: "admin.member.name",
       icon: "user",
+      ...textual,
       sortable: true,
-      filterable: false,
     },
     {
       key: "role",
@@ -72,27 +90,27 @@ export const STAFF_TABLE: TableConfig<StaffRecord> = {
       label: "admin.member.email",
       icon: "mail",
       sortable: true,
-      ...filled,
+      ...optional,
     },
     {
       key: "phone",
       label: "admin.member.phone",
       icon: "phone",
       sortable: true,
-      ...filled,
+      ...optional,
     },
     {
       key: "summary",
       label: "admin.editor.summary",
       icon: "text",
-      ...filled,
+      ...optional,
     },
     {
       key: "photo",
       label: "admin.member.photo",
       icon: "image",
       type: "url",
-      ...filled,
+      ...optional,
     },
     {
       key: "updatedAt",

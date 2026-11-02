@@ -78,10 +78,16 @@ export const toTableDescriptors = <T>(
 
 /**
  * The query key of a committed filter: the column's key, and for an
- * operator filter the operator capitalised after it: `updatedAtBefore`.
+ * operator filter the operator after it, each of its words capitalised:
+ * `updatedAtBefore`, `nameStartsWith`.
  */
 const keyOf = ({ key, op }: TableFetchParams["filters"][number]): string =>
-  op === undefined ? key : `${key}${op.charAt(0).toUpperCase()}${op.slice(1)}`;
+  op === undefined
+    ? key
+    : `${key}${op
+        .split(" ")
+        .map((word) => `${word.charAt(0).toUpperCase()}${word.slice(1)}`)
+        .join("")}`;
 
 /**
  * What a table asks the API for: the page, the free text as `q`, one

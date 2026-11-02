@@ -44,7 +44,24 @@ const ROWS = [ROW, { ...ROW, id: 2, name: "John Roe" }];
 
 type Role = "pastor" | "elder" | "staff";
 type Status = "draft" | "published" | "archived";
-type Presence = "present" | "missing";
+
+const TEXT_COLUMNS = ["name", "email", "phone", "summary", "photo"] as const;
+const TEXT_OPERATORS = [
+  "is",
+  "not",
+  "contains",
+  "not_contains",
+  "starts_with",
+  "ends_with",
+] as const;
+const DAY_COLUMNS = ["updated", "created"] as const;
+const DAY_OPERATORS = [
+  "before",
+  "after",
+  "on",
+  "on_or_after",
+  "on_or_before",
+] as const;
 
 type Search = {
   q: string | null;
@@ -52,36 +69,35 @@ type Search = {
   role_not: Role | null;
   status_is: Status | null;
   status_not: Status | null;
-  email: Presence | null;
-  phone: Presence | null;
-  summary: Presence | null;
-  photo: Presence | null;
   tz: string;
-  updated_before: string | null;
-  updated_after: string | null;
-  updated_on: string | null;
-  created_before: string | null;
-  created_after: string | null;
-  created_on: string | null;
-};
+} & Record<
+  `${(typeof TEXT_COLUMNS)[number]}_${(typeof TEXT_OPERATORS)[number]}`,
+  string | null
+> &
+  Record<
+    `${(typeof DAY_COLUMNS)[number]}_${(typeof DAY_OPERATORS)[number]}`,
+    string | null
+  >;
 
+/* Every part of the search left out: null, but for the time zone. */
 const NONE: Search = {
   q: null,
   role_is: null,
   role_not: null,
   status_is: null,
   status_not: null,
-  email: null,
-  phone: null,
-  summary: null,
-  photo: null,
   tz: "America/Los_Angeles",
-  updated_before: null,
-  updated_after: null,
-  updated_on: null,
-  created_before: null,
-  created_after: null,
-  created_on: null,
+  ...(Object.fromEntries([
+    ...TEXT_COLUMNS.flatMap((column) =>
+      TEXT_OPERATORS.map((operator) => [`${column}_${operator}`, null]),
+    ),
+    ...DAY_COLUMNS.flatMap((column) =>
+      DAY_OPERATORS.map((operator) => [`${column}_${operator}`, null]),
+    ),
+  ]) as Omit<
+    Search,
+    "q" | "role_is" | "role_not" | "status_is" | "status_not" | "tz"
+  >),
 };
 
 type Order = { sort: string | null; direction: string };
@@ -95,8 +111,8 @@ const matches = (search: Search) => (row: (typeof ROWS)[number]) =>
   (search.role_not === null || row.role !== search.role_not) &&
   (search.status_is === null || row.status === search.status_is) &&
   (search.status_not === null || row.status !== search.status_not) &&
-  (search.email === null ||
-    (row.email !== null) === (search.email === "present"));
+  (search.email_is === null ||
+    (row.email !== null) === (search.email_is === "present"));
 
 /* A page of the search, each row carrying how many the search holds. */
 const list = vi.fn(
@@ -237,25 +253,52 @@ describe("useStaff", () => {
     });
   });
 
-  it("hands the database whether each optional column is to be present or missing", async () => {
+  it("hands the database what each text column is or is not, present or missing among them", async () => {
     expect(
-      await useStaff().list({ page: 1, size: 25, email: "missing" }),
+      await useStaff().list({ page: 1, size: 25, emailIs: "missing" }),
     ).toEqual({ items: [], total: 0 });
     await useStaff().list({
       page: 1,
       size: 25,
-      email: "present",
-      phone: "missing",
-      summary: "present",
-      photo: "missing",
+      nameIs: "Jane Doe",
+      nameNot: "John Roe",
+      emailIs: "present",
+      phoneNot: "missing",
+      summaryIs: "present",
+      photoNot: "https://cdn.example.com/x.jpg",
     });
     expect(list).toHaveBeenLastCalledWith({
       ...NONE,
       ...ORDER,
-      email: "present",
-      phone: "missing",
-      summary: "present",
-      photo: "missing",
+      name_is: "Jane Doe",
+      name_not: "John Roe",
+      email_is: "present",
+      phone_not: "missing",
+      summary_is: "present",
+      photo_not: "https://cdn.example.com/x.jpg",
+      size: 25,
+      offset: 0,
+    });
+  });
+
+  it("hands the database the text each text column carries, does not, starts or ends with", async () => {
+    await useStaff().list({
+      page: 1,
+      size: 25,
+      nameContains: "jane",
+      emailNotContains: "example.com",
+      phoneStartsWith: "530",
+      summaryEndsWith: "2010.",
+      photoContains: "cdn",
+    });
+    expect(list).toHaveBeenLastCalledWith({
+      ...NONE,
+      ...ORDER,
+      name_contains: "jane",
+      email_not_contains: "example.com",
+      phone_starts_with: "530",
+      summary_ends_with: "2010.",
+      photo_contains: "cdn",
       size: 25,
       offset: 0,
     });
@@ -268,9 +311,13 @@ describe("useStaff", () => {
       updatedAtBefore: "2026-10-17",
       updatedAtAfter: "2026-10-01",
       updatedAtOn: "2026-10-10",
+      updatedAtOnOrAfter: "2026-10-02",
+      updatedAtOnOrBefore: "2026-10-16",
       createdAtBefore: "2026-09-17",
       createdAtAfter: "2026-09-01",
       createdAtOn: "2026-09-10",
+      createdAtOnOrAfter: "2026-09-02",
+      createdAtOnOrBefore: "2026-09-16",
     });
     expect(list).toHaveBeenLastCalledWith({
       ...NONE,
@@ -280,9 +327,13 @@ describe("useStaff", () => {
       updated_before: "2026-10-17",
       updated_after: "2026-10-01",
       updated_on: "2026-10-10",
+      updated_on_or_after: "2026-10-02",
+      updated_on_or_before: "2026-10-16",
       created_before: "2026-09-17",
       created_after: "2026-09-01",
       created_on: "2026-09-10",
+      created_on_or_after: "2026-09-02",
+      created_on_or_before: "2026-09-16",
     });
   });
 

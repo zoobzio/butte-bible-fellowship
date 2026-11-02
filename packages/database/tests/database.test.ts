@@ -30,13 +30,14 @@ beforeAll(async () => {
 afterAll(() => db.close());
 
 describe("the build", () => {
-  it("carries the staff, events, sermons, users and staff search migrations in order", () => {
+  it("carries the staff, events, sermons, users, staff search and like escape migrations in order", () => {
     expect(migrations.map((migration) => migration.name)).toEqual([
       "staff",
       "events",
       "sermons",
       "users",
       "staff_search",
+      "like_escape",
     ]);
   });
 
@@ -286,21 +287,97 @@ describe("admin.staff", () => {
     expect(await db.admin.staff.list({ ...page, q: "Deacon" })).toEqual([]);
     expect(await db.admin.staff.list({ ...page, q: "Bob" })).toEqual([]);
 
-    // An optional column present or missing, an empty one counted as missing.
+    // A text column held or not, whatever the case: the value, or whether
+    // the column is filled in, an empty one counted as missing.
     expect(
-      (await db.admin.staff.list({ ...page, photo: "present" })).map(
+      (await db.admin.staff.list({ ...page, photo_is: "present" })).map(
         (r) => r.name,
       ),
     ).toEqual(["Pastor Name"]);
     expect(
-      await db.admin.staff.list({ ...page, email: "missing" }),
+      (await db.admin.staff.list({ ...page, photo_not: "missing" })).map(
+        (r) => r.name,
+      ),
+    ).toEqual(["Pastor Name"]);
+    expect(
+      await db.admin.staff.list({ ...page, email_is: "missing" }),
     ).toHaveLength(3);
     expect(
-      await db.admin.staff.list({ ...page, summary: "missing" }),
+      await db.admin.staff.list({ ...page, email_not: "present" }),
+    ).toHaveLength(3);
+    expect(
+      await db.admin.staff.list({ ...page, summary_is: "missing" }),
     ).toHaveLength(1);
-    expect(await db.admin.staff.list({ ...page, phone: "present" })).toEqual(
+    expect(await db.admin.staff.list({ ...page, phone_is: "present" })).toEqual(
       [],
     );
+    expect(
+      (await db.admin.staff.list({ ...page, name_is: "PASTOR NAME" })).map(
+        (r) => r.name,
+      ),
+    ).toEqual(["Pastor Name"]);
+    expect(
+      (await db.admin.staff.list({ ...page, name_is: "Pastor" })).map(
+        (r) => r.name,
+      ),
+    ).toEqual([]);
+    expect(
+      (await db.admin.staff.list({ ...page, name_not: "elder name" })).map(
+        (r) => r.name,
+      ),
+    ).toEqual(["Pastor Name"]);
+    // A column left empty is not what it does not hold.
+    expect(
+      await db.admin.staff.list({ ...page, email_not: "pastor@example.com" }),
+    ).toHaveLength(3);
+    // The text a column carries, or does not, or starts or ends with, as
+    // typed: a wildcard of LIKE is the character itself.
+    expect(
+      (await db.admin.staff.list({ ...page, name_contains: "STOR" })).map(
+        (r) => r.name,
+      ),
+    ).toEqual(["Pastor Name"]);
+    expect(await db.admin.staff.list({ ...page, email_contains: "%" })).toEqual(
+      [],
+    );
+    expect(await db.admin.staff.list({ ...page, name_contains: "_" })).toEqual(
+      [],
+    );
+    expect(
+      (await db.admin.staff.list({ ...page, name_not_contains: "Past" })).map(
+        (r) => r.name,
+      ),
+    ).toEqual(["Elder Name", "Elder Name", "Elder Name"]);
+    expect(
+      await db.admin.staff.list({ ...page, email_not_contains: "example" }),
+    ).toHaveLength(3);
+    expect(
+      (await db.admin.staff.list({ ...page, name_starts_with: "pa" })).map(
+        (r) => r.name,
+      ),
+    ).toEqual(["Pastor Name"]);
+    expect(
+      await db.admin.staff.list({ ...page, name_starts_with: "ame" }),
+    ).toEqual([]);
+    expect(
+      await db.admin.staff.list({ ...page, name_ends_with: "ame" }),
+    ).toHaveLength(4);
+    expect(
+      (await db.admin.staff.list({ ...page, photo_ends_with: ".JPG" })).map(
+        (r) => r.name,
+      ),
+    ).toEqual(["Pastor Name"]);
+    expect(
+      await db.admin.staff.list({ ...page, summary_contains: "elder" }),
+    ).toHaveLength(3);
+    expect(
+      await db.admin.staff.list({
+        ...page,
+        summary_starts_with: "A few",
+        summary_ends_with: "fellowship.",
+        name_is: "elder name",
+      }),
+    ).toHaveLength(3);
     await db.admin.staff.update({
       id,
       ...member,
@@ -308,12 +385,15 @@ describe("admin.staff", () => {
       bio: null,
       phone: "",
     });
-    expect(await db.admin.staff.list({ ...page, phone: "present" })).toEqual(
+    expect(await db.admin.staff.list({ ...page, phone_is: "present" })).toEqual(
       [],
     );
     expect(
-      await db.admin.staff.list({ ...page, phone: "missing" }),
+      await db.admin.staff.list({ ...page, phone_is: "missing" }),
     ).toHaveLength(4);
+    expect(
+      await db.admin.staff.list({ ...page, phone_not: "missing" }),
+    ).toEqual([]);
     // A page is `size` rows from `offset`, each carrying the whole count.
     expect(
       (await db.admin.staff.list({ ...page, size: 2, offset: 2 })).map(
@@ -335,6 +415,26 @@ describe("admin.staff", () => {
     ).toEqual([]);
     expect(
       await db.admin.staff.list({ ...page, created_before: today }),
+    ).toEqual([]);
+    expect(
+      await db.admin.staff.list({ ...page, created_on_or_after: today }),
+    ).toHaveLength(4);
+    expect(
+      await db.admin.staff.list({ ...page, updated_on_or_before: today }),
+    ).toHaveLength(4);
+    expect(
+      await db.admin.staff.list({
+        ...page,
+        created_on_or_after: today,
+        created_on_or_before: today,
+      }),
+    ).toHaveLength(4);
+    expect(
+      await db.admin.staff.list({
+        ...page,
+        updated_on_or_after: "2000-01-01",
+        updated_on_or_before: "2000-12-31",
+      }),
     ).toEqual([]);
 
     // The sort asked for, a null last either way, then the site's order.

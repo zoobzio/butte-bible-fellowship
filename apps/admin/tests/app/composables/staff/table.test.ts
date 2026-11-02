@@ -35,6 +35,7 @@ describe("useStaffTable", () => {
       "updatedAt",
     ]);
     expect(table.filterableColumns.map((column) => column.key)).toEqual([
+      "name",
       "role",
       "status",
       "email",
@@ -61,7 +62,7 @@ describe("useStaffTable", () => {
     expect(link(STAFF)).toBe("/staff/1");
   });
 
-  it("offers a month of days to each date filter, today first, and completes the one typed", () => {
+  it("offers a month of days to each date filter, today first, and completes the one typed, each way of a span its own filter", () => {
     vi.stubGlobal(
       "$fetch",
       vi.fn(async () => ({ items: [], total: 0 })),
@@ -92,9 +93,30 @@ describe("useStaffTable", () => {
       op: "before",
       value: "2019-05-04",
     });
+    expect(query.fields.updatedAt?.operators).toEqual([
+      "before",
+      "after",
+      "on",
+      "on or after",
+      "on or before",
+    ]);
+    // A span is a filter each way, both held: the longer operator is read
+    // whole, not as on with a value of its own.
+    query.setDraft("Updated: on or after 2026-10-01");
+    expect(query.stage).toBe("value");
+    query.submit();
+    query.setDraft("Updated: on or before 2026-10-31");
+    query.submit();
+    expect(query.filters).toEqual(
+      expect.arrayContaining([
+        { key: "updatedAt", op: "on", value: today },
+        { key: "updatedAt", op: "on or after", value: "2026-10-01" },
+        { key: "updatedAt", op: "on or before", value: "2026-10-31" },
+      ]),
+    );
   });
 
-  it("offers the role and the status held or not, a bare value the one held, and each optional column present or missing", () => {
+  it("offers the role and the status held or not, a bare value the one held", () => {
     vi.stubGlobal(
       "$fetch",
       vi.fn(async () => ({ items: [], total: 0 })),
@@ -114,16 +136,59 @@ describe("useStaffTable", () => {
       { key: "status", op: "not", value: "archived" },
       { key: "role", op: "is", value: "elder" },
     ]);
+  });
+
+  it("offers each text column the text it holds, carries, starts or ends with, a bare value the one carried, and an optional one present or missing", () => {
+    vi.stubGlobal(
+      "$fetch",
+      vi.fn(async () => ({ items: [], total: 0 })),
+    );
+    const { result } = withSetup(() => useStaffTable());
+    const { query } = result.table;
+    for (const key of ["name", "email", "phone", "summary", "photo"]) {
+      expect(query.fields[key]?.operators).toEqual([
+        "contains",
+        "not contains",
+        "starts with",
+        "ends with",
+        "is",
+        "not",
+      ]);
+    }
+    // The name is never empty, so it offers no presence; the rest do.
+    expect(query.fields.name?.values).toBeUndefined();
     for (const key of ["email", "phone", "summary", "photo"]) {
-      expect(query.fields[key]?.operators).toBeUndefined();
       expect(query.fields[key]?.values).toEqual(["present", "missing"]);
     }
-    const photo = query.fields.photo!.label;
-    query.setDraft(`${photo}: mis`);
-    expect(query.hint).toBe("sing");
-    query.setDraft(`${photo}: missing`);
+    query.setDraft("Name: jane");
+    expect(query.stage).toBe("op");
     query.submit();
-    expect(query.filters).toContainEqual({ key: "photo", value: "missing" });
+    expect(query.filters).toEqual([
+      { key: "name", op: "contains", value: "jane" },
+    ]);
+    // A longer operator is read whole, not as the shorter it starts with.
+    query.setDraft("Name: not contains doe");
+    expect(query.stage).toBe("value");
+    query.submit();
+    query.setDraft("Name: starts with J");
+    query.submit();
+    query.setDraft("Email: ends with @example.com");
+    query.submit();
+    query.setDraft("Phone: not 530-555-0100");
+    query.submit();
+    const photo = query.fields.photo!.label;
+    query.setDraft(`${photo}: is mis`);
+    expect(query.hint).toBe("sing");
+    query.setDraft(`${photo}: is missing`);
+    query.submit();
+    expect(query.filters).toEqual([
+      { key: "name", op: "contains", value: "jane" },
+      { key: "name", op: "not contains", value: "doe" },
+      { key: "name", op: "starts with", value: "J" },
+      { key: "email", op: "ends with", value: "@example.com" },
+      { key: "phone", op: "not", value: "530-555-0100" },
+      { key: "photo", op: "is", value: "missing" },
+    ]);
   });
 
   it("fetches a page of the staff from the admin's API", async () => {
@@ -152,12 +217,30 @@ describe("useStaffTable", () => {
       op: "not",
       value: "archived",
     });
-    result.table.query.add({ kind: "filter", key: "photo", value: "missing" });
+    result.table.query.add({
+      kind: "filter",
+      key: "photo",
+      op: "is",
+      value: "missing",
+    });
+    result.table.query.add({
+      kind: "filter",
+      key: "name",
+      op: "starts with",
+      value: "J",
+    });
+    result.table.query.add({ kind: "filter", key: "email", value: "example" });
     result.table.query.add({
       kind: "filter",
       key: "updatedAt",
       op: "after",
       value: "2026-10-01",
+    });
+    result.table.query.add({
+      kind: "filter",
+      key: "createdAt",
+      op: "on or before",
+      value: "2026-10-31",
     });
     await flushPromises();
     expect(fetch).toHaveBeenLastCalledWith("/api/staff", {
@@ -167,8 +250,11 @@ describe("useStaffTable", () => {
         q: "jane",
         roleIs: "elder",
         statusNot: "archived",
-        photo: "missing",
+        photoIs: "missing",
+        nameStartsWith: "J",
+        emailContains: "example",
         updatedAtAfter: "2026-10-01",
+        createdAtOnOrBefore: "2026-10-31",
       },
     });
   });

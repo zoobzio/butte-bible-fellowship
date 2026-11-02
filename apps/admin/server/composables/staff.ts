@@ -10,6 +10,63 @@ import { toStaffArguments, toStaffRecord } from "@bbf/utils";
 import { TIME_ZONE } from "#layers/bbf/shared/constants/time";
 import { useDatabase } from "#layers/bbf/server/composables/database";
 
+const TEXT_COLUMNS = ["name", "email", "phone", "summary", "photo"] as const;
+
+const TEXT_OPERATORS = {
+  is: "Is",
+  not: "Not",
+  contains: "Contains",
+  not_contains: "NotContains",
+  starts_with: "StartsWith",
+  ends_with: "EndsWith",
+} as const;
+
+const DAY_COLUMNS = { updated: "updatedAt", created: "createdAt" } as const;
+
+const DAY_OPERATORS = {
+  before: "Before",
+  after: "After",
+  on: "On",
+  on_or_after: "OnOrAfter",
+  on_or_before: "OnOrBefore",
+} as const;
+
+type TextColumn = (typeof TEXT_COLUMNS)[number];
+type TextOperator = keyof typeof TEXT_OPERATORS;
+type DayColumn = keyof typeof DAY_COLUMNS;
+type DayOperator = keyof typeof DAY_OPERATORS;
+
+type TextSearch = Record<`${TextColumn}_${TextOperator}`, string | null>;
+type DaySearch = Record<`${DayColumn}_${DayOperator}`, string | null>;
+
+/**
+ * The filters on each text column as the query takes them, `name_contains`
+ * from `nameContains` and the like: null for each left out.
+ */
+const toTextSearch = (query: StaffQuery): TextSearch =>
+  Object.fromEntries(
+    TEXT_COLUMNS.flatMap((column) =>
+      Object.entries(TEXT_OPERATORS).map(([operator, suffix]) => [
+        `${column}_${operator}`,
+        query[`${column}${suffix}`] ?? null,
+      ]),
+    ),
+  ) as TextSearch;
+
+/**
+ * The filters on each day column as the query takes them, `updated_before`
+ * from `updatedAtBefore` and the like: null for each left out.
+ */
+const toDaySearch = (query: StaffQuery): DaySearch =>
+  Object.fromEntries(
+    Object.entries(DAY_COLUMNS).flatMap(([column, key]) =>
+      Object.entries(DAY_OPERATORS).map(([operator, suffix]) => [
+        `${column}_${operator}`,
+        query[`${key}${suffix}`] ?? null,
+      ]),
+    ),
+  ) as DaySearch;
+
 /**
  * The search as the queries take it: null for each part left out, and the
  * church's time zone, which decides what day a member was changed on.
@@ -20,17 +77,9 @@ const toSearch = (query: StaffQuery) => ({
   role_not: query.roleNot ?? null,
   status_is: query.statusIs ?? null,
   status_not: query.statusNot ?? null,
-  email: query.email ?? null,
-  phone: query.phone ?? null,
-  summary: query.summary ?? null,
-  photo: query.photo ?? null,
+  ...toTextSearch(query),
   tz: TIME_ZONE,
-  updated_before: query.updatedAtBefore ?? null,
-  updated_after: query.updatedAtAfter ?? null,
-  updated_on: query.updatedAtOn ?? null,
-  created_before: query.createdAtBefore ?? null,
-  created_after: query.createdAtAfter ?? null,
-  created_on: query.createdAtOn ?? null,
+  ...toDaySearch(query),
 });
 
 /**

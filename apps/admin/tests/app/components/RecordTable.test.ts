@@ -109,6 +109,7 @@ describe("RecordTable", () => {
         viewport.findAll(".f-autocomplete-item").map((item) => item.text()),
       ).toEqual([
         "Search",
+        "Name",
         "Role",
         "Status",
         "Email",

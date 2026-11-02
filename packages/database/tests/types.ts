@@ -93,6 +93,18 @@ export type Checks = [
       string | null | undefined
     >
   >,
+  Assert<
+    Equal<
+      Arguments<Contract, "admin.staff.list">["name_contains"],
+      string | null | undefined
+    >
+  >,
+  Assert<
+    Equal<
+      Arguments<Contract, "admin.staff.list">["updated_on_or_after"],
+      string | null | undefined
+    >
+  >,
 ];
 
 // @ts-expect-error Day must be an enum label.

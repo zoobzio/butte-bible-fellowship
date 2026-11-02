@@ -2,7 +2,7 @@ import { z } from "zod";
 
 import { hast } from "../models/hast";
 import { contentStatus, staffRole } from "../models/staff";
-import { listingQuery, presence, sorting } from "./listing";
+import { listingQuery, sorting } from "./listing";
 
 export const staffId = z.object({
   id: z.coerce
@@ -39,10 +39,62 @@ export const staffSort = z.enum(STAFF_SORT_KEYS).meta({
   examples: ["name"],
 });
 
-const has = (what: string) =>
-  presence.optional().meta({
-    description: `Whether the members listed have ${what}. Left out, either way.`,
-  });
+const text = (what: string) =>
+  z
+    .string()
+    .min(1)
+    .optional()
+    .meta({
+      description: `${what}, as typed, without regard to case. Left out, any.`,
+    });
+
+/**
+ * The filters on a text column: the value it holds or not, whatever the
+ * case, or `present` or `missing` for whether it is filled in; and the
+ * text it carries, does not carry, starts with or ends with, as typed.
+ */
+const textColumn = <K extends string>(key: K, what: string) =>
+  ({
+    [`${key}Is`]: z
+      .string()
+      .min(1)
+      .optional()
+      .meta({
+        description: `The ${what} the members listed hold, without regard to case, or present or missing for whether they have one. Left out, any.`,
+        examples: ["missing"],
+      }),
+    [`${key}Not`]: z
+      .string()
+      .min(1)
+      .optional()
+      .meta({
+        description: `A ${what} the members listed do not hold, without regard to case, or present or missing for whether they lack one. Left out, none.`,
+        examples: ["present"],
+      }),
+    [`${key}Contains`]: text(`Text the ${what} must carry`),
+    [`${key}NotContains`]: text(`Text the ${what} must not carry`),
+    [`${key}StartsWith`]: text(`Text the ${what} must start with`),
+    [`${key}EndsWith`]: text(`Text the ${what} must end with`),
+  }) as Record<
+    `${K}${"Is" | "Not" | "Contains" | "NotContains" | "StartsWith" | "EndsWith"}`,
+    ReturnType<typeof text>
+  >;
+
+/**
+ * The filters on a day column: the day before, after, on, on or after, or
+ * on or before which the members listed were changed or added.
+ */
+const dayColumn = <K extends string>(key: K, what: string) =>
+  ({
+    [`${key}Before`]: day(`${what} before`),
+    [`${key}After`]: day(`${what} after`),
+    [`${key}On`]: day(`${what} on`),
+    [`${key}OnOrAfter`]: day(`${what} on or after`),
+    [`${key}OnOrBefore`]: day(`${what} on or before`),
+  }) as Record<
+    `${K}${"Before" | "After" | "On" | "OnOrAfter" | "OnOrBefore"}`,
+    ReturnType<typeof day>
+  >;
 
 export const staffQuery = listingQuery.extend({
   ...sorting(staffSort),
@@ -59,16 +111,13 @@ export const staffQuery = listingQuery.extend({
   statusNot: contentStatus.optional().meta({
     description: "A status the members listed are not in. Left out, none.",
   }),
-  email: has("an email"),
-  phone: has("a phone"),
-  summary: has("a summary"),
-  photo: has("a photo"),
-  updatedAtBefore: day("The day the members listed were last changed before"),
-  updatedAtAfter: day("The day the members listed were last changed after"),
-  updatedAtOn: day("The day the members listed were last changed on"),
-  createdAtBefore: day("The day the members listed were added before"),
-  createdAtAfter: day("The day the members listed were added after"),
-  createdAtOn: day("The day the members listed were added on"),
+  ...textColumn("name", "name"),
+  ...textColumn("email", "email"),
+  ...textColumn("phone", "phone"),
+  ...textColumn("summary", "summary"),
+  ...textColumn("photo", "photo's URL"),
+  ...dayColumn("updatedAt", "The day the members listed were last changed"),
+  ...dayColumn("createdAt", "The day the members listed were added"),
 });
 
 export const staffBody = z

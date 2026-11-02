@@ -28,7 +28,7 @@ would not have offered.
 
 ```
 bezoar.config.ts   the kit config: the output directory, the defaults for the rest
-src/migrations/    the schema, forward only: staff, events, sermons, users, staff search
+src/migrations/    the schema, forward only: staff, events, sermons, users, staff search, like escape
 src/seeds/         the staff and events the content lists, and the first admin user, each safe to run again
 src/queries/web/   what the site reads: staff, events, sermons
 src/queries/admin/ what the admin app will read and write: the same, in full
@@ -78,11 +78,18 @@ nothing, for the swapped or dropped letter a trigram misses in a short
 word, by each word typed coming within an edit or two of a word of the
 text (`fuzzystrmatch`), which reads every row and so runs only then; a role held,
 `role_is`, or not held, `role_not`, and a status the same, `status_is` and
-`status_not`; whether the `email`, `phone`, `summary` or `photo` is filled
-in, `present` or `missing`, an empty one counted as missing; and a day each
-member was last changed or added `before`, `after` or `on`, as
-`updated_before` and the like. Left out or null, a part narrows nothing. The days are read in `tz`,
-the church's IANA time zone, which every search passes. `admin.events` and `admin.sermons` have `list`, `fetch`,
+`status_not`; on each text column, the `name`, `email`, `phone`, `summary`
+and `photo`, the text it holds or does not, whatever its case, `name_is`
+and `name_not`, which take `present` or `missing` too, for whether the
+column is filled in, an empty one counted as missing, and the text it
+carries, does not carry, starts with or ends with, as typed,
+`name_contains`, `name_not_contains`, `name_starts_with` and
+`name_ends_with`, a `%` or `_` the character as in the search, by
+`like_escape`, and a column left empty not what it does not carry; and a
+day each member was last changed or added `before`, `after`, `on`,
+`on_or_after` or `on_or_before`, as `updated_before` and the like. Left
+out or null, a part narrows nothing. The days are read in `tz`, the
+church's IANA time zone, which every search passes. `admin.events` and `admin.sermons` have `list`, `fetch`,
 `create`, `update` and `delete`, by `id`.
 
 `admin.users` has the same, and two more for signing in. A user is added

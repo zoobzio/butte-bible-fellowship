@@ -26,17 +26,12 @@ export const sorting = <T extends z.ZodType<string>>(field: T) => ({
   }),
 });
 
-export const PRESENCES = ["present", "missing"] as const;
-
 /**
- * Whether an optional column of a record is filled in: a listing narrows
- * to the records that have it, or to the ones that lack it.
+ * The words a text column's `is` and `not` filters take for whether the
+ * column is filled in, beside any text it holds: a listing narrows to the
+ * records that have it, or to the ones that lack it.
  */
-export const presence = z.enum(PRESENCES).meta({
-  description:
-    "Whether the column is filled in: present narrows to the items that have it, missing to the ones that lack it.",
-  examples: ["missing"],
-});
+export const PRESENCES = ["present", "missing"] as const;
 
 export const listingQuery = z.object({
   page: z.coerce

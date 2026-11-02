@@ -62,22 +62,49 @@ describe("staffQuery", () => {
     expect(staffQuery.parse({ role: "elder" })).toEqual({ page: 1, size: 25 });
   });
 
-  it("takes whether each optional column is present or missing", () => {
+  it("takes what each text column is or is not, present or missing among them", () => {
     expect(
       staffQuery.parse({
-        email: "present",
-        phone: "missing",
-        summary: "present",
-        photo: "missing",
+        nameIs: "Jane Doe",
+        emailIs: "present",
+        phoneNot: "missing",
+        summaryIs: "present",
+        photoNot: "https://cdn.example.com/x.jpg",
       }),
     ).toMatchObject({
-      email: "present",
-      phone: "missing",
-      summary: "present",
-      photo: "missing",
+      nameIs: "Jane Doe",
+      emailIs: "present",
+      phoneNot: "missing",
+      summaryIs: "present",
+      photoNot: "https://cdn.example.com/x.jpg",
     });
-    expect(staffQuery.safeParse({ photo: "yes" }).success).toBe(false);
-    expect(staffQuery.safeParse({ email: "" }).success).toBe(false);
+    expect(staffQuery.safeParse({ emailIs: "" }).success).toBe(false);
+    expect(staffQuery.safeParse({ nameNot: "" }).success).toBe(false);
+    // The bare presence of before is gone: a column names its operator.
+    expect(staffQuery.parse({ photo: "missing" })).toEqual({
+      page: 1,
+      size: 25,
+    });
+  });
+
+  it("takes the text each text column carries, does not, starts or ends with", () => {
+    expect(
+      staffQuery.parse({
+        nameContains: "jane",
+        emailNotContains: "example.com",
+        phoneStartsWith: "530",
+        summaryEndsWith: "2010.",
+        photoContains: "cdn",
+      }),
+    ).toMatchObject({
+      nameContains: "jane",
+      emailNotContains: "example.com",
+      phoneStartsWith: "530",
+      summaryEndsWith: "2010.",
+      photoContains: "cdn",
+    });
+    expect(staffQuery.safeParse({ nameContains: "" }).success).toBe(false);
+    expect(staffQuery.safeParse({ nameStartsWith: "" }).success).toBe(false);
   });
 
   it("sorts by a column of the record, either way", () => {
@@ -100,20 +127,29 @@ describe("staffQuery", () => {
     expect(staffQuery.safeParse({ sort: "id" }).success).toBe(false);
   });
 
-  it("takes a day each member was changed or added before, after or on, as YYYY-MM-DD", () => {
+  it("takes a day each member was changed or added before, after, on, on or after or on or before, as YYYY-MM-DD", () => {
     expect(
       staffQuery.parse({
         updatedAtBefore: "2026-10-17",
         updatedAtAfter: "2026-10-01",
         updatedAtOn: "2026-10-10",
+        updatedAtOnOrAfter: "2026-10-02",
+        updatedAtOnOrBefore: "2026-10-16",
         createdAtBefore: "2026-09-17",
         createdAtAfter: "2026-09-01",
         createdAtOn: "2026-09-10",
+        createdAtOnOrAfter: "2026-09-02",
+        createdAtOnOrBefore: "2026-09-16",
       }),
     ).toMatchObject({
       updatedAtBefore: "2026-10-17",
+      updatedAtOnOrAfter: "2026-10-02",
       createdAtOn: "2026-09-10",
+      createdAtOnOrBefore: "2026-09-16",
     });
+    expect(
+      staffQuery.safeParse({ updatedAtOnOrAfter: "2026-10" }).success,
+    ).toBe(false);
     expect(staffQuery.safeParse({ updatedAtOn: "yesterday" }).success).toBe(
       false,
     );
