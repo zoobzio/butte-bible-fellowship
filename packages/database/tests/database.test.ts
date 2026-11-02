@@ -1,4 +1,6 @@
 import { makeTestBezoar } from "@bezoar/testing";
+import { fuzzystrmatch } from "@electric-sql/pglite/contrib/fuzzystrmatch";
+import { pg_trgm } from "@electric-sql/pglite/contrib/pg_trgm";
 import { ForbiddenQueryError } from "bezoar";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
@@ -17,18 +19,24 @@ const refusal = (call: Promise<unknown>): Promise<string> =>
   );
 
 beforeAll(async () => {
-  db = await makeTestBezoar(contract, { queries, migrations, seeds });
+  db = await makeTestBezoar(contract, {
+    queries,
+    migrations,
+    seeds,
+    database: { extensions: { fuzzystrmatch, pg_trgm } },
+  });
 });
 
 afterAll(() => db.close());
 
 describe("the build", () => {
-  it("carries the staff, events, sermons and users migrations in order", () => {
+  it("carries the staff, events, sermons, users and staff search migrations in order", () => {
     expect(migrations.map((migration) => migration.name)).toEqual([
       "staff",
       "events",
       "sermons",
       "users",
+      "staff_search",
     ]);
   });
 
@@ -237,7 +245,8 @@ describe("admin.staff", () => {
       ).map((r) => r.total),
     ).toEqual([3, 3, 3]);
 
-    // The text is looked for in the email, the phone and the summary too.
+    // The text is looked for in the email, the phone, the summary and the
+    // bio too.
     expect(
       (await db.admin.staff.list({ ...page, q: "@EXAMPLE" })).map(
         (r) => r.name,
@@ -246,6 +255,36 @@ describe("admin.staff", () => {
     expect(await db.admin.staff.list({ ...page, q: "how long" })).toHaveLength(
       3,
     );
+    expect(await db.admin.staff.list({ ...page, q: "story" })).toEqual([]);
+    // Near enough finds a member too: a misspelling, but not another word.
+    expect(
+      (await db.admin.staff.list({ ...page, q: "Pastor Nme" })).map(
+        (r) => r.name,
+      ),
+    ).toEqual(["Pastor Name"]);
+    expect(
+      (await db.admin.staff.list({ ...page, q: "Eldre Name" })).map(
+        (r) => r.name,
+      ),
+    ).toEqual(["Elder Name", "Elder Name", "Elder Name"]);
+    // Two letters swapped, or one dropped, is within an edit or two of a
+    // word, each word typed on its own; a word of four letters gets one edit.
+    // Only where nothing is in or near the text: a word typed right finds
+    // its members, and a misspelled one beside it widens nothing.
+    expect(
+      (await db.admin.staff.list({ ...page, q: "Edler" })).map((r) => r.name),
+    ).toEqual(["Elder Name", "Elder Name", "Elder Name"]);
+    expect(
+      (await db.admin.staff.list({ ...page, q: "Eldr" })).map((r) => r.name),
+    ).toEqual(["Elder Name", "Elder Name", "Elder Name"]);
+    expect(await db.admin.staff.list({ ...page, q: "Eldr Nmae" })).toEqual([]);
+    expect(
+      (await db.admin.staff.list({ ...page, q: "Pastor Edler" })).map(
+        (r) => r.name,
+      ),
+    ).toEqual(["Pastor Name"]);
+    expect(await db.admin.staff.list({ ...page, q: "Deacon" })).toEqual([]);
+    expect(await db.admin.staff.list({ ...page, q: "Bob" })).toEqual([]);
 
     // An optional column present or missing, an empty one counted as missing.
     expect(
@@ -348,6 +387,44 @@ describe("admin.staff", () => {
       email: null,
       phone: "530-555-0100",
     });
+    // The bio's text and the phone are searched once they are written.
+    expect(
+      (await db.admin.staff.list({ ...page, q: "pastor's story" })).map(
+        (r) => r.name,
+      ),
+    ).toEqual(["Pastor Name"]);
+    expect(
+      (await db.admin.staff.list({ ...page, q: "555-0100" })).map(
+        (r) => r.name,
+      ),
+    ).toEqual(["Pastor Name"]);
+
+    // Without a sort, a search lists the nearest first: the exact match
+    // before the near one, though the site's order would put it after.
+    const near = await db.admin.staff.create.first({
+      ...member,
+      name: "Near Name",
+      phone: "530-555-0101",
+    });
+    const unsorted = { ...page, sort: null };
+    expect(
+      (await db.admin.staff.list({ ...unsorted, q: "530-555-0100" })).map(
+        (r) => r.name,
+      ),
+    ).toEqual(["Pastor Name", "Near Name"]);
+    expect(
+      (await db.admin.staff.list({ ...page, q: "530-555-0100" })).map(
+        (r) => r.name,
+      ),
+    ).toEqual(["Near Name", "Pastor Name"]);
+    expect((await db.admin.staff.list(unsorted)).map((r) => r.name)).toEqual([
+      "Near Name",
+      "Elder Name",
+      "Elder Name",
+      "Elder Name",
+      "Pastor Name",
+    ]);
+    await db.admin.staff.delete({ id: near!.id });
     expect((await db.web.staff.list()).map((row) => row.name)).toEqual([
       "Elder Name",
       "Elder Name",
@@ -889,6 +966,7 @@ describe("roles", () => {
         seeds,
         roles,
         role: "web",
+        database: { extensions: { fuzzystrmatch, pg_trgm } },
       }),
       makeTestBezoar(contract, {
         queries,
@@ -896,6 +974,7 @@ describe("roles", () => {
         seeds,
         roles,
         role: "admin",
+        database: { extensions: { fuzzystrmatch, pg_trgm } },
       }),
     ]);
   });

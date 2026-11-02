@@ -13,6 +13,8 @@ import {
   staffRecord,
 } from "@bbf/schema";
 import { makeTestBezoar } from "@bezoar/testing";
+import { fuzzystrmatch } from "@electric-sql/pglite/contrib/fuzzystrmatch";
+import { pg_trgm } from "@electric-sql/pglite/contrib/pg_trgm";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import {
@@ -31,7 +33,12 @@ import {
 let db: Awaited<ReturnType<typeof makeTestBezoar<typeof contract>>>;
 
 beforeAll(async () => {
-  db = await makeTestBezoar(contract, { queries, migrations, seeds });
+  db = await makeTestBezoar(contract, {
+    queries,
+    migrations,
+    seeds,
+    database: { extensions: { fuzzystrmatch, pg_trgm } },
+  });
 });
 
 afterAll(() => db.close());

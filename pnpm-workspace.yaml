@@ -5,9 +5,10 @@ packages:
 
 catalog:
   "@ai-sdk/anthropic": "^4.0.82"
-  "@bezoar/kit": "0.0.5"
-  "@bezoar/nuxt": "0.0.5"
-  "@bezoar/testing": "0.0.5"
+  "@bezoar/kit": "0.0.6"
+  "@bezoar/nuxt": "0.0.6"
+  "@bezoar/testing": "0.0.6"
+  "@electric-sql/pglite": "0.5.10"
   "@icon-sheets/kit": "0.0.8"
   "@icon-sheets/nuxt": "0.0.8"
   "@letters-patent/google": "0.0.4"
@@ -32,7 +33,7 @@ catalog:
   "@zoobzio/icons": "0.1.2"
   "@zoobzio/nuxt": "0.1.2"
   "@zoobzio/vue": "0.1.2"
-  bezoar: "0.0.5"
+  bezoar: "0.0.6"
   h3: "^1.15.11"
   happy-dom: "^20.11.6"
   hast-util-from-html: "^2.0.3"

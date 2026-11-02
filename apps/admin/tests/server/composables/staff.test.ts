@@ -84,9 +84,9 @@ const NONE: Search = {
   created_on: null,
 };
 
-type Order = { sort: string; direction: string };
+type Order = { sort: string | null; direction: string };
 
-const ORDER: Order = { sort: "role", direction: "asc" };
+const ORDER: Order = { sort: null, direction: "asc" };
 
 const matches = (search: Search) => (row: (typeof ROWS)[number]) =>
   (search.q === null ||

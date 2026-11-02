@@ -31,10 +31,10 @@ const filled = { values: [...PRESENCES] };
  * cell can show, the bio aside. The name, the role, the status and the
  * contact details are shown at first; the summary, the photo and the day
  * added wait in the column manager. A column the API sorts by is
- * sortable. The free text searches the name, the email, the phone and the
- * summary, so the name offers no filter of its own; each optional column
- * filters on whether it is filled in, the role and the status on a value
- * held or not, and the days on before, after or on.
+ * sortable. The free text searches the name, the email, the phone, the
+ * summary and the bio, so the name offers no filter of its own; each
+ * optional column filters on whether it is filled in, the role and the
+ * status on a value held or not, and the days on before, after or on.
  */
 export const STAFF_TABLE: TableConfig<StaffRecord> = {
   rowKey: "id",

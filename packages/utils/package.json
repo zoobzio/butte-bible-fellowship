@@ -29,6 +29,7 @@
   "devDependencies": {
     "@bbf/toolbox": "workspace:*",
     "@bezoar/testing": "catalog:",
+    "@electric-sql/pglite": "catalog:",
     "@types/hast": "catalog:",
     "@types/node": "catalog:",
     "typescript": "catalog:",

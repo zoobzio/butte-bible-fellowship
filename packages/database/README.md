@@ -28,7 +28,7 @@ would not have offered.
 
 ```
 bezoar.config.ts   the kit config: the output directory, the defaults for the rest
-src/migrations/    the schema, forward only: staff, events, sermons, users
+src/migrations/    the schema, forward only: staff, events, sermons, users, staff search
 src/seeds/         the staff and events the content lists, and the first admin user, each safe to run again
 src/queries/web/   what the site reads: staff, events, sermons
 src/queries/admin/ what the admin app will read and write: the same, in full
@@ -62,11 +62,21 @@ one page, `size` rows from `offset`, sorted by the column `sort` names —
 `name`, `role`, `status`, `email`, `phone`, `created_at` or `updated_at` —
 in `direction`, `asc` or `desc`, a null last either way, and then in the
 site's order, by role and name, so `role` ascending is the site's order
-itself; each row carries `total`, how many rows the whole search holds, so
+itself; with `sort` null, a search lists the nearest first, a row the text
+is in before one it is only near, and the rest keep the site's order; each
+row carries `total`, how many rows the whole search holds, so
 a page and its count are one query. It takes the search the admin
 app's table commits, every part of it optional: `q`, text the name, the
-email, the phone or the summary must carry whatever its case, taken as
-typed, so a `%` or `_` is the character and not a wildcard; a role held,
+email, the phone, the summary or the bio must carry whatever its case,
+taken as typed, so a `%` or `_` is the character and not a wildcard, or
+must come near enough to in a run of words that a misspelling still finds
+its member; `search`, a column the database keeps in step with the five,
+carries them as one text under a trigram index (`pg_trgm`), which serves
+the substring and the near match alike, the latter by strict word
+similarity at the extension's default threshold, or, where those two find
+nothing, for the swapped or dropped letter a trigram misses in a short
+word, by each word typed coming within an edit or two of a word of the
+text (`fuzzystrmatch`), which reads every row and so runs only then; a role held,
 `role_is`, or not held, `role_not`, and a status the same, `status_is` and
 `status_not`; whether the `email`, `phone`, `summary` or `photo` is filled
 in, `present` or `missing`, an empty one counted as missing; and a day each

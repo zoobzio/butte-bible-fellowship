@@ -38,6 +38,7 @@
     "@bbf/toolbox": "workspace:*",
     "@bezoar/kit": "catalog:",
     "@bezoar/testing": "catalog:",
+    "@electric-sql/pglite": "catalog:",
     "@types/node": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:"

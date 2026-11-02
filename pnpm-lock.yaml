@@ -10,14 +10,17 @@ catalogs:
       specifier: ^4.0.82
       version: 4.0.82
     '@bezoar/kit':
-      specifier: 0.0.5
-      version: 0.0.5
+      specifier: 0.0.6
+      version: 0.0.6
     '@bezoar/nuxt':
-      specifier: 0.0.5
-      version: 0.0.5
+      specifier: 0.0.6
+      version: 0.0.6
     '@bezoar/testing':
-      specifier: 0.0.5
-      version: 0.0.5
+      specifier: 0.0.6
+      version: 0.0.6
+    '@electric-sql/pglite':
+      specifier: 0.5.10
+      version: 0.5.10
     '@icon-sheets/kit':
       specifier: 0.0.8
       version: 0.0.8
@@ -91,8 +94,8 @@ catalogs:
       specifier: 0.1.2
       version: 0.1.2
     bezoar:
-      specifier: 0.0.5
-      version: 0.0.5
+      specifier: 0.0.6
+      version: 0.0.6
     h3:
       specifier: ^1.15.11
       version: 1.15.11
@@ -220,7 +223,7 @@ importers:
         version: 0.1.2(happy-dom@20.11.6)(vue@3.5.41(typescript@5.9.3))
       bezoar:
         specifier: 'catalog:'
-        version: 0.0.5
+        version: 0.0.6
       h3:
         specifier: 'catalog:'
         version: 1.15.11
@@ -308,7 +311,7 @@ importers:
         version: 0.1.2(happy-dom@20.11.6)(vue@3.5.41(typescript@5.9.3))
       bezoar:
         specifier: 'catalog:'
-        version: 0.0.5
+        version: 0.0.6
       nuxt:
         specifier: 'catalog:'
         version: 4.6.1(@babel/plugin-syntax-jsx@7.29.7(@babel/core@7.29.7))(@babel/plugin-syntax-typescript@7.29.7(@babel/core@7.29.7))(@electric-sql/pglite@0.5.10)(@oxc-project/types@0.154.0)(@types/node@26.2.0)(@vue/compiler-sfc@3.5.44)(acorn@8.18.0)(confbox@0.3.1)(db0@0.3.4(@electric-sql/pglite@0.5.10))(dotenv@17.4.2)(esbuild@0.28.2)(eslint@9.39.5(jiti@2.7.0))(giget@3.3.1)(ioredis@5.11.1)(lightningcss@1.33.0)(mlly@1.8.2)(optionator@0.9.4)(oxlint@1.86.0)(rolldown@1.2.14)(rollup-plugin-visualizer@7.1.1(rolldown@1.2.14)(rollup@4.62.4))(rollup@4.62.4)(terser@5.50.0)(typescript@5.9.3)(vite@8.3.4(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(yaml@2.9.1))(vue-tsc@2.2.12(typescript@5.9.3))(yaml@2.9.1)
@@ -378,7 +381,7 @@ importers:
         version: link:../../packages/theme
       '@bezoar/nuxt':
         specifier: 'catalog:'
-        version: 0.0.5(@nuxt/schema@4.6.1)(confbox@0.3.1)(dotenv@17.4.2)(giget@3.3.1)(jiti@2.7.0)(magic-string@1.4.3)(mlly@1.8.2)(rolldown@1.2.14)(unplugin@3.4.0(esbuild@0.28.2)(rolldown@1.2.14)(rollup@4.62.4)(vite@8.3.4(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(yaml@2.9.1)))
+        version: 0.0.6(@nuxt/schema@4.6.1)(confbox@0.3.1)(dotenv@17.4.2)(giget@3.3.1)(jiti@2.7.0)(magic-string@1.4.3)(mlly@1.8.2)(rolldown@1.2.14)(unplugin@3.4.0(esbuild@0.28.2)(rolldown@1.2.14)(rollup@4.62.4)(vite@8.3.4(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(yaml@2.9.1)))
       '@icon-sheets/nuxt':
         specifier: 'catalog:'
         version: 0.0.8(@nuxt/schema@4.6.1)(confbox@0.3.1)(dotenv@17.4.2)(giget@3.3.1)(jiti@2.7.0)(magic-string@1.4.3)(mlly@1.8.2)(rolldown@1.2.14)(typescript@5.9.3)(unplugin@3.4.0(esbuild@0.28.2)(rolldown@1.2.14)(rollup@4.62.4)(vite@8.3.4(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(yaml@2.9.1)))
@@ -441,17 +444,20 @@ importers:
     dependencies:
       bezoar:
         specifier: 'catalog:'
-        version: 0.0.5
+        version: 0.0.6
     devDependencies:
       '@bbf/toolbox':
         specifier: workspace:*
         version: link:../toolbox
       '@bezoar/kit':
         specifier: 'catalog:'
-        version: 0.0.5(@electric-sql/pglite-age@0.0.11(@electric-sql/pglite@0.5.10))(@electric-sql/pglite-pg_hashids@0.0.11(@electric-sql/pglite@0.5.10))(@electric-sql/pglite-pg_ivm@0.0.11(@electric-sql/pglite@0.5.10))(@electric-sql/pglite-pg_textsearch@0.0.12(@electric-sql/pglite@0.5.10))(@electric-sql/pglite-pg_uuidv7@0.0.11(@electric-sql/pglite@0.5.10))(@electric-sql/pglite-pgtap@0.0.11(@electric-sql/pglite@0.5.10))(@electric-sql/pglite-pgvector@0.0.11(@electric-sql/pglite@0.5.10))
+        version: 0.0.6(@electric-sql/pglite-age@0.0.11(@electric-sql/pglite@0.5.10))(@electric-sql/pglite-pg_hashids@0.0.11(@electric-sql/pglite@0.5.10))(@electric-sql/pglite-pg_ivm@0.0.11(@electric-sql/pglite@0.5.10))(@electric-sql/pglite-pg_textsearch@0.0.12(@electric-sql/pglite@0.5.10))(@electric-sql/pglite-pg_uuidv7@0.0.11(@electric-sql/pglite@0.5.10))(@electric-sql/pglite-pgtap@0.0.11(@electric-sql/pglite@0.5.10))(@electric-sql/pglite-pgvector@0.0.11(@electric-sql/pglite@0.5.10))
       '@bezoar/testing':
         specifier: 'catalog:'
-        version: 0.0.5
+        version: 0.0.6
+      '@electric-sql/pglite':
+        specifier: 'catalog:'
+        version: 0.5.10
       '@types/node':
         specifier: 'catalog:'
         version: 26.2.0
@@ -591,7 +597,7 @@ importers:
         version: 0.0.7
       bezoar:
         specifier: 'catalog:'
-        version: 0.0.5
+        version: 0.0.6
       hast-util-from-html:
         specifier: 'catalog:'
         version: 2.0.3
@@ -610,7 +616,10 @@ importers:
         version: link:../toolbox
       '@bezoar/testing':
         specifier: 'catalog:'
-        version: 0.0.5
+        version: 0.0.6
+      '@electric-sql/pglite':
+        specifier: 'catalog:'
+        version: 0.5.10
       '@types/hast':
         specifier: 'catalog:'
         version: 3.0.5
@@ -799,27 +808,27 @@ packages:
     resolution: {integrity: sha512-6zABk/ECA/QYSCQ1NGiVwwbQerUCZ+TQbp64Q3AgmfNvurHH0j8TtXa1qbShXA6qqkpAj4V5W8pP6mLe1mcMqA==}
     engines: {node: '>=18'}
 
-  '@bezoar/core@0.0.5':
-    resolution: {integrity: sha512-1UG1DvYGdVd9BtoZcyCPegdiJrIrAp27twJU0xypdm6xwxw6UZCJ4yUXZrQeyYb9bQ659VintwmQdAfUxinmfg==}
+  '@bezoar/core@0.0.6':
+    resolution: {integrity: sha512-aSH0wpU45t7OKmEquIGCKkBoLf/9JZiHnvKy/PkWqw+vkMpvWFVygZfTJwIihIOsH/N4u7rHI28mzig5HBJejg==}
 
-  '@bezoar/kit@0.0.5':
-    resolution: {integrity: sha512-HLZL0Njxa4equmIfmCAZpkc2dcLr4QmRX2bU87dHoD48BPm20sZLNWq1TGnFNgEpw9Mif5YXbuwol+cxVLRdtA==}
+  '@bezoar/kit@0.0.6':
+    resolution: {integrity: sha512-WA4SiRvCFSv9nMkVfZ1p0jVp1IW0A8a9Ns8RUUXLDxYNLiEan6WdRrEK8P7Ol3oJrHjc7FCHMyLQiND8ZuSweQ==}
     hasBin: true
 
-  '@bezoar/nuxt@0.0.5':
-    resolution: {integrity: sha512-9x+AXkkTz4EnkIxmyzd/mW1VG5rAiqzH82MXQ5Xx+pCymlJoj9elFo4EFIQJeWpyJ2xgI59e/eE2RV8LutpNiw==}
+  '@bezoar/nuxt@0.0.6':
+    resolution: {integrity: sha512-+1Erc3GaAclgdAOEdF/zuKkpGSNESzV5ZjsfEB56ZnOUX6/KwFo9z63TNZQZrK2YD+e/ZuLNhCJj8ZCFrG1jcA==}
 
-  '@bezoar/pg@0.0.5':
-    resolution: {integrity: sha512-Tp+FVa+E2e6JrP6PCSWMrjaWLmU8uIel9A54WvD8AKKntKh1ZGEuYypH4ApqEk6WWgBO38QVRy38HHlv07PZnQ==}
+  '@bezoar/pg@0.0.6':
+    resolution: {integrity: sha512-PSdcx1fXq36QPBJAuSBkrXZ6RR4WMYqRc8znARib6vNF2jVx6UFr8rd1ZbNzYPOiu2ezXnDK85zhSCxjDZXaYg==}
 
-  '@bezoar/pglite@0.0.5':
-    resolution: {integrity: sha512-xGcr6C+N0p7Wlmn9sKQYaUd+V67Vco7IBS392gECvLbS+sDqtOuip75zF+tiR8hsHODUW7QA9NN38wtLRduSng==}
+  '@bezoar/pglite@0.0.6':
+    resolution: {integrity: sha512-JnVjZ6gUWOP7tolLR2MKsuoZ+KfrzkE93SANotU7L4K5OV3/sZNVnMKfIYIh8kS+XxuXwNYGOHQlMSTLf5Tgqw==}
 
-  '@bezoar/schema@0.0.5':
-    resolution: {integrity: sha512-zOEagMSucTNKS8h3qcurzsSx6iP0EQJL0GsKzkqz5WT0AwfdjXByeq01KE+c7Ak6l82jGwhXXb67aU6k0lliGw==}
+  '@bezoar/schema@0.0.6':
+    resolution: {integrity: sha512-eC5WoMD4N/l/Z0sZi6Kk/2cdYCn3jCR2RCNhpGmopo0Nqdb5/DW0flzfyfDp7ihFqNHO/Eree7pVR4lqgRg4jA==}
 
-  '@bezoar/testing@0.0.5':
-    resolution: {integrity: sha512-RZ3//135lFm/z1rH26K/XiXITKle47yaXpT7LuXUCYDBPFE+/Fmq4ifHArh1Wj4ENWMnQ9aS5pEPe+uVqCV7Wg==}
+  '@bezoar/testing@0.0.6':
+    resolution: {integrity: sha512-LEbHIi3n0kn/Y/mUKvzH62PdG2nYT0MUMW51ordC9rUGyndq9nSKgfKRaZboYQfVJBkchlKconByvknynrMHtw==}
 
   '@capsizecss/unpack@4.0.1':
     resolution: {integrity: sha512-CuNiSqg7+e1cO/GjffyMOm5Tt2jUF9CWHHnvQ/UkqvtkGfHdgwEC0wpmq7fkN3gxwpRnrAN0WzO3vREKmNolMQ==}
@@ -2966,8 +2975,8 @@ packages:
     engines: {node: '>=6.0.0'}
     hasBin: true
 
-  bezoar@0.0.5:
-    resolution: {integrity: sha512-Sa3mH49RawnIqfb1vWOKcb9kiCIOp44NG4jJcmP4XxKCGcosvKQXTDeKHgksqrqO/Zl0zfuaINF3DlL8b7JCFw==}
+  bezoar@0.0.6:
+    resolution: {integrity: sha512-1fiYu3zzOVE+jv5fLGzjnSRRE9G218YFDCHvMYXCPavYERcMYAs18brVCplMYvhI6lMtsFEa7twPJoMrdfCysw==}
 
   bindings@1.5.0:
     resolution: {integrity: sha512-p2q/t/mhvuOj/UeLlV6566GD/guowlr0hHxClI0W9m7MWYkL1F0hLo+0Aexs9HSPCtR1SXQ0TD3MMKrXZajbiQ==}
@@ -6110,17 +6119,17 @@ snapshots:
 
   '@bcoe/v8-coverage@1.0.2': {}
 
-  '@bezoar/core@0.0.5':
+  '@bezoar/core@0.0.6':
     dependencies:
-      '@bezoar/schema': 0.0.5
+      '@bezoar/schema': 0.0.6
       kysely: 0.29.7
       objectively: 0.3.0
 
-  '@bezoar/kit@0.0.5(@electric-sql/pglite-age@0.0.11(@electric-sql/pglite@0.5.10))(@electric-sql/pglite-pg_hashids@0.0.11(@electric-sql/pglite@0.5.10))(@electric-sql/pglite-pg_ivm@0.0.11(@electric-sql/pglite@0.5.10))(@electric-sql/pglite-pg_textsearch@0.0.12(@electric-sql/pglite@0.5.10))(@electric-sql/pglite-pg_uuidv7@0.0.11(@electric-sql/pglite@0.5.10))(@electric-sql/pglite-pgtap@0.0.11(@electric-sql/pglite@0.5.10))(@electric-sql/pglite-pgvector@0.0.11(@electric-sql/pglite@0.5.10))':
+  '@bezoar/kit@0.0.6(@electric-sql/pglite-age@0.0.11(@electric-sql/pglite@0.5.10))(@electric-sql/pglite-pg_hashids@0.0.11(@electric-sql/pglite@0.5.10))(@electric-sql/pglite-pg_ivm@0.0.11(@electric-sql/pglite@0.5.10))(@electric-sql/pglite-pg_textsearch@0.0.12(@electric-sql/pglite@0.5.10))(@electric-sql/pglite-pg_uuidv7@0.0.11(@electric-sql/pglite@0.5.10))(@electric-sql/pglite-pgtap@0.0.11(@electric-sql/pglite@0.5.10))(@electric-sql/pglite-pgvector@0.0.11(@electric-sql/pglite@0.5.10))':
     dependencies:
-      '@bezoar/core': 0.0.5
-      '@bezoar/pglite': 0.0.5
-      '@bezoar/schema': 0.0.5
+      '@bezoar/core': 0.0.6
+      '@bezoar/pglite': 0.0.6
+      '@bezoar/schema': 0.0.6
       '@electric-sql/pglite': 0.5.10
       '@electric-sql/pglite-socket': 0.2.13(@electric-sql/pglite-age@0.0.11(@electric-sql/pglite@0.5.10))(@electric-sql/pglite-pg_hashids@0.0.11(@electric-sql/pglite@0.5.10))(@electric-sql/pglite-pg_ivm@0.0.11(@electric-sql/pglite@0.5.10))(@electric-sql/pglite-pg_textsearch@0.0.12(@electric-sql/pglite@0.5.10))(@electric-sql/pglite-pg_uuidv7@0.0.11(@electric-sql/pglite@0.5.10))(@electric-sql/pglite-pgtap@0.0.11(@electric-sql/pglite@0.5.10))(@electric-sql/pglite-pgvector@0.0.11(@electric-sql/pglite@0.5.10))(@electric-sql/pglite@0.5.10)
       '@ts-safeql/generate': 5.4.1(libpg-query@18.1.5)
@@ -6137,12 +6146,12 @@ snapshots:
       - '@electric-sql/pglite-pgtap'
       - '@electric-sql/pglite-pgvector'
 
-  '@bezoar/nuxt@0.0.5(@nuxt/schema@4.6.1)(confbox@0.3.1)(dotenv@17.4.2)(giget@3.3.1)(jiti@2.7.0)(magic-string@1.4.3)(mlly@1.8.2)(rolldown@1.2.14)(unplugin@3.4.0(esbuild@0.28.2)(rolldown@1.2.14)(rollup@4.62.4)(vite@8.3.4(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(yaml@2.9.1)))':
+  '@bezoar/nuxt@0.0.6(@nuxt/schema@4.6.1)(confbox@0.3.1)(dotenv@17.4.2)(giget@3.3.1)(jiti@2.7.0)(magic-string@1.4.3)(mlly@1.8.2)(rolldown@1.2.14)(unplugin@3.4.0(esbuild@0.28.2)(rolldown@1.2.14)(rollup@4.62.4)(vite@8.3.4(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(yaml@2.9.1)))':
     dependencies:
-      '@bezoar/pg': 0.0.5
-      '@bezoar/pglite': 0.0.5
-      '@nuxt/kit': 4.6.1(@nuxt/schema@4.6.1)(confbox@0.3.1)(dotenv@17.4.2)(giget@3.3.1)(jiti@2.7.0)(magic-string@1.4.3)(mlly@1.8.2)(rolldown@1.2.14)(unplugin@3.4.0(esbuild@0.28.2)(rolldown@1.2.14)(rollup@4.62.4)(vite@8.3.4(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(yaml@2.9.1)))
-      bezoar: 0.0.5
+      '@bezoar/pg': 0.0.6
+      '@bezoar/pglite': 0.0.6
+      '@nuxt/kit': 4.6.2(@nuxt/schema@4.6.1)(confbox@0.3.1)(dotenv@17.4.2)(giget@3.3.1)(jiti@2.7.0)(magic-string@1.4.3)(mlly@1.8.2)(rolldown@1.2.14)(unplugin@3.4.0(esbuild@0.28.2)(rolldown@1.2.14)(rollup@4.62.4)(vite@8.3.4(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(yaml@2.9.1)))
+      bezoar: 0.0.6
       objectively: 0.3.0
     transitivePeerDependencies:
       - '@nuxt/schema'
@@ -6157,31 +6166,32 @@ snapshots:
       - rolldown
       - unplugin
 
-  '@bezoar/pg@0.0.5':
+  '@bezoar/pg@0.0.6':
     dependencies:
-      '@bezoar/core': 0.0.5
+      '@bezoar/core': 0.0.6
       pg: 8.23.1
       postgres-array: 3.0.4
     transitivePeerDependencies:
       - pg-native
 
-  '@bezoar/pglite@0.0.5':
+  '@bezoar/pglite@0.0.6':
     dependencies:
-      '@bezoar/core': 0.0.5
-      '@bezoar/schema': 0.0.5
+      '@bezoar/core': 0.0.6
+      '@bezoar/schema': 0.0.6
       '@electric-sql/pglite': 0.5.10
 
-  '@bezoar/schema@0.0.5':
+  '@bezoar/schema@0.0.6':
     dependencies:
       kysely: 0.29.7
       objectively: 0.3.0
       zod: 4.6.5
 
-  '@bezoar/testing@0.0.5':
+  '@bezoar/testing@0.0.6':
     dependencies:
-      '@bezoar/core': 0.0.5
-      '@bezoar/pglite': 0.0.5
-      '@bezoar/schema': 0.0.5
+      '@bezoar/core': 0.0.6
+      '@bezoar/pglite': 0.0.6
+      '@bezoar/schema': 0.0.6
+      '@electric-sql/pglite': 0.5.10
 
   '@capsizecss/unpack@4.0.1':
     dependencies:
@@ -8823,10 +8833,10 @@ snapshots:
 
   baseline-browser-mapping@2.11.29: {}
 
-  bezoar@0.0.5:
+  bezoar@0.0.6:
     dependencies:
-      '@bezoar/core': 0.0.5
-      '@bezoar/schema': 0.0.5
+      '@bezoar/core': 0.0.6
+      '@bezoar/schema': 0.0.6
 
   bindings@1.5.0:
     dependencies:

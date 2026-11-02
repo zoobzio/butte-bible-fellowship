@@ -48,11 +48,12 @@ const SORT_COLUMNS: Record<StaffSort, string> = {
 
 /**
  * The order as the list query takes it: the column asked for, ascending
- * unless told otherwise. Asked for nothing, the site's order: by role,
- * then by name, which the query falls back to after any sort.
+ * unless told otherwise. Asked for nothing, null: a search then lists the
+ * nearest first, and otherwise the site's order holds, by role, then by
+ * name, which the query falls back to after any sort.
  */
 const toOrder = (query: StaffQuery) => ({
-  sort: SORT_COLUMNS[query.sort ?? "role"],
+  sort: query.sort === undefined ? null : SORT_COLUMNS[query.sort],
   direction: query.direction ?? "asc",
 });
 

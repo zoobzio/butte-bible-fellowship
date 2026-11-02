@@ -1,17 +1,27 @@
--- The text, as typed, as the pattern each text column is matched against.
-WITH search AS (
+-- The text, as typed, as the pattern the search text is matched against;
+-- and the text near enough to a run of the words of the search text, by
+-- trigram (pg_trgm) at its default threshold. Both read the trigram index.
+WITH typed AS (
   SELECT CASE WHEN :q::text IS NULL THEN NULL
     ELSE '%' || replace(replace(replace(:q::text, '\', '\\'), '%', '\%'), '_', '\_') || '%'
   END AS pattern
+),
+hits AS (
+  SELECT id FROM staff, typed
+  WHERE search ILIKE typed.pattern OR :q::text <<% search
+),
+-- Where those find nothing, each word typed within an edit or two of a word
+-- of the search text (fuzzystrmatch), so a misspelling a trigram misses
+-- still finds its member. Reads every row, so only when there is no hit.
+near AS (
+  SELECT id FROM staff
+  WHERE NOT EXISTS (SELECT 1 FROM hits) AND words_near(search, :q::text)
 )
 SELECT id, name, role, summary, bio, photo, email, phone, status, created_at, updated_at,
   count(*) OVER ()::int AS total
-FROM staff, search
-WHERE (search.pattern IS NULL
-    OR name ILIKE search.pattern
-    OR email ILIKE search.pattern
-    OR phone ILIKE search.pattern
-    OR summary ILIKE search.pattern)
+FROM staff, typed
+WHERE (typed.pattern IS NULL
+    OR id IN (SELECT id FROM hits UNION ALL SELECT id FROM near))
   AND (:role_is::staff_role IS NULL OR role = :role_is::staff_role)
   AND (:role_not::staff_role IS NULL OR role <> :role_not::staff_role)
   AND (:status_is::content_status IS NULL OR status = :status_is::content_status)
@@ -27,6 +37,10 @@ WHERE (search.pattern IS NULL
   AND (:created_after::date IS NULL OR (created_at AT TIME ZONE :tz::text)::date > :created_after::date)
   AND (:created_on::date IS NULL OR (created_at AT TIME ZONE :tz::text)::date = :created_on::date)
 ORDER BY
+  -- Without a sort, a search lists the nearest first: a row the text is in
+  -- before one it is only near, and the nearer before the farther.
+  CASE WHEN :sort::text IS NULL AND typed.pattern IS NOT NULL THEN (search ILIKE typed.pattern)::int END DESC,
+  CASE WHEN :sort::text IS NULL AND typed.pattern IS NOT NULL THEN strict_word_similarity(:q::text, search) END DESC,
   CASE WHEN :sort::text = 'name' AND :direction::text = 'asc' THEN name END ASC NULLS LAST,
   CASE WHEN :sort::text = 'name' AND :direction::text = 'desc' THEN name END DESC NULLS LAST,
   CASE WHEN :sort::text = 'role' AND :direction::text = 'asc' THEN role END ASC NULLS LAST,
