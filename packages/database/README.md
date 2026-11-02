@@ -28,7 +28,7 @@ would not have offered.
 
 ```
 bezoar.config.ts   the kit config: the output directory, the defaults for the rest
-src/migrations/    the schema, forward only: staff, events, sermons, users, staff search, like escape
+src/migrations/    the schema, forward only: staff, events, sermons, users, staff search, like escape, search cost
 src/seeds/         the staff and events the content lists, and the first admin user, each safe to run again
 src/queries/web/   what the site reads: staff, events, sermons
 src/queries/admin/ what the admin app will read and write: the same, in full
@@ -73,7 +73,9 @@ must come near enough to in a run of words that a misspelling still finds
 its member; `search`, a column the database keeps in step with the five,
 carries them as one text under a trigram index (`pg_trgm`), which serves
 the substring and the near match alike, the latter by strict word
-similarity at the extension's default threshold, or, where those two find
+similarity at the extension's default threshold, the planner told what that
+similarity costs (`search_cost`) so it reads the index rather than every
+row, or, where those two find
 nothing, for the swapped or dropped letter a trigram misses in a short
 word, by each word typed coming within an edit or two of a word of the
 text (`fuzzystrmatch`), which reads every row and so runs only then; a role held,

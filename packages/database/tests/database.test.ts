@@ -30,7 +30,7 @@ beforeAll(async () => {
 afterAll(() => db.close());
 
 describe("the build", () => {
-  it("carries the staff, events, sermons, users, staff search and like escape migrations in order", () => {
+  it("carries the staff, events, sermons, users, staff search, like escape and search cost migrations in order", () => {
     expect(migrations.map((migration) => migration.name)).toEqual([
       "staff",
       "events",
@@ -38,6 +38,7 @@ describe("the build", () => {
       "users",
       "staff_search",
       "like_escape",
+      "search_cost",
     ]);
   });
 
