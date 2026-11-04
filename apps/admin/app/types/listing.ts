@@ -1,11 +1,6 @@
 import type { listing } from "@bbf/schema";
 import type { ListingQuery } from "@bbf/schema/types";
-import type {
-  AppProsaryMessage,
-  IconAlias,
-  TableOptions,
-  UseTable,
-} from "#imports";
+import type { AppProsaryMessage, TableOptions, UseTable } from "#imports";
 import type { z } from "zod";
 
 export type Listing<T> = z.infer<ReturnType<typeof listing<z.ZodType<T>>>>;
@@ -18,25 +13,27 @@ export type RecordLink<T> = (record: T) => string;
  */
 export type ListingRequest = ListingQuery & Record<string, string | number>;
 
-export type TableDescriptors<T> = Omit<
-  TableOptions<T>,
-  "fetch" | "actions" | "bulkActions" | "initial"
->;
-
 /**
- * A column as the app configures it: its label as a message of the prose,
- * and an icon the heading, the search's field option and the column
- * manager's item all lead with.
+ * A column as the app configures it: its label a message of the prose,
+ * never a bare string, which the layer's factory resolves as the table is
+ * built. The icon the heading, the search's field option and the column
+ * manager's item lead with is the layer's own field.
  */
 export type TableColumn<T> = Omit<
-  TableDescriptors<T>["columns"][number],
+  TableOptions<T>["columns"][number],
   "label"
 > & {
   label: AppProsaryMessage;
-  icon?: IconAlias;
 };
 
-export type TableConfig<T> = Omit<TableDescriptors<T>, "columns"> & {
+/**
+ * A table as the app configures it: the descriptors alone. The fetch, the
+ * actions and the initial state are wired where the table is created.
+ */
+export type TableConfig<T> = Omit<
+  TableOptions<T>,
+  "columns" | "fetch" | "actions" | "bulkActions" | "initial"
+> & {
   columns: TableColumn<T>[];
 };
 

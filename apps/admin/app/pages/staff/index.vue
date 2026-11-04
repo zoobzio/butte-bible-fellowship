@@ -1,8 +1,8 @@
 <script lang="ts">
+import { Table } from "#components";
 import { definePageMeta, useHead, useNuxtApp } from "#imports";
 
 import PageHeader from "~/components/PageHeader.vue";
-import RecordTable from "~/components/RecordTable.vue";
 import { useTableRequest } from "~/composables/listing";
 import { useStaffTable } from "~/composables/staff/table";
 </script>
@@ -11,9 +11,10 @@ import { useStaffTable } from "~/composables/staff/table";
 definePageMeta({ middleware: "auth", auth: { scopes: ["staff:read"] } });
 
 const { $t } = useNuxtApp();
+const table = useStaffTable();
+
 useHead(() => ({ title: $t.admin.staff.title() }));
 
-const { table, link } = useStaffTable();
 await useTableRequest(table);
 </script>
 
@@ -23,5 +24,5 @@ await useTableRequest(table);
     to="/staff/new"
     :action="$t.admin.staff.new()"
   />
-  <RecordTable :table="table" :link="link" title="name" />
+  <Table :service="table" />
 </template>

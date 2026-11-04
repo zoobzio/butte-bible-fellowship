@@ -13,9 +13,9 @@ describe("useEventsTable", () => {
   it("is the events table, the title the way to an event's editor", async () => {
     const fetch = vi.fn(async () => ({ items: [WORSHIP, DINNER], total: 2 }));
     vi.stubGlobal("$fetch", fetch);
-    const { result } = withSetup(() => useEventsTable());
-    const { table, link } = result;
+    const table = withSetup(() => useEventsTable()).result;
     expect(table.id).toBe("events");
+    expect(table.columns[0]?.label).toBe("Title");
     expect(table.columns.map((column) => column.key)).toEqual([
       "title",
       "day",
@@ -24,7 +24,7 @@ describe("useEventsTable", () => {
       "status",
       "updatedAt",
     ]);
-    expect(link(DINNER)).toBe("/events/4");
+    expect(table.columns[0]?.link?.(DINNER)).toBe("/events/4");
     await table.fetch();
     expect(fetch).toHaveBeenCalledWith("/api/events", {
       query: { page: 1, size: 25 },

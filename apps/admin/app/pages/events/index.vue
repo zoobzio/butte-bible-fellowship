@@ -1,8 +1,8 @@
 <script lang="ts">
+import { Table } from "#components";
 import { definePageMeta, useHead, useNuxtApp } from "#imports";
 
 import PageHeader from "~/components/PageHeader.vue";
-import RecordTable from "~/components/RecordTable.vue";
 import { useEventsTable } from "~/composables/events";
 import { useTableRequest } from "~/composables/listing";
 </script>
@@ -13,7 +13,7 @@ definePageMeta({ middleware: "auth", auth: { scopes: ["events:read"] } });
 const { $t } = useNuxtApp();
 useHead(() => ({ title: $t.admin.events.title() }));
 
-const { table, link } = useEventsTable();
+const table = useEventsTable();
 await useTableRequest(table);
 </script>
 
@@ -23,5 +23,5 @@ await useTableRequest(table);
     to="/events/new"
     :action="$t.admin.events.new()"
   />
-  <RecordTable :table="table" :link="link" title="title" />
+  <Table :service="table" />
 </template>

@@ -1,80 +1,9 @@
-import type { AppProsaryMessage } from "#imports";
-
 import type {
   Listing,
   ListingRequest,
-  TableConfig,
-  TableDescriptors,
   TableFetchParams,
   TableFetchResult,
 } from "~/types/listing";
-
-import { TIME_ZONE } from "#layers/bbf/shared/constants/time";
-import { TEXT_LITERAL_KEY, TEXT_QUOTE } from "~/constants/listing";
-
-const DAY = 86_400_000;
-
-/**
- * The last `count` days, today first, each as YYYY-MM-DD: the day it is in
- * the church's time zone, as the API reads a day.
- */
-export const recentDays = (count: number, now = new Date()): string[] => {
-  const today = new Intl.DateTimeFormat("en-CA", {
-    timeZone: TIME_ZONE,
-    dateStyle: "short",
-  }).format(now);
-  const [year, month, day] = today.split("-").map(Number) as [
-    number,
-    number,
-    number,
-  ];
-  const start = Date.UTC(year, month - 1, day);
-  return Array.from({ length: count }, (_, i) =>
-    new Date(start - i * DAY).toISOString().slice(0, 10),
-  );
-};
-
-/**
- * The config with `days` as the values each date column's filter offers,
- * for the search to list, narrow and complete. The operators are the
- * column's own.
- */
-export const withDays = <T>(
-  config: TableConfig<T>,
-  days: string[],
-): TableConfig<T> => ({
-  ...config,
-  columns: config.columns.map((column) =>
-    column.type === "date" || column.type === "datetime"
-      ? { ...column, values: days }
-      : column,
-  ),
-});
-
-/**
- * The config as the table takes it: each column named by the prose, the
- * search's text literal named by it too (the quoted free text the table
- * reads as the fetch's query, under the `text` key it reads it from), and
- * every table formatted in the church's time zone.
- */
-export const toTableDescriptors = <T>(
-  config: TableConfig<T>,
-  name: (message: AppProsaryMessage) => string,
-): TableDescriptors<T> => ({
-  ...config,
-  timeZone: TIME_ZONE,
-  literals: {
-    [TEXT_LITERAL_KEY]: {
-      label: name("admin.editor.text"),
-      open: TEXT_QUOTE,
-      close: TEXT_QUOTE,
-    },
-  },
-  columns: config.columns.map((column) => ({
-    ...column,
-    label: name(column.label),
-  })),
-});
 
 /**
  * The query key of a committed filter: the column's key, and for an

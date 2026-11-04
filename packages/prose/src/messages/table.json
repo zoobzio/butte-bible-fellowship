@@ -1,0 +1,10 @@
+{
+  "search": {
+    "defaultMessage": "Search…",
+    "description": "The placeholder of a table's search box, which takes free text or a column filter."
+  },
+  "empty": {
+    "defaultMessage": "Nothing here yet.",
+    "description": "What a table of records shows when there are none."
+  }
+}

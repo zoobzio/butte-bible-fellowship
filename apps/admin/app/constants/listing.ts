@@ -1,10 +1,3 @@
-/**
- * How many days back a date column's filter offers to pick from: a month,
- * today first. The search renders every option it offers, so the list
- * stays short; an older day is typed in full, and taken as typed.
- */
-export const FILTER_DAYS = 31;
-
 /*
  * The operators a column's filter carries, by the kind of column, as the
  * search's grammar reads them: `Label: operator value`, the operator a
@@ -73,12 +66,3 @@ export const DATE_DEFAULT_OPERATOR = "on";
 export const MATCH_OPERATORS = ["is", "not"] as const;
 
 export const MATCH_DEFAULT_OPERATOR = "is";
-
-/**
- * The key of the text literal of a table's search, the one the table reads
- * as the fetch's free text, and the quote the text is typed between: the
- * query's own text literal, with the option named by the prose.
- */
-export const TEXT_LITERAL_KEY = "text";
-
-export const TEXT_QUOTE = '"';

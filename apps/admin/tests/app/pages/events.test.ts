@@ -1,10 +1,10 @@
 import { describe, expect, it, vi } from "vitest";
 import { mount } from "@vue/test-utils";
 
+import { Table } from "#components";
 import { setRoutePath } from "#imports";
 import EventEditor from "~/components/EventEditor.vue";
 import PageHeader from "~/components/PageHeader.vue";
-import RecordTable from "~/components/RecordTable.vue";
 import Index from "~/pages/events/index.vue";
 import New from "~/pages/events/new.vue";
 import Editor from "~/pages/events/[id].vue";
@@ -23,15 +23,18 @@ describe("events page", () => {
       to: "/events/new",
       action: "New event",
     });
-    const table = wrapper.findComponent(RecordTable);
-    expect(table.props("title")).toBe("title");
-    expect(table.props("table").id).toBe("events");
-    expect(table.props("link")(DINNER)).toBe("/events/4");
+    const table = wrapper.findComponent(Table);
+    expect(table.props("service").id).toBe("events");
     expect(fetch).toHaveBeenCalledTimes(1);
     expect(fetch).toHaveBeenCalledWith("/api/events", {
       query: { page: 1, size: 25 },
     });
-    expect(table.props("table").data).toEqual([WORSHIP, DINNER]);
+    expect(table.props("service").data).toEqual([WORSHIP, DINNER]);
+    expect(
+      wrapper
+        .findAll(".f-td > a.f-anchor")
+        .map((link) => link.attributes("href")),
+    ).toEqual(["/events/3", "/events/4"]);
     expect(head()).toEqual({ title: "Events" });
   });
 });

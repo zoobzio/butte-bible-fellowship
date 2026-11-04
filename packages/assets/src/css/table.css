@@ -474,6 +474,23 @@
   background: color-mix(in oklab, var(--primary-container) 40%, transparent);
 }
 
+/*
+ * A cell that links, a row's title the way to its own page: it reads as
+ * the cells beside it do, a shade darker, and underlines as the pointer
+ * comes over it.
+ */
+.f-data-table .f-td > .f-anchor {
+  color: var(--on-surface-high-contrast);
+  font-weight: var(--weight-medium);
+  text-decoration-color: transparent;
+  transition: text-decoration-color var(--transition-fast);
+}
+
+.f-data-table .f-td > .f-anchor:hover {
+  color: var(--primary-high-contrast);
+  text-decoration-color: currentColor;
+}
+
 .f-data-table .f-td .f-img {
   max-height: var(--space-7);
   border-radius: var(--shape-sm);

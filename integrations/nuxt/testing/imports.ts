@@ -23,7 +23,10 @@ const prosary = makeProsary(
   reactive({ locale, messages: await bundles[locale]() }),
 );
 
-export const useNuxtApp = () => ({ $t: prosary.createResolver() });
+export const useNuxtApp = () => ({
+  $t: prosary.createResolver(),
+  $prosary: prosary,
+});
 
 type Locale = (typeof contract.locales)[number];
 
