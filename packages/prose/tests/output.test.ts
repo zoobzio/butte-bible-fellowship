@@ -2,6 +2,7 @@ import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
+import { messages as layer } from "@zoobzio/prose";
 import { makeProsary } from "prosary";
 import { beforeAll, describe, expect, it } from "vitest";
 
@@ -76,8 +77,10 @@ describe("contract", () => {
     expect(index.locales).toEqual([locale, ...targets]);
   });
 
-  it("lists every source message", () => {
-    expect([...index.messages].sort()).toEqual(Object.keys(source).sort());
+  it("lists every source message, the layer's with its own", () => {
+    expect([...index.messages].sort()).toEqual(
+      [...new Set([...layer, ...Object.keys(source)])].sort(),
+    );
   });
 
   it("recognises its keys and locales and nothing else", () => {

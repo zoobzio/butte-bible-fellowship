@@ -23,6 +23,7 @@
   "dependencies": {
     "@prosary/kit": "catalog:",
     "@prosary/parse": "catalog:",
+    "@zoobzio/prose": "catalog:",
     "prosary": "catalog:",
     "rehype-slug": "catalog:"
   },

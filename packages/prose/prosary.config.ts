@@ -4,6 +4,7 @@ import rehypeSlug from "rehype-slug";
 
 export default defineConfig({
   messages: "src/messages",
+  extends: "@zoobzio/prose/config",
   content: {
     dir: "src/content",
     presets: [matter(), gfm(), mdc(), { rehype: [rehypeSlug] }],
