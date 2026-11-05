@@ -1,4 +1,7 @@
+import { rekey } from "objectively";
 import { z } from "zod";
+
+import { DATE_OPERATORS, TEXT_OPERATORS } from "./operators";
 
 export const LISTING_MAX_SIZE = 100;
 
@@ -32,6 +35,112 @@ export const sorting = <T extends z.ZodType<string>>(field: T) => ({
  * records that have it, or to the ones that lack it.
  */
 export const PRESENCES = ["present", "missing"] as const;
+
+const text = (what: string) =>
+  z
+    .string()
+    .min(1)
+    .optional()
+    .meta({
+      description: `${what}, as typed, without regard to case. Left out, any.`,
+    });
+
+const day = (what: string) =>
+  z.iso
+    .date()
+    .optional()
+    .meta({
+      description: `${what}, as YYYY-MM-DD, in the church's own time. Left out, any day.`,
+      examples: ["2026-10-17"],
+    });
+
+type TextOperator = keyof typeof TEXT_OPERATORS;
+
+type DateOperator = keyof typeof DATE_OPERATORS;
+
+type TextFilter = ReturnType<typeof text>;
+
+type DayFilter = ReturnType<typeof day>;
+
+/**
+ * The filter each text operator takes, over what the column holds: the
+ * value it holds or not, whatever the case, or `present` or `missing` for
+ * whether it is filled in; and the text it carries, does not carry, starts
+ * with or ends with, as typed. One per operator, which the type holds the
+ * record to.
+ */
+const TEXT_FILTERS: Record<TextOperator, (what: string) => TextFilter> = {
+  is: (what) =>
+    z
+      .string()
+      .min(1)
+      .optional()
+      .meta({
+        description: `The ${what} the items listed hold, without regard to case, or present or missing for whether they have one. Left out, any.`,
+        examples: ["missing"],
+      }),
+  not: (what) =>
+    z
+      .string()
+      .min(1)
+      .optional()
+      .meta({
+        description: `A ${what} the items listed do not hold, without regard to case, or present or missing for whether they lack one. Left out, none.`,
+        examples: ["present"],
+      }),
+  contains: (what) => text(`Text the ${what} must carry`),
+  "not contains": (what) => text(`Text the ${what} must not carry`),
+  "starts with": (what) => text(`Text the ${what} must start with`),
+  "ends with": (what) => text(`Text the ${what} must end with`),
+};
+
+/**
+ * The filter each day operator takes, over the day the column names: the
+ * day before, after, on, on or after, or on or before it.
+ */
+const DAY_FILTERS: Record<DateOperator, (what: string) => DayFilter> = {
+  before: (what) => day(`${what} before`),
+  after: (what) => day(`${what} after`),
+  on: (what) => day(`${what} on`),
+  "on or after": (what) => day(`${what} on or after`),
+  "on or before": (what) => day(`${what} on or before`),
+};
+
+/** The filters on a text column, under its key and each operator's suffix. */
+type TextColumn<K extends string> = Record<
+  `${K}${(typeof TEXT_OPERATORS)[TextOperator]}`,
+  TextFilter
+>;
+
+/** The filters on a day column, under its key and each operator's suffix. */
+type DayColumn<K extends string> = Record<
+  `${K}${(typeof DATE_OPERATORS)[DateOperator]}`,
+  DayFilter
+>;
+
+/**
+ * The filters on a text column, one per text operator, each under the
+ * column's key and the operator's suffix: `nameContains`, `nameNotContains`,
+ * `nameStartsWith`, `nameEndsWith`, `nameIs`, `nameNot`. `what` names the
+ * column as the descriptions read it.
+ */
+export const textColumn = <K extends string>(key: K, what: string) =>
+  rekey<typeof TEXT_OPERATORS, TextColumn<K>>(
+    TEXT_OPERATORS,
+    (operator, suffix) => [`${key}${suffix}`, TEXT_FILTERS[operator](what)],
+  );
+
+/**
+ * The filters on a day column, one per day operator, each under the
+ * column's key and the operator's suffix: `updatedAtBefore`,
+ * `updatedAtAfter`, `updatedAtOn`, `updatedAtOnOrAfter`,
+ * `updatedAtOnOrBefore`. `what` names the day as the descriptions read it.
+ */
+export const dayColumn = <K extends string>(key: K, what: string) =>
+  rekey<typeof DAY_FILTERS, DayColumn<K>>(DAY_FILTERS, (operator, filter) => [
+    `${key}${DATE_OPERATORS[operator]}`,
+    filter(what),
+  ]);
 
 export const listingQuery = z.object({
   page: z.coerce

@@ -5,18 +5,27 @@ import type {
   TableFetchResult,
 } from "~/types/listing";
 
+import { DATE_OPERATORS, MATCH_OPERATORS, TEXT_OPERATORS } from "@bbf/schema";
+import { keys, within } from "objectively";
+
+/** Every operator's suffix, whatever the kind of column it filters. */
+const SUFFIXES = { ...TEXT_OPERATORS, ...DATE_OPERATORS, ...MATCH_OPERATORS };
+
+const OPERATORS = keys(SUFFIXES);
+
 /**
  * The query key of a committed filter: the column's key, and for an
- * operator filter the operator after it, each of its words capitalised:
- * `updatedAtBefore`, `nameStartsWith`.
+ * operator filter the operator's suffix after it, as the schema spells it:
+ * `updatedAtBefore`, `nameStartsWith`. A table offers only the schema's
+ * operators, so one it does not name is a fault in the table's config.
  */
-const keyOf = ({ key, op }: TableFetchParams["filters"][number]): string =>
-  op === undefined
-    ? key
-    : `${key}${op
-        .split(" ")
-        .map((word) => `${word.charAt(0).toUpperCase()}${word.slice(1)}`)
-        .join("")}`;
+const keyOf = ({ key, op }: TableFetchParams["filters"][number]): string => {
+  if (op === undefined) return key;
+  if (!within(OPERATORS, op)) {
+    throw new Error(`"${op}" is not an operator the schema names.`);
+  }
+  return `${key}${SUFFIXES[op]}`;
+};
 
 /**
  * What a table asks the API for: the page, the free text as `q`, one

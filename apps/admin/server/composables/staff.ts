@@ -1,71 +1,68 @@
 import type {
+  DateOperator,
   StaffBody,
   StaffListing,
   StaffQuery,
   StaffRecord,
   StaffSort,
+  TextOperator,
 } from "@bbf/schema/types";
 
+import type { Param } from "~~/server/types/listing";
+
+import { DATE_OPERATORS, TEXT_OPERATORS } from "@bbf/schema";
 import { toStaffArguments, toStaffRecord } from "@bbf/utils";
 import { TIME_ZONE } from "#layers/bbf/shared/constants/time";
 import { useDatabase } from "#layers/bbf/server/composables/database";
+import { collect, entries, keys } from "objectively";
 
+import { param } from "~~/server/utils/listing";
+
+/** The text columns of a member, each filtered by the text operators. */
 const TEXT_COLUMNS = ["name", "email", "phone", "summary", "photo"] as const;
 
-const TEXT_OPERATORS = {
-  is: "Is",
-  not: "Not",
-  contains: "Contains",
-  not_contains: "NotContains",
-  starts_with: "StartsWith",
-  ends_with: "EndsWith",
-} as const;
-
+/** The day columns of a member, by the name the list query gives each. */
 const DAY_COLUMNS = { updated: "updatedAt", created: "createdAt" } as const;
 
-const DAY_OPERATORS = {
-  before: "Before",
-  after: "After",
-  on: "On",
-  on_or_after: "OnOrAfter",
-  on_or_before: "OnOrBefore",
-} as const;
-
 type TextColumn = (typeof TEXT_COLUMNS)[number];
-type TextOperator = keyof typeof TEXT_OPERATORS;
 type DayColumn = keyof typeof DAY_COLUMNS;
-type DayOperator = keyof typeof DAY_OPERATORS;
 
-type TextSearch = Record<`${TextColumn}_${TextOperator}`, string | null>;
-type DaySearch = Record<`${DayColumn}_${DayOperator}`, string | null>;
+type TextSearch = Record<`${TextColumn}_${Param<TextOperator>}`, string | null>;
+type DaySearch = Record<`${DayColumn}_${Param<DateOperator>}`, string | null>;
 
 /**
  * The filters on each text column as the query takes them, `name_contains`
- * from `nameContains` and the like: null for each left out.
+ * from `nameContains` and the like, each operator's suffix the schema's:
+ * null for each left out.
  */
 const toTextSearch = (query: StaffQuery): TextSearch =>
-  Object.fromEntries(
+  collect(
     TEXT_COLUMNS.flatMap((column) =>
-      Object.entries(TEXT_OPERATORS).map(([operator, suffix]) => [
-        `${column}_${operator}`,
-        query[`${column}${suffix}`] ?? null,
-      ]),
+      keys(TEXT_OPERATORS).map((operator) => [column, operator] as const),
     ),
-  ) as TextSearch;
+    ([column, operator]) =>
+      [
+        `${column}_${param(operator)}`,
+        query[`${column}${TEXT_OPERATORS[operator]}`] ?? null,
+      ] as const,
+  );
 
 /**
  * The filters on each day column as the query takes them, `updated_before`
- * from `updatedAtBefore` and the like: null for each left out.
+ * from `updatedAtBefore` and the like, each operator's suffix the schema's:
+ * null for each left out.
  */
 const toDaySearch = (query: StaffQuery): DaySearch =>
-  Object.fromEntries(
-    Object.entries(DAY_COLUMNS).flatMap(([column, key]) =>
-      Object.entries(DAY_OPERATORS).map(([operator, suffix]) => [
-        `${column}_${operator}`,
-        query[`${key}${suffix}`] ?? null,
-      ]),
+  collect(
+    entries(DAY_COLUMNS).flatMap(([column, key]) =>
+      keys(DATE_OPERATORS).map((operator) => [column, key, operator] as const),
     ),
-  ) as DaySearch;
+    ([column, key, operator]) =>
+      [
+        `${column}_${param(operator)}`,
+        query[`${key}${DATE_OPERATORS[operator]}`] ?? null,
+      ] as const,
+  );
 
 /**
  * The search as the queries take it: null for each part left out, and the

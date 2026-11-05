@@ -75,6 +75,19 @@ describe("toListingQuery", () => {
       emailStartsWith: "jane",
     });
   });
+
+  it("refuses an operator the schema does not name", () => {
+    expect(() =>
+      toListingQuery({
+        page: 1,
+        pageSize: 25,
+        sortField: null,
+        sortDirection: "asc",
+        query: "",
+        filters: [{ key: "name", op: "between", value: "a" }],
+      }),
+    ).toThrow('"between" is not an operator the schema names.');
+  });
 });
 
 describe("toFetchResult", () => {

@@ -2,20 +2,23 @@ import type { StaffRecord } from "@bbf/schema/types";
 
 import type { RecordLink, TableConfig } from "~/types/listing";
 
-import { CONTENT_STATUSES, PRESENCES, STAFF_ROLES } from "@bbf/schema";
-import { TIME_ZONE } from "#layers/bbf/shared/constants/time";
 import {
+  CONTENT_STATUSES,
   DATE_DEFAULT_OPERATOR,
   DATE_OPERATORS,
   MATCH_DEFAULT_OPERATOR,
   MATCH_OPERATORS,
+  PRESENCES,
+  STAFF_ROLES,
   TEXT_DEFAULT_OPERATOR,
   TEXT_OPERATORS,
-} from "~/constants/listing";
+} from "@bbf/schema";
+import { TIME_ZONE } from "#layers/bbf/shared/constants/time";
+import { keys } from "objectively";
 
 /** A filter on a column with a set of values: the value held, or one not. */
 const matching = {
-  operators: MATCH_OPERATORS,
+  operators: keys(MATCH_OPERATORS),
   defaultOperator: MATCH_DEFAULT_OPERATOR,
 };
 
@@ -24,7 +27,7 @@ const matching = {
  * started or ended with.
  */
 const textual = {
-  operators: TEXT_OPERATORS,
+  operators: keys(TEXT_OPERATORS),
   defaultOperator: TEXT_DEFAULT_OPERATOR,
 };
 
@@ -40,7 +43,7 @@ const optional = { ...textual, values: [...PRESENCES] };
  * typed.
  */
 const dated = {
-  operators: DATE_OPERATORS,
+  operators: keys(DATE_OPERATORS),
   defaultOperator: DATE_DEFAULT_OPERATOR,
 };
 

@@ -2,6 +2,11 @@ import type { z } from "zod";
 
 import type { eventBody, eventId, eventPath, eventsQuery } from "./input/event";
 import type { listingQuery, sortDirection } from "./input/listing";
+import type {
+  DATE_OPERATORS,
+  MATCH_OPERATORS,
+  TEXT_OPERATORS,
+} from "./input/operators";
 import type { sermonBody, sermonPath, sermonsQuery } from "./input/sermon";
 import type {
   staffBody,
@@ -80,6 +85,12 @@ export type EventsQuery = z.infer<typeof eventsQuery>;
 export type ListingQuery = z.infer<typeof listingQuery>;
 
 export type SortDirection = z.infer<typeof sortDirection>;
+
+export type TextOperator = keyof typeof TEXT_OPERATORS;
+
+export type DateOperator = keyof typeof DATE_OPERATORS;
+
+export type MatchOperator = keyof typeof MATCH_OPERATORS;
 
 export type EventBody = z.infer<typeof eventBody>;
 

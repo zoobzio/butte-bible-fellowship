@@ -31,6 +31,7 @@
     "letters-patent": "catalog:",
     "nitropack": "catalog:",
     "nuxt": "catalog:",
+    "objectively": "catalog:",
     "untheme": "catalog:",
     "vue": "catalog:",
     "zod": "catalog:"
@@ -42,7 +43,6 @@
     "@vitest/coverage-v8": "catalog:",
     "@vue/test-utils": "catalog:",
     "happy-dom": "catalog:",
-    "objectively": "catalog:",
     "reka-ui": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:",

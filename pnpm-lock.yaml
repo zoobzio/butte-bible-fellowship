@@ -239,6 +239,9 @@ importers:
       nuxt:
         specifier: 'catalog:'
         version: 4.6.1(@babel/plugin-syntax-jsx@7.29.7(@babel/core@7.29.7))(@babel/plugin-syntax-typescript@7.29.7(@babel/core@7.29.7))(@electric-sql/pglite@0.5.10)(@oxc-project/types@0.154.0)(@types/node@26.2.0)(@vue/compiler-sfc@3.5.44)(acorn@8.18.0)(confbox@0.3.1)(db0@0.3.4(@electric-sql/pglite@0.5.10))(dotenv@17.4.2)(esbuild@0.28.2)(eslint@9.39.5(jiti@2.7.0))(giget@3.3.1)(ioredis@5.11.1)(lightningcss@1.33.0)(mlly@1.8.2)(optionator@0.9.4)(oxlint@1.86.0)(rolldown@1.2.14)(rollup-plugin-visualizer@7.1.1(rolldown@1.2.14)(rollup@4.62.4))(rollup@4.62.4)(srvx@1.0.5)(terser@5.50.0)(typescript@5.9.3)(vite@8.3.4(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(yaml@2.9.1))(vue-tsc@2.2.12(typescript@5.9.3))(yaml@2.9.1)
+      objectively:
+        specifier: 'catalog:'
+        version: 0.3.0
       untheme:
         specifier: 'catalog:'
         version: 0.6.0
@@ -267,9 +270,6 @@ importers:
       happy-dom:
         specifier: 'catalog:'
         version: 20.11.6
-      objectively:
-        specifier: 'catalog:'
-        version: 0.3.0
       reka-ui:
         specifier: 'catalog:'
         version: 2.10.3(vue@3.5.41(typescript@5.9.3))
@@ -542,6 +542,9 @@ importers:
 
   packages/schema:
     dependencies:
+      objectively:
+        specifier: 'catalog:'
+        version: 0.3.0
       zod:
         specifier: 'catalog:'
         version: 4.6.5

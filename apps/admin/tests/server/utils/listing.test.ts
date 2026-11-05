@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { paginate } from "~~/server/utils/listing";
+import { paginate, param } from "~~/server/utils/listing";
 
 const ITEMS = ["a", "b", "c", "d", "e"];
 
@@ -36,5 +36,13 @@ describe("paginate", () => {
       items: [],
       total: 0,
     });
+  });
+});
+
+describe("param", () => {
+  it("joins an operator's words with underscores, as the SQL names its parameter", () => {
+    expect(param("is")).toBe("is");
+    expect(param("not contains")).toBe("not_contains");
+    expect(param("on or before")).toBe("on_or_before");
   });
 });

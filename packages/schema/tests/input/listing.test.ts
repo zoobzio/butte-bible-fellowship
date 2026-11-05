@@ -3,11 +3,13 @@ import { describe, expect, it } from "vitest";
 import { z } from "zod";
 
 import {
+  dayColumn,
   LISTING_DEFAULT_SIZE,
   LISTING_MAX_SIZE,
   listingQuery,
   SORT_DIRECTIONS,
   sorting,
+  textColumn,
 } from "../../src/input/listing";
 
 describe("listingQuery", () => {
@@ -65,5 +67,72 @@ describe("sorting", () => {
   it("refuses a column not named, or a direction that is neither way", () => {
     expect(sorted.safeParse({ sort: "email" }).success).toBe(false);
     expect(sorted.safeParse({ direction: "down" }).success).toBe(false);
+  });
+});
+
+describe("textColumn", () => {
+  const named = z.object(textColumn("name", "name"));
+
+  it("filters the column under its key and each text operator's suffix", () => {
+    expect(Object.keys(named.shape)).toEqual([
+      "nameContains",
+      "nameNotContains",
+      "nameStartsWith",
+      "nameEndsWith",
+      "nameIs",
+      "nameNot",
+    ]);
+  });
+
+  it("takes text under each, never empty, and leaves out what is not given", () => {
+    expect(named.parse({ nameContains: "jane", nameNot: "missing" })).toEqual({
+      nameContains: "jane",
+      nameNot: "missing",
+    });
+    expect(named.parse({})).toEqual({});
+    expect(named.safeParse({ nameStartsWith: "" }).success).toBe(false);
+  });
+
+  it("describes each filter by the column named", () => {
+    expect(named.shape.nameContains.meta()?.description).toBe(
+      "Text the name must carry, as typed, without regard to case. Left out, any.",
+    );
+    expect(named.shape.nameIs.meta()?.description).toContain(
+      "present or missing",
+    );
+  });
+});
+
+describe("dayColumn", () => {
+  const changed = z.object(dayColumn("updatedAt", "The day it was changed"));
+
+  it("filters the column under its key and each day operator's suffix", () => {
+    expect(Object.keys(changed.shape)).toEqual([
+      "updatedAtBefore",
+      "updatedAtAfter",
+      "updatedAtOn",
+      "updatedAtOnOrAfter",
+      "updatedAtOnOrBefore",
+    ]);
+  });
+
+  it("takes a day as YYYY-MM-DD under each, and leaves out what is not given", () => {
+    expect(
+      changed.parse({
+        updatedAtOn: "2026-10-17",
+        updatedAtAfter: "2026-10-01",
+      }),
+    ).toEqual({ updatedAtOn: "2026-10-17", updatedAtAfter: "2026-10-01" });
+    expect(changed.parse({})).toEqual({});
+    expect(changed.safeParse({ updatedAtOn: "2026-10" }).success).toBe(false);
+    expect(changed.safeParse({ updatedAtBefore: "yesterday" }).success).toBe(
+      false,
+    );
+  });
+
+  it("describes each filter by the day named and its operator", () => {
+    expect(changed.shape.updatedAtOnOrAfter.meta()?.description).toBe(
+      "The day it was changed on or after, as YYYY-MM-DD, in the church's own time. Left out, any day.",
+    );
   });
 });
