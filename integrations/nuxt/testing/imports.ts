@@ -110,6 +110,24 @@ export const useAppConfig = () => appConfig;
 
 export const useHead = vi.fn();
 
+const route = reactive({
+  path: "/",
+  params: {} as Record<string, string>,
+  query: {} as Record<string, string>,
+});
+
+export const setRoutePath = (
+  path: string,
+  params: Record<string, string> = {},
+  query: Record<string, string> = {},
+) => {
+  route.path = path;
+  route.params = params;
+  route.query = query;
+};
+
+export const useRoute = () => route;
+
 export const createError = (input: { statusCode: number; message: string }) =>
   Object.assign(new Error(input.message), input);
 

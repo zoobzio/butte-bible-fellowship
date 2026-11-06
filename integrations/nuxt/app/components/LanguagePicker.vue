@@ -1,45 +1,59 @@
 <script lang="ts">
-import type { AppProsaryLocale } from "#imports";
+import type { AppProsaryLocale, CommandOption } from "#imports";
 
-import { Icon, Menu } from "#components";
-import { defineMenu, useNuxtApp } from "#imports";
+import { Command, Icon, Popover } from "#components";
+import { defineCommand, definePopover, useNuxtApp } from "#imports";
 import { useLanguages } from "#layers/bbf/app/composables/locale";
 </script>
 
 <script setup lang="ts">
 defineOptions({ name: "LanguagePicker" });
 
-const { $t } = useNuxtApp();
-const { current, languages, choose } = useLanguages();
+type LanguageOption = CommandOption & { value: AppProsaryLocale };
 
-const menu = defineMenu(() => ({
-  groups: [
-    {
-      key: "languages",
-      items: languages.value.map(({ label, locale }) => ({ label, locale })),
-    },
-  ],
-  side: "top" as const,
-  align: "end" as const,
-  onSelect: (item: { locale: AppProsaryLocale }) => choose(item.locale),
+const { $t } = useNuxtApp();
+const { languages, choose } = useLanguages();
+
+const options: LanguageOption[] = languages.value.map(({ locale, label }) => ({
+  value: locale,
+  label,
+}));
+
+const popover = definePopover({ side: "bottom", align: "end" });
+
+const command = defineCommand(() => ({
+  groups: [{ key: "languages", label: $t.language.languages(), options }],
+  modelValue: options.filter((option) =>
+    languages.value.some(
+      ({ locale, active }) => active && locale === option.value,
+    ),
+  ),
+  placeholder: $t.language.search(),
+  "onUpdate:modelValue": ([option] = []) => {
+    if (option) {
+      choose(option.value);
+    }
+  },
 }));
 </script>
 
 <template>
-  <Menu v-bind="menu">
-    <button
-      type="button"
-      class="theme-toggle language-toggle"
-      :aria-label="$t.language.open()"
-    >
-      <Icon name="languages" class="icon" />
-      <span>{{ current }}</span>
-    </button>
-  </Menu>
+  <Popover v-bind="popover">
+    <template #trigger>
+      <button
+        type="button"
+        class="theme-toggle language-toggle"
+        :aria-label="$t.language.open()"
+      >
+        <Icon name="languages" class="icon" />
+      </button>
+    </template>
+    <template #content>
+      <Command
+        v-bind="command"
+        class="language-picker"
+        :aria-label="$t.language.languages()"
+      />
+    </template>
+  </Popover>
 </template>
-
-<style>
-.theme-toggle.language-toggle {
-  padding-inline: var(--space-3);
-}
-</style>

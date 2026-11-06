@@ -2,15 +2,25 @@
 import { Icon, NuxtLink } from "#components";
 import { useNuxtApp, useTemplateRef } from "#imports";
 
-import AppMobileNav from "~/components/AppMobileNav.vue";
-import { useHeaderHeight, useNavigation } from "~/composables/navigation";
+import AppMobileNav from "#layers/bbf/app/components/AppMobileNav.vue";
+import ColorMode from "#layers/bbf/app/components/ColorMode.vue";
+import LanguagePicker from "#layers/bbf/app/components/LanguagePicker.vue";
+import ThemePicker from "#layers/bbf/app/components/ThemePicker.vue";
+import ThemeSettings from "#layers/bbf/app/components/ThemeSettings.vue";
+import {
+  useHeaderHeight,
+  useNavigation,
+} from "#layers/bbf/app/composables/navigation";
 </script>
 
 <script setup lang="ts">
 defineOptions({ name: "AppHeader" });
 
+/* What an app adds at the right end of the bar: the admin's account menu. */
+defineSlots<{ default?: () => unknown }>();
+
 const { $t } = useNuxtApp();
-const { home, links } = useNavigation();
+const { home, tagline, links } = useNavigation();
 
 // Do not name this ref `header`. A production build resolves that name to a config.
 useHeaderHeight(useTemplateRef<HTMLElement>("root"));
@@ -22,7 +32,7 @@ useHeaderHeight(useTemplateRef<HTMLElement>("root"));
       <Icon name="logo" class="site-brand-logo" aria-hidden="true" />
       <span class="site-brand-text">
         <span class="site-brand-name">{{ $t.site.name() }}</span>
-        <span class="site-brand-tag">{{ $t.site.tagline() }}</span>
+        <span class="site-brand-tag">{{ tagline }}</span>
       </span>
     </NuxtLink>
 
@@ -38,7 +48,20 @@ useHeaderHeight(useTemplateRef<HTMLElement>("root"));
       </NuxtLink>
     </nav>
 
-    <AppMobileNav />
+    <div class="site-actions">
+      <div
+        class="site-controls"
+        role="group"
+        :aria-label="$t.appearance.label()"
+      >
+        <ColorMode />
+        <ThemePicker />
+        <ThemeSettings />
+        <LanguagePicker />
+      </div>
+      <slot />
+      <AppMobileNav />
+    </div>
   </header>
 </template>
 
@@ -50,7 +73,6 @@ useHeaderHeight(useTemplateRef<HTMLElement>("root"));
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  justify-content: space-between;
   gap: var(--space-4) var(--space-6);
   padding: var(--space-5) calc(var(--site-gutter) / 2) var(--space-4);
   background: color-mix(in oklab, var(--surface) 88%, transparent);
@@ -77,8 +99,8 @@ useHeaderHeight(useTemplateRef<HTMLElement>("root"));
 .site-brand-logo {
   flex: none;
   display: block;
-  width: var(--brand-height);
-  height: var(--brand-height);
+  width: var(--space-7);
+  height: var(--space-7);
   color: var(--primary);
 }
 
@@ -88,10 +110,9 @@ useHeaderHeight(useTemplateRef<HTMLElement>("root"));
 }
 
 .site-brand-name {
-  font: var(--type-headline);
+  font: var(--type-title);
   font-family: var(--font-display);
-  font-size: var(--brand-name-size);
-  letter-spacing: var(--type-headline-letter-spacing);
+  letter-spacing: var(--type-title-letter-spacing);
   color: var(--on-surface-high-contrast);
 }
 
@@ -108,12 +129,11 @@ useHeaderHeight(useTemplateRef<HTMLElement>("root"));
   color: var(--primary-high-contrast);
 }
 
+/* The links follow the brand; the controls take the far end. */
 .site-nav {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  justify-content: flex-end;
-  margin-left: auto;
   gap: var(--space-2) var(--space-5);
 }
 
@@ -159,13 +179,31 @@ useHeaderHeight(useTemplateRef<HTMLElement>("root"));
   transform: scaleX(1);
 }
 
+.site-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-2) var(--space-3);
+  margin-left: auto;
+}
+
+.site-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
 @media (max-width: 44rem) {
   .site-header {
-    align-items: flex-start;
     padding-block: var(--space-4) var(--space-3);
   }
   .site-nav {
     display: none;
+  }
+  /* The actions take a row of their own under the brand. */
+  .site-actions {
+    flex: 1 1 100%;
   }
 }
 </style>

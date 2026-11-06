@@ -2,7 +2,7 @@
 import { Body } from "#components";
 import { useHead, useLocale, useNuxtApp } from "#imports";
 
-import AppHeader from "~/components/AppHeader.vue";
+import AppHeader from "#layers/bbf/app/components/AppHeader.vue";
 import AppFooter from "~/components/AppFooter.vue";
 import AppInvitation from "~/components/AppInvitation.vue";
 </script>

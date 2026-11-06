@@ -45,15 +45,48 @@ import type { DatabaseRow } from "#layers/bbf/server/types/database";
 The layer's own files reach one another the same way, by `#layers/bbf/…`:
 inside a layer, `~/` resolves against the app that extends it.
 
+### The header
+
+The bar along the top of every app: the brand, which leads home, then the
+app's links, and at the far end the language and appearance controls, with
+whatever the app adds after them in the default slot. An app configures it
+in its `app.config.ts`, under `header`, as a `HeaderConfig`: the message
+that names the line under the church's name, and its links, each a message
+key and a path. The layer's own `app.config.ts` holds the default the app's
+merges over: the site's tagline, and no links.
+
+```ts
+const header: HeaderConfig = {
+  tagline: "admin.site.tag",
+  links: [{ label: "admin.navigation.staff", to: "/staff" }],
+};
+```
+
+```vue
+<AppHeader>
+  <AccountMenu />
+</AppHeader>
+```
+
+| component          | what it is                                                         |
+| ------------------ | ------------------------------------------------------------------ |
+| `AppHeader.vue`    | the bar: brand, links, controls, the app's slot, the mobile menu   |
+| `AppMobileNav.vue` | the links as a menu behind one button, in place of them on a phone |
+
+`useNavigation`, under both, is the config in the reader's words: the way
+home, the tagline, and each link, marked while its page or a page under it
+is read (`isWithin`). `useHeaderHeight` publishes the bar's height to the
+root as `--header-height`, which what sticks under it reads.
+
 ### Language and appearance
 
-The controls over the reader's language and the church's theme, which every
-app offers, each named in the reader's language from `appearance.json` and
-`language.json` of `@bbf/prose`:
+The controls over the reader's language and the church's theme, which the
+header offers in every app, each named in the reader's language from
+`appearance.json` and `language.json` of `@bbf/prose`:
 
 | component            | what it is                                                        |
 | -------------------- | ----------------------------------------------------------------- |
-| `LanguagePicker.vue` | a button naming the language being read, that opens a menu of all |
+| `LanguagePicker.vue` | a button that opens a searchable list of the languages, by name   |
 | `ColorMode.vue`      | a button that switches the color scheme                           |
 | `ThemePicker.vue`    | a button that opens a searchable list of the build's themes       |
 | `ThemeSettings.vue`  | a button that opens a button group per modifier (contrast, text…) |
@@ -75,18 +108,19 @@ changed through a view-transition cross-fade where the browser has one.
 
 The apps' tests share its support through the package, as `@bbf/nuxt/testing/…`:
 
-| file                    | what it is                                                                                         |
-| ----------------------- | -------------------------------------------------------------------------------------------------- |
-| `testing/imports.ts`    | the vitest shim for `#imports` every app shares: Vue, `useState`, `useUntheme`, `useLocale`, `$t`… |
-| `testing/components.ts` | the vitest shim for `#components` every app shares: `NuxtLink`, `Icon`, `Popover`, `Menu`…         |
-| `testing/bezoar.ts`     | the vitest shim for `#bezoar/service`: a stub service a test fills                                 |
-| `testing/mount.ts`      | `withSetup` and `mountSuspended`, to run a composable or async setup                               |
+| file                    | what it is                                                                                                     |
+| ----------------------- | -------------------------------------------------------------------------------------------------------------- |
+| `testing/imports.ts`    | the vitest shim for `#imports` every app shares: Vue, `useState`, `useUntheme`, `useLocale`, `useRoute`, `$t`… |
+| `testing/components.ts` | the vitest shim for `#components` every app shares: `NuxtLink`, `Icon`, `Popover`, `Menu`…                     |
+| `testing/bezoar.ts`     | the vitest shim for `#bezoar/service`: a stub service a test fills                                             |
+| `testing/mount.ts`      | `withSetup` and `mountSuspended`, to run a composable or async setup                                           |
 
 An app's `tests/mocks/imports.ts` and `tests/mocks/components.ts` re-export
 the shared shims and add what the app's own modules put there (the web's
 `useRequestFetch`, the admin's `useAuth`, …). The shared `useNuxtApp` is
-`$t` over the real build of `@bbf/prose`, and `setLocale` switches it; an
-app whose modules put more on the Nuxt app spreads it into its own. An app's `vitest.config.ts` aliases the
+`$t` over the real build of `@bbf/prose`, and `setLocale` switches it, as
+`setRoutePath` moves the shared `useRoute`; an app whose modules put more on
+the Nuxt app spreads it into its own. An app's `vitest.config.ts` aliases the
 virtual modules to its mocks, `#bezoar/service` to the shim and `#layers/bbf`
 to the layer, as Nuxt would.
 
@@ -94,10 +128,13 @@ to the layer, as Nuxt would.
 
 ```
 nuxt.config.ts                  the layer
-app/components/                 LanguagePicker, ColorMode, ThemePicker and ThemeSettings
-app/composables/                useLanguages, useColorMode, useThemes and useModifiers
+app/app.config.ts               the header's default, which an app's config merges over
+app/components/                 AppHeader and AppMobileNav; LanguagePicker, ColorMode, ThemePicker and ThemeSettings
+app/composables/                useNavigation and useHeaderHeight; useLanguages, useColorMode, useThemes and useModifiers
+app/types/navigation.ts         HeaderConfig and its links, as an app configures them and as they render
 app/types/theme.ts              the themes and settings, as types
 app/utils/locale.ts             languageName: a language's name in that language
+app/utils/navigation.ts         isWithin: whether a path is a section's page or under it
 app/utils/theme.ts              transition: a change as a view-transition cross-fade
 server/composables/database.ts  useDatabase: the bezoar service, as the app's role
 server/types/database.ts        DatabaseQuery and DatabaseRow, from the service

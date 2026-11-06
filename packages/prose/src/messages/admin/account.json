@@ -1,10 +1,10 @@
 {
-  "appearance": {
-    "defaultMessage": "Appearance",
-    "description": "The accessible name of the group of controls over the admin's language, color scheme and theme."
+  "menu": {
+    "defaultMessage": "Account",
+    "description": "The name of the header's account menu, which opens from the signed-in user's name, and of its button when Google gave them neither name nor email."
   },
   "signOut": {
     "defaultMessage": "Sign out",
-    "description": "The button that ends the session."
+    "description": "The menu item that ends the session."
   }
 }

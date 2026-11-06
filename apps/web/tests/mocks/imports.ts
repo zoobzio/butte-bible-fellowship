@@ -1,6 +1,5 @@
 import type { Root } from "hast";
 
-import { reactive } from "vue";
 import { vi } from "vitest";
 import { CONTENT_URL } from "@prosary/nuxt/constant";
 
@@ -9,14 +8,6 @@ export * from "@bbf/nuxt/testing/imports";
 export const useRuntimeConfig = () => ({
   public: { youtube: { channel: "UCtest" } },
 });
-
-const route = reactive({ path: "/" });
-
-export const setRoutePath = (path: string) => {
-  route.path = path;
-};
-
-export const useRoute = () => route;
 
 const router = {
   back: vi.fn(),

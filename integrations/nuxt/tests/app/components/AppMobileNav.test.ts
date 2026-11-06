@@ -2,11 +2,11 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { nextTick } from "vue";
 import { mount } from "@vue/test-utils";
 
-import type { NavigationLink } from "~/types/navigation";
+import type { NavigationLink } from "#layers/bbf/app/types/navigation";
 
 import { Menu } from "#components";
 import { setAppConfig, useNuxtApp } from "#imports";
-import AppMobileNav from "~/components/AppMobileNav.vue";
+import AppMobileNav from "#layers/bbf/app/components/AppMobileNav.vue";
 
 const LINKS: NavigationLink[] = [
   { label: "navigation.about", to: "/" },
@@ -16,7 +16,7 @@ const LINKS: NavigationLink[] = [
 const { $t } = useNuxtApp();
 
 beforeEach(() => {
-  setAppConfig({ header: { links: LINKS } });
+  setAppConfig({ header: { tagline: "site.tagline", links: LINKS } });
 });
 
 const items = () => [

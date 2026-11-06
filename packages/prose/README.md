@@ -34,8 +34,8 @@ through the `@bbf/nuxt` layer.
 | `site.json`       | the church's name, its tagline and the meta description     |
 | `navigation.json` | the primary navigation: its links and accessible names      |
 | `footer.json`     | the footer's headings, service time and copyright line      |
-| `appearance.json` | the color scheme toggle, theme picker and theme settings    |
-| `language.json`   | the language switcher                                       |
+| `appearance.json` | the header's controls: color scheme, theme and its settings |
+| `language.json`   | the language picker: its button, its list and its search    |
 | `page.json`       | page-level words: not found, contents, the way back         |
 | `about.json`      | the about page: its title                                   |
 | `sermons.json`    | the sermons page: its header, play button, channel link     |
@@ -46,9 +46,9 @@ through the `@bbf/nuxt` layer.
 | File                    | Messages                                                         |
 | ----------------------- | ---------------------------------------------------------------- |
 | `admin/site.json`       | what the admin is: the line under the church's name              |
-| `admin/navigation.json` | the sidebar: its accessible name and its sections                |
+| `admin/navigation.json` | the header's links: the sections the admin edits                 |
 | `admin/login.json`      | the login page                                                   |
-| `admin/account.json`    | the account panel: its controls' group and the way out           |
+| `admin/account.json`    | the account menu: its name and the way out                       |
 | `admin/editor.json`     | what every editor shares: its buttons, prompts, fields, statuses |
 | `admin/events.json`     | the events section: its pages' titles and not found              |
 | `admin/event.json`      | an event's fields, and the hints under them                      |
@@ -151,8 +151,8 @@ The `@bbf/nuxt` layer hands the build to `@prosary/nuxt` —
 every app that extends the layer, and serves the pages. A component calls a
 message it names (`$t.navigation.open()`); data carries one by key, typed as
 `AppProsaryMessage`, and resolves it where it renders (`$t(link.label)`).
-The web's header and footer and the admin's sidebar, in each app's
-`app.config.ts`, are data of that kind. Nuxt reads the built output when it
+Each app's header, and the web's footer, in its `app.config.ts`, are data
+of that kind. Nuxt reads the built output when it
 loads its config, so restart `pnpm dev` after rebuilding this package.
 
 The locale is the visitor's own: the module picks it from their cookie, else

@@ -10,7 +10,7 @@ defineOptions({ name: "ThemeSettings" });
 const { $t } = useNuxtApp();
 const { settings, selection, set } = useModifiers();
 
-const popover = definePopover({ side: "top", align: "start" });
+const popover = definePopover({ side: "bottom", align: "end" });
 
 const controls = settings.map(({ id, name, contexts }) => {
   const options = contexts.map((context) => ({

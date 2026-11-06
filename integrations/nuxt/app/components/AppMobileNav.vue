@@ -1,11 +1,12 @@
 <script lang="ts">
 import { Icon, Menu } from "#components";
 import { defineMenu, useNuxtApp } from "#imports";
-import MenuLink from "~/components/MenuLink.vue";
-import { useNavigation } from "~/composables/navigation";
+import { useNavigation } from "#layers/bbf/app/composables/navigation";
 </script>
 
 <script setup lang="ts">
+defineOptions({ name: "AppMobileNav" });
+
 const { $t } = useNuxtApp();
 const { links } = useNavigation();
 
@@ -26,9 +27,6 @@ const menu = defineMenu(() => ({
       <button type="button" :aria-label="$t.navigation.open()">
         <Icon name="menu" class="icon" />
       </button>
-      <template #item="{ item, settings }">
-        <MenuLink :item="item" :settings="settings" />
-      </template>
     </Menu>
   </div>
 </template>
@@ -67,7 +65,7 @@ const menu = defineMenu(() => ({
 
 .site-nav-mobile .icon {
   display: block;
-  width: var(--space-5);
-  height: var(--space-5);
+  width: var(--space-4);
+  height: var(--space-4);
 }
 </style>

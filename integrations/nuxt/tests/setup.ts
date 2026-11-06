@@ -5,6 +5,7 @@ import {
   clearLocale,
   clearNuxtStateRegistry,
   clearUntheme,
+  setRoutePath,
   useHead,
 } from "@bbf/nuxt/testing/imports";
 
@@ -13,6 +14,7 @@ beforeEach(() => {
   clearAppConfig();
   clearLocale();
   clearUntheme();
+  setRoutePath("/");
   useHead.mockClear();
 });
 

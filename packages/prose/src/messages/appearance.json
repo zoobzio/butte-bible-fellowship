@@ -1,4 +1,8 @@
 {
+  "label": {
+    "defaultMessage": "Appearance",
+    "description": "The accessible name of the group of controls in the header over the reader's language, color scheme and theme."
+  },
   "scheme": {
     "defaultMessage": "{mode, select, dark {Switch to dark mode} other {Switch to light mode}}",
     "description": "The accessible name of the color scheme toggle. `mode` is the scheme it switches to."

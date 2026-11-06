@@ -20,7 +20,7 @@ const options: ThemeOption[] = themes.map(({ id, name }) => ({
   label: name,
 }));
 
-const popover = definePopover({ side: "top", align: "start" });
+const popover = definePopover({ side: "bottom", align: "end" });
 
 const command = defineCommand(() => ({
   groups: [{ key: "themes", label: $t.appearance.themes(), options }],

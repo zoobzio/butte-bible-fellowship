@@ -4,11 +4,6 @@
   --site-width: 64rem;
   --site-gutter: clamp(var(--space-5), 8vw, var(--space-8));
   --page-width: 80rem;
-  --brand-name-size: clamp(var(--title-size), 2.4vw, var(--headline-size));
-  --brand-height: calc(
-    var(--brand-name-size) * var(--headline-line-height) + var(--label-size) *
-      var(--title-line-height) + var(--space-1)
-  );
 }
 
 /* The loading bar reads this token. The theme does not define it. */

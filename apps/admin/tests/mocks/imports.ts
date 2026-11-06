@@ -59,24 +59,6 @@ export const useAuth = () => auth;
 
 export const useRuntimeConfig = () => ({ public: {} });
 
-const route = reactive({
-  path: "/",
-  params: {} as Record<string, string>,
-  query: {} as Record<string, string>,
-});
-
-export const setRoutePath = (
-  path: string,
-  params: Record<string, string> = {},
-  query: Record<string, string> = {},
-) => {
-  route.path = path;
-  route.params = params;
-  route.query = query;
-};
-
-export const useRoute = () => route;
-
 const router = {
   back: vi.fn(),
   push: vi.fn(async () => {}),

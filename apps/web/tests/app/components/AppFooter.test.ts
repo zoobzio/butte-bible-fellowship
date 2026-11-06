@@ -121,6 +121,5 @@ describe("AppFooter", () => {
       $t.appearance.settings(),
     ]);
     expect(labels).not.toContain("Switch to dark mode");
-    expect(controls.find(".language-toggle").text()).toBe("Español");
   });
 });

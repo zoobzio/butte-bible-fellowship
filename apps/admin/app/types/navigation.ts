@@ -1,14 +1,4 @@
-import type { AppProsaryMessage } from "#imports";
 import type { IconAlias } from "@zoobzio/nuxt/types/icon";
-
-export interface SidebarLink {
-  label: AppProsaryMessage;
-  to: string;
-}
-
-export interface SidebarConfig {
-  links: SidebarLink[];
-}
 
 /**
  * A link of a page's header, named, with an icon before its name when it

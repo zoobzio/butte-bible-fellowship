@@ -1,13 +1,14 @@
 import type { ContactConfig } from "~/types/contact";
 import type { EventsConfig } from "~/types/events";
 import type { FooterConfig } from "~/types/footer";
-import type { HeaderConfig } from "~/types/header";
 import type { InvitationConfig } from "~/types/invitation";
+import type { HeaderConfig } from "#layers/bbf/app/types/navigation";
 
 import { defineAppConfig } from "#imports";
 import { emailHref, phoneHref } from "~/utils/contact";
 
 const header: HeaderConfig = {
+  tagline: "site.tagline",
   links: [
     { label: "navigation.about", to: "/about-us" },
     { label: "navigation.events", to: "/events" },
