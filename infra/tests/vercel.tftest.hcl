@@ -61,3 +61,17 @@ run "environment" {
     error_message = "Each project's NUXT_BEZOAR_URL is its own app's connection string, held as a secret."
   }
 }
+
+run "storage" {
+  command = apply
+
+  assert {
+    condition     = vercel_blob_store.avatars.access == "public"
+    error_message = "The staff's photos are read by the site's visitors, so the store is public."
+  }
+
+  assert {
+    condition     = vercel_blob_project_connection.avatars.blob_store_id == vercel_blob_store.avatars.id && vercel_blob_project_connection.avatars.project_id == vercel_project.app["admin"].id
+    error_message = "The admin project alone is given the store's token: the site only reads."
+  }
+}

@@ -10,5 +10,13 @@
   "notFound": {
     "defaultMessage": "Staff member not found",
     "description": "The error shown when an address names a staff member that does not exist."
+  },
+  "description": {
+    "defaultMessage": "The people who serve the church, as the site introduces them.",
+    "description": "The line under the title of the page that lists the staff members: what the list is."
+  },
+  "profile": {
+    "defaultMessage": "Profile",
+    "description": "The tab of a staff member's page that holds their details, their photo and their bio."
   }
 }

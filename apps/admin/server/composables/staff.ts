@@ -1,5 +1,6 @@
 import type {
   DateOperator,
+  StaffBio,
   StaffBody,
   StaffListing,
   StaffQuery,
@@ -149,10 +150,37 @@ export const useStaff = () => {
     return written === null ? null : fetch(id);
   };
 
+  /**
+   * A member's photo, written on its own: the URL it is read at, or null
+   * for none. Their details and their bio stay as they are.
+   */
+  const setPhoto = async (
+    id: number,
+    photo: string | null,
+  ): Promise<StaffRecord | null> => {
+    const written = await db.admin.staff.photo.first({ id, photo });
+    return written === null ? null : fetch(id);
+  };
+
+  /**
+   * A member's bio, written on its own: the tree, or none when the body
+   * leaves it out. Their details and their photo stay as they are.
+   */
+  const setBio = async (
+    id: number,
+    body: StaffBio,
+  ): Promise<StaffRecord | null> => {
+    const written = await db.admin.staff.bio.first({
+      id,
+      bio: body.bio ?? null,
+    });
+    return written === null ? null : fetch(id);
+  };
+
   const remove = async (id: number): Promise<boolean> => {
     const deleted = await db.admin.staff.delete({ id });
     return deleted > 0;
   };
 
-  return { list, fetch, create, update, remove };
+  return { list, fetch, create, update, setPhoto, setBio, remove };
 };

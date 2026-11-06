@@ -89,8 +89,8 @@ describe("the build", () => {
       "web.sermons.list",
       "web.staff.list",
     ]);
-    expect(names.filter((name) => name.startsWith("admin."))).toHaveLength(22);
-    expect(names).toHaveLength(29);
+    expect(names.filter((name) => name.startsWith("admin."))).toHaveLength(24);
+    expect(names).toHaveLength(31);
   });
 });
 
@@ -177,24 +177,33 @@ describe("admin.staff", () => {
   const member = {
     name: "Pastor Name",
     role: "pastor" as const,
-    photo: "https://cdn.example.com/staff/pastor.jpg",
     email: "pastor@example.com",
     status: "published" as const,
   };
+
+  const photo = "https://cdn.example.com/staff/pastor.jpg";
 
   it("creates, reads, updates and deletes a member", async () => {
     const created = await db.admin.staff.create.first(member);
     expect(created?.created_at).toBeInstanceOf(Date);
     const id = created!.id;
 
+    // A member is created without a photo or a bio: each is set on its own.
     expect(await db.admin.staff.fetch.first({ id })).toMatchObject({
       summary: null,
       bio: null,
       phone: null,
-      photo: member.photo,
+      photo: null,
       email: member.email,
       status: "published",
     });
+    const portrayed = await db.admin.staff.photo.first({ id, photo });
+    expect(portrayed?.updated_at).toBeInstanceOf(Date);
+    expect(await db.admin.staff.fetch.first({ id })).toMatchObject({
+      photo,
+      email: member.email,
+    });
+    expect(await db.admin.staff.photo.first({ id: 0, photo })).toBeNull();
 
     const tz = "America/Los_Angeles";
     const page = { size: 25, offset: 0, tz, sort: "role", direction: "asc" };
@@ -383,7 +392,6 @@ describe("admin.staff", () => {
       id,
       ...member,
       summary: null,
-      bio: null,
       phone: "",
     });
     expect(await db.admin.staff.list({ ...page, phone_is: "present" })).toEqual(
@@ -474,20 +482,32 @@ describe("admin.staff", () => {
       id,
       role: "staff",
       summary: "Serving since 2010.",
-      bio,
-      photo: null,
       email: null,
       phone: "530-555-0100",
     });
     expect(updated?.updated_at).toBeInstanceOf(Date);
+    // An update replaces the member's details, and leaves the photo and
+    // the bio as they were.
+    expect(await db.admin.staff.fetch.first({ id })).toMatchObject({
+      role: "staff",
+      summary: "Serving since 2010.",
+      bio: null,
+      photo,
+      email: null,
+      phone: "530-555-0100",
+    });
+    const written = await db.admin.staff.bio.first({ id, bio });
+    expect(written?.updated_at).toBeInstanceOf(Date);
+    expect((await db.admin.staff.photo.first({ id, photo: null }))?.id).toBe(
+      id,
+    );
     expect(await db.admin.staff.fetch.first({ id })).toMatchObject({
       role: "staff",
       summary: "Serving since 2010.",
       bio,
       photo: null,
-      email: null,
-      phone: "530-555-0100",
     });
+    expect(await db.admin.staff.bio.first({ id: 0, bio })).toBeNull();
     // The bio's text and the phone are searched once they are written.
     expect(
       (await db.admin.staff.list({ ...page, q: "pastor's story" })).map(

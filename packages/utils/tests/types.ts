@@ -80,5 +80,5 @@ declare const staffRecord: StaffRecord;
 export const staffForm = toStaffForm(staffRecord);
 export const staffBody: StaffBody = toStaffBody(staffForm);
 
-// @ts-expect-error A form holds the bio as HTML, not a tree.
+// @ts-expect-error A form carries no bio: it is written on its own.
 export const noTree = toStaffBody({ ...staffForm, bio: staffRecord.bio });

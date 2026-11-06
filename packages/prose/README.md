@@ -54,7 +54,7 @@ through the `@bbf/nuxt` layer.
 | `admin/event.json`      | an event's fields, and the hints under them                      |
 | `admin/days.json`       | the days of the week an event repeats on                         |
 | `admin/staff.json`      | the staff section: its pages' titles and not found               |
-| `admin/member.json`     | a staff member's fields, and the hints under them                |
+| `admin/member.json`     | a staff member's fields, their photo's controls, and the hints   |
 
 Messages are ICU MessageFormat, where an ASCII apostrophe is the escape
 character — write a typographic one (`You’re`), as the pages already do.

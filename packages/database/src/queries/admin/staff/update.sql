@@ -2,8 +2,6 @@ UPDATE staff
 SET name = :name,
     role = :role,
     summary = :summary,
-    bio = :bio::jsonb,
-    photo = :photo,
     email = :email,
     phone = :phone,
     status = :status,

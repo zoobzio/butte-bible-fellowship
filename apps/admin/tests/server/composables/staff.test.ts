@@ -138,6 +138,12 @@ const created = vi.fn(async () => ({ id: 3, created_at: ROW.created_at }));
 const updated = vi.fn(async (args: { id: number }) =>
   args.id === 1 ? { id: 1, updated_at: ROW.updated_at } : null,
 );
+const portrayed = vi.fn(async (args: { id: number; photo: string | null }) =>
+  args.id === 1 ? { id: 1, updated_at: ROW.updated_at } : null,
+);
+const described = vi.fn(async (args: { id: number; bio: unknown }) =>
+  args.id === 1 ? { id: 1, updated_at: ROW.updated_at } : null,
+);
 const deleted = vi.fn(async ({ id }: { id: number }) => (id === 1 ? 1 : 0));
 
 Object.assign(service, {
@@ -147,13 +153,23 @@ Object.assign(service, {
       fetch: { first: fetched },
       create: { first: created },
       update: { first: updated },
+      photo: { first: portrayed },
+      bio: { first: described },
       delete: deleted,
     },
   },
 });
 
 afterEach(() => {
-  for (const query of [list, fetched, created, updated, deleted]) {
+  for (const query of [
+    list,
+    fetched,
+    created,
+    updated,
+    portrayed,
+    described,
+    deleted,
+  ]) {
     query.mockClear();
   }
 });
@@ -364,8 +380,6 @@ describe("useStaff", () => {
       name: "New",
       role: "staff",
       summary: null,
-      bio: null,
-      photo: null,
       email: null,
       phone: null,
       status: "draft",
@@ -380,7 +394,7 @@ describe("useStaff", () => {
     ).toBeNull();
   });
 
-  it("replaces every field of a member, and hands back the record", async () => {
+  it("replaces a member's details, and hands back the record", async () => {
     const record = await useStaff().update(1, {
       name: "Jane Doe",
       role: "pastor",
@@ -397,6 +411,31 @@ describe("useStaff", () => {
     expect(
       await useStaff().update(9, { name: "x", role: "staff", status: "draft" }),
     ).toBeNull();
+    expect(fetched).not.toHaveBeenCalled();
+  });
+
+  it("sets a member's photo on its own, or clears it, and hands back the record", async () => {
+    const photo = "https://cdn.example.com/staff/jane-doe.jpg";
+    expect(await useStaff().setPhoto(1, photo)).toEqual(RECORD);
+    expect(portrayed).toHaveBeenCalledWith({ id: 1, photo });
+    expect(await useStaff().setPhoto(1, null)).toEqual(RECORD);
+    expect(portrayed).toHaveBeenLastCalledWith({ id: 1, photo: null });
+    expect(updated).not.toHaveBeenCalled();
+    expect(described).not.toHaveBeenCalled();
+  });
+
+  it("sets a member's bio on its own, or clears it when the body has none", async () => {
+    expect(await useStaff().setBio(1, { bio: BIO as never })).toEqual(RECORD);
+    expect(described).toHaveBeenCalledWith({ id: 1, bio: BIO });
+    expect(await useStaff().setBio(1, {})).toEqual(RECORD);
+    expect(described).toHaveBeenLastCalledWith({ id: 1, bio: null });
+    expect(updated).not.toHaveBeenCalled();
+    expect(portrayed).not.toHaveBeenCalled();
+  });
+
+  it("sets neither when no member has the id", async () => {
+    expect(await useStaff().setPhoto(9, null)).toBeNull();
+    expect(await useStaff().setBio(9, {})).toBeNull();
     expect(fetched).not.toHaveBeenCalled();
   });
 

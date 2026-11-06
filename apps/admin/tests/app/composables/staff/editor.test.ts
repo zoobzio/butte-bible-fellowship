@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 
 import { useRouter } from "#imports";
-import { BIO, STAFF } from "#test/support/records";
+import { STAFF } from "#test/support/records";
 import { useStaffEditor } from "~/composables/staff/editor";
 
 describe("useStaffEditor", () => {
@@ -9,35 +9,37 @@ describe("useStaffEditor", () => {
     name: "Jane Doe",
     role: "elder",
     summary: "Has served since 2010.",
-    bio: BIO,
     email: "jane@example.com",
     status: "published",
   };
 
-  it("is the staff form, blank for a new member: a draft, with no role, and no delete", () => {
+  it("is the staff form, blank for a new member: a draft, with no role", () => {
     const editor = useStaffEditor(null);
     expect(editor.form.id).toBe("staff");
     expect(editor.form.config.fields.map((field) => field.key)).toEqual([
       "name",
       "role",
       "status",
-      "photo",
       "email",
       "phone",
       "summary",
-      "bio",
     ]);
     expect(editor.form.payload).toEqual({ status: "draft" });
-    expect(editor.removable).toBe(false);
   });
 
-  it("opens on a member's record, the bio as HTML, with a delete", () => {
+  it("opens on a member's details", () => {
     const editor = useStaffEditor(STAFF);
-    expect(editor.form.payload).toEqual({
-      ...BODY,
-      bio: "<p>Has served since 2010.</p>",
-    });
-    expect(editor.removable).toBe(true);
+    expect(editor.form.payload).toEqual(BODY);
+  });
+
+  it("is one column of their details: no field is given a span, and neither the photo nor the bio is one", () => {
+    const { fields } = useStaffEditor({
+      ...STAFF,
+      photo: "https://cdn.example.com/staff/jane-doe.jpg",
+    }).form.config;
+    expect(fields.every((field) => field.colspan === undefined)).toBe(true);
+    expect(useStaffEditor(STAFF).form.payload).not.toHaveProperty("bio");
+    expect(useStaffEditor(STAFF).form.payload).not.toHaveProperty("photo");
   });
 
   it("starts over from the record, whatever the last visit left", () => {
@@ -64,7 +66,7 @@ describe("useStaffEditor", () => {
     ]);
   });
 
-  it("creates a member from what is written, and leaves for the list", async () => {
+  it("creates a member from what is written, and opens their page, where the photo and the bio wait", async () => {
     const fetch = vi.fn(async () => STAFF);
     vi.stubGlobal("$fetch", fetch);
     const editor = useStaffEditor(null);
@@ -76,48 +78,39 @@ describe("useStaffEditor", () => {
       method: "POST",
       body: { name: "John Roe", role: "staff", status: "draft" },
     });
-    expect(useRouter().push).toHaveBeenCalledWith("/staff");
+    expect(useRouter().push).toHaveBeenCalledWith("/staff/1/profile");
     expect(editor.form.submitted).toBe(true);
     expect(editor.error.value).toBeNull();
   });
 
-  it("replaces the member when there is a record, the bio as the tree the app renders", async () => {
-    const fetch = vi.fn(async () => STAFF);
+  it("replaces the member's details when there is a record, stays, and hands the record saved on", async () => {
+    const changed = { ...STAFF, role: "pastor" as const };
+    const fetch = vi.fn(async () => changed);
     vi.stubGlobal("$fetch", fetch);
-    const editor = useStaffEditor(STAFF);
+    const saved = vi.fn();
+    const editor = useStaffEditor(STAFF, saved);
     editor.form.set("role", "pastor");
-    editor.form.set("bio", "<p>Since 2010.</p>");
     await editor.form.submit();
     expect(fetch).toHaveBeenCalledWith("/api/staff/1", {
       method: "PUT",
-      body: {
-        ...BODY,
-        role: "pastor",
-        bio: {
-          type: "root",
-          children: [
-            {
-              type: "element",
-              tagName: "p",
-              properties: {},
-              children: [{ type: "text", value: "Since 2010." }],
-            },
-          ],
-        },
-      },
+      body: { ...BODY, role: "pastor" },
     });
+    expect(saved).toHaveBeenCalledWith(changed);
+    expect(useRouter().push).not.toHaveBeenCalled();
+    expect(editor.form.submitted).toBe(true);
+    expect(editor.form.payload.role).toBe("pastor");
   });
 
-  it("writes no bio once the editor is emptied", async () => {
+  it("writes no summary once the field is cleared", async () => {
     const fetch = vi.fn(async () => STAFF);
     vi.stubGlobal("$fetch", fetch);
     const editor = useStaffEditor(STAFF);
-    editor.form.set("bio", "");
-    expect(editor.form.payload.bio).toBeUndefined();
+    editor.form.set("summary", " ");
+    expect(editor.form.payload.summary).toBeUndefined();
     await editor.form.submit();
     expect(fetch).toHaveBeenCalledWith("/api/staff/1", {
       method: "PUT",
-      body: { ...BODY, bio: undefined },
+      body: { ...BODY, summary: undefined },
     });
   });
 
@@ -153,42 +146,5 @@ describe("useStaffEditor", () => {
     editor.form.set("email", "jane");
     await editor.form.submit();
     expect(editor.error.value).toBeNull();
-  });
-
-  it("deletes the member, once asked by name", async () => {
-    const fetch = vi.fn(async () => null);
-    vi.stubGlobal("$fetch", fetch);
-    const confirm = vi.fn(() => true);
-    vi.stubGlobal("confirm", confirm);
-    await useStaffEditor(STAFF).destroy();
-    expect(confirm).toHaveBeenCalledWith(
-      "Delete Jane Doe? This cannot be undone.",
-    );
-    expect(fetch).toHaveBeenCalledWith("/api/staff/1", { method: "DELETE" });
-    expect(useRouter().push).toHaveBeenCalledWith("/staff");
-  });
-
-  it("keeps the member when the question is declined, or there is none", async () => {
-    const fetch = vi.fn(async () => null);
-    vi.stubGlobal("$fetch", fetch);
-    vi.stubGlobal("confirm", () => false);
-    await useStaffEditor(STAFF).destroy();
-    await useStaffEditor(null).destroy();
-    expect(fetch).not.toHaveBeenCalled();
-  });
-
-  it("says what went wrong when the deletion fails", async () => {
-    vi.stubGlobal(
-      "$fetch",
-      vi.fn(async () => {
-        throw new Error("The server is away.");
-      }),
-    );
-    vi.stubGlobal("confirm", () => true);
-    const editor = useStaffEditor(STAFF);
-    await editor.destroy();
-    expect(editor.error.value).toBe("The server is away.");
-    expect(editor.removing.value).toBe(false);
-    expect(useRouter().push).not.toHaveBeenCalled();
   });
 });

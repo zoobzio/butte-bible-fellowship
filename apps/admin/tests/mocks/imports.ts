@@ -129,3 +129,26 @@ export const useLazyAsyncData = <T>(
 export const useRequest = useAsyncData;
 
 export const useLazyRequest = useLazyAsyncData;
+
+const indicator = {
+  start: vi.fn(),
+  finish: vi.fn(),
+};
+
+// Whether a Nuxt instance is reachable: in setup, on the client, within a
+// request on the server. Off, the API runs without the indicator.
+let instance = true;
+
+export const setNuxtInstance = (reachable: boolean) => {
+  instance = reachable;
+};
+
+export const tryUseNuxtApp = () => (instance ? useNuxtApp() : null);
+
+export const clearLoadingIndicator = () => {
+  indicator.start.mockClear();
+  indicator.finish.mockClear();
+  instance = true;
+};
+
+export const useLoadingIndicator = () => indicator;

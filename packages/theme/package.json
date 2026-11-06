@@ -37,6 +37,7 @@
   "devDependencies": {
     "@untheme/aurora": "catalog:",
     "@untheme/kit": "catalog:",
+    "@zoobzio/theme": "catalog:",
     "vitest": "catalog:"
   }
 }

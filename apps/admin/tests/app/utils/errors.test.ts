@@ -15,9 +15,9 @@ describe("isNotFound", () => {
 
 describe("failure", () => {
   it("says each issue of a body the schema refused, with its field", () => {
-    const { error } = staffBody.safeParse({ name: "Jane", photo: "x" });
+    const { error } = staffBody.safeParse({ name: "Jane", email: "x" });
     const said = failure(error);
-    expect(said).toContain("photo:");
+    expect(said).toContain("email:");
     expect(said).toContain("role:");
   });
 

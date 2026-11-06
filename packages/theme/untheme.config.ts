@@ -1,7 +1,7 @@
 import { defineConfig } from "@untheme/kit";
 
 export default defineConfig({
-  source: "npm:/@untheme/aurora",
+  source: "npm:/@zoobzio/theme",
   id: "bbf",
   name: "Butte Bible Fellowship",
   extend: {

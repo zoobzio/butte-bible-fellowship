@@ -214,12 +214,12 @@ describe("staff", () => {
       name: "Pastor Name",
       role: "pastor",
       summary: "Serving since 2010.",
-      bio,
       phone: "530-555-0100",
       status: "published",
     });
     const created = await db.admin.staff.create.first(toStaffArguments(body));
     const id = created!.id;
+    await db.admin.staff.bio({ id, bio });
 
     expect(await db.admin.staff.fetch.first({ id })).toMatchObject({ bio });
 

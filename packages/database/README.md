@@ -56,8 +56,11 @@ takes the newest published sermons, as many as asked, and
 `web.sermons.fetch` is a sermon's own page by slug, which alone carries its
 `body`, as an event's does.
 
-`admin.staff` has `list`, `fetch`, `create`, `update` and `delete`, over
-every member whatever their status. `list` is
+`admin.staff` has `list`, `fetch`, `create`, `update`, `photo`, `bio` and
+`delete`, over every member whatever their status. `create` and `update`
+write a member's details, and neither their photo nor their bio: `photo`
+sets the photo's URL and `bio` the bio's tree, each on its own and each
+null to clear it, so a save of one never replaces another. `list` is
 one page, `size` rows from `offset`, sorted by the column `sort` names —
 `name`, `role`, `status`, `email`, `phone`, `created_at` or `updated_at` —
 in `direction`, `asc` or `desc`, a null last either way, and then in the

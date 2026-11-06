@@ -21,6 +21,7 @@ await useTableRequest(table);
 <template>
   <PageHeader
     :title="$t.admin.staff.title()"
+    :description="$t.admin.staff.description()"
     to="/staff/new"
     :action="$t.admin.staff.new()"
   />

@@ -15,7 +15,7 @@ providers.tf      how each provider connects: Vercel, Neon, and Postgres as Neon
 variables.tf      the team, the repository, the region, and the Neon organization
 neon.tf           the Neon project: one branch, one database, its owner
 database.tf       the `web` and `admin` groups and the login user of each app
-vercel.tf         the two projects and their environment variables
+vercel.tf         the two projects, their environment variables, and the Blob store of the staff's photos
 imports.tf        adopts the Vercel project that already exists
 outputs.tf        the ids, and the owner's connection string for migrations
 tests/            `terraform test`: the roles, the connection strings, the projects
@@ -44,6 +44,16 @@ Each app is given its own user as `NUXT_BEZOAR_URL`, over Neon's pooler.
 The owner's connection string is the `owner_database_url` output, for
 whatever applies the roles, the migrations and the seeds before an app
 deploys; it is never an app's.
+
+## Storage
+
+The admin app uploads each staff member's photo to a public Vercel Blob
+store, `vercel_blob_store.avatars`, and writes the URL the store answers
+with to the member's row; the site shows the photo by that URL. The store
+is connected to the admin project alone, which is what gives the app
+`BLOB_READ_WRITE_TOKEN`: the site only reads, and needs no token. A
+`pnpm dev` with no token keeps the photos in the app's own `.data`
+instead, and serves them itself.
 
 ## Setup
 
@@ -86,8 +96,9 @@ is the shape of the deployment rather than the providers: that the groups
 cannot log in and each app's user is a member of its group alone, that
 each app's connection string names its own user over the pooler and
 neither another's nor the owner's password, that each project sits at its
-app's directory and deploys `main`, and that every project is given its
-database.
+app's directory and deploys `main`, that every project is given its
+database, and that the photos' store is public and the admin's alone to
+write.
 
 ## State
 

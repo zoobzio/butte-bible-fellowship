@@ -22,5 +22,37 @@
   "bio": {
     "defaultMessage": "Bio",
     "description": "The label of the rich text editor for a staff member's bio in full."
+  },
+  "photoUpload": {
+    "defaultMessage": "Upload photo",
+    "description": "The accessible name of the badge on a staff member's picture that picks an image to upload as their photo, when they have none."
+  },
+  "photoChange": {
+    "defaultMessage": "Change photo",
+    "description": "The accessible name of the badge on a staff member's picture that picks an image to upload in place of their photo."
+  },
+  "photoUploading": {
+    "defaultMessage": "Uploading…",
+    "description": "The accessible name of the upload badge while a staff member's photo is being uploaded."
+  },
+  "photoRemove": {
+    "defaultMessage": "Remove photo",
+    "description": "The accessible name of the badge on a staff member's picture that removes their photo."
+  },
+  "photoRemoving": {
+    "defaultMessage": "Removing…",
+    "description": "The accessible name of the remove badge while a staff member's photo is being removed."
+  },
+  "photoConfirm": {
+    "defaultMessage": "Remove {name}’s photo?",
+    "description": "The question asked before a staff member's photo is removed. `name` is the member's name."
+  },
+  "photoInvalid": {
+    "defaultMessage": "That file can’t be used. Choose a JPEG, PNG or WebP image of 4 MB or less.",
+    "description": "The error shown when the file picked for a staff member's photo is not an image of an accepted kind, or is too large."
+  },
+  "bioEmpty": {
+    "defaultMessage": "Click to write a bio.",
+    "description": "What stands in for a staff member's bio when they have none: an invitation to click and start writing."
   }
 }

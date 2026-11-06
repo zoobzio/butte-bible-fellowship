@@ -47,8 +47,9 @@ const dated = {
   defaultOperator: DATE_DEFAULT_OPERATOR,
 };
 
-/** The way to a member's editor: the page a row's name leads to. */
-export const link: RecordLink<StaffRecord> = (record) => `/staff/${record.id}`;
+/** The way to a member's profile: the page a row's name leads to. */
+export const link: RecordLink<StaffRecord> = (record) =>
+  `/staff/${record.id}/profile`;
 
 /**
  * The staff as the admin lists them: every column of a member's record a

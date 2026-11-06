@@ -18,47 +18,50 @@ const choose = (wrapper: ReturnType<typeof mount>, id: string, value: string) =>
   select(wrapper, id).vm.$emit("update:modelValue", { value, label: value });
 
 describe("StaffEditor", () => {
-  it("opens blank for a new member, a draft with no role, with no delete", () => {
+  it("opens blank for a new member, a draft with no role", () => {
     const wrapper = mount(StaffEditor, { props: { record: null } });
     expect(value(wrapper, "staff-name")).toBe("");
     expect(wrapper.find("#staff-role").text()).toBe("");
     expect(wrapper.find("#staff-status").text()).toBe("Draft");
-    expect(wrapper.find("#staff-bio").text()).toBe("");
-    expect(wrapper.find(".staff-editor-delete").exists()).toBe(false);
   });
 
-  it("opens on a member's record, every field filled, with a delete", () => {
+  it("opens on a member's record, every field filled, with a save alone: the page's menu deletes", () => {
     const wrapper = mount(StaffEditor, { props: { record: STAFF } });
     expect(value(wrapper, "staff-name")).toBe("Jane Doe");
     expect(wrapper.find("#staff-role").text()).toBe("Elder");
     expect(wrapper.find("#staff-status").text()).toBe("Published");
     expect(value(wrapper, "staff-email")).toBe("jane@example.com");
     expect(value(wrapper, "staff-summary")).toBe("Has served since 2010.");
-    expect(wrapper.find("#staff-bio").html()).toContain(
-      "<p>Has served since 2010.</p>",
-    );
-    expect(wrapper.find(".staff-editor-delete").exists()).toBe(true);
+    expect(
+      wrapper.findAll('button[type="submit"]').map((b) => b.text()),
+    ).toEqual(["Save"]);
+    expect(wrapper.find(".staff-editor-delete").exists()).toBe(false);
+    expect(wrapper.text()).not.toContain("Delete");
   });
 
-  it("offers each role by name, and the bio as rich text", () => {
+  it("offers each role by name", () => {
     const wrapper = mount(StaffEditor, { props: { record: null } });
     expect(select(wrapper, "staff-role").props("options")).toEqual([
       { value: "pastor", label: "Pastor" },
       { value: "elder", label: "Elder" },
       { value: "staff", label: "Staff" },
     ]);
-    const editor = wrapper.find(".f-data-editor");
-    expect(editor.exists()).toBe(true);
-    expect(editor.find('[data-tool="bold"]').exists()).toBe(true);
-    expect(wrapper.find("#staff-bio").attributes("aria-labelledby")).toBe(
-      "staff-bio-label",
-    );
+  });
+
+  it("is one column of a member's details: no photo's address, and no bio", () => {
+    const wrapper = mount(StaffEditor, { props: { record: STAFF } });
+    expect(
+      wrapper.findAll(".f-data-form-field label").map((label) => label.text()),
+    ).toEqual(["Name", "Role", "Status", "Email", "Phone", "Summary"]);
+    expect(wrapper.find("#staff-photo").exists()).toBe(false);
+    expect(wrapper.find("#staff-bio").exists()).toBe(false);
+    expect(wrapper.find(".f-data-editor").exists()).toBe(false);
   });
 
   it("labels every control", () => {
     const wrapper = mount(StaffEditor, { props: { record: null } });
     const labels = wrapper.findAll("label");
-    expect(labels.length).toBe(8);
+    expect(labels.length).toBe(6);
     for (const label of labels) {
       const id = label.attributes("for");
       expect(id).toBeDefined();
@@ -87,8 +90,25 @@ describe("StaffEditor", () => {
       body: { name: "John Roe", role: "staff", status: "published" },
     });
     await vi.waitFor(() =>
-      expect(useRouter().push).toHaveBeenCalledWith("/staff"),
+      expect(useRouter().push).toHaveBeenCalledWith("/staff/1/profile"),
     );
+  });
+
+  it("saves a member's details in place, and says who was saved", async () => {
+    const changed = { ...STAFF, name: "Jane Roe" };
+    const fetch = vi.fn(async () => changed);
+    vi.stubGlobal("$fetch", fetch);
+    const wrapper = mount(StaffEditor, { props: { record: STAFF } });
+    await wrapper.find("#staff-name").setValue("Jane Roe");
+    await wrapper.find("form").trigger("submit");
+    await vi.waitFor(() => expect(wrapper.emitted("saved")).toBeTruthy());
+    expect(wrapper.emitted("saved")).toEqual([[changed]]);
+    expect(fetch).toHaveBeenCalledWith("/api/staff/1", {
+      method: "PUT",
+      body: expect.objectContaining({ name: "Jane Roe" }),
+    });
+    expect(useRouter().push).not.toHaveBeenCalled();
+    expect(value(wrapper, "staff-name")).toBe("Jane Roe");
   });
 
   it("shows what is wrong with a draft, by its field, and stays open", async () => {
@@ -127,16 +147,5 @@ describe("StaffEditor", () => {
     expect(error.text()).toBe("The server is away.");
     expect(useRouter().push).not.toHaveBeenCalled();
     expect(wrapper.find(".staff-editor-save").text()).toBe("Save");
-  });
-
-  it("deletes the member once asked", async () => {
-    const fetch = vi.fn(async () => null);
-    vi.stubGlobal("$fetch", fetch);
-    vi.stubGlobal("confirm", () => true);
-    const wrapper = mount(StaffEditor, { props: { record: STAFF } });
-    await wrapper.find(".staff-editor-delete").trigger("click");
-    await vi.waitFor(() =>
-      expect(fetch).toHaveBeenCalledWith("/api/staff/1", { method: "DELETE" }),
-    );
   });
 });

@@ -17,6 +17,7 @@ import {
   sermonPath,
   sermons,
   sermonsQuery,
+  staffBio,
   staffBody,
   staffId,
   staffListing,
@@ -103,6 +104,15 @@ const document = createDocument(
           responses: { 200: json(staffRecord) },
         },
       },
+      "/admin/api/staff/{id}/bio": {
+        patch: {
+          requestParams: { path: staffId },
+          requestBody: {
+            content: { "application/json": { schema: staffBio } },
+          },
+          responses: { 200: json(staffRecord) },
+        },
+      },
       "/admin/api/events": {
         get: {
           requestParams: { query: listingQuery },
@@ -162,6 +172,7 @@ describe("the components", () => {
       "Page",
       "Sermon",
       "SermonBody",
+      "StaffBio",
       "StaffBody",
       "StaffListing",
       "StaffMember",
@@ -291,9 +302,13 @@ describe("the components", () => {
     expect(schemas.StaffBody).toMatchObject({
       properties: {
         role: { $ref: "#/components/schemas/StaffRole" },
-        bio: { $ref: "#/components/schemas/Hast" },
         status: { $ref: "#/components/schemas/ContentStatus" },
       },
+    });
+    expect(schemas.StaffBody).not.toHaveProperty("properties.bio");
+    expect(schemas.StaffBody).not.toHaveProperty("properties.photo");
+    expect(schemas.StaffBio).toMatchObject({
+      properties: { bio: { $ref: "#/components/schemas/Hast" } },
     });
   });
 

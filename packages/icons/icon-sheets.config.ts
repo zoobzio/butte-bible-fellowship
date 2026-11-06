@@ -9,6 +9,7 @@ export default defineConfig({
     briefcase: "lucide:briefcase",
     "calendar-clock": "lucide:calendar-clock",
     "calendar-days": "lucide:calendar-days",
+    camera: "lucide:camera",
     "chevron-left": "lucide:chevron-left",
     "chevron-right": "lucide:chevron-right",
     clock: "lucide:clock",

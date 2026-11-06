@@ -20,7 +20,7 @@ describe("useStaffTable", () => {
     expect(table.rowKey).toBe("id");
     expect(table.timeZone).toBe(TIME_ZONE);
     expect(table.searchable).toBe(true);
-    expect(table.columns[0]?.link?.(STAFF)).toBe("/staff/1");
+    expect(table.columns[0]?.link?.(STAFF)).toBe("/staff/1/profile");
     expect(table.columns.slice(1).every((column) => !column.link)).toBe(true);
     expect(table.columns.map((column) => column.label)).toEqual([
       "Name",
@@ -303,6 +303,6 @@ describe("useStaffTable", () => {
     const [edit] = withSetup(() => useStaffTable()).result.actions;
     expect(edit?.label).toBe("Edit");
     edit?.action(STAFF);
-    expect(navigateTo).toHaveBeenCalledWith("/staff/1");
+    expect(navigateTo).toHaveBeenCalledWith("/staff/1/profile");
   });
 });

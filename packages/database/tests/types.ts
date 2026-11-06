@@ -76,7 +76,13 @@ export type Checks = [
       (number | null)[] | null | undefined
     >
   >,
-  Assert<Equal<Arguments<Contract, "admin.staff.create">["bio"], unknown>>,
+  Assert<Equal<Arguments<Contract, "admin.staff.bio">["bio"], unknown>>,
+  Assert<
+    Equal<
+      Arguments<Contract, "admin.staff.photo">["photo"],
+      string | null | undefined
+    >
+  >,
   Assert<Equal<Arguments<Contract, "admin.events.create">["title"], string>>,
   Assert<Equal<Arguments<Contract, "admin.events.update">["id"], number>>,
   Assert<

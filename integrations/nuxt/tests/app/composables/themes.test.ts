@@ -19,11 +19,12 @@ describe("useThemes", () => {
     expect(useThemes().active.value).toBe("bbf");
   });
 
-  it("lists the site's theme and every aurora theme, by name", () => {
+  it("lists the site's theme and every foundation theme, by name", () => {
     const { themes } = useThemes();
-    expect(themes.length).toBe(32);
+    expect(themes.length).toBe(33);
     const ids = themes.map((theme) => theme.id);
     expect(ids).toContain("bbf");
+    expect(ids).toContain("foundation");
     expect(ids).toContain("nord");
     const names = themes.map((theme) => theme.name);
     expect(names).toContain("Butte Bible Fellowship");

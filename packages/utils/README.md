@@ -30,7 +30,7 @@ src/dao/        an input into the arguments a query takes, one file per kind
   sermon.ts     toSermonArguments: a SermonBody into what admin.sermons.create takes
 src/vm/         a record into what a form holds, and a form's payload into a body
   hast.ts       toHtml: a Hast into the HTML an editor holds; fromHtml: back
-  staff.ts      toStaffForm: a StaffRecord into a StaffForm; toStaffBody: a StaffForm into a StaffBody
+  staff.ts      toStaffForm: a StaffRecord's details into a StaffForm; toStaffBody: a StaffForm into a StaffBody
 src/hast.ts     toContent: any hast tree into the schema's shape, for dto/ and vm/
 src/types.ts    the rows and the arguments the transforms speak, from the contract, and the forms
 src/index.ts    every transform
@@ -84,15 +84,16 @@ through it and `toSermon` a sermon's; the body a request carries, and the
 column, stay Markdown. A member's `bio` is stored as the tree already, and
 `toStaffMember` checks it against the schema's `hast` as it reads it.
 
-A form holds a bio as HTML, the form an editor speaks, so `toStaffForm`
-writes the record's tree through `hast-util-to-html` and `toStaffBody`
-reads the form's string back through `hast-util-from-html`, as a fragment,
-and builds the schema's `hast` from it node by node, through the same
-`toContent` the Markdown pipeline's tree goes through: no position, no
-attribute left `undefined`, no comment or doctype. What a form leaves
-blank, a body leaves out, as a column's null is; what is written is
-trimmed. A form carries no `id` and no timestamps: those are the record's,
-and the route's.
+An editor holds a bio as HTML, so `toHtml` writes the record's tree
+through `hast-util-to-html` and `fromHtml` reads the editor's string back
+through `hast-util-from-html`, as a fragment, and builds the schema's
+`hast` from it node by node, through the same `toContent` the Markdown
+pipeline's tree goes through: no position, no attribute left `undefined`,
+no comment or doctype. A form holds a member's details and nothing else:
+their photo and their bio are each written on their own, so `toStaffForm`
+leaves both behind. What a form leaves blank, a body leaves out, as a
+column's null is; what is written is trimmed. A form carries no `id` and
+no timestamps: those are the record's, and the route's.
 
 `toEventArguments`, `toStaffArguments` and `toSermonArguments` build what
 `create` takes; an `update` takes the same and the `id` of the row it

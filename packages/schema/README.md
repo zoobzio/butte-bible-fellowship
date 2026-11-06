@@ -54,8 +54,11 @@ never carries Markdown and the app never parses it. `@bbf/utils`'s
 `toHast` builds it, through the same presets as the pages. A body still
 takes the Markdown: `eventBody.body` and `sermonBody.body` are the string
 as written. A member's `bio` is `hast` everywhere: the admin's editor
-writes the tree, `staffBody.bio` carries it, and the site reads it as it
-was stored. An input is one part of a request, named for the
+writes the tree, `staffBio.bio` carries it, and the site reads it as it
+was stored. A member is written in three parts, each on its own, so a save
+of one never replaces another: `staffBody` is their details, `staffBio`
+their bio, and `staffAvatar` their photo as it is uploaded, a JPEG, PNG or
+WebP file of `STAFF_AVATAR_SIZE` at most. An input is one part of a request, named for the
 group and the part: `eventPath` is the path parameters of one event,
 `eventsQuery` the query of the events list, `eventBody` what a write
 carries. A body says what a model cannot: an event is written with a date
@@ -79,7 +82,7 @@ Every schema is documented where it is declared. A model or a body is
 `.meta({ id, description })`, so the document names it once under
 `components.schemas` and refers to it from every operation that uses it:
 `ChurchEvent`, `StaffMember`, `Sermon`, `Hero`, `Page`, `EventBody`,
-`StaffBody`, `SermonBody`. A primitive used by both — `EventDay`, `EventTime`,
+`StaffBody`, `StaffBio`, `SermonBody`. A primitive used by both — `EventDay`, `EventTime`,
 `ContentStatus`, `StaffRole` — is one component too, and so is `Hast`, with
 `HastElement` and `HastText`, which refer to each other as a tree does; rendered the same in a request and a response. A field is
 `.meta({ description, examples })`, and its format comes from its zod type:
@@ -127,7 +130,7 @@ what it renders: the components, their references, the parameters.
   name — `ChurchEvent`, `ChurchEvents`, `EventDay`, `EventTime`, `Hast`, `HastElement`,
   `HastText`, `ContentStatus`, `StaffRole`, `StaffMember`, `StaffMembers`, `Hero`,
   `Page`, `Sermon`, `Sermons`, `Slug`, `EventPath`, `EventsQuery`,
-  `EventBody`, `StaffId`, `StaffBody`, `SermonPath`, `SermonsQuery`,
+  `EventBody`, `StaffId`, `StaffBody`, `StaffBio`, `SermonPath`, `SermonsQuery`,
   `SermonBody`. Nothing here
   reaches a bundle: a file that only needs the shape imports from here and
   carries no zod.

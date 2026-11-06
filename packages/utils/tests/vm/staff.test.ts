@@ -1,4 +1,4 @@
-import type { Hast } from "@bbf/schema/types";
+import type { Hast, StaffRecord } from "@bbf/schema/types";
 
 import { staffBody } from "@bbf/schema";
 import { describe, expect, it } from "vitest";
@@ -35,7 +35,7 @@ describe("toStaffForm", () => {
     });
   });
 
-  it("holds the bio as HTML, and carries what else the record has", () => {
+  it("carries the details the record has, and neither its photo nor its bio", () => {
     expect(
       toStaffForm({
         ...RECORD,
@@ -50,8 +50,6 @@ describe("toStaffForm", () => {
       name: "Jane Doe",
       role: "elder",
       summary: "Serving since 2010.",
-      bio: "<p>Serving since 2010.</p>",
-      photo: "https://cdn.example.com/staff/jane-doe.jpg",
       email: "j@x.org",
       phone: "530-555-0100",
       status: "published",
@@ -72,9 +70,7 @@ describe("toStaffBody", () => {
       toStaffBody({
         name: " Jane Doe ",
         role: "elder",
-        summary: "",
-        bio: " ",
-        photo: "",
+        summary: " ",
         email: "",
         phone: "",
         status: "draft",
@@ -82,14 +78,12 @@ describe("toStaffBody", () => {
     ).toEqual({ name: "Jane Doe", role: "elder", status: "draft" });
   });
 
-  it("writes the bio as the tree the app renders, and carries what else is written", () => {
+  it("carries what is written, trimmed", () => {
     expect(
       toStaffBody({
         name: "Jane Doe",
         role: "elder",
-        summary: "Serving since 2010.",
-        bio: "<p>Serving since 2010.</p>",
-        photo: "https://cdn.example.com/staff/jane-doe.jpg",
+        summary: " Serving since 2010. ",
         email: "j@x.org",
         phone: "530-555-0100",
         status: "published",
@@ -98,8 +92,6 @@ describe("toStaffBody", () => {
       name: "Jane Doe",
       role: "elder",
       summary: "Serving since 2010.",
-      bio: BIO,
-      photo: "https://cdn.example.com/staff/jane-doe.jpg",
       email: "j@x.org",
       phone: "530-555-0100",
       status: "published",
@@ -110,15 +102,20 @@ describe("toStaffBody", () => {
     const body = toStaffBody({
       name: "Jane Doe",
       role: "elder",
-      bio: "<h2>Jane</h2><p>Serving <strong>since 2010</strong>.</p>",
+      email: "j@x.org",
       status: "draft",
     });
-    expect(staffBody.safeParse(body).success).toBe(true);
+    expect(staffBody.parse(body)).toEqual(body);
   });
 
-  it("round trips a record through the form", () => {
-    const record = { ...RECORD, bio: BIO, summary: "x", email: "j@x.org" };
-    const { id: _id, createdAt: _c, updatedAt: _u, ...body } = record;
+  it("round trips a record's details through the form", () => {
+    const record: StaffRecord = {
+      ...RECORD,
+      bio: BIO,
+      summary: "x",
+      email: "j@x.org",
+    };
+    const { id: _id, createdAt: _c, updatedAt: _u, bio: _b, ...body } = record;
     expect(toStaffBody(toStaffForm(record))).toEqual(body);
   });
 });

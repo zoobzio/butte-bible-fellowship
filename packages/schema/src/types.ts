@@ -9,6 +9,7 @@ import type {
 } from "./input/operators";
 import type { sermonBody, sermonPath, sermonsQuery } from "./input/sermon";
 import type {
+  staffBio,
   staffBody,
   staffForm,
   staffId,
@@ -103,6 +104,8 @@ export type StaffQuery = z.infer<typeof staffQuery>;
 export type StaffBody = z.infer<typeof staffBody>;
 
 export type StaffForm = z.infer<typeof staffForm>;
+
+export type StaffBio = z.infer<typeof staffBio>;
 
 export type SermonPath = z.infer<typeof sermonPath>;
 

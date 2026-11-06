@@ -19,7 +19,7 @@ const names = () => themes().map((item) => item.textContent!.trim());
 const open = async () => {
   const wrapper = mount(ThemePicker, { attachTo: document.body });
   await wrapper.find("button").trigger("click");
-  await vi.waitFor(() => expect(themes().length).toBe(32));
+  await vi.waitFor(() => expect(themes().length).toBe(33));
   return wrapper;
 };
 

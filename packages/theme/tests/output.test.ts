@@ -29,16 +29,20 @@ const hexOf = (slot: Token) => (slot.$value as Hex).hex;
 
 const ours = tokensOf(json("src/bbf.json"));
 
-const theirs = tokensOf(resolve("@untheme/aurora/src/themes/aurora.json"));
+// The foundation palette: the base our palette rebinds.
+const theirs = tokensOf(resolve("@zoobzio/theme/src/foundation.json"));
+
+// The roles the foundation theme adds over aurora for the Nuxt layer's shell.
+const roles = tokensOf(resolve("@zoobzio/theme/src/roles.json"));
 
 let config: typeof import("../.output/config.mjs");
 let index: typeof import("../.output/index.mjs");
 let manifest: typeof import("../.output/manifest.mjs");
 let layers: typeof import("../.output/layers.mjs");
-let aurora: {
-  config: typeof import("@untheme/aurora/config");
-  manifest: typeof import("@untheme/aurora/manifest");
-  layers: typeof import("@untheme/aurora/layers");
+let foundation: {
+  config: typeof import("@zoobzio/theme/config");
+  manifest: typeof import("@zoobzio/theme/manifest");
+  layers: typeof import("@zoobzio/theme/layers");
 };
 
 beforeAll(async () => {
@@ -47,10 +51,10 @@ beforeAll(async () => {
   index = await import("../.output/index.mjs");
   manifest = await import("../.output/manifest.mjs");
   layers = await import("../.output/layers.mjs");
-  aurora = {
-    config: await import("@untheme/aurora/config"),
-    manifest: await import("@untheme/aurora/manifest"),
-    layers: await import("@untheme/aurora/layers"),
+  foundation = {
+    config: await import("@zoobzio/theme/config"),
+    manifest: await import("@zoobzio/theme/manifest"),
+    layers: await import("@zoobzio/theme/layers"),
   };
 });
 
@@ -71,7 +75,7 @@ describe("package exports", () => {
 });
 
 describe("palette", () => {
-  it("defines exactly the tokens an aurora theme defines", () => {
+  it("defines exactly the tokens the foundation palette defines", () => {
     expect(Object.keys(ours)).toEqual(Object.keys(theirs));
     for (const [token, slot] of Object.entries(ours)) {
       expect(slot.$type, token).toBe("color");
@@ -86,8 +90,8 @@ describe("theme", () => {
     expect(config.theme.name).toBe("Butte Bible Fellowship");
   });
 
-  it("has exactly aurora's contract", () => {
-    const upstream = aurora.config.theme;
+  it("has exactly the foundation theme's contract", () => {
+    const upstream = foundation.config.theme;
     expect([...index.tokens].sort()).toEqual(
       Object.keys(upstream.tokens).sort(),
     );
@@ -96,8 +100,16 @@ describe("theme", () => {
     }
   });
 
-  it("binds our palette as authored and everything else as aurora does", () => {
-    const upstream = aurora.config.theme.tokens as Tokens;
+  it("carries the roles the Nuxt layer's shell reads", () => {
+    expect(Object.keys(roles)).toContain("loading-indicator");
+    for (const role of Object.keys(roles)) {
+      expect([...index.tokens], role).toContain(role);
+      expect(config.theme.tokens[role as never], role).toBeDefined();
+    }
+  });
+
+  it("binds our palette as authored and everything else as foundation does", () => {
+    const upstream = foundation.config.theme.tokens as Tokens;
     for (const [token, slot] of Object.entries(config.theme.tokens)) {
       const own = ours[token];
       if (own) {
@@ -109,12 +121,12 @@ describe("theme", () => {
     }
   });
 
-  it("declares aurora's modifiers, contexts and boot selection, untouched", () => {
+  it("declares foundation's modifiers, contexts and boot selection, untouched", () => {
     expect(index.modifiers).not.toHaveProperty("theme");
-    expect(config.theme.order).toEqual(aurora.config.theme.order);
-    expect(config.theme.modifiers).toEqual(aurora.config.theme.modifiers);
-    expect(config.input).toEqual(aurora.config.input);
-    expect(manifest.manifest).toEqual(aurora.manifest.manifest);
+    expect(config.theme.order).toEqual(foundation.config.theme.order);
+    expect(config.theme.modifiers).toEqual(foundation.config.theme.modifiers);
+    expect(config.input).toEqual(foundation.config.input);
+    expect(manifest.manifest).toEqual(foundation.manifest.manifest);
   });
 });
 
@@ -122,11 +134,14 @@ describe("layers", () => {
   const layer = (id: string) =>
     json(`.output/layers/${id}.json`) as unknown as Layer;
 
-  it("list our palette first, then every aurora theme in aurora's order", () => {
+  it("list our palette first, then every foundation theme in foundation's order", () => {
     const ids = layers.layers.map((entry) => entry.id);
     expect(ids[0]).toBe("bbf");
-    expect(ids.slice(1)).toEqual(aurora.layers.layers.map((entry) => entry.id));
-    expect(ids.length).toBe(32);
+    expect(ids.slice(1)).toEqual(
+      foundation.layers.layers.map((entry) => entry.id),
+    );
+    expect(ids.length).toBe(33);
+    expect(ids[1]).toBe("foundation");
     expect(ids).toContain("nord");
   });
 
@@ -136,7 +151,7 @@ describe("layers", () => {
     expect(description).toBeTruthy();
   });
 
-  it("hold, in our palette's layer, the stops that differ from aurora's", () => {
+  it("hold, in our palette's layer, the stops that differ from foundation's", () => {
     const bbf = layer("bbf");
     expect(bbf.name).toBe("Butte Bible Fellowship");
     const changed = Object.entries(ours)
@@ -150,7 +165,7 @@ describe("layers", () => {
     }
   });
 
-  it("apply every aurora theme, and our palette again", async () => {
+  it("apply every foundation theme, and our palette again", async () => {
     const { makeUntheme } = await import("untheme");
     const untheme = makeUntheme(config.theme, {
       patch: {},
@@ -164,7 +179,7 @@ describe("layers", () => {
       expect(() => untheme.apply(built as never), entry.id).not.toThrow();
       expect(untheme.theme().id, entry.id).toBe(entry.id);
       const upstream = resolve(
-        `@untheme/aurora/layers/${entry.id}.json`,
+        `@zoobzio/theme/layers/${entry.id}.json`,
       ) as Layer;
       expect(hex("primary-600"), entry.id).toBe(
         upstream.tokens!["primary-600"]!.hex,
@@ -186,19 +201,26 @@ describe("preset", () => {
     expect(preset.layers).toEqual(layers.layers);
   });
 
-  it("references our palette through this package, after aurora's", () => {
+  it("references our palette through this package, after aurora's and foundation's", () => {
     const resolver = json(".output/resolver.json") as {
       name: string;
       description: string;
-      sets: { ramps: { sources: { $ref: string }[] } };
+      sets: {
+        ramps: { sources: { $ref: string }[] };
+        roles: { sources: { $ref: string }[] };
+      };
       modifiers: Record<string, unknown>;
     };
     expect(resolver.name).toBe("Butte Bible Fellowship");
     expect(resolver.description).toBeTruthy();
     expect(resolver.sets.ramps.sources).toEqual([
       { $ref: "npm:/@untheme/aurora/src/themes/aurora.json" },
+      { $ref: "npm:/@zoobzio/theme/src/foundation.json" },
       { $ref: "npm:/@bbf/theme/src/bbf.json" },
     ]);
+    expect(resolver.sets.roles.sources.at(-1)).toEqual({
+      $ref: "npm:/@zoobzio/theme/src/roles.json",
+    });
     expect(Object.keys(resolver.modifiers)).toEqual(config.theme.order);
     expect(resolve("@bbf/theme/src/bbf.json")).toEqual(json("src/bbf.json"));
   });

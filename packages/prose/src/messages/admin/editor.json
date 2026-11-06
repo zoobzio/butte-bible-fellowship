@@ -62,5 +62,13 @@
   "created": {
     "defaultMessage": "Created",
     "description": "The heading of the table column for when a record was added."
+  },
+  "cancel": {
+    "defaultMessage": "Cancel",
+    "description": "The button that leaves an editor and drops the changes not yet saved."
+  },
+  "actions": {
+    "defaultMessage": "Actions",
+    "description": "The button in a page's header that opens the menu of what can be done to the record: delete it, for one."
   }
 }

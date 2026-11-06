@@ -1,11 +1,15 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  STAFF_AVATAR_SIZE,
+  STAFF_AVATAR_TYPES,
+  STAFF_SORT_KEYS,
+  staffAvatar,
+  staffBio,
   staffBody,
   staffForm,
   staffId,
   staffQuery,
-  STAFF_SORT_KEYS,
 } from "../../src/input/staff";
 
 const MEMBER = { name: "Jane Doe", role: "elder" };
@@ -164,12 +168,10 @@ describe("staffBody", () => {
     expect(staffBody.parse(MEMBER)).toEqual({ ...MEMBER, status: "draft" });
   });
 
-  it("accepts all a member can say", () => {
+  it("accepts all a member's details can say", () => {
     const value = {
       ...MEMBER,
       summary: "Has served since 2010.",
-      bio: BIO,
-      photo: "https://cdn.example.com/staff/jane-doe.jpg",
       email: "jane@example.com",
       phone: "530-555-0100",
       status: "published",
@@ -193,24 +195,26 @@ describe("staffBody", () => {
     );
   });
 
-  it("takes a bio as a tree, never as a string", () => {
+  it("carries neither a photo nor a bio: each is written on its own", () => {
     expect(
-      staffBody.safeParse({ ...MEMBER, bio: "## Jane\n\nHas served." }).success,
-    ).toBe(false);
+      staffBody.parse({
+        ...MEMBER,
+        bio: BIO,
+        photo: "https://cdn.example.com/staff/jane-doe.jpg",
+      }),
+    ).toEqual({ ...MEMBER, status: "draft" });
   });
 });
 
 describe("staffForm", () => {
-  it("is the body, with the bio as the HTML the editor holds", () => {
+  it("is the body as a form holds it", () => {
     const value = {
       ...MEMBER,
       summary: "Has served since 2010.",
-      bio: "<p>Has served since 2010.</p>",
       email: "jane@example.com",
       status: "published",
     };
     expect(staffForm.parse(value)).toEqual(value);
-    expect(staffForm.safeParse({ ...MEMBER, bio: BIO }).success).toBe(false);
   });
 
   it("writes a member as a draft when not told otherwise", () => {
@@ -228,5 +232,51 @@ describe("staffForm", () => {
     expect(staffForm.shape.email.safeParse("jane").success).toBe(false);
     expect(staffForm.shape.email.safeParse(undefined).success).toBe(true);
     expect(staffForm.shape.role.safeParse(undefined).success).toBe(false);
+  });
+});
+
+describe("staffBio", () => {
+  it("takes a bio as a tree, never as a string", () => {
+    expect(staffBio.parse({ bio: BIO })).toEqual({ bio: BIO });
+    expect(staffBio.safeParse({ bio: "## Jane\n\nHas served." }).success).toBe(
+      false,
+    );
+  });
+
+  it("takes no bio at all, for a member left without one", () => {
+    expect(staffBio.parse({})).toEqual({});
+  });
+});
+
+describe("staffAvatar", () => {
+  const image = (type: string, size = 8) =>
+    new File([new Uint8Array(size)], "jane", { type });
+
+  it("takes a JPEG, a PNG or a WebP image", () => {
+    expect(STAFF_AVATAR_TYPES).toEqual([
+      "image/jpeg",
+      "image/png",
+      "image/webp",
+    ]);
+    for (const type of STAFF_AVATAR_TYPES) {
+      expect(staffAvatar.safeParse(image(type)).success, type).toBe(true);
+    }
+  });
+
+  it("refuses another kind of file, and what is not a file", () => {
+    expect(staffAvatar.safeParse(image("image/svg+xml")).success).toBe(false);
+    expect(staffAvatar.safeParse(image("application/pdf")).success).toBe(false);
+    expect(staffAvatar.safeParse(image("")).success).toBe(false);
+    expect(staffAvatar.safeParse("jane.jpg").success).toBe(false);
+  });
+
+  it("refuses an image past 4 MB", () => {
+    expect(STAFF_AVATAR_SIZE).toBe(4_194_304);
+    expect(
+      staffAvatar.safeParse(image("image/png", STAFF_AVATAR_SIZE)).success,
+    ).toBe(true);
+    expect(
+      staffAvatar.safeParse(image("image/png", STAFF_AVATAR_SIZE + 1)).success,
+    ).toBe(false);
   });
 });
