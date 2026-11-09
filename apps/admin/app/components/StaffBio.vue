@@ -87,11 +87,22 @@ const pt = computed(() => ({
 .staff-bio .f-data-editor-toolbar {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: var(--space-1);
 }
 
+/*
+ * The toolbar's controls: the block type's dropdown and a button per
+ * tool, each tool an icon. The layer's icons are bare `svg` elements laid
+ * out as blocks, so each control is a flex box that centers its own.
+ */
+.staff-bio .f-data-editor-block,
 .staff-bio .f-data-editor-tool {
-  padding: var(--space-1) var(--space-2);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-2);
   border: 1px var(--stroke-solid) var(--rule);
   border-radius: var(--shape-sm);
   background: var(--surface);
@@ -100,12 +111,41 @@ const pt = computed(() => ({
   cursor: pointer;
 }
 
+.staff-bio .f-data-editor-toolbar svg {
+  flex: none;
+  width: var(--space-4);
+  height: var(--space-4);
+}
+
+/*
+ * The dropdown names the block at the selection, so it keeps one width
+ * as that name changes and the tools after it stay where they are.
+ */
+.staff-bio .f-data-editor-block {
+  justify-content: space-between;
+  min-width: 8rem;
+  padding-inline: var(--space-3);
+}
+
+.staff-bio .f-data-editor-block > svg {
+  color: var(--on-surface-muted);
+}
+
+/* The rule between one group of tools and the next. */
+.staff-bio .f-data-editor-separator {
+  align-self: stretch;
+  width: 1px;
+  margin-inline: var(--space-1);
+  background: var(--rule);
+}
+
 .staff-bio .f-data-editor-tool[aria-pressed="true"] {
   border-color: var(--primary);
   background: var(--primary-container);
   color: var(--on-primary-container);
 }
 
+.staff-bio .f-data-editor-block:disabled,
 .staff-bio .f-data-editor-tool:disabled {
   opacity: 0.6;
   cursor: default;
