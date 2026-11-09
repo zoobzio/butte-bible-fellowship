@@ -2,49 +2,9 @@ import type { StaffRecord } from "@bbf/schema/types";
 
 import type { RecordLink, TableConfig } from "~/types/listing";
 
-import {
-  DATE_DEFAULT_OPERATOR,
-  DATE_OPERATORS,
-  MATCH_DEFAULT_OPERATOR,
-  MATCH_OPERATORS,
-  PRESENCES,
-  STAFF_ROLES,
-  TEXT_DEFAULT_OPERATOR,
-  TEXT_OPERATORS,
-} from "@bbf/schema";
+import { STAFF_ROLES } from "@bbf/schema";
 import { TIME_ZONE } from "#layers/bbf/shared/constants/time";
-import { keys } from "objectively";
-
-/** A filter on a column with a set of values: the value held, or one not. */
-const matching = {
-  operators: keys(MATCH_OPERATORS),
-  defaultOperator: MATCH_DEFAULT_OPERATOR,
-};
-
-/**
- * A filter on a text column: the text held or not, carried or not, or
- * started or ended with.
- */
-const textual = {
-  operators: keys(TEXT_OPERATORS),
-  defaultOperator: TEXT_DEFAULT_OPERATOR,
-};
-
-/**
- * A filter on an optional text column: the text filters, and under is and
- * not, whether the column is filled in, which the search offers.
- */
-const optional = { ...textual, values: [...PRESENCES] };
-
-/**
- * A filter on a day: before, after, on, on or after, or on or before it.
- * The days the search offers are the table's own, generated from the term
- * typed.
- */
-const dated = {
-  operators: keys(DATE_OPERATORS),
-  defaultOperator: DATE_DEFAULT_OPERATOR,
-};
+import { dated, matching, optional, textual } from "~/constants/listing";
 
 /** The way to a member's profile: the page a row's name leads to. */
 export const link: RecordLink<StaffRecord> = (record) =>

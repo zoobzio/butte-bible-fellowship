@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { ROLE_OPTIONS, STATUS_OPTIONS } from "~/constants/editor";
+import { ROLE_OPTIONS, WEEK_OPTIONS } from "~/constants/editor";
 import { toOptions } from "~/utils/editor";
 
 describe("toOptions", () => {
@@ -11,7 +11,7 @@ describe("toOptions", () => {
       { value: "staff", label: "[roles.staff]" },
     ]);
     expect(
-      toOptions(STATUS_OPTIONS, (message) => message).map((o) => o.value),
-    ).toEqual(["draft", "published", "archived"]);
+      toOptions(WEEK_OPTIONS, (message) => message).map((o) => o.value),
+    ).toEqual(["1", "2", "3", "4", "5"]);
   });
 });

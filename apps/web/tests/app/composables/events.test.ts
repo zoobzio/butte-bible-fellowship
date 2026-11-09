@@ -65,7 +65,6 @@ const DINNER: ChurchEvent = {
   slug: "harvest-dinner",
   date: "2026-10-24",
   start: "17:30",
-  note: "Bring a dish",
 };
 
 const OPEN_HOUSE: ChurchEvent = {
@@ -249,19 +248,16 @@ describe("useEventListing", () => {
     expect(result.value).toEqual([
       {
         title: "Worship Service",
-        note: undefined,
         time: "10:00 – 11:30 AM",
         to: "/events/worship-service",
       },
       {
         title: "Harvest Dinner",
-        note: "Bring a dish",
         time: "5:30 PM",
         to: "/events/harvest-dinner",
       },
       {
         title: "Open House",
-        note: undefined,
         time: undefined,
         to: "/events/open-house",
       },
@@ -371,11 +367,9 @@ describe("useEventDetails", () => {
     expect(details(OPEN_HOUSE).when).toEqual([]);
   });
 
-  it("holds the event at the church until it names a place of its own", () => {
+  it("holds the event at the church", () => {
     expect(details(WORSHIP).where).toBe("1 Test Street, Testville");
-    expect(details({ ...WORSHIP, location: "Bidwell Park" }).where).toBe(
-      "Bidwell Park",
-    );
+    expect(details(DINNER).where).toBe("1 Test Street, Testville");
   });
 
   it("gives the office's phone to call and email to write to", () => {
@@ -762,13 +756,11 @@ describe("useEventArticle", () => {
     };
   };
 
-  it("describes the event by its days, its time and its note", () => {
-    expect(
-      article({ ...WORSHIP, note: "All welcome", weeks: [1, 3] }).description,
-    ).toBe("Every first and third Sunday · 10:00 – 11:30 AM · All welcome");
-    expect(article(DINNER).description).toBe(
-      "Saturday, October 24 · 5:30 PM · Bring a dish",
+  it("describes the event by its days and its time", () => {
+    expect(article({ ...WORSHIP, weeks: [1, 3] }).description).toBe(
+      "Every first and third Sunday · 10:00 – 11:30 AM",
     );
+    expect(article(DINNER).description).toBe("Saturday, October 24 · 5:30 PM");
   });
 
   it("leaves out of the description what the event does not say", () => {

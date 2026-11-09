@@ -15,7 +15,7 @@ const listed = (events: ChurchEvent[]) =>
     .map((item) => item.findAll(":scope > *").map((part) => part.text()));
 
 describe("EventList", () => {
-  it("lists each event with its title, when it is held, and its note", () => {
+  it("lists each event with its title and when it is held", () => {
     expect(
       listed([
         {
@@ -25,13 +25,13 @@ describe("EventList", () => {
           end: "11:30",
         },
         { title: "Harvest Dinner", start: "17:30" },
-        { title: "Prayer Meeting", note: "All welcome", start: "10:00" },
+        { title: "Prayer Meeting", start: "10:00" },
         { title: "Open House", start: "all day" },
       ]),
     ).toEqual([
       ["Worship Service", "10:00 – 11:30 AM"],
       ["Harvest Dinner", "5:30 PM"],
-      ["Prayer Meeting", "10:00 AM", "All welcome"],
+      ["Prayer Meeting", "10:00 AM"],
       ["Open House"],
     ]);
   });

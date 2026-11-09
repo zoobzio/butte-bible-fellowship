@@ -1,6 +1,15 @@
 import type { z } from "zod";
 
-import type { eventBody, eventId, eventPath, eventsQuery } from "./input/event";
+import type {
+  eventArticle,
+  eventBody,
+  eventForm,
+  eventId,
+  eventPath,
+  eventQuery,
+  eventSort,
+  eventsQuery,
+} from "./input/event";
 import type { listingQuery, sortDirection } from "./input/listing";
 import type {
   DATE_OPERATORS,
@@ -94,6 +103,14 @@ export type DateOperator = keyof typeof DATE_OPERATORS;
 export type MatchOperator = keyof typeof MATCH_OPERATORS;
 
 export type EventBody = z.infer<typeof eventBody>;
+
+export type EventForm = z.infer<typeof eventForm>;
+
+export type EventArticle = z.infer<typeof eventArticle>;
+
+export type EventSort = z.infer<typeof eventSort>;
+
+export type EventQuery = z.infer<typeof eventQuery>;
 
 export type StaffId = z.infer<typeof staffId>;
 

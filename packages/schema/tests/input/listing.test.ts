@@ -7,6 +7,7 @@ import {
   LISTING_DEFAULT_SIZE,
   LISTING_MAX_SIZE,
   listingQuery,
+  matchColumn,
   SORT_DIRECTIONS,
   sorting,
   textColumn,
@@ -133,6 +134,35 @@ describe("dayColumn", () => {
   it("describes each filter by the day named and its operator", () => {
     expect(changed.shape.updatedAtOnOrAfter.meta()?.description).toBe(
       "The day it was changed on or after, as YYYY-MM-DD, in the church's own time. Left out, any day.",
+    );
+  });
+});
+
+describe("matchColumn", () => {
+  const held = z.object(
+    matchColumn("status", z.enum(["draft", "published"]), "status"),
+  );
+
+  it("filters the column under its key and each match operator's suffix", () => {
+    expect(Object.keys(held.shape)).toEqual(["statusIs", "statusNot"]);
+  });
+
+  it("takes a value of the column under each, and leaves out what is not given", () => {
+    expect(held.parse({ statusIs: "draft", statusNot: "published" })).toEqual({
+      statusIs: "draft",
+      statusNot: "published",
+    });
+    expect(held.parse({})).toEqual({});
+    expect(held.safeParse({ statusIs: "archived" }).success).toBe(false);
+    expect(held.safeParse({ statusNot: "" }).success).toBe(false);
+  });
+
+  it("describes each filter by the column named", () => {
+    expect(held.shape.statusIs.meta()?.description).toBe(
+      "The status the items listed hold. Left out, any.",
+    );
+    expect(held.shape.statusNot.meta()?.description).toBe(
+      "A status the items listed do not hold. Left out, none.",
     );
   });
 });

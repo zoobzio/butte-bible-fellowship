@@ -168,7 +168,6 @@ const useListing = () => {
 
   return (event: ChurchEvent): EventListing => ({
     title: event.title,
-    note: event.note,
     time: time(event),
     to: link(event),
   });
@@ -214,7 +213,7 @@ export const useEventDetails = (event: MaybeRefOrGetter<ChurchEvent>) => {
     ),
   );
 
-  const where = computed(() => toValue(event).location ?? contact.address);
+  const where = computed(() => contact.address);
 
   const questions = computed(() => [
     { text: contact.phone, href: phoneHref(contact.phone) },
@@ -312,7 +311,7 @@ export const useEventArticle = (
 
   const description = computed(() => {
     const held = toValue(event);
-    const said = [days(held), time(held), held.note].filter(Boolean);
+    const said = [days(held), time(held)].filter(Boolean);
     return said.length ? said.join(" · ") : undefined;
   });
 

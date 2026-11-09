@@ -35,22 +35,6 @@
     "defaultMessage": "Lowercase words joined by hyphens.",
     "description": "The hint under the slug field: how a slug is written."
   },
-  "status": {
-    "defaultMessage": "Status",
-    "description": "The label of the field, and the heading of the table column, for whether a record is a draft, published or archived."
-  },
-  "draft": {
-    "defaultMessage": "Draft",
-    "description": "The status of a record not yet shown on the site."
-  },
-  "published": {
-    "defaultMessage": "Published",
-    "description": "The status of a record shown on the site."
-  },
-  "archived": {
-    "defaultMessage": "Archived",
-    "description": "The status of a record taken off the site and kept."
-  },
   "summary": {
     "defaultMessage": "Summary",
     "description": "The label of the field for a record's one-line summary."

@@ -12,7 +12,6 @@ export interface EventsConfig {
 export interface EventListing {
   title: string;
   time?: string;
-  note?: string;
   to: string;
 }
 

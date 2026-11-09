@@ -44,6 +44,25 @@ beforeAll(async () => {
 afterAll(() => db.close());
 
 describe("events", () => {
+  const all = {
+    size: 100,
+    offset: 0,
+    tz: "America/Los_Angeles",
+    direction: "asc",
+  };
+
+  const article = {
+    type: "root",
+    children: [
+      {
+        type: "element",
+        tagName: "p",
+        properties: {},
+        children: [{ type: "text", value: "Come early." }],
+      },
+    ],
+  };
+
   it("reads the seeded calendar as events the schema accepts", async () => {
     const events = (await db.web.events.weekly()).map(toChurchEvent);
     expect(events).toHaveLength(8);
@@ -59,8 +78,8 @@ describe("events", () => {
       end: "11:30",
     });
     expect(
-      events.find((event) => event.slug === "stamp-ministry")?.weeks,
-    ).toEqual([1, 3]);
+      events.find((event) => event.slug === "stamp-ministry"),
+    ).toMatchObject({ day: "tuesday", weeks: [1, 3] });
   });
 
   it("reads a seeded event's own page, its body as the tree", async () => {
@@ -70,10 +89,10 @@ describe("events", () => {
       type: "root",
       children: [
         expect.objectContaining({ type: "element", tagName: "p" }),
-        { type: "text", value: "\n" },
         expect.objectContaining({ type: "element", tagName: "p" }),
       ],
     });
+    expect(event.day).toBe("thursday");
     expect(churchEvent.safeParse(event).success).toBe(true);
   });
 
@@ -81,41 +100,35 @@ describe("events", () => {
     const body = eventBody.parse({
       slug: "christmas-eve",
       title: "Christmas Eve Service",
-      note: "Candlelight",
       summary: "A candlelight service.",
-      body: "Come **early**.",
       date: "2026-12-24",
       start: "18:00",
       end: "19:30",
-      status: "published",
     });
     const created = await db.admin.events.create.first(toEventArguments(body));
     const id = created!.id;
-
-    expect(await db.admin.events.fetch.first({ id })).toMatchObject({
-      body: "Come **early**.",
-    });
+    await db.admin.events.body({ id, body: article });
 
     const record = toEventRecord((await db.admin.events.fetch.first({ id }))!);
     expect(record).toMatchObject({
       id,
       slug: "christmas-eve",
-      body: "Come **early**.",
+      body: article,
       date: "2026-12-24",
+      day: "thursday",
+      recurring: false,
       start: "18:00",
       end: "19:30",
-      status: "published",
     });
     expect(eventRecord.safeParse(record).success).toBe(true);
     expect(
-      (await db.admin.events.list()).map(toEventRecord).map((e) => e.slug),
+      (await db.admin.events.list(all)).map(toEventRecord).map((e) => e.slug),
     ).toContain("christmas-eve");
     const upcoming = await db.web.events.upcoming({ from: "2026-12-01" });
     expect(upcoming.map(toChurchEvent)).toEqual([
       {
         slug: "christmas-eve",
         title: "Christmas Eve Service",
-        note: "Candlelight",
         summary: "A candlelight service.",
         date: "2026-12-24",
         start: "18:00",
@@ -126,63 +139,45 @@ describe("events", () => {
     const page = await db.web.events.fetch.first({ slug: "christmas-eve" });
     expect(toChurchEvent(page!)).toEqual({
       ...toChurchEvent(upcoming[0]!),
-      body: {
-        type: "root",
-        children: [
-          {
-            type: "element",
-            tagName: "p",
-            properties: {},
-            children: [
-              { type: "text", value: "Come " },
-              {
-                type: "element",
-                tagName: "strong",
-                properties: {},
-                children: [{ type: "text", value: "early" }],
-              },
-              { type: "text", value: "." },
-            ],
-          },
-        ],
-      },
+      body: article,
     });
 
     const weekly = eventBody.parse({
       slug: "christmas-eve",
       title: "Advent Evening",
-      location: "Fellowship Hall",
-      day: "wednesday",
+      date: "2026-12-02",
+      recurring: true,
       weeks: [1, 2, 3, 4],
       start: "18:00",
-      status: "published",
     });
     await db.admin.events.update({ ...toEventArguments(weekly), id });
     const found = await db.web.events.fetch.first({ slug: "christmas-eve" });
+    // The details are replaced; what is written about it stays.
     expect(toChurchEvent(found!)).toEqual({
       slug: "christmas-eve",
       title: "Advent Evening",
-      location: "Fellowship Hall",
+      body: article,
       day: "wednesday",
       weeks: [1, 2, 3, 4],
       start: "18:00",
     });
+    expect(await db.web.events.upcoming({ from: "2026-12-01" })).toEqual([]);
 
     expect(await db.admin.events.delete({ id })).toBe(1);
   });
 
-  it("writes a draft the site does not list", async () => {
+  it("carries no status: an event written is on the site", async () => {
     const body = eventBody.parse({
-      slug: "draft",
-      title: "Draft",
-      day: "monday",
+      slug: "choir",
+      title: "Choir Practice",
+      date: "2026-01-05",
+      recurring: true,
       start: "19:00",
     });
     const created = await db.admin.events.create.first(toEventArguments(body));
     expect(
       (await db.web.events.weekly()).map(toChurchEvent).map((e) => e.slug),
-    ).not.toContain("draft");
-    expect(await db.web.events.fetch.first({ slug: "draft" })).toBeNull();
+    ).toContain("choir");
     expect(await db.admin.events.delete({ id: created!.id })).toBe(1);
   });
 });

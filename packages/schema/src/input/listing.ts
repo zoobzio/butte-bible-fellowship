@@ -1,7 +1,7 @@
 import { rekey } from "objectively";
 import { z } from "zod";
 
-import { DATE_OPERATORS, TEXT_OPERATORS } from "./operators";
+import { DATE_OPERATORS, MATCH_OPERATORS, TEXT_OPERATORS } from "./operators";
 
 export const LISTING_MAX_SIZE = 100;
 
@@ -57,6 +57,8 @@ const day = (what: string) =>
 type TextOperator = keyof typeof TEXT_OPERATORS;
 
 type DateOperator = keyof typeof DATE_OPERATORS;
+
+type MatchOperator = keyof typeof MATCH_OPERATORS;
 
 type TextFilter = ReturnType<typeof text>;
 
@@ -141,6 +143,40 @@ export const dayColumn = <K extends string>(key: K, what: string) =>
     `${key}${DATE_OPERATORS[operator]}`,
     filter(what),
   ]);
+
+/**
+ * What each match operator's filter says of itself, over the value the
+ * column holds: the one the items hold, or one they do not.
+ */
+const MATCH_FILTERS: Record<MatchOperator, (what: string) => string> = {
+  is: (what) => `The ${what} the items listed hold. Left out, any.`,
+  not: (what) => `A ${what} the items listed do not hold. Left out, none.`,
+};
+
+/** The filters on a column with a set of values, under its key and each operator's suffix. */
+type MatchColumn<K extends string, T extends z.ZodType> = Record<
+  `${K}${(typeof MATCH_OPERATORS)[MatchOperator]}`,
+  z.ZodOptional<T>
+>;
+
+/**
+ * The filters on a column with a set of values, one per match operator,
+ * each under the column's key and the operator's suffix: `statusIs`,
+ * `statusNot`. `value` is the schema of the values the column holds, and
+ * `what` names the column as the descriptions read it.
+ */
+export const matchColumn = <K extends string, T extends z.ZodType>(
+  key: K,
+  value: T,
+  what: string,
+) =>
+  rekey<typeof MATCH_OPERATORS, MatchColumn<K, T>>(
+    MATCH_OPERATORS,
+    (operator, suffix) => [
+      `${key}${suffix}`,
+      value.optional().meta({ description: MATCH_FILTERS[operator](what) }),
+    ],
+  );
 
 export const listingQuery = z.object({
   page: z.coerce

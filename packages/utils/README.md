@@ -53,24 +53,27 @@ arguments type it speaks goes in `types.ts`.
 
 The database and the schema were drawn to the same shapes, so most of a
 transform is the difference between a column and a field. What a row has
-null in, a model leaves out: a `summary`, a `note`, a `location`, an
-event's `end`, a sermon's `speaker` or `video`. What a body leaves out, the
-arguments write as null, so an update that passes no `date` clears one; what
-a body defaults, an event's or a sermon's `status`, is written as the body
+null in, a model leaves out: a `summary`, an event's `end`, a sermon's
+`speaker` or `video`. What a body leaves out, the arguments write as null,
+so an update that passes no `end` clears one; what a body defaults, a
+sermon's `status` or whether an event recurs, is written as the body
 parsed it. A time comes out of
 Postgres as `HH:MM:SS` and the API says `HH:MM`; a `date` comes out as
 `YYYY-MM-DD`, as the API says it.
 
-A row's columns differ by query. `web.events.weekly` has no `date` and
-`web.events.upcoming` no `day` or `weeks`, each knowing its kind of event
-has none, and every list of the events has no `body`, which is the event's
-own page's to carry, so `EventRow` lets a row do without those four and
-`toChurchEvent` takes any query's row of the events, the admin's included.
+A row's columns differ by query. Every list of the events has no `body`,
+which is the event's own page's to carry, so `EventRow` lets a row do
+without it and `toChurchEvent` takes any query's row of the events, the
+admin's included. An event's row holds a `date` and whether it is
+`recurring`, and the site knows a recurring event by its `day` and a
+one-off by its `date`: `toEventDay` names the day of the week a date falls
+on, `toChurchEvent` gives a recurring event that day and no date, and
+`toEventRecord` gives the admin both.
 `web.sermons.list` leaves out a sermon's `body` the same way, and
 `SermonRow` lets it. Columns a model has no field for go nowhere: an admin
-row's `id`, `position`, `status` and timestamps.
+row's `id`, `position` and timestamps.
 
-A column that holds Markdown — a bio, an event's body — reaches the wire
+A column that holds Markdown — a sermon's body — reaches the wire
 as the HTML tree the app renders, not as the string. `toHast` reads it
 through `@prosary/parse` with the presets the pages are built with, `gfm()`,
 `mdc()` and `rehype-slug` as `@bbf/prose`'s `prosary.config.ts` lists them,
@@ -79,10 +82,11 @@ schema's `hast` from the parser's tree node by node: an element's
 tag, its attributes and what it holds, or a run of text. The position the
 parser kept is not built, nor is an attribute left `undefined`, nor a node
 Markdown never makes. Nothing is cast: the parser's shape goes in, the
-wire's comes out, as with any row. `toChurchEvent` runs an event's `body`
-through it and `toSermon` a sermon's; the body a request carries, and the
-column, stay Markdown. A member's `bio` is stored as the tree already, and
-`toStaffMember` checks it against the schema's `hast` as it reads it.
+wire's comes out, as with any row. `toSermon` runs a sermon's `body`
+through it; the body a request carries, and the column, stay Markdown. A
+member's `bio` and an event's `body` are stored as the tree already, and
+`toStaffMember` and `toChurchEvent` check each against the schema's `hast`
+as they read it.
 
 An editor holds a bio as HTML, so `toHtml` writes the record's tree
 through `hast-util-to-html` and `fromHtml` reads the editor's string back

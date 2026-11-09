@@ -1,10 +1,9 @@
 <script lang="ts">
 import type { EventRecord } from "@bbf/schema/types";
 
+import { Form } from "#components";
 import { useNuxtApp } from "#imports";
-import RecordForm from "~/components/RecordForm.vue";
-import { useEventEditor } from "~/composables/events";
-import { DAY_OPTIONS, KIND_OPTIONS, STATUS_OPTIONS } from "~/constants/editor";
+import { useEventEditor } from "~/composables/events/editor";
 </script>
 
 <script setup lang="ts">
@@ -12,111 +11,203 @@ defineOptions({ name: "EventEditor" });
 
 const { record } = defineProps<{ record: EventRecord | null }>();
 
+const emit = defineEmits<{ saved: [record: EventRecord] }>();
+
 const { $t } = useNuxtApp();
 
-const { draft, saving, removing, error, removable, submit, destroy } =
-  useEventEditor(record);
+const { form, error } = useEventEditor(record, (saved) => emit("saved", saved));
+
+/* The browser's own checks stay off: the schema's are the ones shown. */
+const pt = { form: { novalidate: true } };
 </script>
 
 <template>
-  <RecordForm
-    :saving="saving"
-    :removing="removing"
-    :error="error"
-    :removable="removable"
-    @submit="submit"
-    @remove="destroy"
-  >
-    <div class="record-form-field">
-      <label for="event-title">{{ $t.admin.event.title() }}</label>
-      <input id="event-title" v-model="draft.title" type="text" required />
-    </div>
-    <div class="record-form-field">
-      <label for="event-slug">{{ $t.admin.editor.slug() }}</label>
-      <input id="event-slug" v-model="draft.slug" type="text" required />
-      <span class="record-form-hint">{{ $t.admin.editor.slugHint() }}</span>
-    </div>
-    <div class="record-form-field">
-      <label for="event-status">{{ $t.admin.editor.status() }}</label>
-      <select id="event-status" v-model="draft.status">
-        <option
-          v-for="option in STATUS_OPTIONS"
-          :key="option.value"
-          :value="option.value"
-        >
-          {{ $t(option.label) }}
-        </option>
-      </select>
-    </div>
-    <fieldset class="record-form-field record-form-choices">
-      <legend class="record-form-legend">{{ $t.admin.event.held() }}</legend>
-      <label
-        v-for="option in KIND_OPTIONS"
-        :key="option.value"
-        class="record-form-choice"
-      >
-        <input
-          v-model="draft.kind"
-          type="radio"
-          name="event-kind"
-          :value="option.value"
-        />
-        {{ $t(option.label) }}
-      </label>
-    </fieldset>
-    <div v-if="draft.kind === 'once'" class="record-form-field">
-      <label for="event-date">{{ $t.admin.event.date() }}</label>
-      <input id="event-date" v-model="draft.date" type="date" required />
-    </div>
-    <template v-else>
-      <div class="record-form-field">
-        <label for="event-day">{{ $t.admin.event.day() }}</label>
-        <select id="event-day" v-model="draft.day">
-          <option
-            v-for="option in DAY_OPTIONS"
-            :key="option.value"
-            :value="option.value"
-          >
-            {{ $t(option.label) }}
-          </option>
-        </select>
-      </div>
-      <div class="record-form-field">
-        <label for="event-weeks">{{ $t.admin.event.weeks() }}</label>
-        <input id="event-weeks" v-model="draft.weeks" type="text" />
-        <span class="record-form-hint">{{ $t.admin.event.weeksHint() }}</span>
-      </div>
-    </template>
-    <div class="record-form-field">
-      <label for="event-start">{{ $t.admin.event.start() }}</label>
-      <input id="event-start" v-model="draft.start" type="time" required />
-    </div>
-    <div class="record-form-field">
-      <label for="event-end">{{ $t.admin.event.end() }}</label>
-      <input id="event-end" v-model="draft.end" type="time" />
-    </div>
-    <div class="record-form-field">
-      <label for="event-location">{{ $t.admin.event.location() }}</label>
-      <input id="event-location" v-model="draft.location" type="text" />
-      <span class="record-form-hint">{{ $t.admin.event.locationHint() }}</span>
-    </div>
-    <div class="record-form-field">
-      <label for="event-image">{{ $t.admin.event.image() }}</label>
-      <input id="event-image" v-model="draft.image" type="url" />
-    </div>
-    <div class="record-form-field record-form-field-wide">
-      <label for="event-note">{{ $t.admin.event.note() }}</label>
-      <input id="event-note" v-model="draft.note" type="text" />
-      <span class="record-form-hint">{{ $t.admin.event.noteHint() }}</span>
-    </div>
-    <div class="record-form-field record-form-field-wide">
-      <label for="event-summary">{{ $t.admin.editor.summary() }}</label>
-      <input id="event-summary" v-model="draft.summary" type="text" />
-    </div>
-    <div class="record-form-field record-form-field-wide">
-      <label for="event-body">{{ $t.admin.event.body() }}</label>
-      <textarea id="event-body" v-model="draft.body" rows="12" />
-      <span class="record-form-hint">{{ $t.admin.event.bodyHint() }}</span>
-    </div>
-  </RecordForm>
+  <div class="event-editor">
+    <Form :service="form" :pt="pt">
+      <template #footer="{ settings }">
+        <p v-if="error" class="event-editor-error" role="alert">{{ error }}</p>
+        <button class="event-editor-save" v-bind="settings.submit">
+          {{
+            form.submitting ? $t.admin.editor.saving() : $t.admin.editor.save()
+          }}
+        </button>
+      </template>
+    </Form>
+  </div>
 </template>
+
+<style>
+/* One column of an event's details, as narrow as the panel it stands in. */
+.event-editor .f-data-form {
+  display: grid;
+  gap: var(--space-6);
+  max-width: 24rem;
+}
+
+/* The page header names the record; the form's own title would repeat it. */
+.event-editor .f-data-form-toolbar {
+  display: none;
+}
+
+/* The fields stack: a column ignores the spans the form sets. */
+.event-editor .f-data-form-grid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.event-editor .f-data-form-field {
+  display: grid;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.event-editor .f-data-form-field-label {
+  font: var(--type-label);
+  font-variant-caps: all-small-caps;
+  letter-spacing: calc(var(--type-label-letter-spacing) * 2);
+  color: var(--on-surface-muted);
+}
+
+/* A field that must be filled in is marked at its label. */
+.event-editor
+  .f-data-form-field:has(:required, [aria-required="true"])
+  .f-data-form-field-label::after {
+  content: " *";
+  color: var(--error);
+}
+
+.event-editor .f-data-form-input,
+.event-editor .f-data-form-textarea,
+.event-editor .f-select-trigger {
+  box-sizing: border-box;
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  border: 1px var(--stroke-solid) var(--rule);
+  border-radius: var(--shape-sm);
+  background: var(--surface);
+  color: var(--on-surface-high-contrast);
+  font: var(--type-body);
+  transition: border-color var(--transition-fast);
+}
+
+.event-editor .f-data-form-input:focus-visible,
+.event-editor .f-data-form-textarea:focus-visible,
+.event-editor .f-select-trigger:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
+  border-color: var(--primary);
+}
+
+.event-editor .f-data-form-input[aria-invalid="true"],
+.event-editor .f-data-form-textarea[aria-invalid="true"] {
+  border-color: var(--error);
+}
+
+/* The summary grows downward only: the column sets its width. */
+.event-editor .f-data-form-textarea {
+  display: block;
+  resize: vertical;
+}
+
+/*
+ * The select reads as the inputs do. The mark at its end that says it opens
+ * is the layer's own icon: the app draws none of its own.
+ */
+.event-editor .f-select-trigger {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  text-align: left;
+  cursor: pointer;
+}
+
+.event-editor .f-select-trigger > .f-span {
+  flex: 1;
+  min-height: 1lh;
+}
+
+.event-editor .f-select-trigger > svg {
+  flex: none;
+  color: var(--on-surface-muted);
+}
+
+/* The checkbox is a small box of its own, ticked in the theme's color. */
+.event-editor .f-checkbox-root {
+  display: grid;
+  place-items: center;
+  width: var(--space-5);
+  height: var(--space-5);
+  padding: 0;
+  border: 1px var(--stroke-solid) var(--rule);
+  border-radius: var(--shape-sm);
+  background: var(--surface);
+  color: var(--on-primary);
+  cursor: pointer;
+  transition:
+    background var(--transition-fast),
+    border-color var(--transition-fast);
+}
+
+.event-editor .f-checkbox-root[data-state="checked"] {
+  border-color: var(--primary);
+  background: var(--primary);
+}
+
+.event-editor .f-checkbox-root:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
+}
+
+.event-editor .f-checkbox-root svg {
+  display: block;
+  width: var(--space-4);
+  height: var(--space-4);
+}
+
+.event-editor .f-data-form-field-hint,
+.event-editor .f-data-form-field-error {
+  font-size: var(--label-size);
+}
+
+.event-editor .f-data-form-field-hint {
+  color: var(--on-surface-muted);
+}
+
+.event-editor .f-data-form-field-error {
+  color: var(--error);
+}
+
+.event-editor-error {
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--shape-sm);
+  background: var(--error-container);
+  color: var(--on-error-container);
+}
+
+.event-editor-save {
+  justify-self: start;
+  padding: var(--space-3) var(--space-5);
+  border: 1px var(--stroke-solid) transparent;
+  border-radius: var(--shape-full);
+  font: var(--type-label);
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--type-label-letter-spacing);
+  cursor: pointer;
+  transition:
+    background var(--transition-base),
+    color var(--transition-base);
+}
+
+.event-editor-save {
+  background: var(--primary);
+  color: var(--on-primary);
+  box-shadow: var(--elevation-low);
+}
+
+.event-editor-save:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+</style>

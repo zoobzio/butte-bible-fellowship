@@ -1,4 +1,4 @@
-SELECT slug, title, note, summary, image, location, day, weeks, start_time, end_time
+SELECT slug, title, summary, image, date, recurring, weeks, start_time, end_time
 FROM events
-WHERE status = 'published' AND day IS NOT NULL
-ORDER BY day, start_time;
+WHERE recurring
+ORDER BY extract(dow FROM date), start_time;

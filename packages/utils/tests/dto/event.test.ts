@@ -1,16 +1,27 @@
 import { churchEvent, eventRecord } from "@bbf/schema";
 import { describe, expect, it } from "vitest";
 
-import { toChurchEvent, toEventRecord } from "../../src/dto/event";
+import { toChurchEvent, toEventDay, toEventRecord } from "../../src/dto/event";
+
+const BODY = {
+  type: "root",
+  children: [
+    {
+      type: "element",
+      tagName: "p",
+      properties: {},
+      children: [{ type: "text", value: "We gather." }],
+    },
+  ],
+};
 
 const WEEKLY = {
   slug: "worship-service",
   title: "Worship Service",
-  note: null,
   summary: null,
   image: null,
-  location: null,
-  day: "sunday" as const,
+  date: "2026-01-04",
+  recurring: true,
   weeks: null,
   start_time: "10:00:00",
   end_time: "11:30:00",
@@ -19,17 +30,26 @@ const WEEKLY = {
 const ONE_OFF = {
   slug: "christmas-eve",
   title: "Christmas Eve Service",
-  note: "Candlelight",
   summary: "A candlelight service on Christmas Eve.",
   image: "https://cdn.example.com/events/christmas-eve.jpg",
-  location: "Pillsbury Road",
   date: "2026-12-24",
+  recurring: false,
+  weeks: null,
   start_time: "18:00:00",
   end_time: null,
 };
 
+describe("toEventDay", () => {
+  it("names the day of the week a date falls on, in no time zone", () => {
+    expect(toEventDay("2026-01-04")).toBe("sunday");
+    expect(toEventDay("2026-01-06")).toBe("tuesday");
+    expect(toEventDay("2026-01-10")).toBe("saturday");
+    expect(toEventDay("2026-12-24")).toBe("thursday");
+  });
+});
+
 describe("toChurchEvent", () => {
-  it("builds a weekly event, leaving out what the row has null in", () => {
+  it("builds a recurring event by the day of the week of its date, and no date", () => {
     expect(toChurchEvent(WEEKLY)).toEqual({
       slug: "worship-service",
       title: "Worship Service",
@@ -39,47 +59,30 @@ describe("toChurchEvent", () => {
     });
   });
 
-  it("builds a one-off from a row without a day", () => {
+  it("builds a one-off by its date, and no day", () => {
     expect(toChurchEvent(ONE_OFF)).toEqual({
       slug: "christmas-eve",
       title: "Christmas Eve Service",
-      note: "Candlelight",
       summary: "A candlelight service on Christmas Eve.",
       image: "https://cdn.example.com/events/christmas-eve.jpg",
-      location: "Pillsbury Road",
       date: "2026-12-24",
       start: "18:00",
     });
   });
 
-  it("serves the body as the tree the app renders, not the Markdown", () => {
-    const event = toChurchEvent({
-      ...WEEKLY,
-      body: "## Sunday\n\nWe gather.",
-    });
-    expect(event.body).toEqual({
-      type: "root",
-      children: [
-        {
-          type: "element",
-          tagName: "h2",
-          properties: { id: "sunday" },
-          children: [{ type: "text", value: "Sunday" }],
-        },
-        { type: "text", value: "\n" },
-        {
-          type: "element",
-          tagName: "p",
-          properties: {},
-          children: [{ type: "text", value: "We gather." }],
-        },
-      ],
-    });
+  it("serves the body as the tree it was written as", () => {
+    const event = toChurchEvent({ ...WEEKLY, body: BODY });
+    expect(event.body).toEqual(BODY);
     expect(churchEvent.safeParse(event).success).toBe(true);
     expect(toChurchEvent({ ...WEEKLY, body: null }).body).toBeUndefined();
+    expect(toChurchEvent(WEEKLY).body).toBeUndefined();
   });
 
-  it("keeps the weeks a repeating event is held in, dropping a null", () => {
+  it("refuses a body that is no tree", () => {
+    expect(() => toChurchEvent({ ...WEEKLY, body: "## Sunday" })).toThrow();
+  });
+
+  it("keeps the weeks a recurring event is held in, dropping a null", () => {
     expect(toChurchEvent({ ...WEEKLY, weeks: [1, 3] }).weeks).toEqual([1, 3]);
     expect(toChurchEvent({ ...WEEKLY, weeks: [1, null, 3] }).weeks).toEqual([
       1, 3,
@@ -96,14 +99,12 @@ describe("toChurchEvent", () => {
     const row = {
       ...WEEKLY,
       id: 7,
-      date: null,
       body: null,
-      status: "published" as const,
       created_at: new Date(),
       updated_at: new Date(),
     };
     expect(toChurchEvent(row)).not.toHaveProperty("id");
-    expect(toChurchEvent(row)).not.toHaveProperty("status");
+    expect(toChurchEvent(row)).not.toHaveProperty("recurring");
     expect(toChurchEvent(row)).not.toHaveProperty("created_at");
   });
 
@@ -117,61 +118,53 @@ const ADMIN_ROW = {
   ...WEEKLY,
   id: 3,
   body: null,
-  date: null,
-  status: "published" as const,
   created_at: new Date("2026-10-17T18:00:00Z"),
   updated_at: new Date("2026-10-18T09:30:00Z"),
 };
 
 describe("toEventRecord", () => {
-  it("builds a weekly record, leaving out what the row has null in", () => {
+  it("builds a recurring record, with its date and the day it falls on, leaving out what the row has null in", () => {
     expect(toEventRecord(ADMIN_ROW)).toEqual({
       id: 3,
       slug: "worship-service",
       title: "Worship Service",
+      date: "2026-01-04",
       day: "sunday",
+      recurring: true,
       start: "10:00",
       end: "11:30",
-      status: "published",
       createdAt: "2026-10-17T18:00:00.000Z",
       updatedAt: "2026-10-18T09:30:00.000Z",
     });
   });
 
-  it("builds a one-off, the body as the Markdown it was written as", () => {
-    expect(
-      toEventRecord({
-        ...ADMIN_ROW,
-        ...ONE_OFF,
-        day: null,
-        weeks: null,
-        body: "## Eve\n\nCandles.",
-        status: "draft",
-      }),
-    ).toEqual({
-      id: 3,
-      slug: "christmas-eve",
-      title: "Christmas Eve Service",
-      note: "Candlelight",
+  it("carries all the row says, the body as the tree it was written as", () => {
+    const record = toEventRecord({
+      ...ADMIN_ROW,
+      ...ONE_OFF,
+      body: BODY,
+      weeks: null,
+    });
+    expect(record).toMatchObject({
       summary: "A candlelight service on Christmas Eve.",
-      body: "## Eve\n\nCandles.",
+      body: BODY,
       image: "https://cdn.example.com/events/christmas-eve.jpg",
-      location: "Pillsbury Road",
       date: "2026-12-24",
+      day: "thursday",
+      recurring: false,
       start: "18:00",
-      status: "draft",
-      createdAt: "2026-10-17T18:00:00.000Z",
-      updatedAt: "2026-10-18T09:30:00.000Z",
     });
-  });
-
-  it("lists the weeks a repeating event is held in", () => {
-    expect(toEventRecord({ ...ADMIN_ROW, weeks: [1, 3] }).weeks).toEqual([
+    expect(record.end).toBeUndefined();
+    expect(toEventRecord({ ...ADMIN_ROW, weeks: [1, null, 3] }).weeks).toEqual([
       1, 3,
     ]);
   });
 
   it("builds what the schema accepts", () => {
     expect(eventRecord.safeParse(toEventRecord(ADMIN_ROW)).success).toBe(true);
+    expect(
+      eventRecord.safeParse(toEventRecord({ ...ADMIN_ROW, body: BODY }))
+        .success,
+    ).toBe(true);
   });
 });

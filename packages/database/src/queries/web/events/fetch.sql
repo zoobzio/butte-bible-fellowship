@@ -1,3 +1,3 @@
-SELECT slug, title, note, summary, body, image, location, date, day, weeks, start_time, end_time
+SELECT slug, title, summary, body, image, date, recurring, weeks, start_time, end_time
 FROM events
-WHERE slug = :slug AND status = 'published';
+WHERE slug = :slug;

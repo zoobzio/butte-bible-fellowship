@@ -109,6 +109,7 @@ describe("bundles", () => {
       "events.week",
       "admin.editor.confirm",
       "admin.member.photoConfirm",
+      "admin.event.imageConfirm",
     ];
     for (const [key, message] of Object.entries(source)) {
       if (!taking.includes(key)) {
@@ -148,6 +149,9 @@ describe("bundles", () => {
     expect(
       prosary.format("admin.member.photoConfirm", { name: "Jane Doe" }),
     ).toBe("Remove Jane Doe’s photo?");
+    expect(
+      prosary.format("admin.event.imageConfirm", { name: "Harvest Dinner" }),
+    ).toBe("Remove the picture of Harvest Dinner?");
   });
 });
 

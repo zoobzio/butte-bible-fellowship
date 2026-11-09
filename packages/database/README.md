@@ -9,12 +9,14 @@ the kit and the sources never reach it.
 
 The tables are the site's three kinds of data: `staff`, who serve the
 church, each in a `staff_role` — pastor, elder, staff — which is also the
-order the site lists them in; `events`, each held once on a date or weekly on a day, with the page
+order the site lists them in; `events`, each held on a date, and every
+week on that date's day of the week when it is `recurring`, with the page
 written about it; and `sermons`, each preached on a day, with the page
 written about it and its recording on the church's YouTube channel. Beside them, `users` is who may sign in to the admin app.
-An event or a sermon carries a `content_status` — draft, published,
-archived — and only the published reaches the site; the staff carry none,
-and whoever is on the staff is on the site.
+A sermon carries a `content_status` — draft, published, archived — and
+only the published reaches the site; the staff and the events carry none,
+and whoever is on the staff, and whatever event is written, is on the
+site.
 
 The queries are grouped by the app that runs them. `web` is the reads the
 site needs and nothing else; `admin` is the full set of reads and writes
@@ -28,7 +30,7 @@ would not have offered.
 
 ```
 bezoar.config.ts   the kit config: the output directory, the defaults for the rest
-src/migrations/    the schema, forward only: staff, events, sermons, users, staff search, like escape, search cost, staff status
+src/migrations/    the schema, forward only: staff, events, sermons, users, staff search, like escape, search cost, staff status, events search, events trim
 src/seeds/         the staff and events the content lists, and the first admin user, each safe to run again
 src/queries/web/   what the site reads: staff, events, sermons
 src/queries/admin/ what the admin app will read and write: the same, in full
@@ -46,12 +48,13 @@ first row or `null`; one with none returns the count of the rows it changed.
 
 A query is named for what it does: `list` lists, `fetch` reads one.
 `web.staff.list` lists the staff, every member, in their order: by role,
-then by name. The events the web reads are the published ones:
-`web.events.list` is the calendar's feed — every repeating event Sunday
-first, then the one-offs on or after a date — and `web.events.weekly` and
-`web.events.upcoming` are its two halves on their own; `web.events.fetch`
-is an event's own page by slug, and alone carries the event's `body`, the
-Markdown written about it, which the lists leave out. `web.sermons.list`
+then by name. The web reads every event: `web.events.list` is the
+calendar's feed — every recurring event by the day of the week its date
+falls on, Sunday first, then the one-offs on or after a date — and
+`web.events.weekly` and `web.events.upcoming` are its two halves on their
+own; `web.events.fetch` is an event's own page by slug, and alone carries
+the event's `body`, the rich text written about it, which the lists leave
+out. `web.sermons.list`
 takes the newest published sermons, as many as asked, and
 `web.sermons.fetch` is a sermon's own page by slug, which alone carries its
 `body`, as an event's does.
@@ -93,8 +96,27 @@ carries, does not carry, starts with or ends with, as typed,
 day each member was last changed or added `before`, `after`, `on`,
 `on_or_after` or `on_or_before`, as `updated_before` and the like. Left
 out or null, a part narrows nothing. The days are read in `tz`, the
-church's IANA time zone, which every search passes. `admin.events` and `admin.sermons` have `list`, `fetch`,
-`create`, `update` and `delete`, by `id`.
+church's IANA time zone, which every search passes.
+
+`admin.events` has `list`, `fetch`, `create`, `update` and `delete`, by
+`id`, and as the staff have, a query for each part written on its own:
+`image`, the URL of the event's picture, and `body`, the rich text
+written about it. `create` and `update` write the details and leave both
+alone. Its `list` is searched as the staff's is: a page of `size` rows
+from `offset`, each carrying the `total`; `q` looked for in the `search`
+column the events trim migration keeps, the title, the slug, the summary
+and the text of the body as one text, nearest first when no `sort` is
+asked for; whether it recurs and the day of the week its date falls on,
+held or not, `recurring_is` and `day_not` and the like; the text filters
+on the `title`, `slug`, `summary` and `image`; and the day filters on the
+`date` it is held, as it is written, and on the days it was `updated` and
+`created`, read in `tz`. `sort` names a column, `title`, `slug`, `day`,
+`date`, `recurring`, `start_time`, `created_at` or `updated_at`, and after
+any sort the admin's own order holds: the recurring events Sunday first,
+then the one-offs by date. An event's day of the week is never stored:
+`event_day_of` reads it from the date.
+`admin.sermons` has `list`, `fetch`, `create`, `update` and `delete`, by
+`id`.
 
 `admin.users` has the same, and two more for signing in. A user is added
 by their email and a `user_role` — `admin` or `editor`, the roles of
@@ -105,18 +127,19 @@ user by it on every request after. An `update` that changes the email
 unbinds the user until they sign in with the new one. The admin app passes
 `claim` only an email Google has verified.
 
-A member's `bio` is `jsonb`: the HTML tree (hast) the app renders, written
-as the admin's editor hands it over and served to the site as it is, where
-an event's or a sermon's `body` is the Markdown it was written as.
+A member's `bio` and an event's `body` are `jsonb`: the HTML tree (hast)
+the app renders, written as the admin's editor hands it over and served to
+the site as it is, where a sermon's `body` is the Markdown it was written
+as. The events trim migration made the events' bodies so, each paragraph
+of what was Markdown a paragraph of the tree, by `hast_paragraphs`, which
+the seeds write through too.
 
 An argument written into a column the schema lets be null — a summary, a
-bio, a body, an image, a note, a location, an end time, a sermon's
-`speaker` or `video`, an event's `date` or `day` or `weeks` — is optional,
-and takes `null`; left out, it is null. Every other argument is required, an
-event's or a sermon's `status` among them. An event is created
-with its `date` or its `day`, never both, and the schema refuses anything
-else. An `update` replaces every field, so one that passes a `date` and no
-`day` makes the event a one-off. A sermon's `slug` and its `video`,
+bio, a body, an image, an end time, a sermon's `speaker` or `video`, an
+event's `weeks` — is optional, and takes `null`; left out, it is null.
+Every other argument is required, a sermon's `status` and an event's
+`date` and `recurring` among them. Only a recurring event picks its
+`weeks`, and the schema refuses anything else. A sermon's `slug` and its `video`,
 YouTube's id for its recording, are each taken once; a sermon not yet
 recorded has no video, and any number may.
 

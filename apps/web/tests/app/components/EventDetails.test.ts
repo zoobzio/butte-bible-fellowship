@@ -55,11 +55,6 @@ describe("EventDetails", () => {
     ]);
   });
 
-  it("says where an event with a place of its own is held", () => {
-    const [, where] = sections({ ...WORSHIP, location: "Bidwell Park" });
-    expect(where![1]).toEqual({ tag: "dd", text: "Bidwell Park" });
-  });
-
   it("says only as much of when as the event does", () => {
     const [when] = sections({
       title: "Open House",

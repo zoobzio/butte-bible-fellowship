@@ -47,7 +47,6 @@ describe("churchEvent", () => {
     const event = {
       slug: "volunteer-work-fellowship",
       title: "Volunteer Work Fellowship",
-      note: "Bring gloves.",
       summary: "Volunteers lend a hand with the work of the church.",
       body: {
         type: "root",
@@ -61,7 +60,6 @@ describe("churchEvent", () => {
         ],
       },
       image: "https://cdn.example.com/events/volunteer.jpg",
-      location: "Bidwell Park",
       date: "2026-10-17",
       weeks: [1, 3],
       start: "08:00",
@@ -92,8 +90,15 @@ describe("churchEvent", () => {
     ).toBe(false);
   });
 
-  it("carries no status: the site lists only the published", () => {
-    expect(churchEvent.parse({ ...WEEKLY, status: "draft" })).toEqual(WEEKLY);
+  it("carries no status, note or location: an event has none", () => {
+    expect(
+      churchEvent.parse({
+        ...WEEKLY,
+        status: "draft",
+        note: "All welcome",
+        location: "Bidwell Park",
+      }),
+    ).toEqual(WEEKLY);
   });
 
   it("rejects a date that is not YYYY-MM-DD", () => {
@@ -138,46 +143,75 @@ describe("churchEvents", () => {
   });
 });
 
+const BODY = {
+  type: "root",
+  children: [
+    {
+      type: "element",
+      tagName: "p",
+      properties: {},
+      children: [{ type: "text", value: "Come along." }],
+    },
+  ],
+};
+
 describe("eventRecord", () => {
   const RECORD = {
     id: 1,
     slug: "worship-service",
     title: "Worship Service",
+    date: "2026-01-04",
     day: "sunday",
+    recurring: true,
     start: "10:00",
-    status: "published",
     createdAt: "2026-10-17T18:00:00.000Z",
     updatedAt: "2026-10-17T18:00:00.000Z",
   };
 
-  it("needs what an event needs, and its id, status and timestamps", () => {
+  it("needs what an event needs: its id, its date and the day it falls on, whether it recurs, and its timestamps", () => {
     expect(eventRecord.parse(RECORD)).toEqual(RECORD);
-    for (const key of ["id", "status", "createdAt", "updatedAt"]) {
+    for (const key of [
+      "id",
+      "date",
+      "day",
+      "recurring",
+      "start",
+      "createdAt",
+      "updatedAt",
+    ]) {
       const { [key]: _gone, ...without } = RECORD as Record<string, unknown>;
       expect(eventRecord.safeParse(without).success, key).toBe(false);
     }
   });
 
-  it("accepts all an event can say, the body as the Markdown it was written as", () => {
+  it("accepts all an event can say, the body as the tree the editor wrote", () => {
     const value = {
       ...RECORD,
-      note: "Bring gloves.",
       summary: "Volunteers lend a hand.",
-      body: "## Work\n\nCome along.",
+      body: BODY,
       image: "https://cdn.example.com/events/volunteer.jpg",
-      location: "Bidwell Park",
       weeks: [1, 3],
       end: "12:00",
-      status: "draft",
     };
     expect(eventRecord.parse(value)).toEqual(value);
   });
 
-  it("takes a body as the Markdown, never as the tree the site renders", () => {
+  it("takes a body as the tree, never as Markdown", () => {
     expect(
-      eventRecord.safeParse({ ...RECORD, body: { type: "root", children: [] } })
+      eventRecord.safeParse({ ...RECORD, body: "## Work\n\nCome along." })
         .success,
     ).toBe(false);
+  });
+
+  it("carries no status, note or location", () => {
+    expect(
+      eventRecord.parse({
+        ...RECORD,
+        status: "draft",
+        note: "Bring gloves.",
+        location: "Bidwell Park",
+      }),
+    ).toEqual(RECORD);
   });
 
   it("names an event by a whole number from one", () => {
@@ -193,9 +227,10 @@ describe("eventListing", () => {
           id: 1,
           slug: "worship-service",
           title: "Worship Service",
+          date: "2026-01-04",
           day: "sunday",
+          recurring: true,
           start: "10:00",
-          status: "published",
           createdAt: "2026-10-17T18:00:00.000Z",
           updatedAt: "2026-10-17T18:00:00.000Z",
         },

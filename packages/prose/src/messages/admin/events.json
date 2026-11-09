@@ -5,10 +5,22 @@
   },
   "new": {
     "defaultMessage": "New event",
-    "description": "The link to the editor of a new event, and the title of that page."
+    "description": "The button that opens the form of a new event, and the title of that form's dialog."
   },
   "notFound": {
     "defaultMessage": "Event not found",
     "description": "The error shown when an address names an event that does not exist."
+  },
+  "newDescription": {
+    "defaultMessage": "Its details come first. Its picture and what is written about it are added on its page, once it is saved.",
+    "description": "The line under the title of the dialog that adds a new event: what the form asks for, and where the rest is written."
+  },
+  "description": {
+    "defaultMessage": "What the church holds: the weekly gatherings and the one-off events on its calendar.",
+    "description": "The line under the title of the page that lists the events: what the list is."
+  },
+  "details": {
+    "defaultMessage": "Details",
+    "description": "The tab of an event's page that holds its details, its picture and what is written about it."
   }
 }

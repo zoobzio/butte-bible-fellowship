@@ -23,7 +23,6 @@ const WORSHIP: ChurchEvent = {
 const PRAYER: ChurchEvent = {
   title: "Reunión de Oración",
   slug: "prayer-meeting",
-  note: "All welcome",
   day: "thursday",
   weeks: [1, 3],
   start: "10:00",
@@ -79,9 +78,9 @@ describe("EventArticle", () => {
     });
   });
 
-  it("describes an event by its days, its time and its note", () => {
+  it("describes an event by its days and its time", () => {
     expect(header(mountArticle(PRAYER)).description).toBe(
-      "Every first and third Thursday · 10:00 – 11:00 AM · All welcome",
+      "Every first and third Thursday · 10:00 – 11:00 AM",
     );
   });
 

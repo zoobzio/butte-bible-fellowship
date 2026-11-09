@@ -8,9 +8,9 @@ import {
   eventId,
   eventListing,
   eventPath,
+  eventQuery,
   eventRecord,
   eventsQuery,
-  listingQuery,
   page,
   sermon,
   sermonBody,
@@ -115,7 +115,7 @@ const document = createDocument(
       },
       "/admin/api/events": {
         get: {
-          requestParams: { query: listingQuery },
+          requestParams: { query: eventQuery },
           responses: { 200: json(eventListing) },
         },
       },
@@ -192,18 +192,21 @@ describe("the components", () => {
       },
     });
     expect(schemas.StaffRecord).not.toHaveProperty("properties.status");
+    expect(schemas.EventRecord).not.toHaveProperty("properties.status");
     expect(schemas.EventRecord).toMatchObject({
       required: [
         "id",
         "slug",
         "title",
+        "date",
+        "day",
+        "recurring",
         "start",
-        "status",
         "createdAt",
         "updatedAt",
       ],
       properties: {
-        body: { type: "string" },
+        body: { $ref: "#/components/schemas/Hast" },
         day: { $ref: "#/components/schemas/EventDay" },
         start: { $ref: "#/components/schemas/EventTime" },
       },
@@ -252,9 +255,14 @@ describe("the components", () => {
       const { properties } = schemas[id] as {
         properties: Record<string, unknown>;
       };
-      expect(properties.day).toMatchObject({
-        $ref: "#/components/schemas/EventDay",
-      });
+      // A body names no day: it is the day of the week of its date.
+      if (id === "ChurchEvent") {
+        expect(properties.day).toMatchObject({
+          $ref: "#/components/schemas/EventDay",
+        });
+      } else {
+        expect(properties.day).toBeUndefined();
+      }
       expect(properties.start).toMatchObject({
         $ref: "#/components/schemas/EventTime",
       });
@@ -288,8 +296,9 @@ describe("the components", () => {
       },
     });
     expect(schemas.EventBody).toMatchObject({
-      properties: { status: { $ref: "#/components/schemas/ContentStatus" } },
+      properties: { date: { format: "date" }, recurring: { type: "boolean" } },
     });
+    expect(schemas.EventBody).not.toHaveProperty("properties.status");
     expect(schemas.StaffMember).toMatchObject({
       required: ["id", "name", "role"],
       properties: {
@@ -410,7 +419,7 @@ describe("the requests", () => {
       },
     });
     expect(schemas.EventBody).toMatchObject({
-      required: ["slug", "title", "start"],
+      required: ["slug", "title", "date", "start"],
     });
   });
 

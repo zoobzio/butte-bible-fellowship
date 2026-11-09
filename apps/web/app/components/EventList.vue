@@ -23,7 +23,6 @@ const listed = useEventListing(() => events);
           <NuxtLink :to="event.to">{{ event.title }}</NuxtLink>
         </h3>
         <p v-if="event.time" class="event-list-time">{{ event.time }}</p>
-        <p v-if="event.note" class="event-list-note">{{ event.note }}</p>
       </li>
     </ol>
     <p v-else class="event-list-none">{{ $t.events.none() }}</p>
@@ -110,7 +109,6 @@ const listed = useEventListing(() => events);
   font-variant-numeric: tabular-nums;
 }
 
-.event-list-note,
 .event-list-none {
   color: var(--on-surface-muted);
 }

@@ -3,10 +3,8 @@ import type { Arguments, Row } from "bezoar";
 
 type EventColumns = Row<Contract, "web.events.fetch">;
 
-type EventSpare = "date" | "day" | "weeks" | "body";
-
-export type EventRow = Omit<EventColumns, EventSpare> &
-  Partial<Pick<EventColumns, EventSpare>>;
+export type EventRow = Omit<EventColumns, "body"> &
+  Partial<Pick<EventColumns, "body">>;
 
 export type EventRecordRow = Row<Contract, "admin.events.fetch">;
 

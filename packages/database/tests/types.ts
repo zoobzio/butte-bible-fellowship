@@ -18,7 +18,7 @@ type Day =
   | "saturday";
 
 export type Checks = [
-  Assert<Equal<Row<Contract, "web.events.weekly">["day"], Day>>,
+  Assert<Equal<Row<Contract, "web.events.weekly">["recurring"], boolean>>,
   Assert<Equal<Row<Contract, "web.events.upcoming">["date"], string>>,
   Assert<Equal<Row<Contract, "web.staff.list">["bio"], unknown>>,
   Assert<
@@ -31,7 +31,7 @@ export type Checks = [
     >
   >,
   Assert<Equal<Row<Contract, "web.events.weekly">["end_time"], string | null>>,
-  Assert<Equal<Row<Contract, "web.events.fetch">["body"], string | null>>,
+  Assert<Equal<Row<Contract, "web.events.fetch">["body"], unknown>>,
   Assert<
     Equal<
       "body" extends keyof Row<Contract, "web.events.list"> ? true : false,
@@ -39,9 +39,21 @@ export type Checks = [
     >
   >,
   Assert<
+    Equal<Arguments<Contract, "admin.events.create">["recurring"], boolean>
+  >,
+  Assert<Equal<Arguments<Contract, "admin.events.create">["date"], string>>,
+  Assert<Equal<Row<Contract, "admin.events.fetch">["date"], string>>,
+  Assert<Equal<Arguments<Contract, "admin.events.body">["body"], unknown>>,
+  Assert<
     Equal<
-      Arguments<Contract, "admin.events.create">["status"],
-      "draft" | "published" | "archived"
+      Arguments<Contract, "admin.events.image">["image"],
+      string | null | undefined
+    >
+  >,
+  Assert<
+    Equal<
+      "status" extends keyof Row<Contract, "admin.events.fetch"> ? true : false,
+      false
     >
   >,
   Assert<Equal<Row<Contract, "admin.sermons.fetch">["created_at"], Date>>,
@@ -62,12 +74,6 @@ export type Checks = [
     Equal<
       Returns<Contract, "admin.staff.create">,
       { id: number; created_at: Date }[]
-    >
-  >,
-  Assert<
-    Equal<
-      Arguments<Contract, "admin.events.create">["day"],
-      Day | null | undefined
     >
   >,
   Assert<
@@ -111,10 +117,48 @@ export type Checks = [
       string | null | undefined
     >
   >,
+  Assert<
+    Equal<
+      Arguments<Contract, "admin.events.list">["sort"],
+      string | null | undefined
+    >
+  >,
+  Assert<Equal<Arguments<Contract, "admin.events.list">["direction"], string>>,
+  Assert<Equal<Row<Contract, "admin.events.list">["total"], number>>,
+  Assert<
+    Equal<
+      Arguments<Contract, "admin.events.list">["recurring_is"],
+      boolean | null | undefined
+    >
+  >,
+  Assert<
+    Equal<
+      Arguments<Contract, "admin.events.list">["day_not"],
+      Day | null | undefined
+    >
+  >,
+  Assert<
+    Equal<
+      Arguments<Contract, "admin.events.list">["title_not_contains"],
+      string | null | undefined
+    >
+  >,
+  Assert<
+    Equal<
+      Arguments<Contract, "admin.events.list">["date_on_or_before"],
+      string | null | undefined
+    >
+  >,
+  Assert<
+    Equal<
+      "search" extends keyof Row<Contract, "admin.events.fetch"> ? true : false,
+      false
+    >
+  >,
 ];
 
 // @ts-expect-error Day must be an enum label.
-export const wrongDay: Arguments<Contract, "admin.events.create">["day"] =
+export const wrongDay: Arguments<Contract, "admin.events.list">["day_is"] =
   "funday";
 
 export const spare: Arguments<Contract, "admin.staff.create"> = {

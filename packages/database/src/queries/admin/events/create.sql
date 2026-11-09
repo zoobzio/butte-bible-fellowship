@@ -1,3 +1,3 @@
-INSERT INTO events (slug, title, note, summary, body, image, location, date, day, weeks, start_time, end_time, status)
-VALUES (:slug, :title, :note, :summary, :body, :image, :location, :date::date, :day, :weeks::int2[], :start::time, :end::time, :status)
+INSERT INTO events (slug, title, summary, date, recurring, weeks, start_time, end_time)
+VALUES (:slug, :title, :summary, :date::date, :recurring, :weeks::int2[], :start::time, :end::time)
 RETURNING id, slug, created_at;

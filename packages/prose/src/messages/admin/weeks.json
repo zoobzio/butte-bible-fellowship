@@ -1,0 +1,22 @@
+{
+  "first": {
+    "defaultMessage": "First",
+    "description": "A week of the month, as the event editor offers it: the first time the event's day comes round in a month."
+  },
+  "second": {
+    "defaultMessage": "Second",
+    "description": "A week of the month, as the event editor offers it: the second time the event's day comes round in a month."
+  },
+  "third": {
+    "defaultMessage": "Third",
+    "description": "A week of the month, as the event editor offers it: the third time the event's day comes round in a month."
+  },
+  "fourth": {
+    "defaultMessage": "Fourth",
+    "description": "A week of the month, as the event editor offers it: the fourth time the event's day comes round in a month."
+  },
+  "fifth": {
+    "defaultMessage": "Fifth",
+    "description": "A week of the month, as the event editor offers it: the fifth time the event's day comes round in a month."
+  }
+}

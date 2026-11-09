@@ -6,12 +6,10 @@ import { useEvents } from "~~/server/composables/events";
 const WEEKLY = {
   slug: "worship-service",
   title: "Worship Service",
-  note: null,
   summary: "We gather on Sunday morning.",
   image: null,
-  location: null,
-  date: null,
-  day: "sunday" as const,
+  date: "2026-01-04",
+  recurring: true,
   weeks: null,
   start_time: "10:00:00",
   end_time: "11:30:00",
@@ -20,16 +18,28 @@ const WEEKLY = {
 const ONE_OFF = {
   slug: "christmas-eve",
   title: "Christmas Eve Service",
-  note: "Candlelight",
   summary: null,
   image: null,
-  location: null,
   date: "2026-12-24",
+  recurring: false,
+  weeks: null,
   start_time: "18:00:00",
   end_time: null,
 };
 
-const PAGE = { ...WEEKLY, body: "We gather." };
+const BODY = {
+  type: "root",
+  children: [
+    {
+      type: "element",
+      tagName: "p",
+      properties: {},
+      children: [{ type: "text", value: "We gather." }],
+    },
+  ],
+};
+
+const PAGE = { ...WEEKLY, body: BODY };
 
 const list = vi.fn(async (_args: { from: string }) => [WEEKLY, ONE_OFF]);
 const weekly = vi.fn(async () => [WEEKLY]);
@@ -64,7 +74,6 @@ describe("useEvents", () => {
       {
         slug: "christmas-eve",
         title: "Christmas Eve Service",
-        note: "Candlelight",
         date: "2026-12-24",
         start: "18:00",
       },

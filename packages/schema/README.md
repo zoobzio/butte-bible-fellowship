@@ -22,7 +22,7 @@ src/models/      what the API answers with: one file per kind of thing
   event.ts       an event of the church, the list of them, and the days and times it names
   hast.ts        rich text as the API serves it: an HTML syntax tree of elements and text
   staff.ts       someone who serves the church, the list of them, and their roles
-  status.ts      the statuses an event or a sermon passes through
+  status.ts      the statuses a sermon passes through
   sermon.ts      a sermon preached at the church, and the list of them
   page.ts        a page's front matter: its hero, events and image
   slug.ts        what names a thing in an address
@@ -48,30 +48,34 @@ A model is the response: `churchEvent`, `staffMember`, `sermon`, `hero`,
 `page`, with `churchEvents`, `staffMembers` and `sermons`, the lists the
 API answers with, and the primitives they are built from — `eventDay`,
 `eventTime`, `slug`, `contentStatus`, `staffRole`, and `hast`, rich text
-as an HTML syntax tree. A column written as Markdown — an event's or a
-sermon's `body` — goes over the wire as `hast`: the tree the site's pages
-are built to, which the app renders with its own components, so the wire
-never carries Markdown and the app never parses it. `@bbf/utils`'s
-`toHast` builds it, through the same presets as the pages. A body still
-takes the Markdown: `eventBody.body` and `sermonBody.body` are the string
-as written. A member's `bio` is `hast` everywhere: the admin's editor
-writes the tree, `staffBio.bio` carries it, and the site reads it as it
-was stored. A member is written in three parts, each on its own, so a save
-of one never replaces another: `staffBody` is their details, `staffBio`
-their bio, and `staffAvatar` their photo as it is uploaded, a JPEG, PNG or
-WebP file of `STAFF_AVATAR_SIZE` at most. An input is one part of a request, named for the
+as an HTML syntax tree. A column written as Markdown — a sermon's `body` —
+goes over the wire as `hast`: the tree the site's pages are built to,
+which the app renders with its own components, so the wire never carries
+Markdown and the app never parses it. `@bbf/utils`'s `toHast` builds it,
+through the same presets as the pages. A body still takes the Markdown:
+`sermonBody.body` is the string as written. A member's `bio` and an
+event's `body` are `hast` everywhere: the admin's editor writes the tree,
+`staffBio.bio` and `eventArticle.body` carry it, and the site reads it as
+it was stored. A member is written in three parts, each on its own, so a
+save of one never replaces another: `staffBody` is their details,
+`staffBio` their bio, and `staffAvatar` their photo as it is uploaded, a
+JPEG, PNG or WebP file of `STAFF_AVATAR_SIZE` at most. An event is written
+the same way: `eventBody` is its details, `eventArticle` what is written
+about it, and `eventImage` its picture as it is uploaded. An input is one part of a request, named for the
 group and the part: `eventPath` is the path parameters of one event,
 `eventsQuery` the query of the events list, `eventBody` what a write
-carries. A body says what a model cannot: an event is written with a date
-or a day, never both, only a repeating one picks its weeks, and an end comes
-after its start — the rules the database's constraints keep, checked before
-a query runs. A member's phone number is ten digits, however they are
+carries. An event is written with the date it is held and whether it is
+`recurring`: a recurring event is held every week on that date's day of
+the week, which a record names as its `day` and the site's `churchEvent`
+carries in place of the date. A body says what a model cannot: only a
+recurring event picks its weeks, and an end comes after its start — the
+rules the database's constraints keep, checked before a query runs. A member's phone number is ten digits, however they are
 typed: `staffPhone` takes the usual ways of writing one and keeps it one
 way, as `530-555-0100`. Only a write is held to it, so a record with an
-older number still reads. A body also carries what the site never shows:
-the `status` that decides whether an event or a sermon reaches it, a draft
-until the body says otherwise. A member carries none: whoever is on the
-staff is on the site.
+older number still reads. A sermon's body also carries what the site never
+shows: the `status` that decides whether it reaches the site, a draft
+until the body says otherwise. A member and an event carry none: whoever
+is on the staff, and whatever event is written, is on the site.
 
 A sermon is what the church preached, not what YouTube lists: its `date` is
 the day it was preached, its `speaker` who preached it, and its `video`

@@ -4,7 +4,9 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { service } from "@bbf/nuxt/testing/bezoar";
 import {
+  EVENT_FOLDER,
   useBlobStore,
+  useEventImage,
   useLocalStore,
   useStaffAvatar,
 } from "~~/server/composables/avatars";
@@ -68,12 +70,47 @@ const portrayed = vi.fn(
   },
 );
 
+const EVENT_ROW = {
+  id: 3,
+  slug: "worship-service",
+  title: "Worship Service",
+  summary: null,
+  body: null,
+  image: null as string | null,
+  date: "2026-01-04",
+  recurring: true,
+  weeks: null,
+  start_time: "10:00:00",
+  end_time: null,
+  created_at: new Date("2026-10-17T18:00:00Z"),
+  updated_at: new Date("2026-10-18T09:30:00Z"),
+};
+
+/* One event, whose picture the queries read and write. */
+const worship = { ...EVENT_ROW };
+const found = vi.fn(async ({ id }: { id: number }) =>
+  id === 3 ? { ...worship } : null,
+);
+const pictured = vi.fn(
+  async ({ id, image }: { id: number; image: string | null }) => {
+    if (id !== 3) return null;
+    worship.image = image;
+    return { id, updated_at: EVENT_ROW.updated_at };
+  },
+);
+
 Object.assign(service, {
-  admin: { staff: { fetch: { first: fetched }, photo: { first: portrayed } } },
+  admin: {
+    staff: { fetch: { first: fetched }, photo: { first: portrayed } },
+    events: { fetch: { first: found }, image: { first: pictured } },
+  },
 });
 
 afterEach(() => {
   member.photo = null;
+  worship.image = null;
+  found.mockClear();
+  pictured.mockClear();
   kept.clear();
   for (const mock of [put, del, fetched, portrayed]) mock.mockClear();
   vi.restoreAllMocks();
@@ -93,6 +130,18 @@ describe("useBlobStore", () => {
       "staff/7.jpg",
       expect.any(File),
       expect.objectContaining({ contentType: "image/jpeg" }),
+    );
+  });
+
+  it("keeps another kind of record's pictures in a folder of their own", async () => {
+    const file = image("image/png");
+    expect(await useBlobStore(EVENT_FOLDER).put(3, file)).toBe(
+      "https://store.public.blob.vercel-storage.com/events/3-abc.png",
+    );
+    expect(put).toHaveBeenCalledWith(
+      "events/3.png",
+      file,
+      expect.objectContaining({ access: "public", addRandomSuffix: true }),
     );
   });
 
@@ -116,6 +165,17 @@ describe("useLocalStore", () => {
     expect([...kept.keys()]).toEqual([`avatars:${name}`]);
     expect(kept.get(`avatars:${name}`)).toEqual(new Uint8Array([1, 2, 3]));
     expect(put).not.toHaveBeenCalled();
+  });
+
+  it("names another kind of record's picture by its folder first, read back the same way", async () => {
+    const store = useLocalStore(EVENT, EVENT_FOLDER);
+    const url = await store.put(3, image());
+    expect(url).toMatch(
+      /^http:\/\/localhost:3001\/avatars\/events-3-[\da-f-]{36}\.png$/,
+    );
+    expect(kept.size).toBe(1);
+    await store.remove(url);
+    expect(kept.size).toBe(0);
   });
 
   it("drops a photo it keeps, and leaves a URL that is another's alone", async () => {
@@ -205,5 +265,60 @@ describe("useStaffAvatar", () => {
     expect(await useStaffAvatar(EVENT).clear(9)).toBeNull();
     expect(portrayed).not.toHaveBeenCalled();
     expect(del).not.toHaveBeenCalled();
+  });
+});
+
+describe("useEventImage", () => {
+  const EVENTS = "https://store.public.blob.vercel-storage.com/events";
+
+  it("keeps the image with the events', points the event at it, and hands back the record", async () => {
+    const record = await useEventImage(EVENT).replace(3, image());
+    expect(put).toHaveBeenCalledWith(
+      "events/3.png",
+      expect.any(File),
+      expect.any(Object),
+    );
+    expect(pictured).toHaveBeenCalledWith({
+      id: 3,
+      image: `${EVENTS}/3-abc.png`,
+    });
+    expect(record).toMatchObject({ id: 3, image: `${EVENTS}/3-abc.png` });
+    expect(del).not.toHaveBeenCalled();
+  });
+
+  it("drops the picture the event had, once it shows the new one", async () => {
+    worship.image = `${EVENTS}/3-old.png`;
+    await useEventImage(EVENT).replace(3, image());
+    expect(del).toHaveBeenCalledTimes(1);
+    expect(del).toHaveBeenCalledWith(`${EVENTS}/3-old.png`);
+  });
+
+  it("keeps nothing for an event there is not", async () => {
+    expect(await useEventImage(EVENT).replace(9, image())).toBeNull();
+    expect(put).not.toHaveBeenCalled();
+  });
+
+  it("drops the image again when the event cannot be pointed at it, and says so", async () => {
+    pictured.mockRejectedValueOnce(new Error("The database is away."));
+    await expect(useEventImage(EVENT).replace(3, image())).rejects.toThrow(
+      "The database is away.",
+    );
+    expect(del).toHaveBeenCalledWith(`${EVENTS}/3-abc.png`);
+  });
+
+  it("clears an event's picture, and drops it from the store", async () => {
+    worship.image = `${EVENTS}/3-old.png`;
+    const record = await useEventImage(EVENT).clear(3);
+    expect(pictured).toHaveBeenCalledWith({ id: 3, image: null });
+    expect(record).toMatchObject({ id: 3 });
+    expect(record?.image).toBeUndefined();
+    expect(del).toHaveBeenCalledWith(`${EVENTS}/3-old.png`);
+  });
+
+  it("clears nothing for an event there is not, and drops the picture of one that is gone", async () => {
+    expect(await useEventImage(EVENT).clear(9)).toBeNull();
+    expect(pictured).not.toHaveBeenCalled();
+    await useEventImage(EVENT).discard(`${EVENTS}/3-old.png`);
+    expect(del).toHaveBeenCalledWith(`${EVENTS}/3-old.png`);
   });
 });

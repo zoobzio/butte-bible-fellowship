@@ -43,18 +43,18 @@ through the `@bbf/nuxt` layer.
 | `connect.json`    | the connect page: its header                                |
 | `roles.json`      | a staff member's roles, as the site and the admin name them |
 
-| File                    | Messages                                                         |
-| ----------------------- | ---------------------------------------------------------------- |
-| `admin/site.json`       | what the admin is: the line under the church's name              |
-| `admin/navigation.json` | the header's links: the sections the admin edits                 |
-| `admin/login.json`      | the login page                                                   |
-| `admin/account.json`    | the account menu: its name and the way out                       |
-| `admin/editor.json`     | what every editor shares: its buttons, prompts, fields, statuses |
-| `admin/events.json`     | the events section: its pages' titles and not found              |
-| `admin/event.json`      | an event's fields, and the hints under them                      |
-| `admin/days.json`       | the days of the week an event repeats on                         |
-| `admin/staff.json`      | the staff section: its pages' titles and not found               |
-| `admin/member.json`     | a staff member's fields, their photo's controls, and the hints   |
+| File                    | Messages                                                       |
+| ----------------------- | -------------------------------------------------------------- |
+| `admin/site.json`       | what the admin is: the line under the church's name            |
+| `admin/navigation.json` | the header's links: the sections the admin edits               |
+| `admin/login.json`      | the login page                                                 |
+| `admin/account.json`    | the account menu: its name and the way out                     |
+| `admin/editor.json`     | what every editor shares: its buttons, prompts and fields      |
+| `admin/events.json`     | the events section: its pages' titles and not found            |
+| `admin/event.json`      | an event's fields, its picture's controls, and the hints       |
+| `admin/weeks.json`      | the weeks of the month a repeating event is held in            |
+| `admin/staff.json`      | the staff section: its pages' titles and not found             |
+| `admin/member.json`     | a staff member's fields, their photo's controls, and the hints |
 
 Messages are ICU MessageFormat, where an ASCII apostrophe is the escape
 character — write a typographic one (`You’re`), as the pages already do.

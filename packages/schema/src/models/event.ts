@@ -3,7 +3,6 @@ import { z } from "zod";
 import { hast } from "./hast";
 import { listing } from "./listing";
 import { slug } from "./slug";
-import { contentStatus } from "./status";
 
 export const EVENT_DAYS = [
   "sunday",
@@ -38,13 +37,6 @@ export const churchEvent = z
       examples: ["worship-service"],
     }),
     title: z.string().meta({ examples: ["Worship Service"] }),
-    note: z
-      .string()
-      .optional()
-      .meta({
-        description: "A few words more about it, shown under its title.",
-        examples: ["All welcome"],
-      }),
     summary: z
       .string()
       .optional()
@@ -64,13 +56,6 @@ export const churchEvent = z
         description:
           "The URL of its picture. Left out, it is pictured by the church.",
         examples: ["https://cdn.example.com/events/worship-service.jpg"],
-      }),
-    location: z
-      .string()
-      .optional()
-      .meta({
-        description: "Where it is held, when that is not at the church.",
-        examples: ["Bidwell Park"],
       }),
     date: z.iso
       .date()
@@ -117,45 +102,39 @@ export const eventRecord = z
       description: "What the event's own page is called in its address.",
     }),
     title: z.string().meta({ examples: ["Worship Service"] }),
-    note: z.string().optional().meta({
-      description: "A few words more about it, shown under its title.",
-    }),
     summary: z.string().optional().meta({
       description:
         "A line or two about it, as a card shows and search engines list.",
     }),
-    body: z.string().optional().meta({
-      description: "What is written about it, as Markdown, as it was written.",
+    body: hast.optional().meta({
+      description:
+        "What is written about it, for its own page, as rich text: the tree the app renders, as the admin's editor wrote it.",
     }),
     image: z.url().optional().meta({
       description: "The URL of its picture.",
     }),
-    location: z.string().optional().meta({
-      description: "Where it is held, when that is not at the church.",
+    date: z.iso.date().meta({
+      description:
+        "The date it is held, as YYYY-MM-DD: the one date of an event held once, and a date a recurring event is held, which names its day of the week.",
+      examples: ["2026-10-17"],
     }),
-    date: z.iso
-      .date()
-      .optional()
-      .meta({
-        description: "The one date it happens on, as YYYY-MM-DD.",
-        examples: ["2026-10-17"],
-      }),
-    day: eventDay.optional().meta({
-      description: "The day of the week it repeats on.",
+    day: eventDay.meta({
+      description: "The day of the week its date falls on.",
+    }),
+    recurring: z.boolean().meta({
+      description:
+        "Whether it is held every week, on the day of the week of its date, or on that date alone.",
     }),
     weeks: z
       .array(z.int().min(1).max(5))
       .optional()
       .meta({
         description:
-          "Which of the month's weeks a repeating event is held in. Left out, every week.",
+          "Which of the month's weeks a recurring event is held in. Left out, every week.",
         examples: [[1, 3]],
       }),
     start: eventTime.meta({ description: "When it starts." }),
     end: eventTime.optional().meta({ description: "When it ends." }),
-    status: contentStatus.meta({
-      description: "Whether it reaches the site.",
-    }),
     createdAt: z.iso.datetime().meta({
       description: "When its row was written.",
       examples: ["2026-10-17T18:00:00.000Z"],
@@ -168,11 +147,11 @@ export const eventRecord = z
   .meta({
     id: "EventRecord",
     description:
-      "An event of the church, as the admin reads it: every column of its row, whatever its status.",
+      "An event of the church, as the admin reads it: every column of its row.",
   });
 
 export const eventListing = listing(eventRecord).meta({
   id: "EventListing",
   description:
-    "A page of the events, as the admin lists them: the repeating ones Sunday first, then the one-offs by date, whatever their status.",
+    "A page of the events, as the admin lists them: the recurring ones Sunday first, then the one-offs by date.",
 });
