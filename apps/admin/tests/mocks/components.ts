@@ -11,6 +11,7 @@ export const NuxtPage = defineComponent({
 });
 
 export { default as Avatar } from "@zoobzio/vue/components/avatar.vue";
+export { default as Dialog } from "@zoobzio/vue/components/dialog.vue";
 export { default as Editor } from "@zoobzio/vue/components/editor.vue";
 export { default as FileInput } from "@zoobzio/vue/components/file-input.vue";
 export { default as Form } from "@zoobzio/vue/components/form.vue";

@@ -344,6 +344,53 @@
   color: var(--on-primary-container);
 }
 
+/*
+ * The dialog portals to body, so it is styled here, for every app: a
+ * panel in the middle of the page, over a veil that dims what is under it.
+ * A long one scrolls inside itself, and its title leaves room at its end
+ * for whatever closes it.
+ */
+.f-dialog-overlay {
+  position: fixed;
+  inset: 0;
+  background: color-mix(in oklab, black 45%, transparent);
+  z-index: 50;
+}
+
+.f-dialog-content {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  box-sizing: border-box;
+  display: grid;
+  gap: var(--space-4);
+  width: min(28rem, calc(100vw - var(--space-4) * 2));
+  max-height: calc(100dvh - var(--space-4) * 2);
+  padding: var(--space-6);
+  overflow: hidden auto;
+  background: var(--surface-container);
+  border: 1px var(--stroke-solid) var(--rule);
+  border-radius: var(--shape-md);
+  box-shadow: var(--elevation-mid);
+  color: var(--on-surface);
+  font: var(--type-body);
+  transform: translate(-50%, -50%);
+  z-index: 50;
+}
+
+.f-dialog-title {
+  margin: 0;
+  padding-right: var(--space-8);
+  font: var(--type-title);
+  font-family: var(--font-display);
+  color: var(--on-surface-high-contrast);
+}
+
+.f-dialog-description {
+  margin: 0;
+  color: var(--on-surface-muted);
+}
+
 /* The select menu portals to body, so it is styled here, for every app. */
 .f-select-content {
   min-width: 8rem;

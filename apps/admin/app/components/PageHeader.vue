@@ -17,6 +17,8 @@ const { title, description, back, to, action, tabs } = defineProps<{
   tabs?: PageLink[];
 }>();
 
+const emit = defineEmits<{ action: [] }>();
+
 defineSlots<{ default?: () => unknown }>();
 
 const pages = usePageTabs(() => tabs);
@@ -40,10 +42,18 @@ const pages = usePageTabs(() => tabs);
           {{ description }}
         </p>
       </div>
-      <div v-if="(to && action) || $slots.default" class="page-header-actions">
-        <NuxtLink v-if="to && action" :to="to" class="page-header-action">
+      <div v-if="action || $slots.default" class="page-header-actions">
+        <NuxtLink v-if="action && to" :to="to" class="page-header-action">
           {{ action }}
         </NuxtLink>
+        <button
+          v-else-if="action"
+          type="button"
+          class="page-header-action"
+          @click="emit('action')"
+        >
+          {{ action }}
+        </button>
         <slot />
       </div>
     </div>
@@ -114,7 +124,10 @@ const pages = usePageTabs(() => tabs);
   color: var(--on-surface-muted);
 }
 
-/* What can be done from the page: a link to a new record, or its menu. */
+/*
+ * What can be done from the page: the way to a new record, a link to its
+ * page or a button that opens it in place, or the record's menu.
+ */
 .page-header-actions {
   display: flex;
   flex-wrap: wrap;
@@ -126,6 +139,7 @@ const pages = usePageTabs(() => tabs);
   display: inline-flex;
   align-items: center;
   padding: var(--space-2) var(--space-4);
+  border: 0;
   border-radius: var(--shape-full);
   background: var(--primary);
   color: var(--on-primary);
@@ -134,6 +148,7 @@ const pages = usePageTabs(() => tabs);
   letter-spacing: var(--type-label-letter-spacing);
   text-decoration: none;
   box-shadow: var(--elevation-low);
+  cursor: pointer;
   transition:
     transform var(--transition-base),
     box-shadow var(--transition-base);

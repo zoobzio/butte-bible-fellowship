@@ -20,6 +20,20 @@ describe("PageHeader", () => {
     expect(action.text()).toBe("New member");
   });
 
+  it("offers the one thing to do as a button when it leads to no page, and says when it is asked for", async () => {
+    const wrapper = mount(PageHeader, {
+      props: { title: "Staff", action: "New member" },
+    });
+    expect(wrapper.find("a.page-header-action").exists()).toBe(false);
+    const action = wrapper.find(".page-header-actions button");
+    expect(action.classes()).toEqual(["page-header-action"]);
+    expect(action.attributes("type")).toBe("button");
+    expect(action.text()).toBe("New member");
+    expect(wrapper.emitted("action")).toBeUndefined();
+    await action.trigger("click");
+    expect(wrapper.emitted("action")).toEqual([[]]);
+  });
+
   it("says what the page is, under its title, when told", () => {
     const wrapper = mount(PageHeader, {
       props: { title: "Staff", description: "Who serves the church." },

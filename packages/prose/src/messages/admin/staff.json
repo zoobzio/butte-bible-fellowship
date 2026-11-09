@@ -5,7 +5,11 @@
   },
   "new": {
     "defaultMessage": "New member",
-    "description": "The link to the editor of a new staff member, and the title of that page."
+    "description": "The button that opens the form of a new staff member, and the title of that form's dialog."
+  },
+  "newDescription": {
+    "defaultMessage": "Their details come first. Their photo and bio are added on their page, once they are saved.",
+    "description": "The line under the title of the dialog that adds a new staff member: what the form asks for, and where the rest is written."
   },
   "notFound": {
     "defaultMessage": "Staff member not found",

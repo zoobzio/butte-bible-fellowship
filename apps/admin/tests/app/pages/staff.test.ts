@@ -3,15 +3,15 @@ import type { StaffRecord } from "@bbf/schema/types";
 import { describe, expect, it, vi } from "vitest";
 import { flushPromises, mount } from "@vue/test-utils";
 
-import { NuxtPage, Table } from "#components";
-import { setRoutePath } from "#imports";
+import { Dialog, NuxtPage, Table } from "#components";
+import { setRoutePath, useRouter } from "#imports";
+import Select from "@zoobzio/vue/components/select.vue";
 import PageHeader from "~/components/PageHeader.vue";
 import StaffAvatar from "~/components/StaffAvatar.vue";
 import StaffBio from "~/components/StaffBio.vue";
 import StaffEditor from "~/components/StaffEditor.vue";
 import StaffMenu from "~/components/StaffMenu.vue";
 import Index from "~/pages/staff/index.vue";
-import New from "~/pages/staff/new.vue";
 import Member from "~/pages/staff/[id].vue";
 import Profile from "~/pages/staff/[id]/profile.vue";
 import { STAFF } from "#test/support/records";
@@ -34,9 +34,9 @@ describe("staff page", () => {
       title: "Staff",
       description:
         "The people who serve the church, as the site introduces them.",
-      to: "/staff/new",
       action: "New member",
     });
+    expect(wrapper.find("a.page-header-action").exists()).toBe(false);
     const table = wrapper.findComponent(Table);
     expect(table.props("service").id).toBe("staff");
     expect(fetch).toHaveBeenCalledTimes(1);
@@ -137,16 +137,76 @@ describe("staff page", () => {
   });
 });
 
-describe("new member page", () => {
-  it("opens the editor on no record", () => {
-    const wrapper = mount(New, { global: { stubs: { StaffEditor: true } } });
-    expect(wrapper.findComponent(PageHeader).props()).toMatchObject({
+describe("new member dialog", () => {
+  const open = async () => {
+    const mounted = await mountStaff([STAFF]);
+    await mounted.wrapper.find("button.page-header-action").trigger("click");
+    await flushPromises();
+    return mounted;
+  };
+
+  it("stays shut until a new member is asked for", async () => {
+    const { wrapper } = await mountStaff([STAFF]);
+    expect(wrapper.findComponent(Dialog).props("open")).toBe(false);
+    expect(wrapper.findComponent(StaffEditor).exists()).toBe(false);
+    expect(document.body.querySelector(".f-dialog-content")).toBeNull();
+  });
+
+  it("opens the editor on no record, over the list, named and described", async () => {
+    const { wrapper } = await open();
+    const dialog = wrapper.findComponent(Dialog);
+    expect(dialog.props()).toMatchObject({
+      open: true,
       title: "New member",
-      back: { label: "Staff", to: "/staff", icon: "chevron-left" },
+      description:
+        "Their details come first. Their photo and bio are added on their page, once they are saved.",
     });
-    expect(wrapper.findComponent(StaffMenu).exists()).toBe(false);
-    expect(wrapper.findComponent(StaffEditor).props("record")).toBeNull();
-    expect(head()).toEqual({ title: "New member" });
+    const content = document.body.querySelector(".f-dialog-content")!;
+    expect(content.getAttribute("role")).toBe("dialog");
+    expect(content.querySelector(".f-dialog-title")?.textContent?.trim()).toBe(
+      "New member",
+    );
+    expect(dialog.findComponent(StaffEditor).props("record")).toBeNull();
+    expect(wrapper.findComponent(Table).exists()).toBe(true);
+    expect(head()).toEqual({ title: "Staff" });
+  });
+
+  it("shuts from its corner, and opens blank the next time", async () => {
+    const { wrapper } = await open();
+    const editor = wrapper.findComponent(Dialog).findComponent(StaffEditor);
+    await editor.find("#staff-name").setValue("John Roe");
+    // The dialog is drawn on the body, outside the page's own element.
+    const close = document.body.querySelector<HTMLButtonElement>(
+      ".f-dialog-content .staff-new-close",
+    )!;
+    expect(close.getAttribute("aria-label")).toBe("Cancel");
+    close.click();
+    await flushPromises();
+    expect(wrapper.findComponent(Dialog).props("open")).toBe(false);
+    expect(wrapper.findComponent(StaffEditor).exists()).toBe(false);
+    await wrapper.find("button.page-header-action").trigger("click");
+    await flushPromises();
+    const name = wrapper.findComponent(StaffEditor).find("#staff-name");
+    expect((name.element as HTMLInputElement).value).toBe("");
+  });
+
+  it("writes the member and leads on to their page", async () => {
+    const { wrapper } = await open();
+    const fetch = vi.fn(async () => STAFF);
+    vi.stubGlobal("$fetch", fetch);
+    const editor = wrapper.findComponent(Dialog).findComponent(StaffEditor);
+    await editor.find("#staff-name").setValue("John Roe");
+    editor
+      .findComponent(Select)
+      .vm.$emit("update:modelValue", { value: "staff", label: "Staff" });
+    await editor.find("form").trigger("submit");
+    await vi.waitFor(() =>
+      expect(useRouter().push).toHaveBeenCalledWith("/staff/1/profile"),
+    );
+    expect(fetch).toHaveBeenCalledWith("/api/staff", {
+      method: "POST",
+      body: { name: "John Roe", role: "staff" },
+    });
   });
 });
 
