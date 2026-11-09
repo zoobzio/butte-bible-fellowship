@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 import { slug } from "../models/slug";
-import { contentStatus } from "../models/staff";
+import { contentStatus } from "../models/status";
 
 export const sermonPath = z.object({
   slug: slug.meta({

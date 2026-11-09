@@ -183,15 +183,15 @@ describe("the components", () => {
 
   it("carry each record's description, its Markdown as a string, and its listing", () => {
     expect(schemas.StaffRecord).toMatchObject({
-      required: ["id", "name", "role", "status", "createdAt", "updatedAt"],
+      required: ["id", "name", "role", "createdAt", "updatedAt"],
       properties: {
         id: { type: "integer" },
         role: { $ref: "#/components/schemas/StaffRole" },
         bio: { $ref: "#/components/schemas/Hast" },
-        status: { $ref: "#/components/schemas/ContentStatus" },
         createdAt: { format: "date-time" },
       },
     });
+    expect(schemas.StaffRecord).not.toHaveProperty("properties.status");
     expect(schemas.EventRecord).toMatchObject({
       required: [
         "id",
@@ -300,11 +300,9 @@ describe("the components", () => {
       },
     });
     expect(schemas.StaffBody).toMatchObject({
-      properties: {
-        role: { $ref: "#/components/schemas/StaffRole" },
-        status: { $ref: "#/components/schemas/ContentStatus" },
-      },
+      properties: { role: { $ref: "#/components/schemas/StaffRole" } },
     });
+    expect(schemas.StaffBody).not.toHaveProperty("properties.status");
     expect(schemas.StaffBody).not.toHaveProperty("properties.bio");
     expect(schemas.StaffBody).not.toHaveProperty("properties.photo");
     expect(schemas.StaffBio).toMatchObject({
@@ -378,15 +376,7 @@ describe("the requests", () => {
       in: "query",
       schema: {
         type: "string",
-        enum: [
-          "name",
-          "role",
-          "status",
-          "email",
-          "phone",
-          "createdAt",
-          "updatedAt",
-        ],
+        enum: ["name", "role", "email", "phone", "createdAt", "updatedAt"],
       },
     });
     expect(sort?.required).toBeUndefined();

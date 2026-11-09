@@ -12,9 +12,9 @@ church, each in a `staff_role` — pastor, elder, staff — which is also the
 order the site lists them in; `events`, each held once on a date or weekly on a day, with the page
 written about it; and `sermons`, each preached on a day, with the page
 written about it and its recording on the church's YouTube channel. Beside them, `users` is who may sign in to the admin app.
-Content
-the admin app edits carries a `content_status` — draft, published, archived —
-and only the published reaches the site.
+An event or a sermon carries a `content_status` — draft, published,
+archived — and only the published reaches the site; the staff carry none,
+and whoever is on the staff is on the site.
 
 The queries are grouped by the app that runs them. `web` is the reads the
 site needs and nothing else; `admin` is the full set of reads and writes
@@ -28,7 +28,7 @@ would not have offered.
 
 ```
 bezoar.config.ts   the kit config: the output directory, the defaults for the rest
-src/migrations/    the schema, forward only: staff, events, sermons, users, staff search, like escape, search cost
+src/migrations/    the schema, forward only: staff, events, sermons, users, staff search, like escape, search cost, staff status
 src/seeds/         the staff and events the content lists, and the first admin user, each safe to run again
 src/queries/web/   what the site reads: staff, events, sermons
 src/queries/admin/ what the admin app will read and write: the same, in full
@@ -45,8 +45,8 @@ first row or `null`; one with none returns the count of the rows it changed.
 ## Queries
 
 A query is named for what it does: `list` lists, `fetch` reads one.
-`web.staff.list` lists the published staff in their order: by role, then
-by name. The events the web reads are the published ones:
+`web.staff.list` lists the staff, every member, in their order: by role,
+then by name. The events the web reads are the published ones:
 `web.events.list` is the calendar's feed — every repeating event Sunday
 first, then the one-offs on or after a date — and `web.events.weekly` and
 `web.events.upcoming` are its two halves on their own; `web.events.fetch`
@@ -57,12 +57,12 @@ takes the newest published sermons, as many as asked, and
 `body`, as an event's does.
 
 `admin.staff` has `list`, `fetch`, `create`, `update`, `photo`, `bio` and
-`delete`, over every member whatever their status. `create` and `update`
+`delete`, over every member. `create` and `update`
 write a member's details, and neither their photo nor their bio: `photo`
 sets the photo's URL and `bio` the bio's tree, each on its own and each
 null to clear it, so a save of one never replaces another. `list` is
 one page, `size` rows from `offset`, sorted by the column `sort` names —
-`name`, `role`, `status`, `email`, `phone`, `created_at` or `updated_at` —
+`name`, `role`, `email`, `phone`, `created_at` or `updated_at` —
 in `direction`, `asc` or `desc`, a null last either way, and then in the
 site's order, by role and name, so `role` ascending is the site's order
 itself; with `sort` null, a search lists the nearest first, a row the text
@@ -82,8 +82,7 @@ row, or, where those two find
 nothing, for the swapped or dropped letter a trigram misses in a short
 word, by each word typed coming within an edit or two of a word of the
 text (`fuzzystrmatch`), which reads every row and so runs only then; a role held,
-`role_is`, or not held, `role_not`, and a status the same, `status_is` and
-`status_not`; on each text column, the `name`, `email`, `phone`, `summary`
+`role_is`, or not held, `role_not`; on each text column, the `name`, `email`, `phone`, `summary`
 and `photo`, the text it holds or does not, whatever its case, `name_is`
 and `name_not`, which take `present` or `missing` too, for whether the
 column is filled in, an empty one counted as missing, and the text it
@@ -113,8 +112,8 @@ an event's or a sermon's `body` is the Markdown it was written as.
 An argument written into a column the schema lets be null — a summary, a
 bio, a body, an image, a note, a location, an end time, a sermon's
 `speaker` or `video`, an event's `date` or `day` or `weeks` — is optional,
-and takes `null`; left out, it is null. Every other argument is required, a
-member's, an event's or a sermon's `status` among them. An event is created
+and takes `null`; left out, it is null. Every other argument is required, an
+event's or a sermon's `status` among them. An event is created
 with its `date` or its `day`, never both, and the schema refuses anything
 else. An `update` replaces every field, so one that passes a `date` and no
 `day` makes the event a one-off. A sermon's `slug` and its `video`,

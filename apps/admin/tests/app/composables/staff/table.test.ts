@@ -25,7 +25,6 @@ describe("useStaffTable", () => {
     expect(table.columns.map((column) => column.label)).toEqual([
       "Name",
       "Role",
-      "Status",
       "Email",
       "Phone",
       "Summary",
@@ -39,7 +38,6 @@ describe("useStaffTable", () => {
     expect(table.columns.map((column) => column.key)).toEqual([
       "name",
       "role",
-      "status",
       "email",
       "phone",
       "summary",
@@ -50,7 +48,6 @@ describe("useStaffTable", () => {
     expect(table.visibleColumns.map((column) => column.key)).toEqual([
       "name",
       "role",
-      "status",
       "email",
       "phone",
       "updatedAt",
@@ -58,7 +55,6 @@ describe("useStaffTable", () => {
     expect(table.filterableColumns.map((column) => column.key)).toEqual([
       "name",
       "role",
-      "status",
       "email",
       "phone",
       "summary",
@@ -70,15 +66,7 @@ describe("useStaffTable", () => {
       table.columns
         .filter((column) => column.sortable)
         .map((column) => column.key),
-    ).toEqual([
-      "name",
-      "role",
-      "status",
-      "email",
-      "phone",
-      "updatedAt",
-      "createdAt",
-    ]);
+    ).toEqual(["name", "role", "email", "phone", "updatedAt", "createdAt"]);
     expect(table.isColumnPinned("name")).toBe(true);
   });
 
@@ -141,23 +129,20 @@ describe("useStaffTable", () => {
     );
   });
 
-  it("offers the role and the status held or not, a bare value the one held", () => {
+  it("offers the role held or not, a bare value the one held, and no status", () => {
     vi.stubGlobal(
       "$fetch",
       vi.fn(async () => ({ items: [], total: 0 })),
     );
     const { query } = withSetup(() => useStaffTable()).result;
     expect(query.fields.role?.operators).toEqual(["is", "not"]);
-    expect(query.fields.status?.values).toEqual([
-      "draft",
-      "published",
-      "archived",
-    ]);
-    query.setDraft("Status: not archived");
+    expect(query.fields.role?.values).toEqual(["pastor", "elder", "staff"]);
+    expect(query.fields.status).toBeUndefined();
+    query.setDraft("Role: not pastor");
     query.submit();
     query.add({ kind: "filter", key: "role", value: "elder" });
     expect(query.filters).toEqual([
-      { key: "status", op: "not", value: "archived" },
+      { key: "role", op: "not", value: "pastor" },
       { key: "role", op: "is", value: "elder" },
     ]);
   });
@@ -236,9 +221,9 @@ describe("useStaffTable", () => {
     table.query.add({ kind: "filter", key: "role", value: "elder" });
     table.query.add({
       kind: "filter",
-      key: "status",
+      key: "role",
       op: "not",
-      value: "archived",
+      value: "pastor",
     });
     table.query.add({
       kind: "filter",
@@ -272,7 +257,7 @@ describe("useStaffTable", () => {
         size: 25,
         q: "jane",
         roleIs: "elder",
-        statusNot: "archived",
+        roleNot: "pastor",
         photoIs: "missing",
         nameStartsWith: "J",
         emailContains: "example",

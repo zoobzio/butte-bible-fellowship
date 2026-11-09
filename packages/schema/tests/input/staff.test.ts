@@ -36,34 +36,28 @@ describe("staffId", () => {
 });
 
 describe("staffQuery", () => {
-  it("is the listing query, with a role and a status held or not to narrow it", () => {
+  it("is the listing query, with a role held or not to narrow it", () => {
     expect(staffQuery.parse({})).toEqual({ page: 1, size: 25 });
-    expect(
-      staffQuery.parse({
-        page: "2",
-        q: "jane",
-        roleIs: "elder",
-        statusNot: "archived",
-      }),
-    ).toEqual({
-      page: 2,
-      size: 25,
-      q: "jane",
-      roleIs: "elder",
-      statusNot: "archived",
+    expect(staffQuery.parse({ page: "2", q: "jane", roleIs: "elder" })).toEqual(
+      { page: 2, size: 25, q: "jane", roleIs: "elder" },
+    );
+    expect(staffQuery.parse({ roleNot: "pastor" })).toMatchObject({
+      roleNot: "pastor",
     });
-    expect(
-      staffQuery.parse({ roleNot: "pastor", statusIs: "draft" }),
-    ).toMatchObject({ roleNot: "pastor", statusIs: "draft" });
   });
 
-  it("takes only a role and a status the staff are written in", () => {
+  it("takes only a role the staff are written in", () => {
     expect(staffQuery.safeParse({ roleIs: "deacon" }).success).toBe(false);
     expect(staffQuery.safeParse({ roleNot: "deacon" }).success).toBe(false);
-    expect(staffQuery.safeParse({ statusIs: "live" }).success).toBe(false);
-    expect(staffQuery.safeParse({ statusNot: "live" }).success).toBe(false);
     expect(staffQuery.safeParse({ role: "elder" }).success).toBe(true);
     expect(staffQuery.parse({ role: "elder" })).toEqual({ page: 1, size: 25 });
+  });
+
+  it("narrows by no status: the staff carry none", () => {
+    expect(
+      staffQuery.parse({ statusIs: "draft", statusNot: "archived" }),
+    ).toEqual({ page: 1, size: 25 });
+    expect(staffQuery.safeParse({ sort: "status" }).success).toBe(false);
   });
 
   it("takes what each text column is or is not, present or missing among them", () => {
@@ -115,7 +109,6 @@ describe("staffQuery", () => {
     expect(STAFF_SORT_KEYS).toEqual([
       "name",
       "role",
-      "status",
       "email",
       "phone",
       "createdAt",
@@ -164,8 +157,8 @@ describe("staffQuery", () => {
 });
 
 describe("staffBody", () => {
-  it("writes a member as a draft when not told otherwise", () => {
-    expect(staffBody.parse(MEMBER)).toEqual({ ...MEMBER, status: "draft" });
+  it("writes a member by their name and role alone", () => {
+    expect(staffBody.parse(MEMBER)).toEqual(MEMBER);
   });
 
   it("accepts all a member's details can say", () => {
@@ -174,7 +167,6 @@ describe("staffBody", () => {
       summary: "Has served since 2010.",
       email: "jane@example.com",
       phone: "530-555-0100",
-      status: "published",
     };
     expect(staffBody.parse(value)).toEqual(value);
   });
@@ -186,13 +178,14 @@ describe("staffBody", () => {
     expect(staffBody.safeParse({ ...MEMBER, role: "" }).success).toBe(false);
   });
 
-  it("rejects a status or a role that is not one", () => {
-    expect(staffBody.safeParse({ ...MEMBER, status: "hidden" }).success).toBe(
-      false,
-    );
+  it("rejects a role that is not one", () => {
     expect(staffBody.safeParse({ ...MEMBER, role: "Elder" }).success).toBe(
       false,
     );
+  });
+
+  it("carries no status", () => {
+    expect(staffBody.parse({ ...MEMBER, status: "published" })).toEqual(MEMBER);
   });
 
   it("keeps a phone number one way, however it is typed", () => {
@@ -248,7 +241,7 @@ describe("staffBody", () => {
         bio: BIO,
         photo: "https://cdn.example.com/staff/jane-doe.jpg",
       }),
-    ).toEqual({ ...MEMBER, status: "draft" });
+    ).toEqual(MEMBER);
   });
 });
 
@@ -258,13 +251,8 @@ describe("staffForm", () => {
       ...MEMBER,
       summary: "Has served since 2010.",
       email: "jane@example.com",
-      status: "published",
     };
     expect(staffForm.parse(value)).toEqual(value);
-  });
-
-  it("writes a member as a draft when not told otherwise", () => {
-    expect(staffForm.parse(MEMBER)).toEqual({ ...MEMBER, status: "draft" });
   });
 
   it("trims the name, and needs one left", () => {

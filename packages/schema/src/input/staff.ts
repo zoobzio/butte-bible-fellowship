@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 import { hast } from "../models/hast";
-import { contentStatus, staffRole } from "../models/staff";
+import { staffRole } from "../models/staff";
 import { dayColumn, listingQuery, sorting, textColumn } from "./listing";
 
 export const staffId = z.object({
@@ -18,7 +18,6 @@ export const staffId = z.object({
 export const STAFF_SORT_KEYS = [
   "name",
   "role",
-  "status",
   "email",
   "phone",
   "createdAt",
@@ -37,13 +36,6 @@ export const staffQuery = listingQuery.extend({
   }),
   roleNot: staffRole.optional().meta({
     description: "A role the members listed do not hold. Left out, none.",
-  }),
-  statusIs: contentStatus.optional().meta({
-    description:
-      "The status the members listed are in. Left out, every status.",
-  }),
-  statusNot: contentStatus.optional().meta({
-    description: "A status the members listed are not in. Left out, none.",
   }),
   ...textColumn("name", "name"),
   ...textColumn("email", "email"),
@@ -93,9 +85,6 @@ export const staffBody = z
     }),
     email: z.email().optional(),
     phone: staffPhone.optional(),
-    status: contentStatus.default("draft").meta({
-      description: "Whether they reach the site. Left out, a draft.",
-    }),
   })
   .meta({
     id: "StaffBody",

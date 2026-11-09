@@ -4,7 +4,6 @@ SET name = :name,
     summary = :summary,
     email = :email,
     phone = :phone,
-    status = :status,
     updated_at = now()
 WHERE id = :id
 RETURNING id, updated_at;

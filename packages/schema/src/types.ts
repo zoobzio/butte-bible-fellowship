@@ -29,13 +29,13 @@ import type { hero, page } from "./models/page";
 import type { sermon, sermons } from "./models/sermon";
 import type { slug } from "./models/slug";
 import type {
-  contentStatus,
   staffListing,
   staffMember,
   staffMembers,
   staffRecord,
   staffRole,
 } from "./models/staff";
+import type { contentStatus } from "./models/status";
 
 export type Slug = z.infer<typeof slug>;
 

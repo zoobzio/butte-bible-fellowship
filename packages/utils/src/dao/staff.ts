@@ -8,5 +8,4 @@ export const toStaffArguments = (body: StaffBody): StaffArguments => ({
   summary: body.summary ?? null,
   email: body.email ?? null,
   phone: body.phone ?? null,
-  status: body.status,
 });

@@ -3,7 +3,7 @@ import { z } from "zod";
 import { hast } from "./hast";
 import { listing } from "./listing";
 import { slug } from "./slug";
-import { contentStatus } from "./staff";
+import { contentStatus } from "./status";
 
 export const EVENT_DAYS = [
   "sunday",

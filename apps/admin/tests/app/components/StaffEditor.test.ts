@@ -18,18 +18,17 @@ const choose = (wrapper: ReturnType<typeof mount>, id: string, value: string) =>
   select(wrapper, id).vm.$emit("update:modelValue", { value, label: value });
 
 describe("StaffEditor", () => {
-  it("opens blank for a new member, a draft with no role", () => {
+  it("opens blank for a new member, with no role", () => {
     const wrapper = mount(StaffEditor, { props: { record: null } });
     expect(value(wrapper, "staff-name")).toBe("");
     expect(wrapper.find("#staff-role").text()).toBe("");
-    expect(wrapper.find("#staff-status").text()).toBe("Draft");
+    expect(wrapper.find("#staff-status").exists()).toBe(false);
   });
 
   it("opens on a member's record, every field filled, with a save alone: the page's menu deletes", () => {
     const wrapper = mount(StaffEditor, { props: { record: STAFF } });
     expect(value(wrapper, "staff-name")).toBe("Jane Doe");
     expect(wrapper.find("#staff-role").text()).toBe("Elder");
-    expect(wrapper.find("#staff-status").text()).toBe("Published");
     expect(value(wrapper, "staff-email")).toBe("jane@example.com");
     expect(value(wrapper, "staff-summary")).toBe("Has served since 2010.");
     expect(wrapper.find("textarea#staff-summary").exists()).toBe(true);
@@ -53,7 +52,7 @@ describe("StaffEditor", () => {
     const wrapper = mount(StaffEditor, { props: { record: STAFF } });
     expect(
       wrapper.findAll(".f-data-form-field label").map((label) => label.text()),
-    ).toEqual(["Name", "Role", "Status", "Email", "Phone", "Summary"]);
+    ).toEqual(["Name", "Role", "Email", "Phone", "Summary"]);
     expect(wrapper.find("#staff-photo").exists()).toBe(false);
     expect(wrapper.find("#staff-bio").exists()).toBe(false);
     expect(wrapper.find(".f-data-editor").exists()).toBe(false);
@@ -62,7 +61,7 @@ describe("StaffEditor", () => {
   it("labels every control", () => {
     const wrapper = mount(StaffEditor, { props: { record: null } });
     const labels = wrapper.findAll("label");
-    expect(labels.length).toBe(6);
+    expect(labels.length).toBe(5);
     for (const label of labels) {
       const id = label.attributes("for");
       expect(id).toBeDefined();
@@ -83,12 +82,11 @@ describe("StaffEditor", () => {
     const wrapper = mount(StaffEditor, { props: { record: null } });
     await wrapper.find("#staff-name").setValue("John Roe");
     choose(wrapper, "staff-role", "staff");
-    choose(wrapper, "staff-status", "published");
     await wrapper.find("form").trigger("submit");
     await vi.waitFor(() => expect(fetch).toHaveBeenCalled());
     expect(fetch).toHaveBeenCalledWith("/api/staff", {
       method: "POST",
-      body: { name: "John Roe", role: "staff", status: "published" },
+      body: { name: "John Roe", role: "staff" },
     });
     await vi.waitFor(() =>
       expect(useRouter().push).toHaveBeenCalledWith("/staff/1/profile"),

@@ -24,7 +24,6 @@ export const toStaffRecord = (row: StaffRecordRow): StaffRecord => ({
   photo: row.photo ?? undefined,
   email: row.email ?? undefined,
   phone: row.phone ?? undefined,
-  status: row.status,
   createdAt: row.created_at.toISOString(),
   updatedAt: row.updated_at.toISOString(),
 });

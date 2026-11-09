@@ -5,3 +5,4 @@ export * from "./page";
 export * from "./sermon";
 export * from "./slug";
 export * from "./staff";
+export * from "./status";

@@ -3,15 +3,6 @@ import { z } from "zod";
 import { hast } from "./hast";
 import { listing } from "./listing";
 
-export const CONTENT_STATUSES = ["draft", "published", "archived"] as const;
-
-export const contentStatus = z.enum(CONTENT_STATUSES).meta({
-  id: "ContentStatus",
-  description:
-    "Whether it reaches the site: a draft is being written, published is live, archived is kept but no longer shown.",
-  examples: ["published"],
-});
-
 export const STAFF_ROLES = ["pastor", "elder", "staff"] as const;
 
 export const staffRole = z.enum(STAFF_ROLES).meta({
@@ -87,9 +78,6 @@ export const staffRecord = z
       .string()
       .optional()
       .meta({ examples: ["530-555-0100"] }),
-    status: contentStatus.meta({
-      description: "Whether they reach the site.",
-    }),
     createdAt: z.iso.datetime().meta({
       description: "When their row was written.",
       examples: ["2026-10-17T18:00:00.000Z"],
@@ -102,11 +90,10 @@ export const staffRecord = z
   .meta({
     id: "StaffRecord",
     description:
-      "Someone who serves the church, as the admin reads them: every column of their row, whatever their status.",
+      "Someone who serves the church, as the admin reads them: every column of their row.",
   });
 
 export const staffListing = listing(staffRecord).meta({
   id: "StaffListing",
-  description:
-    "A page of the staff, as the admin lists them: in their order, whatever their status.",
+  description: "A page of the staff, as the admin lists them, in their order.",
 });

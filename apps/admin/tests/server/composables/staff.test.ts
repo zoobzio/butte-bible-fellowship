@@ -24,7 +24,6 @@ const ROW = {
   photo: null,
   email: "jane@example.com",
   phone: null,
-  status: "published" as const,
   created_at: new Date("2026-10-17T18:00:00Z"),
   updated_at: new Date("2026-10-18T09:30:00Z"),
 };
@@ -35,7 +34,6 @@ const RECORD = {
   role: "elder",
   bio: BIO,
   email: "jane@example.com",
-  status: "published",
   createdAt: "2026-10-17T18:00:00.000Z",
   updatedAt: "2026-10-18T09:30:00.000Z",
 };
@@ -43,7 +41,6 @@ const RECORD = {
 const ROWS = [ROW, { ...ROW, id: 2, name: "John Roe" }];
 
 type Role = "pastor" | "elder" | "staff";
-type Status = "draft" | "published" | "archived";
 
 const TEXT_COLUMNS = ["name", "email", "phone", "summary", "photo"] as const;
 const TEXT_OPERATORS = [
@@ -67,8 +64,6 @@ type Search = {
   q: string | null;
   role_is: Role | null;
   role_not: Role | null;
-  status_is: Status | null;
-  status_not: Status | null;
   tz: string;
 } & Record<
   `${(typeof TEXT_COLUMNS)[number]}_${(typeof TEXT_OPERATORS)[number]}`,
@@ -84,8 +79,6 @@ const NONE: Search = {
   q: null,
   role_is: null,
   role_not: null,
-  status_is: null,
-  status_not: null,
   tz: "America/Los_Angeles",
   ...(Object.fromEntries([
     ...TEXT_COLUMNS.flatMap((column) =>
@@ -94,10 +87,7 @@ const NONE: Search = {
     ...DAY_COLUMNS.flatMap((column) =>
       DAY_OPERATORS.map((operator) => [`${column}_${operator}`, null]),
     ),
-  ]) as Omit<
-    Search,
-    "q" | "role_is" | "role_not" | "status_is" | "status_not" | "tz"
-  >),
+  ]) as Omit<Search, "q" | "role_is" | "role_not" | "tz">),
 };
 
 type Order = { sort: string | null; direction: string };
@@ -109,8 +99,6 @@ const matches = (search: Search) => (row: (typeof ROWS)[number]) =>
     row.name.toLowerCase().includes(search.q.toLowerCase())) &&
   (search.role_is === null || row.role === search.role_is) &&
   (search.role_not === null || row.role !== search.role_not) &&
-  (search.status_is === null || row.status === search.status_is) &&
-  (search.status_not === null || row.status !== search.status_not) &&
   (search.email_is === null ||
     (row.email !== null) === (search.email_is === "present"));
 
@@ -131,7 +119,7 @@ const list = vi.fn(
 );
 const fetched = vi.fn(async ({ id }: { id: number }) =>
   id === 3
-    ? { ...ROW, id: 3, name: "New", status: "draft" as const }
+    ? { ...ROW, id: 3, name: "New" }
     : (ROWS.find((row) => row.id === id) ?? null),
 );
 const created = vi.fn(async () => ({ id: 3, created_at: ROW.created_at }));
@@ -251,19 +239,11 @@ describe("useStaff", () => {
       size: 25,
       offset: 0,
     });
-    await useStaff().list({
-      page: 1,
-      size: 25,
-      roleNot: "pastor",
-      statusIs: "draft",
-      statusNot: "archived",
-    });
+    await useStaff().list({ page: 1, size: 25, roleNot: "pastor" });
     expect(list).toHaveBeenLastCalledWith({
       ...NONE,
       ...ORDER,
       role_not: "pastor",
-      status_is: "draft",
-      status_not: "archived",
       size: 25,
       offset: 0,
     });
@@ -371,34 +351,26 @@ describe("useStaff", () => {
   });
 
   it("creates a member from their body, and hands back the record", async () => {
-    const record = await useStaff().create({
-      name: "New",
-      role: "staff",
-      status: "draft",
-    });
+    const record = await useStaff().create({ name: "New", role: "staff" });
     expect(created).toHaveBeenCalledWith({
       name: "New",
       role: "staff",
       summary: null,
       email: null,
       phone: null,
-      status: "draft",
     });
-    expect(record).toMatchObject({ id: 3, name: "New", status: "draft" });
+    expect(record).toMatchObject({ id: 3, name: "New" });
   });
 
   it("hands back nothing when nothing was written", async () => {
     created.mockResolvedValueOnce(null as never);
-    expect(
-      await useStaff().create({ name: "New", role: "staff", status: "draft" }),
-    ).toBeNull();
+    expect(await useStaff().create({ name: "New", role: "staff" })).toBeNull();
   });
 
   it("replaces a member's details, and hands back the record", async () => {
     const record = await useStaff().update(1, {
       name: "Jane Doe",
       role: "pastor",
-      status: "published",
     });
     expect(updated).toHaveBeenCalledWith(
       expect.objectContaining({ id: 1, role: "pastor", summary: null }),
@@ -408,9 +380,7 @@ describe("useStaff", () => {
   });
 
   it("updates nothing when no member has the id", async () => {
-    expect(
-      await useStaff().update(9, { name: "x", role: "staff", status: "draft" }),
-    ).toBeNull();
+    expect(await useStaff().update(9, { name: "x", role: "staff" })).toBeNull();
     expect(fetched).not.toHaveBeenCalled();
   });
 

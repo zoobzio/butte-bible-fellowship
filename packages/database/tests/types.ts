@@ -26,8 +26,8 @@ export type Checks = [
   >,
   Assert<
     Equal<
-      Row<Contract, "admin.staff.fetch">["status"],
-      "draft" | "published" | "archived"
+      "status" extends keyof Row<Contract, "admin.staff.fetch"> ? true : false,
+      false
     >
   >,
   Assert<Equal<Row<Contract, "web.events.weekly">["end_time"], string | null>>,
@@ -120,13 +120,11 @@ export const wrongDay: Arguments<Contract, "admin.events.create">["day"] =
 export const spare: Arguments<Contract, "admin.staff.create"> = {
   name: "x",
   role: "staff",
-  status: "draft",
 };
 
 // @ts-expect-error Role is required.
 export const incomplete: Arguments<Contract, "admin.staff.create"> = {
   name: "x",
-  status: "draft",
 };
 
 // @ts-expect-error Role must be an enum label.

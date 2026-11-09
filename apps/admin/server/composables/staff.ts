@@ -73,8 +73,6 @@ const toSearch = (query: StaffQuery) => ({
   q: query.q === undefined || query.q === "" ? null : query.q,
   role_is: query.roleIs ?? null,
   role_not: query.roleNot ?? null,
-  status_is: query.statusIs ?? null,
-  status_not: query.statusNot ?? null,
   ...toTextSearch(query),
   tz: TIME_ZONE,
   ...toDaySearch(query),
@@ -86,7 +84,6 @@ const toSearch = (query: StaffQuery) => ({
 const SORT_COLUMNS: Record<StaffSort, string> = {
   name: "name",
   role: "role",
-  status: "status",
   email: "email",
   phone: "phone",
   createdAt: "created_at",

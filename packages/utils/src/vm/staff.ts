@@ -11,7 +11,6 @@ export const toStaffForm = (record: StaffRecord): StaffForm => ({
   summary: record.summary,
   email: record.email,
   phone: record.phone,
-  status: record.status,
 });
 
 export const toStaffBody = (form: StaffForm): StaffBody => ({
@@ -20,5 +19,4 @@ export const toStaffBody = (form: StaffForm): StaffBody => ({
   summary: written(form.summary),
   email: written(form.email),
   phone: written(form.phone),
-  status: form.status,
 });

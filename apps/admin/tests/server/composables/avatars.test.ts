@@ -51,7 +51,6 @@ const ROW = {
   photo: null as string | null,
   email: null,
   phone: null,
-  status: "published" as const,
   created_at: new Date("2026-10-17T18:00:00Z"),
   updated_at: new Date("2026-10-18T09:30:00Z"),
 };

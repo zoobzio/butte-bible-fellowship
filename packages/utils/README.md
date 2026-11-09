@@ -56,8 +56,8 @@ transform is the difference between a column and a field. What a row has
 null in, a model leaves out: a `summary`, a `note`, a `location`, an
 event's `end`, a sermon's `speaker` or `video`. What a body leaves out, the
 arguments write as null, so an update that passes no `date` clears one; what
-a body defaults, a member's `position` and `status` and an event's or a
-sermon's `status`, is written as the body parsed it. A time comes out of
+a body defaults, an event's or a sermon's `status`, is written as the body
+parsed it. A time comes out of
 Postgres as `HH:MM:SS` and the API says `HH:MM`; a `date` comes out as
 `YYYY-MM-DD`, as the API says it.
 

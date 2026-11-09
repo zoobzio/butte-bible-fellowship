@@ -10,21 +10,19 @@ describe("useStaffEditor", () => {
     role: "elder",
     summary: "Has served since 2010.",
     email: "jane@example.com",
-    status: "published",
   };
 
-  it("is the staff form, blank for a new member: a draft, with no role", () => {
+  it("is the staff form, blank for a new member, with no role", () => {
     const editor = useStaffEditor(null);
     expect(editor.form.id).toBe("staff");
     expect(editor.form.config.fields.map((field) => field.key)).toEqual([
       "name",
       "role",
-      "status",
       "email",
       "phone",
       "summary",
     ]);
-    expect(editor.form.payload).toEqual({ status: "draft" });
+    expect(editor.form.payload).toEqual({});
   });
 
   it("opens on a member's details", () => {
@@ -44,11 +42,11 @@ describe("useStaffEditor", () => {
 
   it("starts over from the record, whatever the last visit left", () => {
     useStaffEditor(STAFF).form.set("name", "Someone Else");
-    expect(useStaffEditor(null).form.payload).toEqual({ status: "draft" });
+    expect(useStaffEditor(null).form.payload).toEqual({});
     expect(useStaffEditor(STAFF).form.payload.name).toBe("Jane Doe");
   });
 
-  it("offers each role and each status by name", () => {
+  it("offers each role by name, and no status", () => {
     const { fields } = useStaffEditor(null).form.config;
     const options = (key: string) =>
       fields.flatMap((field) =>
@@ -59,11 +57,7 @@ describe("useStaffEditor", () => {
       { value: "elder", label: "Elder" },
       { value: "staff", label: "Staff" },
     ]);
-    expect(options("status")).toEqual([
-      { value: "draft", label: "Draft" },
-      { value: "published", label: "Published" },
-      { value: "archived", label: "Archived" },
-    ]);
+    expect(options("status")).toEqual([]);
   });
 
   it("creates a member from what is written, and opens their page, where the photo and the bio wait", async () => {
@@ -76,7 +70,7 @@ describe("useStaffEditor", () => {
     await editor.form.submit();
     expect(fetch).toHaveBeenCalledWith("/api/staff", {
       method: "POST",
-      body: { name: "John Roe", role: "staff", status: "draft" },
+      body: { name: "John Roe", role: "staff" },
     });
     expect(useRouter().push).toHaveBeenCalledWith("/staff/1/profile");
     expect(editor.form.submitted).toBe(true);

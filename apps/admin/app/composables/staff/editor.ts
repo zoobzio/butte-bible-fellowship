@@ -5,7 +5,7 @@ import { toStaffBody, toStaffForm } from "@bbf/utils/vm";
 import { createForm, ref, useNuxtApp, useRouter } from "#imports";
 import { useApi } from "~/composables/api";
 import { ROUTE, endpoint } from "~/composables/staff/routes";
-import { ROLE_OPTIONS, STATUS_OPTIONS } from "~/constants/editor";
+import { ROLE_OPTIONS } from "~/constants/editor";
 import { link } from "~/constants/staff";
 import { toOptions } from "~/utils/editor";
 import { failure } from "~/utils/errors";
@@ -54,12 +54,6 @@ export const useStaffEditor = (
         placeholder: "",
         options: toOptions(ROLE_OPTIONS, (message) => $t(message)),
       },
-      {
-        type: "select",
-        key: "status",
-        label: $t.admin.editor.status(),
-        options: toOptions(STATUS_OPTIONS, (message) => $t(message)),
-      },
       { type: "email", key: "email", label: $t.admin.member.email() },
       { type: "tel", key: "phone", label: $t.admin.member.phone() },
       {
@@ -70,7 +64,6 @@ export const useStaffEditor = (
       },
     ],
     schema: staffForm,
-    defaults: { status: "draft" },
     middleware: { summary: blank, email: blank, phone: blank },
     submit: async (form) => {
       const body = toStaffBody(staffForm.parse(form.payload));

@@ -30,7 +30,7 @@ beforeAll(async () => {
 afterAll(() => db.close());
 
 describe("the build", () => {
-  it("carries the staff, events, sermons, users, staff search, like escape and search cost migrations in order", () => {
+  it("carries the staff, events, sermons, users, staff search, like escape, search cost and staff status migrations in order", () => {
     expect(migrations.map((migration) => migration.name)).toEqual([
       "staff",
       "events",
@@ -39,6 +39,7 @@ describe("the build", () => {
       "staff_search",
       "like_escape",
       "search_cost",
+      "staff_status",
     ]);
   });
 
@@ -178,7 +179,6 @@ describe("admin.staff", () => {
     name: "Pastor Name",
     role: "pastor" as const,
     email: "pastor@example.com",
-    status: "published" as const,
   };
 
   const photo = "https://cdn.example.com/staff/pastor.jpg";
@@ -195,7 +195,6 @@ describe("admin.staff", () => {
       phone: null,
       photo: null,
       email: member.email,
-      status: "published",
     });
     const portrayed = await db.admin.staff.photo.first({ id, photo });
     expect(portrayed?.updated_at).toBeInstanceOf(Date);
@@ -239,19 +238,12 @@ describe("admin.staff", () => {
         (r) => r.name,
       ),
     ).toEqual(["Pastor Name"]);
-    expect(await db.admin.staff.list({ ...page, status_is: "draft" })).toEqual(
-      [],
-    );
-    expect(
-      await db.admin.staff.list({ ...page, status_not: "published" }),
-    ).toEqual([]);
     expect(
       (
         await db.admin.staff.list({
           ...page,
           role_is: "elder",
-          status_is: "published",
-          status_not: "archived",
+          role_not: "pastor",
         })
       ).map((r) => r.total),
     ).toEqual([3, 3, 3]);
@@ -558,46 +550,24 @@ describe("admin.staff", () => {
     expect(await db.admin.staff.delete({ id })).toBe(0);
   });
 
-  it("keeps a draft or an archived member off the site", async () => {
-    const draft = await db.admin.staff.create.first({
-      ...member,
-      name: "Draft",
-      status: "draft",
+  it("carries no status: a member written is on the site", async () => {
+    const created = await db.admin.staff.create.first({
+      name: "Office Name",
+      role: "staff",
     });
-    const archived = await db.admin.staff.create.first({
-      ...member,
-      name: "Archived",
-      status: "archived",
-    });
-
     expect(
-      await db.admin.staff.list({
-        size: 25,
-        offset: 0,
-        tz: "America/Los_Angeles",
-        sort: "role",
-        direction: "asc",
-      }),
-    ).toHaveLength(5);
+      await db.admin.staff.fetch.first({ id: created!.id }),
+    ).not.toHaveProperty("status");
     expect((await db.web.staff.list()).map((row) => row.name)).toEqual([
       "Elder Name",
       "Elder Name",
       "Elder Name",
+      "Office Name",
     ]);
-
-    await db.admin.staff.update({ ...member, id: draft!.id, name: "Draft" });
-    expect((await db.web.staff.list()).map((row) => row.name)).toContain(
-      "Draft",
-    );
-
-    expect(await db.admin.staff.delete({ id: draft!.id })).toBe(1);
-    expect(await db.admin.staff.delete({ id: archived!.id })).toBe(1);
+    expect(await db.admin.staff.delete({ id: created!.id })).toBe(1);
   });
 
-  it("refuses a status or a role that is not one", async () => {
-    await expect(
-      db.admin.staff.create({ ...member, status: "hidden" as never }),
-    ).rejects.toThrow(/status: Invalid option/);
+  it("refuses a role that is not one", async () => {
     await expect(
       db.admin.staff.create({ ...member, role: "deacon" as never }),
     ).rejects.toThrow(/role: Invalid option/);
@@ -1153,15 +1123,11 @@ describe("roles", () => {
     const created = await admin.admin.staff.create.first({
       name: "Office Name",
       role: "staff",
-      status: "draft",
     });
     expect(created?.id).toBeGreaterThan(0);
     expect(
       await admin.admin.staff.fetch.first({ id: created!.id }),
-    ).toMatchObject({
-      name: "Office Name",
-      status: "draft",
-    });
+    ).toMatchObject({ name: "Office Name" });
     expect(await admin.admin.staff.delete({ id: created!.id })).toBe(1);
   });
 });

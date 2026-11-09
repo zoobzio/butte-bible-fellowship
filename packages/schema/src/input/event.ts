@@ -2,7 +2,7 @@ import { z } from "zod";
 
 import { eventDay, eventTime } from "../models/event";
 import { slug } from "../models/slug";
-import { contentStatus } from "../models/staff";
+import { contentStatus } from "../models/status";
 
 export const eventPath = z.object({
   slug: slug.meta({

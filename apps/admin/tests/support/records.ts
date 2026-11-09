@@ -19,7 +19,6 @@ export const STAFF: StaffRecord = {
   summary: "Has served since 2010.",
   bio: BIO,
   email: "jane@example.com",
-  status: "published",
   createdAt: "2026-10-17T18:00:00.000Z",
   updatedAt: "2026-10-18T09:30:00.000Z",
 };

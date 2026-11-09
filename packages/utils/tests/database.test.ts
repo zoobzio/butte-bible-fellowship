@@ -215,7 +215,6 @@ describe("staff", () => {
       role: "pastor",
       summary: "Serving since 2010.",
       phone: "530-555-0100",
-      status: "published",
     });
     const created = await db.admin.staff.create.first(toStaffArguments(body));
     const id = created!.id;
@@ -229,7 +228,6 @@ describe("staff", () => {
       name: "Pastor Name",
       role: "pastor",
       bio,
-      status: "published",
     });
     expect(staffRecord.safeParse(record).success).toBe(true);
     const [first] = (await db.web.staff.list()).map(toStaffMember);
@@ -249,12 +247,12 @@ describe("staff", () => {
     expect(await db.admin.staff.delete({ id })).toBe(1);
   });
 
-  it("writes a draft the site does not list, and the admin does", async () => {
-    const body = staffBody.parse({ name: "Draft", role: "staff" });
+  it("writes a member the site lists, and the admin does", async () => {
+    const body = staffBody.parse({ name: "Office Name", role: "staff" });
     const created = await db.admin.staff.create.first(toStaffArguments(body));
     expect(
       (await db.web.staff.list()).map(toStaffMember).map((m) => m.name),
-    ).not.toContain("Draft");
+    ).toContain("Office Name");
     expect(
       (
         await db.admin.staff.list({
@@ -267,7 +265,7 @@ describe("staff", () => {
       )
         .map(toStaffRecord)
         .map((m) => m.name),
-    ).toContain("Draft");
+    ).toContain("Office Name");
     expect(await db.admin.staff.delete({ id: created!.id })).toBe(1);
   });
 });

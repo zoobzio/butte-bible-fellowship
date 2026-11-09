@@ -21,18 +21,13 @@ const RECORD = {
   id: 7,
   name: "Jane Doe",
   role: "elder" as const,
-  status: "draft" as const,
   createdAt: "2026-10-17T18:00:00.000Z",
   updatedAt: "2026-10-18T09:30:00.000Z",
 };
 
 describe("toStaffForm", () => {
   it("builds what a form holds, leaving out what the record has not", () => {
-    expect(toStaffForm(RECORD)).toEqual({
-      name: "Jane Doe",
-      role: "elder",
-      status: "draft",
-    });
+    expect(toStaffForm(RECORD)).toEqual({ name: "Jane Doe", role: "elder" });
   });
 
   it("carries the details the record has, and neither its photo nor its bio", () => {
@@ -44,7 +39,6 @@ describe("toStaffForm", () => {
         photo: "https://cdn.example.com/staff/jane-doe.jpg",
         email: "j@x.org",
         phone: "530-555-0100",
-        status: "published",
       }),
     ).toEqual({
       name: "Jane Doe",
@@ -52,7 +46,6 @@ describe("toStaffForm", () => {
       summary: "Serving since 2010.",
       email: "j@x.org",
       phone: "530-555-0100",
-      status: "published",
     });
   });
 
@@ -73,9 +66,8 @@ describe("toStaffBody", () => {
         summary: " ",
         email: "",
         phone: "",
-        status: "draft",
       }),
-    ).toEqual({ name: "Jane Doe", role: "elder", status: "draft" });
+    ).toEqual({ name: "Jane Doe", role: "elder" });
   });
 
   it("carries what is written, trimmed", () => {
@@ -86,7 +78,6 @@ describe("toStaffBody", () => {
         summary: " Serving since 2010. ",
         email: "j@x.org",
         phone: "530-555-0100",
-        status: "published",
       }),
     ).toEqual({
       name: "Jane Doe",
@@ -94,7 +85,6 @@ describe("toStaffBody", () => {
       summary: "Serving since 2010.",
       email: "j@x.org",
       phone: "530-555-0100",
-      status: "published",
     });
   });
 
@@ -103,7 +93,6 @@ describe("toStaffBody", () => {
       name: "Jane Doe",
       role: "elder",
       email: "j@x.org",
-      status: "draft",
     });
     expect(staffBody.parse(body)).toEqual(body);
   });

@@ -54,7 +54,7 @@ describe("staff page", () => {
       wrapper
         .findAll(".f-th:not(.f-data-table-actions)")
         .map((th) => th.text()),
-    ).toEqual(["Name", "Role", "Status", "Email", "Phone", "Updated"]);
+    ).toEqual(["Name", "Role", "Email", "Phone", "Updated"]);
     expect(wrapper.find(".f-th.f-data-table-actions").exists()).toBe(true);
   });
 
@@ -100,7 +100,6 @@ describe("staff page", () => {
         "Search",
         "Name",
         "Role",
-        "Status",
         "Email",
         "Phone",
         "Summary",

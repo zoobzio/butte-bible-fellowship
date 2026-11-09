@@ -21,7 +21,8 @@ into a query's arguments before it runs.
 src/models/      what the API answers with: one file per kind of thing
   event.ts       an event of the church, the list of them, and the days and times it names
   hast.ts        rich text as the API serves it: an HTML syntax tree of elements and text
-  staff.ts       someone who serves the church, the list of them, their roles, and the statuses content passes through
+  staff.ts       someone who serves the church, the list of them, and their roles
+  status.ts      the statuses an event or a sermon passes through
   sermon.ts      a sermon preached at the church, and the list of them
   page.ts        a page's front matter: its hero, events and image
   slug.ts        what names a thing in an address
@@ -68,8 +69,9 @@ a query runs. A member's phone number is ten digits, however they are
 typed: `staffPhone` takes the usual ways of writing one and keeps it one
 way, as `530-555-0100`. Only a write is held to it, so a record with an
 older number still reads. A body also carries what the site never shows:
-the `status` that decides whether a member, an event or a sermon reaches
-it, a draft until the body says otherwise.
+the `status` that decides whether an event or a sermon reaches it, a draft
+until the body says otherwise. A member carries none: whoever is on the
+staff is on the site.
 
 A sermon is what the church preached, not what YouTube lists: its `date` is
 the day it was preached, its `speaker` who preached it, and its `video`

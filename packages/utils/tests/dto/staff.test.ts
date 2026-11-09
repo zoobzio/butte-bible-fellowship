@@ -66,12 +66,6 @@ describe("toStaffMember", () => {
     expect(() => toStaffMember({ ...ROW, bio: "## Jane" })).toThrow();
   });
 
-  it("leaves an admin row's status behind", () => {
-    const row = { ...ROW, status: "published" };
-    const member = toStaffMember(row);
-    expect(member).not.toHaveProperty("status");
-  });
-
   it("builds what the schema accepts", () => {
     expect(staffMember.safeParse(toStaffMember(ROW)).success).toBe(true);
   });
@@ -80,7 +74,6 @@ describe("toStaffMember", () => {
 const ADMIN_ROW = {
   ...ROW,
   id: 7,
-  status: "draft" as const,
   created_at: new Date("2026-10-17T18:00:00Z"),
   updated_at: new Date("2026-10-18T09:30:00Z"),
 };
@@ -92,7 +85,6 @@ describe("toStaffRecord", () => {
       name: "Jane Doe",
       role: "elder",
       photo: "https://cdn.example.com/staff/jane-doe.jpg",
-      status: "draft",
       createdAt: "2026-10-17T18:00:00.000Z",
       updatedAt: "2026-10-18T09:30:00.000Z",
     });
@@ -111,13 +103,11 @@ describe("toStaffRecord", () => {
         summary: "Serving since 2010.",
         email: "j@x.org",
         phone: "530-555-0100",
-        status: "published",
       }),
     ).toMatchObject({
       summary: "Serving since 2010.",
       email: "j@x.org",
       phone: "530-555-0100",
-      status: "published",
     });
   });
 

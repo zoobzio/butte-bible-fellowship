@@ -17,15 +17,13 @@ near AS (
   SELECT id FROM staff
   WHERE NOT EXISTS (SELECT 1 FROM hits) AND words_near(search, :q::text)
 )
-SELECT id, name, role, summary, bio, photo, email, phone, status, created_at, updated_at,
+SELECT id, name, role, summary, bio, photo, email, phone, created_at, updated_at,
   count(*) OVER ()::int AS total
 FROM staff, typed
 WHERE (typed.pattern IS NULL
     OR id IN (SELECT id FROM hits UNION ALL SELECT id FROM near))
   AND (:role_is::staff_role IS NULL OR role = :role_is::staff_role)
   AND (:role_not::staff_role IS NULL OR role <> :role_not::staff_role)
-  AND (:status_is::content_status IS NULL OR status = :status_is::content_status)
-  AND (:status_not::content_status IS NULL OR status <> :status_not::content_status)
   -- A text column held, or not: the value, whatever its case, or whether
   -- the column is filled in, an empty one counted as missing; and the text
   -- it carries, or does not, or starts or ends with, as typed. A column
@@ -109,8 +107,6 @@ ORDER BY
   CASE WHEN :sort::text = 'name' AND :direction::text = 'desc' THEN name END DESC NULLS LAST,
   CASE WHEN :sort::text = 'role' AND :direction::text = 'asc' THEN role END ASC NULLS LAST,
   CASE WHEN :sort::text = 'role' AND :direction::text = 'desc' THEN role END DESC NULLS LAST,
-  CASE WHEN :sort::text = 'status' AND :direction::text = 'asc' THEN status END ASC NULLS LAST,
-  CASE WHEN :sort::text = 'status' AND :direction::text = 'desc' THEN status END DESC NULLS LAST,
   CASE WHEN :sort::text = 'email' AND :direction::text = 'asc' THEN email END ASC NULLS LAST,
   CASE WHEN :sort::text = 'email' AND :direction::text = 'desc' THEN email END DESC NULLS LAST,
   CASE WHEN :sort::text = 'phone' AND :direction::text = 'asc' THEN phone END ASC NULLS LAST,
