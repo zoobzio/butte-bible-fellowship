@@ -64,9 +64,12 @@ group and the part: `eventPath` is the path parameters of one event,
 carries. A body says what a model cannot: an event is written with a date
 or a day, never both, only a repeating one picks its weeks, and an end comes
 after its start — the rules the database's constraints keep, checked before
-a query runs. A body also carries what the site never shows: the `status`
-that decides whether a member, an event or a sermon reaches it, a draft
-until the body says otherwise.
+a query runs. A member's phone number is ten digits, however they are
+typed: `staffPhone` takes the usual ways of writing one and keeps it one
+way, as `530-555-0100`. Only a write is held to it, so a record with an
+older number still reads. A body also carries what the site never shows:
+the `status` that decides whether a member, an event or a sermon reaches
+it, a draft until the body says otherwise.
 
 A sermon is what the church preached, not what YouTube lists: its `date` is
 the day it was preached, its `speaker` who preached it, and its `video`

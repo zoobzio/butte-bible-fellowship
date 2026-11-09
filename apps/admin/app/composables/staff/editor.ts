@@ -25,9 +25,10 @@ const blank = (value: string | undefined): string | undefined =>
  * carries no title of its own: the page's header names the member, and
  * its menu is where the member is deleted. A new member saved opens on
  * their own page, where the photo and the bio wait; one changed stays on
- * the page, and the record saved is handed to `saved`, for the page to
- * name them afresh. A save that fails reports through `error`, which the
- * next submit clears.
+ * the page, its fields showing what was kept, a phone number in the one
+ * way it is written, and the record saved is handed to `saved`, for the
+ * page to name them afresh. A save that fails reports through `error`,
+ * which the next submit clears.
  */
 export const useStaffEditor = (
   record: StaffRecord | null,
@@ -61,7 +62,12 @@ export const useStaffEditor = (
       },
       { type: "email", key: "email", label: $t.admin.member.email() },
       { type: "tel", key: "phone", label: $t.admin.member.phone() },
-      { type: "text", key: "summary", label: $t.admin.editor.summary() },
+      {
+        type: "textarea",
+        key: "summary",
+        label: $t.admin.editor.summary(),
+        rows: 3,
+      },
     ],
     schema: staffForm,
     defaults: { status: "draft" },
@@ -73,8 +79,11 @@ export const useStaffEditor = (
         await router.push(link(staffRecord.parse(created)));
         return;
       }
-      const changed = await api(endpoint(record.id), { method: "PUT", body });
-      saved(staffRecord.parse(changed));
+      const changed = staffRecord.parse(
+        await api(endpoint(record.id), { method: "PUT", body }),
+      );
+      form.update(toStaffForm(changed));
+      saved(changed);
     },
   });
 

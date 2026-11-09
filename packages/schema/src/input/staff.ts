@@ -54,6 +54,33 @@ export const staffQuery = listingQuery.extend({
   ...dayColumn("createdAt", "The day the members listed were added"),
 });
 
+/**
+ * A US phone number as it may be typed: ten digits, the area code in
+ * parentheses or not, the parts set apart by spaces, dots or hyphens or
+ * not at all, after a +1 or a 1 or neither.
+ */
+const PHONE = /^(?:\+?1[\s.-]?)?(?:\(\d{3}\)|\d{3})[\s.-]?\d{3}[\s.-]?\d{4}$/;
+
+/**
+ * A member's phone number as it is written. However it is typed, it is
+ * kept one way, as 530-555-0100, so every number reads alike wherever it
+ * is shown. A record read back is not held to it: a number written before
+ * the rule still loads, and is put right the next time it is saved.
+ */
+export const staffPhone = z
+  .string()
+  .trim()
+  .regex(PHONE, "Invalid phone number: ten digits, like 530-555-0100")
+  .transform((value) => {
+    const digits = value.replace(/\D/g, "").slice(-10);
+    return `${digits.slice(0, 3)}-${digits.slice(3, 6)}-${digits.slice(6)}`;
+  })
+  .meta({
+    description:
+      "Their phone number: ten digits, however they are set apart. It is kept as 530-555-0100.",
+    examples: ["530-555-0100"],
+  });
+
 export const staffBody = z
   .object({
     name: z
@@ -65,10 +92,7 @@ export const staffBody = z
       description: "A line or two about them, as a card shows.",
     }),
     email: z.email().optional(),
-    phone: z
-      .string()
-      .optional()
-      .meta({ examples: ["530-555-0100"] }),
+    phone: staffPhone.optional(),
     status: contentStatus.default("draft").meta({
       description: "Whether they reach the site. Left out, a draft.",
     }),

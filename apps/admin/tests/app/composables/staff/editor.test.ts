@@ -129,6 +129,49 @@ describe("useStaffEditor", () => {
     expect(useRouter().push).not.toHaveBeenCalled();
   });
 
+  it("refuses a phone number that is not one, as the field is left and on a save", async () => {
+    const fetch = vi.fn(async () => STAFF);
+    vi.stubGlobal("$fetch", fetch);
+    const editor = useStaffEditor(STAFF);
+    editor.form.set("phone", "asdf");
+    editor.form.touch("phone");
+    expect(editor.form.check("phone")).toBe(false);
+    expect(editor.form.field("phone").error).toBe(
+      "Invalid phone number: ten digits, like 530-555-0100",
+    );
+    await editor.form.submit();
+    expect(fetch).not.toHaveBeenCalled();
+    expect(editor.form.field("phone").error).toBeDefined();
+  });
+
+  it("writes a phone number the one way it is kept, and shows it so once saved", async () => {
+    const changed = { ...STAFF, phone: "530-555-0100" };
+    const fetch = vi.fn(async () => changed);
+    vi.stubGlobal("$fetch", fetch);
+    const editor = useStaffEditor(STAFF);
+    editor.form.set("phone", "(530) 555-0100");
+    expect(editor.form.check("phone")).toBe(true);
+    await editor.form.submit();
+    expect(fetch).toHaveBeenCalledWith("/api/staff/1", {
+      method: "PUT",
+      body: { ...BODY, phone: "530-555-0100" },
+    });
+    expect(editor.form.payload.phone).toBe("530-555-0100");
+  });
+
+  it("writes no phone number once the field is cleared", async () => {
+    const fetch = vi.fn(async () => STAFF);
+    vi.stubGlobal("$fetch", fetch);
+    const editor = useStaffEditor({ ...STAFF, phone: "530-555-0100" });
+    editor.form.set("phone", "");
+    expect(editor.form.payload.phone).toBeUndefined();
+    await editor.form.submit();
+    expect(fetch).toHaveBeenCalledWith("/api/staff/1", {
+      method: "PUT",
+      body: { ...BODY, phone: undefined },
+    });
+  });
+
   it("says what went wrong when the save fails, and stays, until the next try", async () => {
     vi.stubGlobal(
       "$fetch",

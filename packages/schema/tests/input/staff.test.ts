@@ -195,6 +195,52 @@ describe("staffBody", () => {
     );
   });
 
+  it("keeps a phone number one way, however it is typed", () => {
+    for (const typed of [
+      "530-555-0100",
+      "(530) 555-0100",
+      "(530)555-0100",
+      "530.555.0100",
+      "530 555 0100",
+      "5305550100",
+      "+1 530 555 0100",
+      "1-530-555-0100",
+      " 530-555-0100 ",
+    ]) {
+      expect(staffBody.parse({ ...MEMBER, phone: typed }).phone, typed).toBe(
+        "530-555-0100",
+      );
+    }
+  });
+
+  it("refuses a phone number that is not ten digits", () => {
+    for (const typed of [
+      "",
+      "asdf",
+      "555-0100",
+      "530-555-01000",
+      "530-555-010",
+      "(530 555-0100",
+      "530-555-0100 ext 4",
+      "call the office",
+    ]) {
+      expect(
+        staffBody.safeParse({ ...MEMBER, phone: typed }).success,
+        typed,
+      ).toBe(false);
+    }
+  });
+
+  it("says what a phone number is when one is refused", () => {
+    const { error } = staffBody.safeParse({ ...MEMBER, phone: "asdf" });
+    expect(error?.issues).toMatchObject([
+      {
+        path: ["phone"],
+        message: "Invalid phone number: ten digits, like 530-555-0100",
+      },
+    ]);
+  });
+
   it("carries neither a photo nor a bio: each is written on its own", () => {
     expect(
       staffBody.parse({
@@ -231,6 +277,11 @@ describe("staffForm", () => {
   it("checks a field on its own, as a form does as it is left", () => {
     expect(staffForm.shape.email.safeParse("jane").success).toBe(false);
     expect(staffForm.shape.email.safeParse(undefined).success).toBe(true);
+    expect(staffForm.shape.phone.safeParse("asdf").success).toBe(false);
+    expect(staffForm.shape.phone.safeParse("(530) 555-0100").success).toBe(
+      true,
+    );
+    expect(staffForm.shape.phone.safeParse(undefined).success).toBe(true);
     expect(staffForm.shape.role.safeParse(undefined).success).toBe(false);
   });
 });

@@ -70,6 +70,7 @@ const pt = { form: { novalidate: true } };
 }
 
 .staff-editor .f-data-form-input,
+.staff-editor .f-data-form-textarea,
 .staff-editor .f-select-trigger {
   box-sizing: border-box;
   width: 100%;
@@ -83,14 +84,22 @@ const pt = { form: { novalidate: true } };
 }
 
 .staff-editor .f-data-form-input:focus-visible,
+.staff-editor .f-data-form-textarea:focus-visible,
 .staff-editor .f-select-trigger:focus-visible {
   outline: 2px solid var(--primary);
   outline-offset: 1px;
   border-color: var(--primary);
 }
 
-.staff-editor .f-data-form-input[aria-invalid="true"] {
+.staff-editor .f-data-form-input[aria-invalid="true"],
+.staff-editor .f-data-form-textarea[aria-invalid="true"] {
   border-color: var(--error);
+}
+
+/* The summary grows downward only: the column sets its width. */
+.staff-editor .f-data-form-textarea {
+  display: block;
+  resize: vertical;
 }
 
 /*

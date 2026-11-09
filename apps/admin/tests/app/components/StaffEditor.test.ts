@@ -32,6 +32,7 @@ describe("StaffEditor", () => {
     expect(wrapper.find("#staff-status").text()).toBe("Published");
     expect(value(wrapper, "staff-email")).toBe("jane@example.com");
     expect(value(wrapper, "staff-summary")).toBe("Has served since 2010.");
+    expect(wrapper.find("textarea#staff-summary").exists()).toBe(true);
     expect(
       wrapper.findAll('button[type="submit"]').map((b) => b.text()),
     ).toEqual(["Save"]);
