@@ -69,6 +69,14 @@ const pt = { form: { novalidate: true } };
   color: var(--on-surface-muted);
 }
 
+/* A field that must be filled in is marked at its label. */
+.staff-editor
+  .f-data-form-field:has(:required, [aria-required="true"])
+  .f-data-form-field-label::after {
+  content: " *";
+  color: var(--error);
+}
+
 .staff-editor .f-data-form-input,
 .staff-editor .f-data-form-textarea,
 .staff-editor .f-select-trigger {

@@ -20,5 +20,14 @@ export const useListingFetch = <T>(
   return fetch;
 };
 
+/**
+ * Loads a table for the page it sits on. Every visit fetches: the table's
+ * state outlives the page, and its own `init` fetches once only, so going
+ * through it would show the rows as they stood on the first visit. The
+ * page, sort and filters the table holds are kept and asked for again.
+ */
 export const useTableRequest = <T>(table: TableService<T>) =>
-  useRequest(`table:${table.id}`, () => table.init());
+  useRequest(`table:${table.id}`, async () => {
+    await table.fetch();
+    return true;
+  });

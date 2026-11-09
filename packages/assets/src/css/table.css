@@ -324,11 +324,6 @@
   border-radius: var(--shape-md);
   background: var(--surface);
   font-size: var(--body-size);
-  transition: opacity var(--transition-fast);
-}
-
-.f-data-table-loading .f-table {
-  opacity: 0.6;
 }
 
 .f-data-table .f-th,
