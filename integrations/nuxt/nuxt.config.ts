@@ -6,6 +6,12 @@ const assets = fileURLToPath(
   new URL("src", import.meta.resolve("@bbf/assets/package.json")),
 );
 
+// `defineContentHandlers`, which @prosary/nuxt offers the server as an
+// auto-import only: named here, since nothing is auto-imported.
+const handlers = fileURLToPath(
+  new URL("runtime/server/handlers", import.meta.resolve("@prosary/nuxt")),
+);
+
 export default defineNuxtConfig({
   compatibilityDate: "2026-08-19",
 
@@ -32,6 +38,8 @@ export default defineNuxtConfig({
   bezoar: { build: "@bbf/database" },
 
   prosary: { build: "@bbf/prose" },
+
+  alias: { "#prosary-handlers": handlers },
 
   $development: {
     bezoar: { driver: "pglite", migrate: true, roles: true, seed: true },

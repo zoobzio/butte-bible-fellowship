@@ -3,7 +3,7 @@ import type { Root } from "hast";
 import type { PageItem } from "~/types/page";
 
 import { page as schema } from "@bbf/schema";
-import { CONTENT_URL } from "@prosary/nuxt/constant";
+import { CONTENT, PREFIX } from "@prosary/nuxt/constant";
 
 import { useAsyncData, useLocale, useRequestFetch, useRoute } from "#imports";
 
@@ -26,7 +26,7 @@ export const usePage = (page?: string) => {
       let body: Root;
       try {
         body = await request<Root>(
-          `${CONTENT_URL}/${locale.value}/${fileOf(path)}`,
+          `${PREFIX}/${CONTENT}/${locale.value}/${fileOf(path)}`,
           { responseType: "json" },
         );
       } catch (error) {

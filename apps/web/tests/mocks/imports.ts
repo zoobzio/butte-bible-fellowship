@@ -1,7 +1,7 @@
 import type { Root } from "hast";
 
 import { vi } from "vitest";
-import { CONTENT_URL } from "@prosary/nuxt/constant";
+import { CONTENT, PREFIX } from "@prosary/nuxt/constant";
 
 export * from "@bbf/nuxt/testing/imports";
 
@@ -49,7 +49,7 @@ const pathOf = (file: string) => {
 };
 
 export const useRequestFetch = () => async (url: string) => {
-  const file = url.slice(`${CONTENT_URL}/`.length);
+  const file = url.slice(`${PREFIX}/${CONTENT}/`.length);
   requestedDocuments.push(file);
   const page = contentPages.get(pathOf(file));
   if (!page) throw Object.assign(new Error(`404 ${url}`), { status: 404 });

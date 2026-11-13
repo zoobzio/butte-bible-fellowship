@@ -64,8 +64,11 @@ character — write a typographic one (`You’re`), as the pages already do.
 A page is Markdown with YAML front matter. The front matter is what
 `@bbf/schema` says a page carries: every page has a `title` and a
 `description`, and a page adds what it needs — the home page its `hero`, the
-events page its `events`, an event's page its
-`image`.
+events page its `events`.
+
+An event's own page, `/events/<slug>`, is not written here: it is in the
+database, where the admin writes it, and the site answers for it at the
+same address a built page has, from `server/routes/i18n/[...path].ts`.
 
 The build runs each page through `@prosary/parse` with the presets
 `prosary.config.ts` lists:
@@ -130,7 +133,7 @@ quoted — the translations of the connect page's `bio` lines are.
   locale's compiled messages.
 
 The pages have no export: the app's prosary module serves them from this
-package's build, as `/_prosary/content/<locale>/<page>.json`.
+package's build, as `/i18n/content/<locale>/<page>.json`.
 
 ```ts
 import { makeProsary } from "prosary";
