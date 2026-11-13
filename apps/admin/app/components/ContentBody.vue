@@ -65,19 +65,27 @@ const pt = computed(() => ({
 
 .content-body .f-data-editor {
   display: grid;
-  gap: var(--space-2);
+  gap: var(--space-5);
 }
 
-/* The toolbar belongs to the editor: a body being read shows none. */
-.content-body .f-data-editor:not([data-mounted]) .f-data-editor-toolbar {
-  display: none;
-}
-
+/*
+ * The toolbar keeps to the screen's head as the writing scrolls beneath
+ * it, tucked a pixel under the header, whose published height is rounded,
+ * so nothing shows between the two. A rule at its foot parts it from the
+ * writing, over which it is drawn as the header is.
+ */
 .content-body .f-data-editor-toolbar {
+  position: sticky;
+  top: calc(var(--header-height) - 1px);
+  z-index: 5;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: var(--space-1);
+  padding-block: var(--space-3);
+  border-bottom: 1px var(--stroke-solid) var(--rule);
+  background: color-mix(in oklab, var(--surface) 88%, transparent);
+  backdrop-filter: blur(var(--blur-sm)) saturate(1.2);
 }
 
 /*
@@ -141,34 +149,20 @@ const pt = computed(() => ({
 }
 
 /*
- * Read, the body is a page with a border that only shows under the pointer
- * or the keyboard; edited, it is a field like the form's beside it.
+ * The writing sits bare under its toolbar, read or edited: no box around
+ * it, and nothing drawn on focus, the caret being the sign of that.
  */
 .content-body .f-data-editor-content {
-  box-sizing: border-box;
   min-height: 16rem;
-  padding: var(--space-3) var(--space-4);
-  border: 1px var(--stroke-solid) transparent;
-  border-radius: var(--shape-sm);
   color: var(--on-surface-high-contrast);
   font: var(--type-body);
   cursor: text;
-  transition:
-    border-color var(--transition-fast),
-    background var(--transition-fast);
 }
 
-.content-body .f-data-editor-content:hover,
-.content-body .f-data-editor[data-mounted] .f-data-editor-content {
-  border-color: var(--rule);
-  background: var(--surface);
-}
-
+.content-body .f-data-editor-content:focus,
 .content-body .f-data-editor-content:focus-visible,
-.content-body .f-data-editor[data-mounted] .f-data-editor-content:focus-within {
-  outline: 2px solid var(--primary);
-  outline-offset: 1px;
-  border-color: var(--primary);
+.content-body .f-data-editor-content :focus-visible {
+  outline: none;
 }
 
 .content-body .f-data-editor-content > :first-child {
