@@ -25,15 +25,19 @@ useHead(() => ({ htmlAttrs: { lang: locale.value } }));
 </template>
 
 <style>
+/*
+ * The page keeps to its gutters and no more: its header leaves its own
+ * room above and below, and a record's page ends at the bar that saves it.
+ */
 .admin-main {
   width: min(100%, calc(var(--page-width) + 2 * var(--space-7)));
   margin-inline: auto;
-  padding: var(--space-7) var(--space-7) var(--space-9);
+  padding-inline: var(--space-7);
 }
 
 @media (max-width: 44rem) {
   .admin-main {
-    padding: var(--space-5) var(--space-4) var(--space-8);
+    padding-inline: var(--space-4);
   }
 }
 </style>

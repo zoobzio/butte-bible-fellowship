@@ -184,4 +184,85 @@ describe("useStaffEditor", () => {
     await editor.form.submit();
     expect(editor.error.value).toBeNull();
   });
+
+  it("is clean on the record as it was saved, and dirty from the first change", () => {
+    const editor = useStaffEditor(STAFF);
+    expect(editor.dirty.value).toBe(false);
+    expect(editor.saving.value).toBe(false);
+    editor.form.set("name", "Jane Roe");
+    expect(editor.dirty.value).toBe(true);
+  });
+
+  it("saves for the page that saves the whole record, and is clean again", async () => {
+    const changed = { ...STAFF, name: "Jane Roe" };
+    const fetch = vi.fn(async () => changed);
+    vi.stubGlobal("$fetch", fetch);
+    const saved = vi.fn();
+    const editor = useStaffEditor(STAFF, saved);
+    editor.form.set("name", "Jane Roe");
+    await editor.save();
+    expect(fetch).toHaveBeenCalledWith("/api/staff/1", {
+      method: "PUT",
+      body: expect.objectContaining({ name: "Jane Roe" }),
+    });
+    expect(saved).toHaveBeenCalledWith(changed);
+    expect(editor.dirty.value).toBe(false);
+    expect(editor.error.value).toBeNull();
+  });
+
+  it("puts the fields back as they were last saved on a reset, with what was wrong", async () => {
+    const editor = useStaffEditor(STAFF);
+    editor.form.set("email", "jane");
+    await editor.save();
+    expect(editor.form.valid).toBe(false);
+    expect(editor.dirty.value).toBe(true);
+    editor.reset();
+    expect(editor.form.payload.name).toBe("Jane Doe");
+    expect(editor.form.errors).toEqual({});
+    expect(editor.dirty.value).toBe(false);
+
+    const changed = { ...STAFF, name: "Jane Roe" };
+    vi.stubGlobal(
+      "$fetch",
+      vi.fn(async () => changed),
+    );
+    editor.form.set("name", "Jane Roe");
+    await editor.save();
+    editor.form.set("name", "Another Slip");
+    editor.reset();
+    expect(editor.form.payload.name).toBe("Jane Roe");
+  });
+
+  it("saves without throwing: what fails reports through the error, which a reset clears", async () => {
+    vi.stubGlobal(
+      "$fetch",
+      vi.fn(async () => {
+        throw new Error("The server is away.");
+      }),
+    );
+    const editor = useStaffEditor(STAFF);
+    editor.form.set("name", "Jane Roe");
+    await editor.save();
+    expect(editor.error.value).toBe("The server is away.");
+    expect(editor.dirty.value).toBe(true);
+    editor.reset();
+    expect(editor.error.value).toBeNull();
+  });
+
+  it("is not reset under a save", async () => {
+    let answer = (_: unknown) => {};
+    vi.stubGlobal(
+      "$fetch",
+      vi.fn(() => new Promise<unknown>((resolve) => (answer = resolve))),
+    );
+    const editor = useStaffEditor(STAFF);
+    editor.form.set("name", "Jane Roe");
+    const saving = editor.save();
+    expect(editor.saving.value).toBe(true);
+    editor.reset();
+    expect(editor.form.payload.name).toBe("Jane Roe");
+    answer({ ...STAFF, name: "Jane Roe" });
+    await saving;
+    expect(editor.saving.value).toBe(false);
+  });
 });

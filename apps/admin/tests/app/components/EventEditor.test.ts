@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import { mount } from "@vue/test-utils";
 
 import { useRouter } from "#imports";
+import { mountHeld } from "#test/support/drafts";
 import { DINNER, WORSHIP } from "#test/support/records";
 import Checkbox from "@zoobzio/vue/components/checkbox.vue";
 import MultiSelect from "@zoobzio/vue/components/multi-select.vue";
@@ -188,5 +189,60 @@ describe("EventEditor", () => {
     expect(error.text()).toBe("The server is away.");
     expect(useRouter().push).not.toHaveBeenCalled();
     expect(wrapper.find(".event-editor-save").text()).toBe("Save");
+  });
+
+  it("leaves the save to the page that holds its record: no button of its own, the form handed in", async () => {
+    const changed = { ...WORSHIP, title: "Morning Worship" };
+    const fetch = vi.fn(async () => changed);
+    vi.stubGlobal("$fetch", fetch);
+    const { wrapper, drafts } = mountHeld(EventEditor, WORSHIP);
+    expect(wrapper.find("button.event-editor-save").exists()).toBe(false);
+    expect(wrapper.find('button[type="submit"]').exists()).toBe(false);
+    expect(drafts.dirty.value).toBe(false);
+    expect(drafts.open.value).toBe(false);
+    await wrapper.find("#event-title").setValue("Morning Worship");
+    expect(drafts.dirty.value).toBe(true);
+    expect(drafts.open.value).toBe(true);
+    await drafts.save();
+    expect(fetch).toHaveBeenCalledWith("/api/events/3", {
+      method: "PUT",
+      body: expect.objectContaining({ title: "Morning Worship" }),
+    });
+    expect(drafts.dirty.value).toBe(false);
+    expect(wrapper.findComponent(EventEditor).emitted("saved")).toEqual([
+      [changed],
+    ]);
+    expect(value(wrapper, "event-title")).toBe("Morning Worship");
+  });
+
+  it("is put back as it was last saved when the page resets its record", async () => {
+    const { wrapper, drafts } = mountHeld(EventEditor, WORSHIP);
+    await wrapper.find("#event-title").setValue("Morning Worship");
+    drafts.reset();
+    await wrapper.vm.$nextTick();
+    expect(value(wrapper, "event-title")).toBe("Worship Service");
+    expect(drafts.dirty.value).toBe(false);
+  });
+
+  it("hands what went wrong with a save to the page's bar", async () => {
+    vi.stubGlobal(
+      "$fetch",
+      vi.fn(async () => {
+        throw new Error("The server is away.");
+      }),
+    );
+    const { wrapper, drafts } = mountHeld(EventEditor, WORSHIP);
+    await wrapper.find("#event-title").setValue("Morning Worship");
+    await drafts.save();
+    await wrapper.vm.$nextTick();
+    expect(drafts.errors.value).toEqual(["The server is away."]);
+    expect(drafts.dirty.value).toBe(true);
+    expect(wrapper.find(".event-editor-error").exists()).toBe(false);
+  });
+
+  it("keeps its own save for a new event, whatever page it is drawn on", () => {
+    const { wrapper, drafts } = mountHeld(EventEditor, null);
+    expect(wrapper.find("button.event-editor-save").text()).toBe("Save");
+    expect(drafts.open.value).toBe(false);
   });
 });

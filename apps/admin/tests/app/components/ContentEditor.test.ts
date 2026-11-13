@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import { mount } from "@vue/test-utils";
 
 import { useRouter } from "#imports";
+import { mountHeld } from "#test/support/drafts";
 import { ABOUT, HOME } from "#test/support/records";
 import ContentEditor from "~/components/ContentEditor.vue";
 
@@ -149,5 +150,60 @@ describe("ContentEditor", () => {
     expect(error.text()).toBe("The server is away.");
     expect(useRouter().push).not.toHaveBeenCalled();
     expect(wrapper.find(".content-editor-save").text()).toBe("Save");
+  });
+
+  it("leaves the save to the page that holds its record: no button of its own, the form handed in", async () => {
+    const changed = { ...HOME, title: "Welcome" };
+    const fetch = vi.fn(async () => changed);
+    vi.stubGlobal("$fetch", fetch);
+    const { wrapper, drafts } = mountHeld(ContentEditor, HOME);
+    expect(wrapper.find("button.content-editor-save").exists()).toBe(false);
+    expect(wrapper.find('button[type="submit"]').exists()).toBe(false);
+    expect(drafts.dirty.value).toBe(false);
+    expect(drafts.open.value).toBe(false);
+    await wrapper.find("#content-title").setValue("Welcome");
+    expect(drafts.dirty.value).toBe(true);
+    expect(drafts.open.value).toBe(true);
+    await drafts.save();
+    expect(fetch).toHaveBeenCalledWith("/api/content/5", {
+      method: "PUT",
+      body: expect.objectContaining({ title: "Welcome" }),
+    });
+    expect(drafts.dirty.value).toBe(false);
+    expect(wrapper.findComponent(ContentEditor).emitted("saved")).toEqual([
+      [changed],
+    ]);
+    expect(value(wrapper, "content-title")).toBe("Welcome");
+  });
+
+  it("is put back as it was last saved when the page resets its record", async () => {
+    const { wrapper, drafts } = mountHeld(ContentEditor, HOME);
+    await wrapper.find("#content-title").setValue("Welcome");
+    drafts.reset();
+    await wrapper.vm.$nextTick();
+    expect(value(wrapper, "content-title")).toBe(HOME.title);
+    expect(drafts.dirty.value).toBe(false);
+  });
+
+  it("hands what went wrong with a save to the page's bar", async () => {
+    vi.stubGlobal(
+      "$fetch",
+      vi.fn(async () => {
+        throw new Error("The server is away.");
+      }),
+    );
+    const { wrapper, drafts } = mountHeld(ContentEditor, HOME);
+    await wrapper.find("#content-title").setValue("Welcome");
+    await drafts.save();
+    await wrapper.vm.$nextTick();
+    expect(drafts.errors.value).toEqual(["The server is away."]);
+    expect(drafts.dirty.value).toBe(true);
+    expect(wrapper.find(".content-editor-error").exists()).toBe(false);
+  });
+
+  it("keeps its own save for a new page, whatever page it is drawn on", () => {
+    const { wrapper, drafts } = mountHeld(ContentEditor, null);
+    expect(wrapper.find("button.content-editor-save").text()).toBe("Save");
+    expect(drafts.open.value).toBe(false);
   });
 });

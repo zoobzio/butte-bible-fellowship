@@ -3,9 +3,11 @@ import type { StaffRecord } from "@bbf/schema/types";
 
 import { definePageMeta } from "#imports";
 
+import SaveBar from "~/components/SaveBar.vue";
 import StaffAvatar from "~/components/StaffAvatar.vue";
 import StaffBio from "~/components/StaffBio.vue";
 import StaffEditor from "~/components/StaffEditor.vue";
+import { useDrafts } from "~/composables/drafts";
 </script>
 
 <script setup lang="ts">
@@ -18,6 +20,12 @@ definePageMeta({ middleware: "auth", auth: { scopes: ["staff:read"] } });
 const { record } = defineProps<{ record: StaffRecord }>();
 
 const emit = defineEmits<{ saved: [record: StaffRecord] }>();
+
+/*
+ * The record is saved and reset as a whole, from one bar at the foot of
+ * the screen: each panel hands in its own part of it.
+ */
+const { dirty, open, saving, errors, save, reset } = useDrafts();
 </script>
 
 <template>
@@ -27,6 +35,14 @@ const emit = defineEmits<{ saved: [record: StaffRecord] }>();
       <StaffEditor :record="record" @saved="emit('saved', $event)" />
     </div>
     <StaffBio :record="record" />
+    <SaveBar
+      :dirty="dirty"
+      :open="open"
+      :saving="saving"
+      :errors="errors"
+      @save="save"
+      @reset="reset"
+    />
   </div>
 </template>
 
@@ -53,13 +69,17 @@ const emit = defineEmits<{ saved: [record: StaffRecord] }>();
  * least as tall as the screen under the header and holds to the screen's
  * foot from the row's end: short, that is its head held under the header;
  * taller than the screen, it scrolls until its foot shows and stays there.
+ * The screen's foot is the bar that saves the record, which it clears.
  */
 .staff-page-side {
   position: sticky;
-  bottom: var(--space-5);
+  bottom: calc(var(--action-bar-height) + var(--space-5));
   align-self: end;
   align-content: start;
-  min-height: calc(100dvh - var(--header-height) - 2 * var(--space-5));
+  min-height: calc(
+    100dvh - var(--header-height) - var(--action-bar-height) - 2 *
+      var(--space-5)
+  );
 }
 
 @media (max-width: 60rem) {

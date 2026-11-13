@@ -3,13 +3,14 @@ import type { EventRecord } from "@bbf/schema/types";
 import { describe, expect, it, vi } from "vitest";
 import { flushPromises, mount } from "@vue/test-utils";
 
-import { Dialog, NuxtPage, Table } from "#components";
+import { Dialog, Editor, NuxtPage, Table } from "#components";
 import { setRoutePath, useRouter } from "#imports";
 import EventBody from "~/components/EventBody.vue";
 import EventEditor from "~/components/EventEditor.vue";
 import EventImage from "~/components/EventImage.vue";
 import EventMenu from "~/components/EventMenu.vue";
 import PageHeader from "~/components/PageHeader.vue";
+import SaveBar from "~/components/SaveBar.vue";
 import Index from "~/pages/events/index.vue";
 import Event from "~/pages/events/[id].vue";
 import Details from "~/pages/events/[id]/details.vue";
@@ -274,6 +275,7 @@ describe("details page", () => {
     expect([...panels].map((panel) => panel.className)).toEqual([
       "event-page-side",
       "event-body",
+      "save-bar",
     ]);
     const side = wrapper.find(".event-page-side");
     expect([...side.element.children].map((child) => child.className)).toEqual([
@@ -292,5 +294,123 @@ describe("details page", () => {
     const changed = { ...DINNER, title: "Harvest Supper" };
     wrapper.findComponent(EventEditor).vm.$emit("saved", changed);
     expect(wrapper.emitted("saved")).toEqual([[changed]]);
+  });
+
+  /** The page, drawn on the screen, with its bar's two buttons. */
+  const mountWhole = () => {
+    const wrapper = mount(Details, {
+      props: { record: WORSHIP },
+      attachTo: document.body,
+    });
+    return {
+      wrapper,
+      save: wrapper.find("button.save-bar-save"),
+      reset: wrapper.find("button.save-bar-reset"),
+      content: () => wrapper.find(".event-body .f-data-editor-content"),
+    };
+  };
+
+  /** Writes over the whole of what is written, as typing over a selection does. */
+  const write = async (page: ReturnType<typeof mountWhole>, text: string) => {
+    await page.content().trigger("pointerdown");
+    await page.wrapper.vm.$nextTick();
+    page.wrapper
+      .findComponent(EventBody)
+      .findComponent(Editor)
+      .props("service")
+      .run(
+        (chain: {
+          selectAll: () => { insertContent: (text: string) => unknown };
+        }) => chain.selectAll().insertContent(text),
+      );
+    await page.wrapper.vm.$nextTick();
+  };
+
+  it("ends in one bar that saves the whole record, with nothing to do until something changes, and no button in either panel", () => {
+    const { wrapper, save, reset } = mountWhole();
+    expect(wrapper.findAll("button.save-bar-save")).toHaveLength(1);
+    expect(wrapper.findComponent(SaveBar).props()).toEqual({
+      dirty: false,
+      open: false,
+      saving: false,
+      errors: [],
+    });
+    expect(save.attributes("disabled")).toBeDefined();
+    expect(reset.attributes("disabled")).toBeDefined();
+    expect(wrapper.find('button[type="submit"]').exists()).toBe(false);
+    expect(
+      wrapper.findAll("button").filter((b) => b.text() === "Save"),
+    ).toHaveLength(1);
+  });
+
+  it("saves the details and what is written at once, each where it is kept", async () => {
+    const changed = { ...WORSHIP, title: "Morning Worship" };
+    const fetch = vi.fn(async () => changed);
+    vi.stubGlobal("$fetch", fetch);
+    const page = mountWhole();
+    await page.wrapper.find("#event-title").setValue("Morning Worship");
+    await write(page, "Since 2010.");
+    expect(page.save.attributes("disabled")).toBeUndefined();
+    await page.save.trigger("click");
+    await flushPromises();
+    expect(fetch).toHaveBeenCalledTimes(2);
+    expect(fetch).toHaveBeenCalledWith("/api/events/3", {
+      method: "PUT",
+      body: expect.objectContaining({ title: "Morning Worship" }),
+    });
+    expect(fetch).toHaveBeenCalledWith("/api/events/3/body", {
+      method: "PATCH",
+      body: { body: expect.objectContaining({ type: "root" }) },
+    });
+    expect(page.wrapper.emitted("saved")).toEqual([[changed]]);
+    expect(page.save.attributes("disabled")).toBeDefined();
+    expect(page.reset.attributes("disabled")).toBeDefined();
+  });
+
+  it("saves only the panel that changed", async () => {
+    const fetch = vi.fn(async () => WORSHIP);
+    vi.stubGlobal("$fetch", fetch);
+    const page = mountWhole();
+    await write(page, "Since 2010.");
+    await page.save.trigger("click");
+    await flushPromises();
+    expect(fetch).toHaveBeenCalledTimes(1);
+    expect(fetch).toHaveBeenCalledWith("/api/events/3/body", expect.anything());
+  });
+
+  it("resets the details and what is written at once, to what was last saved", async () => {
+    const fetch = vi.fn(async () => WORSHIP);
+    vi.stubGlobal("$fetch", fetch);
+    const page = mountWhole();
+    const field = page.wrapper.find("#event-title");
+    await field.setValue("Morning Worship");
+    await write(page, "A slip of the keys.");
+    expect(page.reset.attributes("disabled")).toBeUndefined();
+    await page.reset.trigger("click");
+    await flushPromises();
+    expect(fetch).not.toHaveBeenCalled();
+    expect((field.element as HTMLInputElement).value).toBe("Worship Service");
+    expect(page.content().text()).toBe("Has served since 2010.");
+    expect(page.content().attributes("contenteditable")).toBeUndefined();
+    expect(page.save.attributes("disabled")).toBeDefined();
+    expect(page.reset.attributes("disabled")).toBeDefined();
+  });
+
+  it("says in the bar what went wrong with a save, and keeps what was written to try again", async () => {
+    vi.stubGlobal(
+      "$fetch",
+      vi.fn(async () => {
+        throw new Error("The server is away.");
+      }),
+    );
+    const page = mountWhole();
+    await page.wrapper.find("#event-title").setValue("Morning Worship");
+    await page.save.trigger("click");
+    await flushPromises();
+    const errors = page.wrapper.findAll(".save-bar-error");
+    expect(errors.map((error) => error.text())).toEqual([
+      "The server is away.",
+    ]);
+    expect(page.save.attributes("disabled")).toBeUndefined();
   });
 });

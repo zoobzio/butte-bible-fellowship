@@ -3,6 +3,7 @@ import type { StaffRecord } from "@bbf/schema/types";
 
 import { Editor } from "#components";
 import { computed, useId, useNuxtApp } from "#imports";
+import { useDraft } from "~/composables/drafts";
 import { useStaffBio } from "~/composables/staff/bio";
 </script>
 
@@ -15,6 +16,13 @@ const { $t } = useNuxtApp();
 
 const { editor, view, editing, dirty, saving, error, save, cancel } =
   useStaffBio(record);
+
+/*
+ * The page saves the record as a whole, from its bar: the bio hands
+ * itself in, with something to put back for as long as it is being edited.
+ */
+const open = computed(() => editing.value || dirty.value);
+useDraft({ dirty, open, saving, error, save, reset: cancel });
 
 const title = useId();
 
@@ -31,25 +39,6 @@ const pt = computed(() => ({
   <section class="staff-bio" :data-editing="editing || undefined">
     <h2 :id="title" class="staff-bio-title">{{ $t.admin.member.bio() }}</h2>
     <Editor :key="view" :service="editor" :pt="pt" />
-    <p v-if="error" class="staff-bio-error" role="alert">{{ error }}</p>
-    <div v-if="editing" class="staff-bio-actions">
-      <button
-        type="button"
-        class="staff-bio-save"
-        :disabled="saving || !dirty"
-        @click="save"
-      >
-        {{ saving ? $t.admin.editor.saving() : $t.admin.editor.save() }}
-      </button>
-      <button
-        type="button"
-        class="staff-bio-cancel"
-        :disabled="saving"
-        @click="cancel"
-      >
-        {{ $t.admin.editor.cancel() }}
-      </button>
-    </div>
   </section>
 </template>
 
@@ -195,51 +184,5 @@ const pt = computed(() => ({
   .f-data-editor-content::before {
   content: attr(data-placeholder);
   color: var(--on-surface-muted);
-}
-
-.staff-bio-error {
-  margin: 0;
-  padding: var(--space-3) var(--space-4);
-  border-radius: var(--shape-sm);
-  background: var(--error-container);
-  color: var(--on-error-container);
-}
-
-.staff-bio-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-3);
-}
-
-.staff-bio-save,
-.staff-bio-cancel {
-  padding: var(--space-3) var(--space-5);
-  border: 1px var(--stroke-solid) transparent;
-  border-radius: var(--shape-full);
-  font: var(--type-label);
-  font-weight: var(--weight-medium);
-  letter-spacing: var(--type-label-letter-spacing);
-  cursor: pointer;
-  transition:
-    background var(--transition-base),
-    color var(--transition-base);
-}
-
-.staff-bio-save {
-  background: var(--primary);
-  color: var(--on-primary);
-  box-shadow: var(--elevation-low);
-}
-
-.staff-bio-cancel {
-  background: transparent;
-  border-color: var(--rule);
-  color: var(--on-surface);
-}
-
-.staff-bio-save:disabled,
-.staff-bio-cancel:disabled {
-  opacity: 0.6;
-  cursor: default;
 }
 </style>

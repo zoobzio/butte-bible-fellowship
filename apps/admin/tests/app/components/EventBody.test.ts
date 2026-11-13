@@ -1,9 +1,10 @@
 import { describe, expect, it, vi } from "vitest";
-import { flushPromises, mount } from "@vue/test-utils";
+import { mount } from "@vue/test-utils";
 
 import type { Service } from "@zoobzio/editor";
 
 import { Editor } from "#components";
+import { mountHeld } from "#test/support/drafts";
 import { WORSHIP } from "#test/support/records";
 import EventBody from "~/components/EventBody.vue";
 
@@ -51,11 +52,9 @@ describe("EventBody", () => {
     );
   });
 
-  it("becomes the editor on a click: its toolbar, a save with nothing yet to save, and a cancel", async () => {
-    const wrapper = mount(EventBody, {
-      props: { record: WORSHIP },
-      attachTo: document.body,
-    });
+  it("becomes the editor on a click: its toolbar, and no button of its own, the page's bar saving and resetting it", async () => {
+    const { wrapper, drafts } = mountHeld(EventBody, WORSHIP);
+    expect(drafts.open.value).toBe(false);
     await open(wrapper);
     expect(wrapper.find(".event-body").attributes("data-editing")).toBe("true");
     expect(wrapper.find(".f-data-editor").attributes("data-mounted")).toBe(
@@ -63,10 +62,12 @@ describe("EventBody", () => {
     );
     expect(content(wrapper).attributes("contenteditable")).toBe("true");
     expect(wrapper.find('[data-tool="bold"]').exists()).toBe(true);
-    const save = wrapper.find(".event-body-save");
-    expect(save.text()).toBe("Save");
-    expect(save.attributes("disabled")).toBeDefined();
-    expect(wrapper.find(".event-body-cancel").text()).toBe("Cancel");
+    expect(wrapper.find(".event-body-actions").exists()).toBe(false);
+    expect(wrapper.text()).not.toContain("Save");
+    expect(wrapper.text()).not.toContain("Cancel");
+    // Nothing is written yet, but the editor is open: there to put back.
+    expect(drafts.dirty.value).toBe(false);
+    expect(drafts.open.value).toBe(true);
   });
 
   it("becomes the editor from the keyboard too", async () => {
@@ -79,7 +80,7 @@ describe("EventBody", () => {
     expect(wrapper.find(".event-body").attributes("data-editing")).toBe("true");
   });
 
-  it("saves what was written on its own, and reads as a page again", async () => {
+  it("is saved by the page's bar, on its own request, and reads as a page again", async () => {
     const written = {
       type: "root",
       children: [
@@ -100,47 +101,42 @@ describe("EventBody", () => {
     };
     const fetch = vi.fn(async () => ({ ...WORSHIP, body: written }));
     vi.stubGlobal("$fetch", fetch);
-    const wrapper = mount(EventBody, {
-      props: { record: WORSHIP },
-      attachTo: document.body,
-    });
+    const { wrapper, drafts } = mountHeld(EventBody, WORSHIP);
     await open(wrapper);
     editor(wrapper).run((chain) => chain.selectAll().toggleBold());
     await wrapper.vm.$nextTick();
-    const save = wrapper.find(".event-body-save");
-    expect(save.attributes("disabled")).toBeUndefined();
-    await save.trigger("click");
-    await flushPromises();
+    expect(drafts.dirty.value).toBe(true);
+    await drafts.save();
+    await wrapper.vm.$nextTick();
     expect(fetch).toHaveBeenCalledWith("/api/events/3/body", {
       method: "PATCH",
       body: { body: written },
     });
+    expect(drafts.dirty.value).toBe(false);
+    expect(drafts.open.value).toBe(false);
     expect(
       wrapper.find(".event-body").attributes("data-editing"),
     ).toBeUndefined();
-    expect(wrapper.find(".event-body-actions").exists()).toBe(false);
     expect(content(wrapper).attributes("contenteditable")).toBeUndefined();
     expect(content(wrapper).html()).toContain(
       "<p><strong>Has served since 2010.</strong></p>",
     );
   });
 
-  it("drops what was written on a cancel, and reads as what was last saved", async () => {
+  it("drops what was written on a reset, and reads as what was last saved", async () => {
     const fetch = vi.fn(async () => WORSHIP);
     vi.stubGlobal("$fetch", fetch);
-    const wrapper = mount(EventBody, {
-      props: { record: WORSHIP },
-      attachTo: document.body,
-    });
+    const { wrapper, drafts } = mountHeld(EventBody, WORSHIP);
     await open(wrapper);
     editor(wrapper).run((chain) =>
       chain.selectAll().insertContent("A slip of the keys."),
     );
     await wrapper.vm.$nextTick();
     expect(content(wrapper).text()).toBe("A slip of the keys.");
-    await wrapper.find(".event-body-cancel").trigger("click");
+    drafts.reset();
     await wrapper.vm.$nextTick();
     expect(fetch).not.toHaveBeenCalled();
+    expect(drafts.open.value).toBe(false);
     expect(
       wrapper.find(".event-body").attributes("data-editing"),
     ).toBeUndefined();
@@ -152,27 +148,35 @@ describe("EventBody", () => {
     expect(wrapper.find(".event-body").attributes("data-editing")).toBe("true");
   });
 
-  it("says what went wrong when the save fails, where a reader is told, and stays open", async () => {
+  it("leaves an editor that was only opened on a reset", async () => {
+    const { wrapper, drafts } = mountHeld(EventBody, WORSHIP);
+    await open(wrapper);
+    drafts.reset();
+    await wrapper.vm.$nextTick();
+    expect(drafts.open.value).toBe(false);
+    expect(
+      wrapper.find(".event-body").attributes("data-editing"),
+    ).toBeUndefined();
+  });
+
+  it("hands what went wrong with a save to the page's bar, and stays open", async () => {
     vi.stubGlobal(
       "$fetch",
       vi.fn(async () => {
         throw new Error("The server is away.");
       }),
     );
-    const wrapper = mount(EventBody, {
-      props: { record: WORSHIP },
-      attachTo: document.body,
-    });
+    const { wrapper, drafts } = mountHeld(EventBody, WORSHIP);
     await open(wrapper);
     editor(wrapper).run((chain) =>
       chain.selectAll().insertContent("Since 2010."),
     );
     await wrapper.vm.$nextTick();
-    await wrapper.find(".event-body-save").trigger("click");
-    await flushPromises();
-    const error = wrapper.find(".event-body-error");
-    expect(error.attributes("role")).toBe("alert");
-    expect(error.text()).toBe("The server is away.");
+    await drafts.save();
+    await wrapper.vm.$nextTick();
+    expect(drafts.errors.value).toEqual(["The server is away."]);
+    expect(drafts.dirty.value).toBe(true);
+    expect(wrapper.find('[role="alert"]').exists()).toBe(false);
     expect(wrapper.find(".event-body").attributes("data-editing")).toBe("true");
     expect(content(wrapper).text()).toBe("Since 2010.");
   });

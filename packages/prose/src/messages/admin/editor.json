@@ -7,6 +7,10 @@
     "defaultMessage": "Saving…",
     "description": "The save button while the save is under way."
   },
+  "reset": {
+    "defaultMessage": "Reset",
+    "description": "The button beside the save button that drops every change not yet saved and puts the record back as it was last saved."
+  },
   "delete": {
     "defaultMessage": "Delete",
     "description": "The button that deletes the record being edited."

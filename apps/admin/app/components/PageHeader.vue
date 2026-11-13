@@ -64,10 +64,17 @@ const pages = usePageTabs(() => tabs);
 </template>
 
 <style>
+/* The header leaves its own room above and below: the page around it has none. */
 .page-header {
   display: grid;
   gap: var(--space-5);
-  margin-bottom: var(--space-6);
+  padding-block: var(--space-7) var(--space-6);
+}
+
+@media (max-width: 44rem) {
+  .page-header {
+    padding-block: var(--space-5) var(--space-6);
+  }
 }
 
 /* The title's block on the left; what can be done sits level with it. */

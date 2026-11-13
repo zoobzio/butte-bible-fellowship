@@ -2,7 +2,7 @@ import type { EventForm, EventRecord } from "@bbf/schema/types";
 
 import { eventForm, eventRecord } from "@bbf/schema";
 import { toEventBody, toEventForm } from "@bbf/utils/vm";
-import { createForm, ref, useNuxtApp, useRouter } from "#imports";
+import { computed, createForm, ref, useNuxtApp, useRouter } from "#imports";
 import { useApi } from "~/composables/api";
 import { ROUTE, endpoint } from "~/composables/events/routes";
 import { WEEK_OPTIONS } from "~/constants/editor";
@@ -41,6 +41,10 @@ const picked = (weeks: EventForm["weeks"]): EventForm["weeks"] =>
  * kept, and the record saved is handed to `saved`, for the page to name it
  * afresh. A save that fails reports through `error`, which the next submit
  * clears.
+ *
+ * For the page that saves the event as a whole, `dirty` holds from the
+ * first change to the next save, `save` submits the form without throwing,
+ * and `reset` puts the fields back as they were last saved.
  */
 export const useEventEditor = (
   record: EventRecord | null,
@@ -49,6 +53,9 @@ export const useEventEditor = (
   const api = useApi();
   const router = useRouter();
   const { $t } = useNuxtApp();
+
+  /* The record as it was last saved: what a reset puts back. */
+  let kept = record;
 
   const useForm = createForm<EventForm>("event", {
     fields: [
@@ -112,14 +119,22 @@ export const useEventEditor = (
       const changed = eventRecord.parse(
         await api(endpoint(record.id), { method: "PUT", body }),
       );
+      kept = changed;
       form.update(toEventForm(changed));
       saved(changed);
     },
   });
 
   const form = useForm();
-  form.reset();
-  if (record !== null) form.update(toEventForm(record));
+  const dirty = ref(false);
+  const error = ref<string | null>(null);
+
+  const fill = () => {
+    form.reset();
+    if (kept !== null) form.update(toEventForm(kept));
+    dirty.value = false;
+  };
+  fill();
 
   /* Only a recurring event picks its weeks: they go when the mark does. */
   form.on("change", ({ field }) => {
@@ -129,8 +144,13 @@ export const useEventEditor = (
     }
   });
 
-  const error = ref<string | null>(null);
-
+  form.on("change", ({ field }) => {
+    if (field === "payload") dirty.value = true;
+  });
+  form.on("submitted", () => {
+    error.value = null;
+    dirty.value = false;
+  });
   form.on("rejected", () => {
     error.value = null;
   });
@@ -138,5 +158,18 @@ export const useEventEditor = (
     error.value = failure(cause) ?? $t.admin.editor.failed();
   });
 
-  return { form, error };
+  const saving = computed(() => form.submitting);
+
+  /* What fails reports through `error`: the rejection has no other use. */
+  const save = async () => {
+    await form.submit().catch(() => {});
+  };
+
+  const reset = () => {
+    if (form.submitting) return;
+    error.value = null;
+    fill();
+  };
+
+  return { form, error, dirty, saving, save, reset };
 };

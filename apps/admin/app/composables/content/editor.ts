@@ -2,7 +2,7 @@ import type { ContentForm, ContentRecord } from "@bbf/schema/types";
 
 import { contentForm, contentRecord } from "@bbf/schema";
 import { toContentBody, toContentForm } from "@bbf/utils/vm";
-import { createForm, ref, useNuxtApp, useRouter } from "#imports";
+import { computed, createForm, ref, useNuxtApp, useRouter } from "#imports";
 import { useApi } from "~/composables/api";
 import { ROUTE, endpoint } from "~/composables/content/routes";
 import { link } from "~/constants/content";
@@ -27,6 +27,10 @@ const blank = (value: string | undefined): string | undefined =>
  * changed stays on the page, its fields showing what was kept, and the
  * record saved is handed to `saved`, for the page to name it afresh. A save
  * that fails reports through `error`, which the next submit clears.
+ *
+ * For the page that saves the page as a whole, `dirty` holds from the
+ * first change to the next save, `save` submits the form without throwing,
+ * and `reset` puts the fields back as they were last saved.
  */
 export const useContentEditor = (
   record: ContentRecord | null,
@@ -35,6 +39,9 @@ export const useContentEditor = (
   const api = useApi();
   const router = useRouter();
   const { $t } = useNuxtApp();
+
+  /* The record as it was last saved: what a reset puts back. */
+  let kept = record;
 
   const useForm = createForm<ContentForm>("content", {
     fields: [
@@ -70,17 +77,30 @@ export const useContentEditor = (
       const changed = contentRecord.parse(
         await api(endpoint(record.id), { method: "PUT", body }),
       );
+      kept = changed;
       form.update(toContentForm(changed));
       saved(changed);
     },
   });
 
   const form = useForm();
-  form.reset();
-  if (record !== null) form.update(toContentForm(record));
-
+  const dirty = ref(false);
   const error = ref<string | null>(null);
 
+  const fill = () => {
+    form.reset();
+    if (kept !== null) form.update(toContentForm(kept));
+    dirty.value = false;
+  };
+  fill();
+
+  form.on("change", ({ field }) => {
+    if (field === "payload") dirty.value = true;
+  });
+  form.on("submitted", () => {
+    error.value = null;
+    dirty.value = false;
+  });
   form.on("rejected", () => {
     error.value = null;
   });
@@ -88,5 +108,18 @@ export const useContentEditor = (
     error.value = failure(cause) ?? $t.admin.editor.failed();
   });
 
-  return { form, error };
+  const saving = computed(() => form.submitting);
+
+  /* What fails reports through `error`: the rejection has no other use. */
+  const save = async () => {
+    await form.submit().catch(() => {});
+  };
+
+  const reset = () => {
+    if (form.submitting) return;
+    error.value = null;
+    fill();
+  };
+
+  return { form, error, dirty, saving, save, reset };
 };

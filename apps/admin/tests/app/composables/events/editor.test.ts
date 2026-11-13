@@ -227,4 +227,85 @@ describe("useEventEditor", () => {
     await editor.form.submit();
     expect(editor.error.value).toBeNull();
   });
+
+  it("is clean on the record as it was saved, and dirty from the first change", () => {
+    const editor = useEventEditor(WORSHIP);
+    expect(editor.dirty.value).toBe(false);
+    expect(editor.saving.value).toBe(false);
+    editor.form.set("title", "Morning Worship");
+    expect(editor.dirty.value).toBe(true);
+  });
+
+  it("saves for the page that saves the whole record, and is clean again", async () => {
+    const changed = { ...WORSHIP, title: "Morning Worship" };
+    const fetch = vi.fn(async () => changed);
+    vi.stubGlobal("$fetch", fetch);
+    const saved = vi.fn();
+    const editor = useEventEditor(WORSHIP, saved);
+    editor.form.set("title", "Morning Worship");
+    await editor.save();
+    expect(fetch).toHaveBeenCalledWith("/api/events/3", {
+      method: "PUT",
+      body: expect.objectContaining({ title: "Morning Worship" }),
+    });
+    expect(saved).toHaveBeenCalledWith(changed);
+    expect(editor.dirty.value).toBe(false);
+    expect(editor.error.value).toBeNull();
+  });
+
+  it("puts the fields back as they were last saved on a reset, with what was wrong", async () => {
+    const editor = useEventEditor(WORSHIP);
+    editor.form.set("slug", "Not A Slug");
+    await editor.save();
+    expect(editor.form.valid).toBe(false);
+    expect(editor.dirty.value).toBe(true);
+    editor.reset();
+    expect(editor.form.payload.title).toBe("Worship Service");
+    expect(editor.form.errors).toEqual({});
+    expect(editor.dirty.value).toBe(false);
+
+    const changed = { ...WORSHIP, title: "Morning Worship" };
+    vi.stubGlobal(
+      "$fetch",
+      vi.fn(async () => changed),
+    );
+    editor.form.set("title", "Morning Worship");
+    await editor.save();
+    editor.form.set("title", "Another Slip");
+    editor.reset();
+    expect(editor.form.payload.title).toBe("Morning Worship");
+  });
+
+  it("saves without throwing: what fails reports through the error, which a reset clears", async () => {
+    vi.stubGlobal(
+      "$fetch",
+      vi.fn(async () => {
+        throw new Error("The server is away.");
+      }),
+    );
+    const editor = useEventEditor(WORSHIP);
+    editor.form.set("title", "Morning Worship");
+    await editor.save();
+    expect(editor.error.value).toBe("The server is away.");
+    expect(editor.dirty.value).toBe(true);
+    editor.reset();
+    expect(editor.error.value).toBeNull();
+  });
+
+  it("is not reset under a save", async () => {
+    let answer = (_: unknown) => {};
+    vi.stubGlobal(
+      "$fetch",
+      vi.fn(() => new Promise<unknown>((resolve) => (answer = resolve))),
+    );
+    const editor = useEventEditor(WORSHIP);
+    editor.form.set("title", "Morning Worship");
+    const saving = editor.save();
+    expect(editor.saving.value).toBe(true);
+    editor.reset();
+    expect(editor.form.payload.title).toBe("Morning Worship");
+    answer({ ...WORSHIP, title: "Morning Worship" });
+    await saving;
+    expect(editor.saving.value).toBe(false);
+  });
 });

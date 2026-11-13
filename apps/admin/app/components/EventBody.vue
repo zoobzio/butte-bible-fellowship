@@ -3,6 +3,7 @@ import type { EventRecord } from "@bbf/schema/types";
 
 import { Editor } from "#components";
 import { computed, useId, useNuxtApp } from "#imports";
+import { useDraft } from "~/composables/drafts";
 import { useEventBody } from "~/composables/events/body";
 </script>
 
@@ -15,6 +16,13 @@ const { $t } = useNuxtApp();
 
 const { editor, view, editing, dirty, saving, error, save, cancel } =
   useEventBody(record);
+
+/*
+ * The page saves the record as a whole, from its bar: the body hands
+ * itself in, with something to put back for as long as it is being edited.
+ */
+const open = computed(() => editing.value || dirty.value);
+useDraft({ dirty, open, saving, error, save, reset: cancel });
 
 const title = useId();
 
@@ -31,25 +39,6 @@ const pt = computed(() => ({
   <section class="event-body" :data-editing="editing || undefined">
     <h2 :id="title" class="event-body-title">{{ $t.admin.event.body() }}</h2>
     <Editor :key="view" :service="editor" :pt="pt" />
-    <p v-if="error" class="event-body-error" role="alert">{{ error }}</p>
-    <div v-if="editing" class="event-body-actions">
-      <button
-        type="button"
-        class="event-body-save"
-        :disabled="saving || !dirty"
-        @click="save"
-      >
-        {{ saving ? $t.admin.editor.saving() : $t.admin.editor.save() }}
-      </button>
-      <button
-        type="button"
-        class="event-body-cancel"
-        :disabled="saving"
-        @click="cancel"
-      >
-        {{ $t.admin.editor.cancel() }}
-      </button>
-    </div>
   </section>
 </template>
 
@@ -195,51 +184,5 @@ const pt = computed(() => ({
   .f-data-editor-content::before {
   content: attr(data-placeholder);
   color: var(--on-surface-muted);
-}
-
-.event-body-error {
-  margin: 0;
-  padding: var(--space-3) var(--space-4);
-  border-radius: var(--shape-sm);
-  background: var(--error-container);
-  color: var(--on-error-container);
-}
-
-.event-body-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-3);
-}
-
-.event-body-save,
-.event-body-cancel {
-  padding: var(--space-3) var(--space-5);
-  border: 1px var(--stroke-solid) transparent;
-  border-radius: var(--shape-full);
-  font: var(--type-label);
-  font-weight: var(--weight-medium);
-  letter-spacing: var(--type-label-letter-spacing);
-  cursor: pointer;
-  transition:
-    background var(--transition-base),
-    color var(--transition-base);
-}
-
-.event-body-save {
-  background: var(--primary);
-  color: var(--on-primary);
-  box-shadow: var(--elevation-low);
-}
-
-.event-body-cancel {
-  background: transparent;
-  border-color: var(--rule);
-  color: var(--on-surface);
-}
-
-.event-body-save:disabled,
-.event-body-cancel:disabled {
-  opacity: 0.6;
-  cursor: default;
 }
 </style>

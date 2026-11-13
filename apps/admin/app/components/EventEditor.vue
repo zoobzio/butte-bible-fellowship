@@ -3,6 +3,7 @@ import type { EventRecord } from "@bbf/schema/types";
 
 import { Form } from "#components";
 import { useNuxtApp } from "#imports";
+import { useDraft } from "~/composables/drafts";
 import { useEventEditor } from "~/composables/events/editor";
 </script>
 
@@ -15,7 +16,19 @@ const emit = defineEmits<{ saved: [record: EventRecord] }>();
 
 const { $t } = useNuxtApp();
 
-const { form, error } = useEventEditor(record, (saved) => emit("saved", saved));
+const { form, error, dirty, saving, save, reset } = useEventEditor(
+  record,
+  (saved) => emit("saved", saved),
+);
+
+/*
+ * A record that exists is saved as a whole, from the bar of the page it is
+ * on, when there is one: the form hands itself in and keeps no button. A
+ * new record, in its dialog, saves from the form's own.
+ */
+const held =
+  record !== null &&
+  useDraft({ dirty, open: dirty, saving, error, save, reset });
 
 /* The browser's own checks stay off: the schema's are the ones shown. */
 const pt = { form: { novalidate: true } };
@@ -25,12 +38,20 @@ const pt = { form: { novalidate: true } };
   <div class="event-editor">
     <Form :service="form" :pt="pt">
       <template #footer="{ settings }">
-        <p v-if="error" class="event-editor-error" role="alert">{{ error }}</p>
-        <button class="event-editor-save" v-bind="settings.submit">
-          {{
-            form.submitting ? $t.admin.editor.saving() : $t.admin.editor.save()
-          }}
-        </button>
+        <template v-if="!held">
+          <p v-if="error" class="event-editor-error" role="alert">
+            {{ error }}
+          </p>
+          <button class="event-editor-save" v-bind="settings.submit">
+            {{
+              form.submitting
+                ? $t.admin.editor.saving()
+                : $t.admin.editor.save()
+            }}
+          </button>
+        </template>
+        <!-- An empty slot would draw the form's own buttons in its place. -->
+        <span v-else hidden />
       </template>
     </Form>
   </div>
