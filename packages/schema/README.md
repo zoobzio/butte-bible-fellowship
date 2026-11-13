@@ -19,14 +19,16 @@ into a query's arguments before it runs.
 
 ```
 src/models/      what the API answers with: one file per kind of thing
+  content.ts     a page of the site as the admin reads it, and a listing of them
   event.ts       an event of the church, the list of them, and the days and times it names
   hast.ts        rich text as the API serves it: an HTML syntax tree of elements and text
   staff.ts       someone who serves the church, the list of them, and their roles
   status.ts      the statuses a sermon passes through
   sermon.ts      a sermon preached at the church, and the list of them
-  page.ts        a page's front matter: its hero, events and image
+  page.ts        a page's front matter: its title, description and image
   slug.ts        what names a thing in an address
 src/input/       what a request carries, one file per group of endpoints
+  content.ts     the site's pages: the id of one, the query of the listing, the metadata and the body of a write
   event.ts       the events: the path of one, the query of the list, the body of a write
   staff.ts       the staff: the id of one, the body of a write
   sermon.ts      the sermons: the path of one, the query of the list, the body of a write
@@ -44,7 +46,7 @@ same name under `input/`. The schemas are `camelCase` values, and
 type is a new schema in the file of its kind, or a new file, exported from
 that directory's `index.ts`, and a type beside it in `types.ts`.
 
-A model is the response: `churchEvent`, `staffMember`, `sermon`, `hero`,
+A model is the response: `churchEvent`, `staffMember`, `sermon`,
 `page`, with `churchEvents`, `staffMembers` and `sermons`, the lists the
 API answers with, and the primitives they are built from — `eventDay`,
 `eventTime`, `slug`, `contentStatus`, `staffRole`, and `hast`, rich text
@@ -61,7 +63,12 @@ save of one never replaces another: `staffBody` is their details,
 `staffBio` their bio, and `staffAvatar` their photo as it is uploaded, a
 JPEG, PNG or WebP file of `STAFF_AVATAR_SIZE` at most. An event is written
 the same way: `eventBody` is its details, `eventArticle` what is written
-about it, and `eventImage` its picture as it is uploaded. An input is one part of a request, named for the
+about it, and `eventImage` its picture as it is uploaded. A page of the site
+is written in two: `contentBody` is its metadata, what a page's front matter
+carried when the pages were Markdown — its slug, `index` for the home page,
+its title and its description — and `contentArticle` what is written on
+it, as `hast`, the site's own blocks among its elements. `contentForm` is
+the metadata as the admin's form holds it. An input is one part of a request, named for the
 group and the part: `eventPath` is the path parameters of one event,
 `eventsQuery` the query of the events list, `eventBody` what a write
 carries. An event is written with the date it is held and whether it is
@@ -90,7 +97,7 @@ here reads TypeScript from a workspace package as it is.
 Every schema is documented where it is declared. A model or a body is
 `.meta({ id, description })`, so the document names it once under
 `components.schemas` and refers to it from every operation that uses it:
-`ChurchEvent`, `StaffMember`, `Sermon`, `Hero`, `Page`, `EventBody`,
+`ChurchEvent`, `StaffMember`, `Sermon`, `Page`, `EventBody`,
 `StaffBody`, `StaffBio`, `SermonBody`. A primitive used by both — `EventDay`, `EventTime`,
 `ContentStatus`, `StaffRole` — is one component too, and so is `Hast`, with
 `HastElement` and `HastText`, which refer to each other as a tree does; rendered the same in a request and a response. A field is
@@ -137,9 +144,10 @@ what it renders: the components, their references, the parameters.
   alone. `@bbf/schema/models/event` and the like reach one file.
 - `@bbf/schema/types`: the type each schema infers, under its `PascalCase`
   name — `ChurchEvent`, `ChurchEvents`, `EventDay`, `EventTime`, `Hast`, `HastElement`,
-  `HastText`, `ContentStatus`, `StaffRole`, `StaffMember`, `StaffMembers`, `Hero`,
+  `HastText`, `ContentStatus`, `StaffRole`, `StaffMember`, `StaffMembers`,
   `Page`, `Sermon`, `Sermons`, `Slug`, `EventPath`, `EventsQuery`,
-  `EventBody`, `StaffId`, `StaffBody`, `StaffBio`, `SermonPath`, `SermonsQuery`,
+  `EventBody`, `ContentRecord`, `ContentBody`, `ContentForm`, `ContentArticle`,
+  `StaffId`, `StaffBody`, `StaffBio`, `SermonPath`, `SermonsQuery`,
   `SermonBody`. Nothing here
   reaches a bundle: a file that only needs the shape imports from here and
   carries no zod.

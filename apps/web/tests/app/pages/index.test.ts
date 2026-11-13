@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { setContentPages, useHead } from "#imports";
+import { setAppConfig, setContentPages, useHead } from "#imports";
 import HomeHero from "~/components/HomeHero.vue";
 import HomeSermons from "~/components/HomeSermons.vue";
 import HomeWeek from "~/components/HomeWeek.vue";
@@ -9,15 +9,7 @@ import Page from "~/pages/index.vue";
 import { document } from "#test/support/content";
 import { mountSuspended } from "@bbf/nuxt/testing/mount";
 
-const HERO = {
-  tagline: "Discover",
-  highlight: "Grace",
-  description: "Join us on Sundays.",
-  cta: { label: "Learn more", to: "/about-us" },
-};
-
-const home = (hero?: typeof HERO) =>
-  document({ title: "Home – Test Church", ...(hero ? { hero } : {}) });
+const home = () => document({ title: "Home – Test Church" });
 
 const SERMON = {
   slug: "abc123",
@@ -27,6 +19,7 @@ const SERMON = {
 };
 
 beforeEach(() => {
+  setAppConfig({ hero: { image: "/images/church.jpg", to: "/about-us" } });
   vi.stubGlobal(
     "$fetch",
     vi.fn(async () => [SERMON]),
@@ -38,29 +31,25 @@ afterEach(() => {
 });
 
 describe("home page", () => {
-  it("opens with the hero from the page's front matter", async () => {
-    setContentPages({ "/": home(HERO) });
-    const { wrapper } = await mountSuspended(Page);
-    expect(wrapper.findComponent(HomeHero).props("hero")).toEqual(HERO);
-  });
-
-  it("renders no hero when the page has none", async () => {
+  it("opens with the hero, which is the interface's own and takes nothing from the page", async () => {
     setContentPages({ "/": home() });
     const { wrapper } = await mountSuspended(Page);
-    expect(wrapper.findComponent(HomeHero).exists()).toBe(false);
+    const hero = wrapper.findComponent(HomeHero);
+    expect(hero.props()).toEqual({});
+    expect(hero.find("h1 em").text()).toBe("Love, Grace & Truth");
   });
 
   it("renders the page body as markdown", async () => {
-    const page = home(HERO);
+    const page = home();
     setContentPages({ "/": page });
     const { wrapper } = await mountSuspended(Page);
     expect(
       wrapper.find("section.prose").findComponent(MarkdownBody).props("page"),
-    ).toEqual({ title: "Home – Test Church", hero: HERO, body: page });
+    ).toEqual({ title: "Home – Test Church", body: page });
   });
 
   it("keeps the site's measure around the hero, the body, the week and the sermons, in that order", async () => {
-    setContentPages({ "/": home(HERO) });
+    setContentPages({ "/": home() });
     const { wrapper } = await mountSuspended(Page);
     expect(
       wrapper
@@ -74,7 +63,7 @@ describe("home page", () => {
   });
 
   it("titles the document after the page", async () => {
-    setContentPages({ "/": home(HERO) });
+    setContentPages({ "/": home() });
     await mountSuspended(Page);
     expect(useHead.mock.calls[0]![0]()).toEqual({
       title: "Home – Test Church",

@@ -66,5 +66,9 @@
   "none": {
     "defaultMessage": "Nothing scheduled",
     "description": "What the events page says when the selected day has no events."
+  },
+  "head": {
+    "defaultMessage": "Events – Butte Bible Fellowship",
+    "description": "The events page's title as the browser's tab and search engines show it: the page, then the church's name."
   }
 }

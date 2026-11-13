@@ -4,6 +4,12 @@ import { createDocument } from "zod-openapi";
 import {
   churchEvent,
   churchEvents,
+  contentArticle,
+  contentBody,
+  contentId,
+  contentListing,
+  contentQuery,
+  contentRecord,
   eventBody,
   eventId,
   eventListing,
@@ -113,6 +119,27 @@ const document = createDocument(
           responses: { 200: json(staffRecord) },
         },
       },
+      "/admin/api/content": {
+        get: {
+          requestParams: { query: contentQuery },
+          responses: { 200: json(contentListing) },
+        },
+        post: {
+          requestBody: {
+            content: { "application/json": { schema: contentBody } },
+          },
+          responses: { 201: json(contentRecord) },
+        },
+      },
+      "/admin/api/content/{id}/body": {
+        patch: {
+          requestParams: { path: contentId },
+          requestBody: {
+            content: { "application/json": { schema: contentArticle } },
+          },
+          responses: { 200: json(contentRecord) },
+        },
+      },
       "/admin/api/events": {
         get: {
           requestParams: { query: eventQuery },
@@ -159,6 +186,10 @@ describe("the components", () => {
   it("name every model and every body", () => {
     expect(Object.keys(schemas).sort()).toEqual([
       "ChurchEvent",
+      "ContentArticle",
+      "ContentBody",
+      "ContentListing",
+      "ContentRecord",
       "ContentStatus",
       "EventBody",
       "EventDay",
@@ -168,7 +199,6 @@ describe("the components", () => {
       "Hast",
       "HastElement",
       "HastText",
-      "Hero",
       "Page",
       "Sermon",
       "SermonBody",
@@ -336,13 +366,15 @@ describe("the components", () => {
     });
   });
 
-  it("nest a model in the page that lists it", () => {
+  it("carry a page's front matter, with neither a hero nor a calendar", () => {
     expect(schemas.Page).toMatchObject({
-      properties: {
-        hero: { $ref: "#/components/schemas/Hero" },
-        events: { items: { $ref: "#/components/schemas/ChurchEvent" } },
-      },
+      properties: { title: { type: "string" } },
     });
+    for (const key of ["hero", "events"]) {
+      expect(schemas.Page, key).not.toMatchObject({
+        properties: { [key]: expect.anything() },
+      });
+    }
   });
 });
 

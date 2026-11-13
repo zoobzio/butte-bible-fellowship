@@ -1,11 +1,8 @@
-import type { Root } from "hast";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { describe, expect, it } from "vitest";
-
-import { setContentPages, setLocale, useHead } from "#imports";
+import { useHead } from "#imports";
 import EventsBrowser from "~/components/EventsBrowser.vue";
 import Page from "~/pages/events/index.vue";
-import { document } from "#test/support/content";
 import { mountSuspended } from "@bbf/nuxt/testing/mount";
 
 const EVENTS = [
@@ -24,42 +21,45 @@ const EVENTS = [
   },
 ];
 
-const EVENTS_PAGE = document({ title: "Events – Test Church", events: EVENTS });
-
-const mountPage = async (page: Root = EVENTS_PAGE) => {
-  setContentPages({ "/events": page });
-  return mountSuspended(Page);
+const mountPage = async (events: unknown = EVENTS) => {
+  const fetch = vi.fn(async () => events);
+  vi.stubGlobal("$fetch", fetch);
+  return { ...(await mountSuspended(Page)), fetch };
 };
 
+afterEach(() => {
+  vi.unstubAllGlobals();
+});
+
 describe("events page", () => {
-  it("hands the page's events to the browser", async () => {
-    const { wrapper } = await mountPage();
+  it("hands the events the API lists to the browser", async () => {
+    const { wrapper, fetch } = await mountPage();
+    expect(fetch).toHaveBeenCalledWith("/api/events");
     expect(wrapper.findComponent(EventsBrowser).props("events")).toEqual(
       EVENTS,
     );
   });
 
-  it("hands the browser no events when the page lists none", async () => {
-    const { wrapper } = await mountPage(
-      document({ title: "Events – Test Church" }),
-    );
+  it("hands the browser no events when the API lists none, or cannot be read", async () => {
+    const { wrapper } = await mountPage([]);
     expect(wrapper.findComponent(EventsBrowser).props("events")).toEqual([]);
+    vi.stubGlobal(
+      "$fetch",
+      vi.fn(async () => {
+        throw new Error("The server is away.");
+      }),
+    );
+    const away = await mountSuspended(Page);
+    expect(away.error).toBeUndefined();
+    expect(away.wrapper.findComponent(EventsBrowser).props("events")).toEqual(
+      [],
+    );
   });
 
-  it("titles the document after the page, whatever language is read", async () => {
-    setLocale("es");
+  it("titles the document with the page's own message: it is no content", async () => {
     await mountPage();
     expect(useHead.mock.calls[0]![0]()).toEqual({
-      title: "Events – Test Church",
+      title: "Events – Butte Bible Fellowship",
     });
-  });
-
-  it("throws a 404 when the page does not exist", async () => {
-    const { wrapper, error } = await mountSuspended(Page);
-    expect(error).toMatchObject({
-      statusCode: 404,
-      message: "Page not found",
-    });
-    expect(wrapper.findComponent(EventsBrowser).exists()).toBe(false);
   });
 });

@@ -3,12 +3,15 @@ import type { StaffBody, StaffRecord } from "@bbf/schema/types";
 import type { Arguments, Row } from "bezoar";
 
 import type {
+  toContentArguments,
   toEventArguments,
   toSermonArguments,
   toStaffArguments,
 } from "../src/dao";
 import {
   toChurchEvent,
+  toContentDocument,
+  toContentRecord,
   toEventRecord,
   toSermon,
   toStaffMember,
@@ -22,6 +25,9 @@ declare const upcoming: Row<Contract, "web.events.upcoming">;
 declare const fetched: Row<Contract, "web.events.fetch">;
 declare const adminEvent: Row<Contract, "admin.events.fetch">;
 declare const adminEvents: Row<Contract, "admin.events.list">;
+declare const webContent: Row<Contract, "web.content.fetch">;
+declare const adminContent: Row<Contract, "admin.content.fetch">;
+declare const adminContentList: Row<Contract, "admin.content.list">;
 declare const webStaff: Row<Contract, "web.staff.list">;
 declare const adminStaff: Row<Contract, "admin.staff.fetch">;
 declare const adminStaffList: Row<Contract, "admin.staff.list">;
@@ -35,11 +41,20 @@ export const events = [listed, weekly, upcoming, fetched, adminEvent].map(
 export const staff = [webStaff, adminStaff].map(toStaffMember);
 export const sermons = [listedSermon, fetchedSermon, adminSermon].map(toSermon);
 
+export const contentDocuments = [webContent, adminContent].map(
+  toContentDocument,
+);
+export const contentRecords = [adminContent, adminContentList].map(
+  toContentRecord,
+);
 export const eventRecords = [adminEvent, adminEvents].map(toEventRecord);
 export const staffRecords = [adminStaff, adminStaffList].map(toStaffRecord);
 
 // @ts-expect-error Site row is not a record.
 export const noRecord = toStaffRecord(webStaff);
+
+// @ts-expect-error Site row has no id.
+export const noContentRecord = toContentRecord(webContent);
 
 // @ts-expect-error Site list row has no id.
 export const noEventRecord = toEventRecord(listed);
@@ -49,6 +64,14 @@ export const noStart = toChurchEvent({ slug: "x", title: "x" });
 
 // @ts-expect-error Date is required.
 export const noDate = toSermon({ slug: "x", title: "x" });
+
+declare const contentArguments: ReturnType<typeof toContentArguments>;
+export const createContent: Arguments<Contract, "admin.content.create"> =
+  contentArguments;
+export const updateContent: Arguments<Contract, "admin.content.update"> = {
+  ...contentArguments,
+  id: 1,
+};
 
 declare const eventArguments: ReturnType<typeof toEventArguments>;
 declare const staffArguments: ReturnType<typeof toStaffArguments>;

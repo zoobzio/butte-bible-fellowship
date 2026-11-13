@@ -6,6 +6,8 @@ export default defineConfig({
   issuers: { google: "./src/issuers/google.json" },
   describe: {
     scopes: {
+      "content:read": "View the site's pages",
+      "content:write": "Create, edit and remove the site's pages",
       "events:read": "View events",
       "events:write": "Create, edit and remove events",
       "staff:read": "View staff",

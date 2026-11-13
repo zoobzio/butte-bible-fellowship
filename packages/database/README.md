@@ -7,7 +7,10 @@ Postgres in memory, describes every query, and writes `.output/`, which is
 what this package exports. An app imports the build and has the database:
 the kit and the sources never reach it.
 
-The tables are the site's three kinds of data: `staff`, who serve the
+The tables are the site's four kinds of data: `content`, the pages whose
+words are written in the admin, the home page and About Us, each named by its
+slug with the title and description its front matter carried and what is
+written on it; `staff`, who serve the
 church, each in a `staff_role` — pastor, elder, staff — which is also the
 order the site lists them in; `events`, each held on a date, and every
 week on that date's day of the week when it is `recurring`, with the page
@@ -15,8 +18,8 @@ written about it; and `sermons`, each preached on a day, with the page
 written about it and its recording on the church's YouTube channel. Beside them, `users` is who may sign in to the admin app.
 A sermon carries a `content_status` — draft, published, archived — and
 only the published reaches the site; the staff and the events carry none,
-and whoever is on the staff, and whatever event is written, is on the
-site.
+and whoever is on the staff, and whatever event or page is written, is on
+the site.
 
 The queries are grouped by the app that runs them. `web` is the reads the
 site needs and nothing else; `admin` is the full set of reads and writes
@@ -30,9 +33,9 @@ would not have offered.
 
 ```
 bezoar.config.ts   the kit config: the output directory, the defaults for the rest
-src/migrations/    the schema, forward only: staff, events, sermons, users, staff search, like escape, search cost, staff status, events search, events trim
-src/seeds/         the staff and events the content lists, and the first admin user, each safe to run again
-src/queries/web/   what the site reads: staff, events, sermons
+src/migrations/    the schema, forward only: staff, events, sermons, users, staff search, like escape, search cost, staff status, events search, events trim, content
+src/seeds/         the staff, the events, the first admin user and the site's pages, each safe to run again
+src/queries/web/   what the site reads: content, staff, events, sermons
 src/queries/admin/ what the admin app will read and write: the same, in full
 src/roles/         what each app's role may do: web reads, admin reads and writes
 tests/             the build, run through @bezoar/testing
@@ -118,6 +121,21 @@ then the one-offs by date. An event's day of the week is never stored:
 `admin.sermons` has `list`, `fetch`, `create`, `update` and `delete`, by
 `id`.
 
+`web.content.fetch` is a page by its slug, `index` for the home page, with
+its title, description and body, and `web.content.list` the slug of
+every page. `admin.content` has `list`, `fetch`, `create`, `update` and
+`delete`, by `id`, and `body`, what is written on the page, on its own:
+`create` and `update` write the metadata — the slug, the title and the
+description — and leave the body alone. Its `list` is searched
+as the others are: `q` looked for in the `search` column the content
+migration keeps, the title, the slug, the description and the text of
+the body as one text; the text filters on the `title`,
+`slug` and `description`; the day filters on the days it was `updated` and
+`created`; and `sort` names `title`, `slug`, `created_at` or `updated_at`,
+the pages by slug after any sort. The
+seed writes the two pages that were Markdown with words of their own, the
+home page and About Us, each body the tree its build made.
+
 `admin.users` has the same, and two more for signing in. A user is added
 by their email and a `user_role` — `admin` or `editor`, the roles of
 `@bbf/patents` — and is bound to Google's subject (`sub`) the first time
@@ -152,10 +170,10 @@ the next run. The build declares each role before the migrations and
 applies its grants after them, and then plans every query as every role,
 so the contract carries, by role, the queries the role may run.
 
-`web` has `SELECT` on `staff`, `events` and `sermons`, and nothing else.
+`web` has `SELECT` on `content`, `staff`, `events` and `sermons`, and nothing else.
 It may run every read of them, the admin app's plain reads among them, and
 no write; it may not read `users` at all. `admin` has `SELECT`, `INSERT`,
-`UPDATE` and `DELETE` on the four tables, and may run every query. Each `id` is an identity column, which
+`UPDATE` and `DELETE` on the five tables, and may run every query. Each `id` is an identity column, which
 Postgres fills without a privilege on its sequence, so the tables are the
 whole of each grant.
 

@@ -254,28 +254,7 @@
         "translation": "a95b5ea413d27584"
       }
     },
-    "documents": {
-      "about-us.md": {
-        "source": "021d9d823fe10014",
-        "translation": "530d8660b313618c"
-      },
-      "connect.md": {
-        "source": "5528083757c918d1",
-        "translation": "5b9724368f07fec6"
-      },
-      "events.md": {
-        "source": "90ea48beea76bd86",
-        "translation": "446c18f0df95285b"
-      },
-      "index.md": {
-        "source": "44993a8408151cc5",
-        "translation": "0e00059440017feb"
-      },
-      "sermons.md": {
-        "source": "74609402433942d4",
-        "translation": "b7d761dec8d4bd45"
-      }
-    }
+    "documents": {}
   },
   "fr": {
     "messages": {
@@ -529,27 +508,6 @@
         "translation": "5e75230b8374ae63"
       }
     },
-    "documents": {
-      "about-us.md": {
-        "source": "021d9d823fe10014",
-        "translation": "5653c430c065cfbf"
-      },
-      "connect.md": {
-        "source": "5528083757c918d1",
-        "translation": "7744f7b24a5372eb"
-      },
-      "events.md": {
-        "source": "90ea48beea76bd86",
-        "translation": "268676d23bc7520d"
-      },
-      "index.md": {
-        "source": "44993a8408151cc5",
-        "translation": "fa4ac12c76d43492"
-      },
-      "sermons.md": {
-        "source": "74609402433942d4",
-        "translation": "4a1cfb88f0407dd4"
-      }
-    }
+    "documents": {}
   }
 }

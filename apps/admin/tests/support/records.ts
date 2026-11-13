@@ -1,4 +1,8 @@
-import type { EventRecord, StaffRecord } from "@bbf/schema/types";
+import type {
+  ContentRecord,
+  EventRecord,
+  StaffRecord,
+} from "@bbf/schema/types";
 
 export const BIO = {
   type: "root" as const,
@@ -47,6 +51,24 @@ export const DINNER: EventRecord = {
   day: "saturday",
   recurring: false,
   start: "17:30",
+  createdAt: "2026-10-17T18:00:00.000Z",
+  updatedAt: "2026-10-17T18:00:00.000Z",
+};
+
+export const HOME: ContentRecord = {
+  id: 5,
+  slug: "index",
+  title: "Butte Bible Fellowship",
+  description: "A local church in Chico.",
+  body: BIO,
+  createdAt: "2026-10-17T18:00:00.000Z",
+  updatedAt: "2026-10-18T09:30:00.000Z",
+};
+
+export const ABOUT: ContentRecord = {
+  id: 6,
+  slug: "about-us",
+  title: "About Us",
   createdAt: "2026-10-17T18:00:00.000Z",
   updatedAt: "2026-10-17T18:00:00.000Z",
 };

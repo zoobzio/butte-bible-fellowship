@@ -1,8 +1,8 @@
 <script lang="ts">
-import { createError, definePageMeta, useHead, useNuxtApp } from "#imports";
+import { definePageMeta, useHead, useNuxtApp } from "#imports";
 
 import EventsBrowser from "~/components/EventsBrowser.vue";
-import { usePage } from "~/composables/page";
+import { useEvents } from "~/composables/events";
 </script>
 
 <script setup lang="ts">
@@ -12,18 +12,11 @@ definePageMeta({
 
 const { $t } = useNuxtApp();
 
-const { data: page } = await usePage("/events");
+useHead(() => ({ title: $t.events.head() }));
 
-if (!page.value) {
-  throw createError({
-    statusCode: 404,
-    message: $t.page.notFound(),
-  });
-}
-
-useHead(() => ({ title: page.value?.title }));
+const events = await useEvents();
 </script>
 
 <template>
-  <EventsBrowser v-if="page" :events="page.events" />
+  <EventsBrowser :events="events" />
 </template>

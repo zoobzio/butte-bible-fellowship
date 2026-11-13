@@ -19,9 +19,6 @@ const list = (directory: string, extension: string) =>
     .sort();
 
 const { source: locale, targets = [] } = config.translate;
-const content =
-  typeof config.content === "string" ? config.content : config.content!.dir;
-
 const source = Object.fromEntries(
   list(config.messages, ".json").flatMap((file) =>
     Object.entries(
@@ -32,20 +29,6 @@ const source = Object.fromEntries(
     ]),
   ),
 );
-
-const pages = list(content, ".md");
-
-const titleOf = (page: string) =>
-  /^title: (.*)$/m.exec(read(`${content}/${page}`))?.[1];
-
-const built = (locale: string, page: string) =>
-  JSON.parse(
-    read(`.output/content/${locale}/${page.replace(/\.md$/, ".json")}`),
-  ) as {
-    type: string;
-    data?: { matter?: Record<string, unknown> };
-    children: { type: string; tagName?: string; properties?: object }[];
-  };
 
 let index: typeof import("../.output/index.mjs");
 let bundles: typeof import("../.output/bundles.mjs");
@@ -110,6 +93,7 @@ describe("bundles", () => {
       "admin.editor.confirm",
       "admin.member.photoConfirm",
       "admin.event.imageConfirm",
+      "connect.map",
     ];
     for (const [key, message] of Object.entries(source)) {
       if (!taking.includes(key)) {
@@ -144,6 +128,9 @@ describe("bundles", () => {
       [1, 2, 3, 4, 5].map((week) => prosary.format("events.week", { week })),
     ).toEqual(["first", "second", "third", "fourth", "fifth"]);
     expect(
+      prosary.format("connect.map", { address: "2255 Pillsbury Road" }),
+    ).toBe("Map to 2255 Pillsbury Road");
+    expect(
       prosary.format("admin.editor.confirm", { name: "Harvest Dinner" }),
     ).toBe("Delete Harvest Dinner? This cannot be undone.");
     expect(
@@ -156,59 +143,11 @@ describe("bundles", () => {
 });
 
 describe("content", () => {
-  it("lists every page", () => {
-    expect([...index.documents]).toEqual(pages);
+  it("builds no page: the site's pages are the database's", () => {
+    expect([...index.documents]).toEqual([]);
   });
 
-  it("builds every page, in every locale, as the tree the app renders", () => {
-    expect(index.content.output).toBe("hast");
-    for (const target of index.locales) {
-      for (const page of pages) {
-        expect(built(target, page).type, `${target}/${page}`).toBe("root");
-      }
-    }
-  });
-
-  it("carries each page's front matter on its root, as authored", () => {
-    for (const page of pages) {
-      expect(built(locale, page).data?.matter?.title, page).toBe(titleOf(page));
-    }
-  });
-
-  it("gives every heading an id, for a page's table of contents", () => {
-    const headings = built(locale, "about-us.md").children.filter(
-      (node) => node.type === "element" && /^h[1-6]$/.test(node.tagName!),
-    );
-    expect(headings.length).toBeGreaterThan(0);
-    for (const heading of headings) {
-      expect(heading.properties).toHaveProperty("id");
-    }
-  });
-
-  it("builds the site's blocks as the components the app renders", () => {
-    const marked = (locale: string, page: string): string[] => {
-      const names: string[] = [];
-      const walk = (node: { properties?: object; children?: unknown[] }) => {
-        const directive = (node.properties as { dataDirective?: string })
-          ?.dataDirective;
-        if (directive !== undefined) names.push(directive);
-        for (const child of node.children ?? []) walk(child as typeof node);
-      };
-      walk(built(locale, page));
-      return names;
-    };
-    expect(marked(locale, "connect.md")).toEqual([
-      "connect-grid",
-      "connect-card",
-      "connect-card",
-      "map-embed",
-    ]);
-    expect(marked(locale, "index.md")).toEqual([
-      "invite-grid",
-      "invite-card",
-      "invite-card",
-      "invite-card",
-    ]);
-    expect(marked(locale, "about-us.md")).toEqual([]);
+  it("names the form a page is served in, and what marks one of its blocks", () => {
+    expect(index.content).toEqual({ output: "hast", marker: "dataDirective" });
   });
 });

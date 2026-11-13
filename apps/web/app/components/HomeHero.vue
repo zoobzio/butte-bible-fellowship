@@ -1,13 +1,18 @@
 <script lang="ts">
-import type { Hero } from "@bbf/schema/types";
-
 import { NuxtLink } from "#components";
+import { useAppConfig, useNuxtApp } from "#imports";
 </script>
 
 <script setup lang="ts">
 defineOptions({ name: "HomeHero" });
 
-const { hero } = defineProps<{ hero: Hero }>();
+/*
+ * What the home page opens with. Its words are the interface's own, so
+ * they are messages, translated with the rest; its picture and where its
+ * button leads are the app's config.
+ */
+const { $t } = useNuxtApp();
+const { hero } = useAppConfig();
 </script>
 
 <template>
@@ -15,16 +20,16 @@ const { hero } = defineProps<{ hero: Hero }>();
     <section class="home-hero-body">
       <div class="home-hero-content">
         <h1 class="page-title">
-          {{ hero.tagline }}
-          <em v-if="hero.highlight">{{ hero.highlight }}</em>
+          {{ $t.home.tagline() }}
+          <em>{{ $t.home.highlight() }}</em>
         </h1>
-        <p v-if="hero.description">{{ hero.description }}</p>
-        <NuxtLink v-if="hero.cta" :to="hero.cta.to" class="cta">
-          {{ hero.cta.label }}
+        <p>{{ $t.home.description() }}</p>
+        <NuxtLink :to="hero.to" class="cta">
+          {{ $t.home.cta() }}
         </NuxtLink>
       </div>
       <div class="home-hero-media arch">
-        <img v-if="hero.image" :src="hero.image" alt="" />
+        <img :src="hero.image" alt="" />
       </div>
     </section>
   </div>

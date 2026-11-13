@@ -1,6 +1,10 @@
 import type { Contract } from "@bbf/database";
 import type { Arguments, Row } from "bezoar";
 
+export type ContentRow = Row<Contract, "web.content.fetch">;
+
+export type ContentRecordRow = Row<Contract, "admin.content.fetch">;
+
 type EventColumns = Row<Contract, "web.events.fetch">;
 
 export type EventRow = Omit<EventColumns, "body"> &
@@ -16,6 +20,8 @@ type SermonColumns = Row<Contract, "web.sermons.fetch">;
 
 export type SermonRow = Omit<SermonColumns, "body"> &
   Partial<Pick<SermonColumns, "body">>;
+
+export type ContentArguments = Arguments<Contract, "admin.content.create">;
 
 export type EventArguments = Arguments<Contract, "admin.events.create">;
 

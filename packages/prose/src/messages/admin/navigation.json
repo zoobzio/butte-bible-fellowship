@@ -6,5 +6,9 @@
   "events": {
     "defaultMessage": "Events",
     "description": "The header link to the list of events."
+  },
+  "content": {
+    "defaultMessage": "Content",
+    "description": "The header link to the list of the site's pages."
   }
 }

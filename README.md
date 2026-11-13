@@ -51,20 +51,35 @@ host, by the package's `prepare` script.
 
 ## Content
 
-The pages are Markdown in [`@bbf/prose`](packages/prose), which builds every
-one for every locale as the tree the app renders, its front matter on the
-root. `@prosary/nuxt` serves them, and `usePage` fetches the one the route
-names in the route's locale, checking its front matter against
-[`@bbf/schema`](packages/schema). A page's body renders through the
-module's `<Prose>`, with the components under `app/components/prose/` in
-place of the elements and blocks they are named for: `A.vue` renders every
-link as a NuxtLink in the reader's locale, `InviteCard.vue` every
-`:::invite-card` block. The images the pages show are in
+What the home page and About Us say is content: rows of
+[`@bbf/database`](packages/database)'s `content` table, each named by its
+slug, `index` for the home page, with the title and the description its
+front matter carried when it was Markdown, and what is written on it as
+rich text. The admin's Content section lists them in a table that
+searches every word of them, and each opens on a page of its own: its
+metadata in a form on the left, what is written on it in an editor on the
+right, the site's own blocks — an `invite-card` — kept as they are through
+an edit.
+
+The site answers for a page where a built one was served, from
+`server/routes/i18n/[...path].ts`, and `usePage` fetches the one the route
+names, checking its front matter against [`@bbf/schema`](packages/schema).
+A page's body renders through the module's `<Prose>`, with the components
+under `app/components/prose/` in place of the elements and blocks they are
+named for: `A.vue` renders every link as a NuxtLink in the reader's locale,
+`InviteCard.vue` every `invite-card` block. A page the admin adds that has
+no layout of its own is served at `/<slug>` by `app/pages/[page].vue`, as
+it is written. The images the pages show are in
 [`@bbf/assets`](packages/assets), served from the site's root.
 
-Pages are edited in the repository, under `packages/prose/src/content`. Run
-`pnpm --filter @bbf/prose translate` afterwards to bring the translations up
-to date, or let CI do it on the pull request.
+The hero the home page opens with is not content either: `HomeHero.vue`
+writes it from the messages of `home.json`, with its picture and where its
+button leads in `app.config.ts`. Connect, Events and Sermons are not
+content: each is its own layout over
+the staff, the events and the sermons the API serves, and its title, with
+the connect page's cards, is a message of [`@bbf/prose`](packages/prose),
+translated with the rest of the interface. What is content is written in
+one language, as an event is.
 
 ## Language
 

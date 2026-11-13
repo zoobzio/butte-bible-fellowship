@@ -1,16 +1,9 @@
 <script lang="ts">
-import {
-  computed,
-  createError,
-  definePageMeta,
-  useHead,
-  useNuxtApp,
-} from "#imports";
+import { computed, definePageMeta, useHead, useNuxtApp } from "#imports";
 
 import PageHeader from "~/components/PageHeader.vue";
 import SermonCard from "~/components/SermonCard.vue";
 import SermonGrid from "~/components/SermonGrid.vue";
-import { usePage } from "~/composables/page";
 import { useSermons } from "~/composables/sermons";
 </script>
 
@@ -21,16 +14,7 @@ definePageMeta({
 
 const { $t } = useNuxtApp();
 
-const { data: page } = await usePage("/sermons");
-
-if (!page.value) {
-  throw createError({
-    statusCode: 404,
-    message: $t.page.notFound(),
-  });
-}
-
-useHead(() => ({ title: page.value?.title }));
+useHead(() => ({ title: $t.sermons.head() }));
 
 const { data: sermons } = await useSermons();
 
@@ -39,7 +23,7 @@ const rest = computed(() => sermons.value?.slice(1) ?? []);
 </script>
 
 <template>
-  <div v-if="page" class="sermons">
+  <div class="sermons">
     <PageHeader
       :title="$t.sermons.title()"
       :description="$t.sermons.description()"

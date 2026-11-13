@@ -10,18 +10,20 @@ import type { PageItem } from "~/types/page";
 
 import type { ChurchEvent, EventDay } from "@bbf/schema/types";
 
+import { churchEvents } from "@bbf/schema";
+
 import {
   computed,
   onMounted,
   ref,
   toValue,
   useAppConfig,
+  useAsyncData,
   useLocale,
   useNuxtApp,
   useRoute,
   useState,
 } from "#imports";
-import { usePage } from "~/composables/page";
 import { emailHref, phoneHref } from "~/utils/contact";
 import {
   addMonths,
@@ -48,10 +50,20 @@ export const useToday = (): Ref<string> => {
   return today;
 };
 
+/**
+ * The events the church holds, from the API: the weekly ones, then the
+ * one-offs to come. None when they cannot be read.
+ */
 export const useEvents = async (): Promise<ComputedRef<ChurchEvent[]>> => {
-  const { data } = await usePage("/events");
+  const { data } = await useAsyncData("events", async () => {
+    try {
+      return churchEvents.parse(await $fetch("/api/events"));
+    } catch {
+      return [];
+    }
+  });
 
-  return computed(() => data.value?.events ?? []);
+  return computed(() => data.value ?? []);
 };
 
 export const useEventsHeldOn = (

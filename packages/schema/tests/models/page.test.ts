@@ -1,23 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { hero, page } from "../../src/models/page";
-
-describe("hero", () => {
-  it("needs only a tagline", () => {
-    expect(hero.parse({ tagline: "Welcome" })).toEqual({ tagline: "Welcome" });
-  });
-
-  it("carries a call to action with a label and a destination", () => {
-    const value = {
-      tagline: "Welcome",
-      cta: { label: "Visit", to: "/connect" },
-    };
-    expect(hero.parse(value)).toEqual(value);
-    expect(
-      hero.safeParse({ tagline: "Welcome", cta: { label: "Visit" } }).success,
-    ).toBe(false);
-  });
-});
+import { page } from "../../src/models/page";
 
 describe("page", () => {
   it("needs only a title", () => {
@@ -25,19 +8,16 @@ describe("page", () => {
     expect(page.safeParse({}).success).toBe(false);
   });
 
-  it("accepts the events page's calendar", () => {
-    const value = {
-      title: "Events",
-      events: [
-        {
-          slug: "worship-service",
-          title: "Worship Service",
-          day: "sunday",
-          start: "10:00",
-        },
-      ],
-    };
-    expect(page.parse(value)).toEqual(value);
+  it("carries no hero: the home page's is the interface's own", () => {
+    expect(page.parse({ title: "Home", hero: { tagline: "Welcome" } })).toEqual(
+      { title: "Home" },
+    );
+  });
+
+  it("carries no calendar: the site reads the events from its API", () => {
+    expect(
+      page.parse({ title: "Events", events: [{ title: "Worship Service" }] }),
+    ).toEqual({ title: "Events" });
   });
 
   it("carries no staff: the site reads them from its API", () => {

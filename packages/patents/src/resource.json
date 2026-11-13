@@ -2,6 +2,8 @@
   "resource": "https://admin.bbf.example",
   "authorization_servers": ["https://accounts.google.com"],
   "scopes_supported": [
+    "content:read",
+    "content:write",
     "events:read",
     "events:write",
     "staff:read",

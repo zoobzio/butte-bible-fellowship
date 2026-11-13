@@ -1,6 +1,15 @@
 import type { z } from "zod";
 
 import type {
+  contentArticle,
+  contentBody,
+  contentForm,
+  contentId,
+  contentPath,
+  contentQuery,
+  contentSort,
+} from "./input/content";
+import type {
   eventArticle,
   eventBody,
   eventForm,
@@ -25,6 +34,7 @@ import type {
   staffQuery,
   staffSort,
 } from "./input/staff";
+import type { contentListing, contentRecord } from "./models/content";
 import type {
   churchEvent,
   churchEvents,
@@ -34,7 +44,7 @@ import type {
   eventTime,
 } from "./models/event";
 import type { hast, hastElement, hastText } from "./models/hast";
-import type { hero, page } from "./models/page";
+import type { page } from "./models/page";
 import type { sermon, sermons } from "./models/sermon";
 import type { slug } from "./models/slug";
 import type {
@@ -82,9 +92,25 @@ export type Sermon = z.infer<typeof sermon>;
 
 export type Sermons = z.infer<typeof sermons>;
 
-export type Hero = z.infer<typeof hero>;
-
 export type Page = z.infer<typeof page>;
+
+export type ContentRecord = z.infer<typeof contentRecord>;
+
+export type ContentListing = z.infer<typeof contentListing>;
+
+export type ContentPath = z.infer<typeof contentPath>;
+
+export type ContentId = z.infer<typeof contentId>;
+
+export type ContentSort = z.infer<typeof contentSort>;
+
+export type ContentQuery = z.infer<typeof contentQuery>;
+
+export type ContentBody = z.infer<typeof contentBody>;
+
+export type ContentForm = z.infer<typeof contentForm>;
+
+export type ContentArticle = z.infer<typeof contentArticle>;
 
 export type EventPath = z.infer<typeof eventPath>;
 

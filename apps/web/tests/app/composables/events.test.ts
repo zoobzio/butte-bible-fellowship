@@ -10,7 +10,6 @@ import type { ChurchEvent } from "@bbf/schema/types";
 import {
   requestedDocuments,
   setAppConfig,
-  setContentPages,
   setLocale,
   setRoutePath,
   useState,
@@ -521,28 +520,33 @@ describe("useEventCalendar", () => {
   });
 });
 
-describe("useEvents", () => {
-  const EVENTS_PAGE = document({ title: "Events", events: [WORSHIP] });
+/** The API listing the events given, or away when there are none to give. */
+const listEvents = (events?: unknown) => {
+  const fetch = vi.fn(async () => {
+    if (events === undefined) throw new Error("The server is away.");
+    return events;
+  });
+  vi.stubGlobal("$fetch", fetch);
+  return fetch;
+};
 
-  it("reads the events off the events page, whichever page asks", async () => {
-    setContentPages({ "/events": EVENTS_PAGE });
+describe("useEvents", () => {
+  it("reads the events from the API, whichever page asks, and no page of content", async () => {
+    const fetch = listEvents([WORSHIP]);
     setRoutePath("/connect");
     const events = await useEvents();
     expect(events.value).toEqual([WORSHIP]);
+    expect(fetch).toHaveBeenCalledWith("/api/events");
+    expect(requestedDocuments).toEqual([]);
   });
 
-  it("reads them in the reader's language", async () => {
-    setContentPages({ "/events": EVENTS_PAGE });
-    setLocale("es");
-    setRoutePath("/connect");
-    await useEvents();
-    expect(requestedDocuments).toEqual(["es/events.json"]);
-  });
-
-  it("has none when the events page cannot be read, or lists none", async () => {
+  it("has none when the events cannot be read, the API lists none, or what it lists is no event", async () => {
     setRoutePath("/");
+    listEvents();
     expect((await useEvents()).value).toEqual([]);
-    setContentPages({ "/events": document({ title: "Events" }) });
+    listEvents([]);
+    expect((await useEvents()).value).toEqual([]);
+    listEvents([{ title: "No slug, no start" }]);
     expect((await useEvents()).value).toEqual([]);
   });
 });
@@ -666,13 +670,10 @@ describe("useEvent", () => {
     day: "thursday",
     start: "10:00",
   };
-  const EVENTS_PAGE = document({
-    title: "Events",
-    events: [WORSHIP, PRAYER, DINNER],
-  });
+  const EVENTS = [WORSHIP, PRAYER, DINNER];
 
   it("is the event the address names, by its title's slug or its own", async () => {
-    setContentPages({ "/events": EVENTS_PAGE });
+    listEvents(EVENTS);
     setRoutePath("/events/harvest-dinner");
     expect((await useEvent()).value).toEqual(DINNER);
     setRoutePath("/events/prayer-meeting");
@@ -680,7 +681,7 @@ describe("useEvent", () => {
   });
 
   it("follows the route", async () => {
-    setContentPages({ "/events": EVENTS_PAGE });
+    listEvents(EVENTS);
     setRoutePath("/events/harvest-dinner");
     const event = await useEvent();
     setRoutePath("/events/worship-service");
@@ -688,10 +689,10 @@ describe("useEvent", () => {
   });
 
   it("is none when no event has the slug, or the events cannot be read", async () => {
-    setContentPages({ "/events": EVENTS_PAGE });
+    listEvents(EVENTS);
     setRoutePath("/events/nope");
     expect((await useEvent()).value).toBeUndefined();
-    setContentPages({});
+    listEvents();
     setRoutePath("/events/harvest-dinner");
     expect((await useEvent()).value).toBeUndefined();
   });

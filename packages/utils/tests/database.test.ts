@@ -4,8 +4,12 @@ import { queries } from "@bbf/database/queries";
 import { seeds } from "@bbf/database/seeds";
 import {
   churchEvent,
+  contentBody,
+  contentRecord,
   eventBody,
   eventRecord,
+  hast,
+  page,
   sermon,
   sermonBody,
   staffBody,
@@ -18,12 +22,15 @@ import { pg_trgm } from "@electric-sql/pglite/contrib/pg_trgm";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import {
+  toContentArguments,
   toEventArguments,
   toSermonArguments,
   toStaffArguments,
 } from "../src/dao";
 import {
   toChurchEvent,
+  toContentDocument,
+  toContentRecord,
   toEventRecord,
   toSermon,
   toStaffMember,
@@ -42,6 +49,77 @@ beforeAll(async () => {
 });
 
 afterAll(() => db.close());
+
+describe("content", () => {
+  it("reads every seeded page as a document the schema accepts, its headings with ids", async () => {
+    for (const { slug } of await db.web.content.list()) {
+      const row = await db.web.content.fetch.first({ slug });
+      const document = toContentDocument(row!);
+      expect(page.parse(document.data.matter), slug).toEqual(
+        document.data.matter,
+      );
+      expect(hast.safeParse(document).success, slug).toBe(true);
+    }
+    const about = toContentDocument(
+      (await db.web.content.fetch.first({ slug: "about-us" }))!,
+    );
+    expect(about.children[0]).toMatchObject({
+      tagName: "h1",
+      properties: { id: "our-vision" },
+    });
+    const home = toContentDocument(
+      (await db.web.content.fetch.first({ slug: "index" }))!,
+    );
+    expect(home.data.matter).toEqual({
+      title: "Butte Bible Fellowship – The Church on Pillsbury Road",
+      description: "A non-denominational local church in Chico, California.",
+    });
+  });
+
+  it("writes a page from its body, and reads it back as the admin and the site do", async () => {
+    const body = contentBody.parse({
+      slug: "membership",
+      title: "Membership",
+      description: "How to join.",
+    });
+    const created = await db.admin.content.create.first(
+      toContentArguments(body),
+    );
+    const id = created!.id;
+    const record = toContentRecord(
+      (await db.admin.content.fetch.first({ id }))!,
+    );
+    expect(contentRecord.parse(record)).toEqual(record);
+    expect(record).toMatchObject({
+      id,
+      slug: "membership",
+      description: "How to join.",
+    });
+    expect(record.body).toBeUndefined();
+
+    expect(
+      toContentDocument(
+        (await db.web.content.fetch.first({ slug: "membership" }))!,
+      ),
+    ).toEqual({
+      type: "root",
+      data: { matter: { title: "Membership", description: "How to join." } },
+      children: [],
+    });
+
+    await db.admin.content.update({
+      ...toContentArguments(
+        contentBody.parse({ ...body, description: undefined }),
+      ),
+      id,
+    });
+    expect(
+      toContentRecord((await db.admin.content.fetch.first({ id }))!)
+        .description,
+    ).toBeUndefined();
+    await db.admin.content.delete({ id });
+  });
+});
 
 describe("events", () => {
   const all = {

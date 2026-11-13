@@ -29,7 +29,7 @@ useHead(() => ({ title: page.value?.title }));
 
 <template>
   <div v-if="page" class="home">
-    <HomeHero v-if="page.hero" :hero="page.hero" />
+    <HomeHero />
 
     <section class="prose">
       <MarkdownBody :page="page" />

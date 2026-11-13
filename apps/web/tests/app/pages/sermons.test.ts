@@ -1,14 +1,11 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { setContentPages, setLocale, useHead, useNuxtApp } from "#imports";
+import { useHead, useNuxtApp } from "#imports";
 import PageHeader from "~/components/PageHeader.vue";
 import SermonCard from "~/components/SermonCard.vue";
 import SermonGrid from "~/components/SermonGrid.vue";
 import Page from "~/pages/sermons.vue";
-import { document } from "#test/support/content";
 import { mountSuspended } from "@bbf/nuxt/testing/mount";
-
-const SERMONS_PAGE = document({ title: "Sermons – Test Church" });
 
 const sermon = (slug: string) => ({
   slug,
@@ -24,7 +21,6 @@ const mountPage = async (sermons = SERMONS) => {
     "$fetch",
     vi.fn(async () => sermons),
   );
-  setContentPages({ "/sermons": SERMONS_PAGE });
   return mountSuspended(Page);
 };
 
@@ -68,20 +64,10 @@ describe("sermons page", () => {
     expect(wrapper.findComponent(SermonGrid).props("sermons")).toEqual([]);
   });
 
-  it("titles the document after the page, whatever language is read", async () => {
-    setLocale("es");
+  it("titles the document with the page's own message: it is no content", async () => {
     await mountPage();
     expect(useHead.mock.calls[0]![0]()).toEqual({
-      title: "Sermons – Test Church",
+      title: "Sermons – Butte Bible Fellowship",
     });
-  });
-
-  it("throws a 404 when the page does not exist", async () => {
-    const { wrapper, error } = await mountSuspended(Page);
-    expect(error).toMatchObject({
-      statusCode: 404,
-      message: "Page not found",
-    });
-    expect(wrapper.find(".sermons").exists()).toBe(false);
   });
 });

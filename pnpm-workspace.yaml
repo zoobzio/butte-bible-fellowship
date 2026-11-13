@@ -21,6 +21,7 @@ catalog:
   "@prosary/nuxt": "0.0.11"
   "@prosary/parse": "0.0.11"
   "@prosary/translate": "0.0.11"
+  "@tiptap/core": "3.32.0"
   "@types/hast": "^3.0.5"
   "@types/node": "^26.2.0"
   "@untheme/aurora": "^0.6.0"

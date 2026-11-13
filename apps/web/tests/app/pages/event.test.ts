@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { setAppConfig, setContentPages, setRoutePath, useHead } from "#imports";
 import EventArticle from "~/components/EventArticle.vue";
@@ -25,10 +25,7 @@ const DINNER = {
   start: "17:30",
 };
 
-const EVENTS_PAGE = document({
-  title: "Events – Test Church",
-  events: [WORSHIP, PRAYER, DINNER],
-});
+const EVENTS = [WORSHIP, PRAYER, DINNER];
 
 const WORSHIP_PAGE = document(
   { title: "Worship Service – Test Church" },
@@ -36,10 +33,11 @@ const WORSHIP_PAGE = document(
 );
 
 const mountPage = async (path: string) => {
-  setContentPages({
-    "/events": EVENTS_PAGE,
-    "/events/worship-service": WORSHIP_PAGE,
-  });
+  vi.stubGlobal(
+    "$fetch",
+    vi.fn(async () => EVENTS),
+  );
+  setContentPages({ "/events/worship-service": WORSHIP_PAGE });
   setRoutePath(path);
   return mountSuspended(Page);
 };
@@ -88,7 +86,13 @@ describe("event page", () => {
     expect(wrapper.findComponent(EventArticle).exists()).toBe(false);
   });
 
-  it("throws a 404 when the events page does not exist", async () => {
+  it("throws a 404 when the events cannot be read", async () => {
+    vi.stubGlobal(
+      "$fetch",
+      vi.fn(async () => {
+        throw new Error("The server is away.");
+      }),
+    );
     setRoutePath("/events/worship-service");
     const { error } = await mountSuspended(Page);
     expect(error).toMatchObject({ statusCode: 404 });

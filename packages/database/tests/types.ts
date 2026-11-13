@@ -56,6 +56,27 @@ export type Checks = [
       false
     >
   >,
+  Assert<
+    Equal<
+      "hero" extends keyof Row<Contract, "web.content.fetch"> ? true : false,
+      false
+    >
+  >,
+  Assert<Equal<Row<Contract, "web.content.fetch">["body"], unknown>>,
+  Assert<
+    Equal<
+      "id" extends keyof Row<Contract, "web.content.fetch"> ? true : false,
+      false
+    >
+  >,
+  Assert<Equal<Row<Contract, "admin.content.fetch">["updated_at"], Date>>,
+  Assert<Equal<Arguments<Contract, "admin.content.body">["body"], unknown>>,
+  Assert<
+    Equal<
+      Arguments<Contract, "admin.content.create">["description"],
+      string | null | undefined
+    >
+  >,
   Assert<Equal<Row<Contract, "admin.sermons.fetch">["created_at"], Date>>,
   Assert<Equal<Row<Contract, "web.sermons.list">["date"], string>>,
   Assert<Equal<Row<Contract, "web.events.weekly">["start_time"], string>>,

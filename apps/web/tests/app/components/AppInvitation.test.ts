@@ -1,18 +1,15 @@
 import type { InvitationConfig } from "~/types/invitation";
 
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
   requestedDocuments,
   setAppConfig,
-  setContentPages,
-  setLocale,
   setRoutePath,
   useNuxtApp,
 } from "#imports";
 import AppInvitation from "~/components/AppInvitation.vue";
 import EventSchedule from "~/components/EventSchedule.vue";
-import { document } from "#test/support/content";
 import { mountSuspended } from "@bbf/nuxt/testing/mount";
 
 const INVITATION: InvitationConfig = {
@@ -44,19 +41,19 @@ const DINNER = {
   start: "17:30",
 };
 
-const EVENTS_PAGE = document({
-  title: "Events – Test Church",
-  events: [PRAYER, DINNER, WORSHIP, SCHOOL],
-});
+const EVENTS = [PRAYER, DINNER, WORSHIP, SCHOOL];
 
 const { $t } = useNuxtApp();
 
-const mountAt = async (
-  path = "/",
-  pages: Record<string, unknown> = { "/events": EVENTS_PAGE },
-) => {
+const mountAt = async (path = "/", events: unknown = EVENTS) => {
   setRoutePath(path);
-  setContentPages(pages);
+  vi.stubGlobal(
+    "$fetch",
+    vi.fn(async () => {
+      if (events === null) throw new Error("The server is away.");
+      return events;
+    }),
+  );
   const { wrapper } = await mountSuspended(AppInvitation);
   return wrapper;
 };
@@ -99,14 +96,14 @@ describe("AppInvitation", () => {
     }
   });
 
-  it("reads the events in the visitor's language", async () => {
-    setLocale("es");
+  it("reads the events from the API, and no page of content for them", async () => {
     await mountAt("/connect");
-    expect(requestedDocuments).toEqual(["es/events.json"]);
+    expect(globalThis.$fetch).toHaveBeenCalledWith("/api/events");
+    expect(requestedDocuments).toEqual([]);
   });
 
   it("has an empty Sunday when the events cannot be read", async () => {
-    const wrapper = await mountAt("/", {});
+    const wrapper = await mountAt("/", null);
     expect(wrapper.findComponent(EventSchedule).props("events")).toEqual([]);
     expect(wrapper.find(".site-invitation-words").exists()).toBe(true);
   });

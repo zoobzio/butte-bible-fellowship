@@ -1,10 +1,8 @@
 # @bbf/prose
 
-The church's words: the site's interface messages and its pages, and the
-admin's interface messages, built by
+The church's words: the site's interface messages and the admin's, built by
 [`@prosary/kit`](https://github.com/zoobzio/prosary/tree/main/packages/kit)
-into a typed contract, a bundle of compiled messages per locale, and each
-page as the tree the app renders — what the
+into a typed contract and a bundle of compiled messages per locale — what the
 [prosary](https://github.com/zoobzio/prosary) runtime consumes.
 
 ## Layout
@@ -13,7 +11,6 @@ page as the tree the app renders — what the
 prosary.config.ts  the kit config: the locales, the sources, the presets, the model
 src/messages/      the site's interface messages, in English, one file per group
 src/messages/admin/  the admin's, the same way, under `admin`
-src/content/       the pages, in English, as Markdown
 .cache/            the translation cache: each locale's translations (committed)
 .env               the model's API key, which `pnpm translate` loads (yours, not committed)
 .output/           the kit's output, every locale's (generated, not committed)
@@ -37,10 +34,11 @@ through the `@bbf/nuxt` layer.
 | `appearance.json` | the header's controls: color scheme, theme and its settings |
 | `language.json`   | the language picker: its button, its list and its search    |
 | `page.json`       | page-level words: not found, contents, the way back         |
+| `home.json`       | the home page's hero: its heading, paragraph and button     |
 | `about.json`      | the about page: its title                                   |
-| `sermons.json`    | the sermons page: its header, play button, channel link     |
-| `events.json`     | the events pages, an event’s days, the home page’s week     |
-| `connect.json`    | the connect page: its header                                |
+| `sermons.json`    | the sermons page: its titles, play button, channel link     |
+| `events.json`     | the events pages, their title, an event’s days, the week    |
+| `connect.json`    | the connect page: its titles, its cards, its map’s name     |
 | `roles.json`      | a staff member's roles, as the site and the admin name them |
 
 | File                    | Messages                                                       |
@@ -55,39 +53,35 @@ through the `@bbf/nuxt` layer.
 | `admin/weeks.json`      | the weeks of the month a repeating event is held in            |
 | `admin/staff.json`      | the staff section: its pages' titles and not found             |
 | `admin/member.json`     | a staff member's fields, their photo's controls, and the hints |
+| `admin/content.json`    | the content section: its pages' titles and not found           |
+| `admin/page.json`       | a page's metadata fields, its body's editor, and the hints     |
 
 Messages are ICU MessageFormat, where an ASCII apostrophe is the escape
-character — write a typographic one (`You’re`), as the pages already do.
+character — write a typographic one (`You’re`).
 
 ## Pages
 
-A page is Markdown with YAML front matter. The front matter is what
-`@bbf/schema` says a page carries: every page has a `title` and a
-`description`, and a page adds what it needs — the home page its `hero`, the
-events page its `events`.
+The site's pages are not written here as Markdown any more. What two of
+them say, the home page and About Us, is in the database, in
+`@bbf/database`'s `content` table, where the admin's Content section
+writes it, as an event's own page is. The other three, Connect, Events and
+Sermons, had only a title to their name, and the connect page its cards:
+those are messages here now (`connect.head`, `events.head`,
+`sermons.head`, and the rest of `connect.json`), translated as every
+message is. The site answers for each at the
+address a built page had, `/i18n/content/<locale>/<page>.json`, from
+`server/routes/i18n/[...path].ts`, in the one language it is written in.
 
-An event's own page, `/events/<slug>`, is not written here: it is in the
-database, where the admin writes it, and the site answers for it at the
-same address a built page has, from `server/routes/i18n/[...path].ts`.
+The config still names `content` and its presets, so the contract carries
+what the app's `<Prose>` reads: that a page is an HTML tree, and that
+`dataDirective` marks one of the site's blocks — an `invite-card`, a
+`map-embed` — which the app renders with the component of that name under
+`apps/web/app/components/prose/`. The build finds no page and writes none.
 
-The build runs each page through `@prosary/parse` with the presets
-`prosary.config.ts` lists:
-
-- `matter()` moves the front matter onto the root of the page's tree.
-- `gfm()` reads GitHub Flavored Markdown: tables, task lists, footnotes.
-- `mdc()` reads the block syntax Nuxt Content did — `::invite-grid` …
-  `::`, nested with more colons, and `::map-embed{src="…"}` — and builds
-  each block as an element marked with its name. The app renders a block
-  with the component of that name under `apps/web/app/components/prose/`;
-  a block no component renders is a plain `div`.
-- `rehype-slug` gives every heading an id, which a page's table of contents
-  links to.
-
-Every page is built in the form the app renders, an HTML tree as JSON, to
-`.output/content/<locale>/<page>.json`. The Markdown the API serves, an
-event's or a sermon's body, is built the same way by `@bbf/utils`, through
-`@prosary/parse` with the same presets less `matter()`, so it renders as a
-page does; a preset added here belongs there too.
+The Markdown the API still serves, a sermon's body, is built to the same
+tree by `@bbf/utils`, through `@prosary/parse` with the presets
+`prosary.config.ts` lists less `matter()`, so it renders as a page does; a
+preset added here belongs there too.
 
 ## Locales
 
@@ -105,8 +99,8 @@ run it too:
    It is the cache that keeps every build offline and the same: nothing is
    translated twice, and no build calls a model.
 3. `pnpm build` compiles the sources and `.cache/` into `.output/`, every
-   locale's messages and pages among them. A message or page a locale has no
-   translation of is built from the English source.
+   locale's messages among them. A message a locale has no translation of
+   is built from the English source.
 
 To add a locale, list it under `translate.targets` in `prosary.config.ts`
 and run `pnpm translate`. That needs `ANTHROPIC_API_KEY`: copy `.env.example`
@@ -119,9 +113,7 @@ model, and exits 1 when there is anything.
 
 Leave the files under `.cache/` as the model wrote them. The lock tells a
 translation it wrote from one edited by hand, and keeps a hand-edited one
-even when its source changes. One exception: the build reads a page's front
-matter as strict YAML, so a translated value with a colon in it has to be
-quoted — the translations of the connect page's `bio` lines are.
+even when its source changes.
 
 ## Exports
 
@@ -132,8 +124,8 @@ quoted — the translations of the connect page's `bio` lines are.
 - `@bbf/prose/bundles`: a lazy loader per locale, each resolving to that
   locale's compiled messages.
 
-The pages have no export: the app's prosary module serves them from this
-package's build, as `/i18n/content/<locale>/<page>.json`.
+The pages have no export, and no build: the site serves them from the
+database, as `/i18n/content/<locale>/<page>.json`.
 
 ```ts
 import { makeProsary } from "prosary";
@@ -151,7 +143,7 @@ prosary.format("navigation.home"); // "Home"
 
 The `@bbf/nuxt` layer hands the build to `@prosary/nuxt` —
 `prosary: { build: "@bbf/prose" }` — which provides `$t` on the Nuxt app of
-every app that extends the layer, and serves the pages. A component calls a
+every app that extends the layer. A component calls a
 message it names (`$t.navigation.open()`); data carries one by key, typed as
 `AppProsaryMessage`, and resolves it where it renders (`$t(link.label)`).
 Each app's header, and the web's footer, in its `app.config.ts`, are data
@@ -164,7 +156,7 @@ place. Listing a new locale under `translate.targets` is all it takes to
 offer it in both apps.
 
 A page reaches the app through `usePage`, which fetches the page the route
-names in the route's locale, checks its front matter against
+names, from the database's `content`, checks its front matter against
 `@bbf/schema`, and hands back the front matter over the page's body. The
 body renders through `<Prose>`, with the overrides under
 `app/components/prose/`.
@@ -175,5 +167,5 @@ body renders through `<Prose>`, with the overrides under
 - `pnpm translate`: brings `.cache/` up to date with the sources. CI runs it
   on pull requests and pushes to `main`.
 - `pnpm translate:check`: reports what `pnpm translate` would do.
-- `pnpm test`: rebuilds, then checks the contract, the bundle and the pages
-  against their sources.
+- `pnpm test`: rebuilds, then checks the contract and the bundle against
+  their sources.

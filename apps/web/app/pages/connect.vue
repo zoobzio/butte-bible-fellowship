@@ -1,16 +1,12 @@
 <script lang="ts">
-import {
-  computed,
-  createError,
-  definePageMeta,
-  useHead,
-  useNuxtApp,
-} from "#imports";
+import { computed, definePageMeta, useHead, useNuxtApp } from "#imports";
 
-import MarkdownBody from "~/components/MarkdownBody.vue";
+import ConnectCard from "~/components/ConnectCard.vue";
+import ConnectGrid from "~/components/ConnectGrid.vue";
+import MapEmbed from "~/components/MapEmbed.vue";
 import PageHeader from "~/components/PageHeader.vue";
 import StaffCard from "~/components/StaffCard.vue";
-import { usePage } from "~/composables/page";
+import { useConnect } from "~/composables/contact";
 import { useStaff } from "~/composables/staff";
 </script>
 
@@ -20,24 +16,16 @@ definePageMeta({
 });
 
 const { $t } = useNuxtApp();
+const connect = useConnect();
 
-const { data: page } = await usePage("/connect");
-
-if (!page.value) {
-  throw createError({
-    statusCode: 404,
-    message: $t.page.notFound(),
-  });
-}
-
-useHead(() => ({ title: page.value?.title }));
+useHead(() => ({ title: $t.connect.head() }));
 
 const { data } = await useStaff();
 const staff = computed(() => data.value ?? []);
 </script>
 
 <template>
-  <div v-if="page" class="connect">
+  <div class="connect">
     <PageHeader
       :title="$t.connect.title()"
       :description="$t.connect.description()"
@@ -46,7 +34,35 @@ const staff = computed(() => data.value ?? []);
       <StaffCard v-for="member in staff" :key="member.id" :member="member" />
     </section>
     <article class="prose">
-      <MarkdownBody :page="page" />
+      <ConnectGrid>
+        <ConnectCard>
+          <h2>{{ $t.connect.visit() }}</h2>
+          <p>
+            <strong>{{ $t.connect.address() }}</strong> {{ connect.address }}
+          </p>
+          <p>
+            <strong>{{ $t.connect.phone() }}</strong>
+            <a :href="connect.phone.href">{{ connect.phone.text }}</a>
+          </p>
+          <p>
+            <strong>{{ $t.connect.fax() }}</strong> {{ connect.fax }}
+          </p>
+          <p>
+            <strong>{{ $t.connect.email() }}</strong>
+            <a :href="connect.email.href">{{ connect.email.text }}</a>
+          </p>
+        </ConnectCard>
+        <ConnectCard>
+          <h2>{{ $t.connect.hours() }}</h2>
+          <p>{{ $t.connect.open() }}</p>
+          <p>{{ $t.connect.friday() }}</p>
+          <p>{{ $t.connect.closed() }}</p>
+        </ConnectCard>
+      </ConnectGrid>
+      <MapEmbed
+        :src="connect.map"
+        :title="$t.connect.map({ address: connect.address })"
+      />
     </article>
   </div>
 </template>

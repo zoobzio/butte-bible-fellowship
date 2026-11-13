@@ -1,13 +1,17 @@
-import type { Root } from "hast";
-
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { setContentPages, setLocale, useHead, useNuxtApp } from "#imports";
-import MarkdownBody from "~/components/MarkdownBody.vue";
+import {
+  requestedDocuments,
+  setAppConfig,
+  useHead,
+  useNuxtApp,
+} from "#imports";
+import ConnectCard from "~/components/ConnectCard.vue";
+import ConnectGrid from "~/components/ConnectGrid.vue";
+import MapEmbed from "~/components/MapEmbed.vue";
 import PageHeader from "~/components/PageHeader.vue";
 import StaffCard from "~/components/StaffCard.vue";
 import Page from "~/pages/connect.vue";
-import { document, element } from "#test/support/content";
 import { mountSuspended } from "@bbf/nuxt/testing/mount";
 
 const STAFF = [
@@ -20,15 +24,22 @@ const STAFF = [
   { id: 2, name: "John Roe", role: "elder" },
 ];
 
-const CONNECT = document(
-  { title: "Connect – Test Church" },
-  element("p", {}, "Visit us."),
-);
-
 const fetchStaff = vi.fn(async () => STAFF);
 
 beforeEach(() => {
   vi.stubGlobal("$fetch", fetchStaff);
+  setAppConfig({
+    contact: {
+      address: "1 Test Street, Testville",
+      phone: "555-010-0100",
+      email: "office@test.example",
+    },
+    connect: {
+      address: "1 Test Street, Testville, California 90000",
+      fax: "555-010-0199",
+      map: "https://maps.example.com/embed",
+    },
+  });
 });
 
 afterEach(() => {
@@ -37,10 +48,7 @@ afterEach(() => {
   fetchStaff.mockImplementation(async () => STAFF);
 });
 
-const mountPage = async (page: Root = CONNECT) => {
-  setContentPages({ "/connect": page });
-  return mountSuspended(Page);
-};
+const mountPage = () => mountSuspended(Page);
 
 describe("connect page", () => {
   it("heads the page with its title and description", async () => {
@@ -68,15 +76,53 @@ describe("connect page", () => {
     ).toEqual(STAFF);
   });
 
-  it("renders its own page after the staff, whatever language is read", async () => {
-    setLocale("es");
+  it("says how to reach the church after the staff, in the interface's own words, from no page of content", async () => {
     const { wrapper } = await mountPage();
+    const article = wrapper.find(".connect > .connect-staff + article.prose");
+    const cards = article
+      .findComponent(ConnectGrid)
+      .findAllComponents(ConnectCard);
+    expect(cards.map((card) => card.find("h2").text())).toEqual([
+      "Visit Us",
+      "Office Hours",
+    ]);
+    // Each line is its label, then what it names.
+    const lines = cards[0]!.findAll("p");
+    expect(lines.map((line) => line.find("strong").text())).toEqual([
+      "Address:",
+      "Phone:",
+      "Fax:",
+      "Email:",
+    ]);
     expect(
-      wrapper
-        .find(".connect > .connect-staff + article.prose")
-        .findComponent(MarkdownBody)
-        .props("page"),
-    ).toEqual({ title: "Connect – Test Church", body: CONNECT });
+      lines.map((line) =>
+        line.text().slice(line.find("strong").text().length).trim(),
+      ),
+    ).toEqual([
+      "1 Test Street, Testville, California 90000",
+      "555-010-0100",
+      "555-010-0199",
+      "office@test.example",
+    ]);
+    expect(
+      cards[0]!.findAll("a").map((link) => link.attributes("href")),
+    ).toEqual(["tel:5550100100", "mailto:office@test.example"]);
+    expect(cards[1]!.findAll("p").map((line) => line.text())).toEqual([
+      "Tuesday–Thursday: 9am–4pm",
+      "Friday: 9am–noon",
+      "Saturday, Sunday, Monday: closed",
+    ]);
+    expect(requestedDocuments).toEqual([]);
+  });
+
+  it("maps the way to the church under the cards", async () => {
+    const { wrapper } = await mountPage();
+    const map = wrapper.find(".connect-grid + iframe").element;
+    expect(wrapper.findComponent(MapEmbed).element).toBe(map);
+    expect(wrapper.findComponent(MapEmbed).props()).toEqual({
+      src: "https://maps.example.com/embed",
+      title: "Map to 1 Test Street, Testville, California 90000",
+    });
   });
 
   it("puts the article straight under the header when the API lists no one", async () => {
@@ -88,19 +134,10 @@ describe("connect page", () => {
     ).toBe(true);
   });
 
-  it("titles the document after the page", async () => {
+  it("titles the document with the page's own message: it is no content", async () => {
     await mountPage();
     expect(useHead.mock.calls[0]![0]()).toEqual({
-      title: "Connect – Test Church",
+      title: "Connect – Butte Bible Fellowship",
     });
-  });
-
-  it("throws a 404 when the page does not exist", async () => {
-    const { wrapper, error } = await mountSuspended(Page);
-    expect(error).toMatchObject({
-      statusCode: 404,
-      message: "Page not found",
-    });
-    expect(wrapper.find(".connect").exists()).toBe(false);
   });
 });

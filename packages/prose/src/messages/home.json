@@ -1,0 +1,18 @@
+{
+  "tagline": {
+    "defaultMessage": "Discover God’s",
+    "description": "The first line of the large heading the home page opens with. It runs on into the highlight, which finishes the phrase: “Discover God’s / Love, Grace & Truth”."
+  },
+  "highlight": {
+    "defaultMessage": "Love, Grace & Truth",
+    "description": "The second, emphasized line of the home page's heading, finishing the phrase the tagline starts."
+  },
+  "description": {
+    "defaultMessage": "Join us in connecting people to the life changing presence of Jesus Christ, and in the pursuit of His character.",
+    "description": "The paragraph under the home page's heading: what the church invites the reader into."
+  },
+  "cta": {
+    "defaultMessage": "Learn More",
+    "description": "The button under the home page's opening paragraph, which leads to the About Us page."
+  }
+}

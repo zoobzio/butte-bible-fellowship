@@ -4,6 +4,8 @@ export const AUTH_PREFIX = "/api/auth";
 
 export const GRANTS: Record<Role, readonly Scope[]> = {
   admin: [
+    "content:read",
+    "content:write",
     "events:read",
     "events:write",
     "staff:read",
@@ -11,5 +13,12 @@ export const GRANTS: Record<Role, readonly Scope[]> = {
     "users:read",
     "users:write",
   ],
-  editor: ["events:read", "events:write", "staff:read", "staff:write"],
+  editor: [
+    "content:read",
+    "content:write",
+    "events:read",
+    "events:write",
+    "staff:read",
+    "staff:write",
+  ],
 };

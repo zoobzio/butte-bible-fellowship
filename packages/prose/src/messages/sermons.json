@@ -26,5 +26,9 @@
   "more": {
     "defaultMessage": "See more sermons",
     "description": "The link under the home page's three newest sermons, to the sermons page, which lists the rest."
+  },
+  "head": {
+    "defaultMessage": "Sermons – Butte Bible Fellowship",
+    "description": "The sermons page's title as the browser's tab and search engines show it: the page, then the church's name."
   }
 }

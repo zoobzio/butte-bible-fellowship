@@ -30,7 +30,7 @@ beforeAll(async () => {
 afterAll(() => db.close());
 
 describe("the build", () => {
-  it("carries the staff, events, sermons, users, staff search, like escape, search cost, staff status, events search and events trim migrations in order", () => {
+  it("carries the staff, events, sermons, users, staff search, like escape, search cost, staff status, events search, events trim and content migrations in order", () => {
     expect(migrations.map((migration) => migration.name)).toEqual([
       "staff",
       "events",
@@ -42,14 +42,16 @@ describe("the build", () => {
       "staff_status",
       "events_search",
       "events_trim",
+      "content",
     ]);
   });
 
-  it("carries the staff, events and users seeds in order", () => {
+  it("carries the staff, events, users and content seeds in order", () => {
     expect(seeds.map((seed) => seed.name)).toEqual([
       "01_staff",
       "02_events",
       "03_users",
+      "04_content",
     ]);
   });
 
@@ -84,6 +86,8 @@ describe("the build", () => {
   it("groups the queries by app: reads for the web, CRUD for admin", () => {
     const names = Object.keys(contract.queries);
     expect(names.filter((name) => name.startsWith("web."))).toEqual([
+      "web.content.fetch",
+      "web.content.list",
       "web.events.fetch",
       "web.events.list",
       "web.events.upcoming",
@@ -92,8 +96,8 @@ describe("the build", () => {
       "web.sermons.list",
       "web.staff.list",
     ]);
-    expect(names.filter((name) => name.startsWith("admin."))).toHaveLength(26);
-    expect(names).toHaveLength(33);
+    expect(names.filter((name) => name.startsWith("admin."))).toHaveLength(32);
+    expect(names).toHaveLength(41);
   });
 });
 
@@ -179,6 +183,55 @@ describe("web", () => {
     expect(await db.web.events.upcoming({ from: "2026-01-01" })).toEqual([]);
     expect(await db.web.sermons.list({ limit: 3 })).toEqual([]);
     expect(await db.web.sermons.fetch.first({ slug: "nope" })).toBeNull();
+  });
+  it("lists the site's pages by slug", async () => {
+    expect((await db.web.content.list()).map((page) => page.slug)).toEqual([
+      "about-us",
+      "index",
+    ]);
+  });
+
+  it("reads a page by its slug: its front matter and what is written on it", async () => {
+    const home = await db.web.content.fetch.first({ slug: "index" });
+    expect(home).toMatchObject({
+      slug: "index",
+      title: "Butte Bible Fellowship – The Church on Pillsbury Road",
+      description: "A non-denominational local church in Chico, California.",
+    });
+    expect(home).not.toHaveProperty("id");
+    // The hero the home page opens with is the interface's, not content.
+    expect(home).not.toHaveProperty("hero");
+    expect(home?.body).toMatchObject({ type: "root" });
+
+    // The pages whose words are the interface's are not content.
+    for (const slug of ["connect", "events", "sermons", "nope"]) {
+      expect(await db.web.content.fetch.first({ slug }), slug).toBeNull();
+    }
+  });
+
+  it("seeds each page as rich text, the site's blocks among its elements", async () => {
+    const blocks = async (slug: string) => {
+      const page = await db.web.content.fetch.first({ slug });
+      const names: string[] = [];
+      const walk = (node: {
+        properties?: { dataDirective?: string };
+        children?: unknown[];
+      }) => {
+        if (node.properties?.dataDirective !== undefined) {
+          names.push(node.properties.dataDirective);
+        }
+        for (const child of node.children ?? []) walk(child as typeof node);
+      };
+      walk(page!.body as Parameters<typeof walk>[0]);
+      return names;
+    };
+    expect(await blocks("index")).toEqual([
+      "invite-grid",
+      "invite-card",
+      "invite-card",
+      "invite-card",
+    ]);
+    expect(await blocks("about-us")).toEqual([]);
   });
 });
 
@@ -591,6 +644,182 @@ describe("admin.staff", () => {
     await expect(
       db.admin.staff.create({ ...member, role: "deacon" as never }),
     ).rejects.toThrow(/role: Invalid option/);
+  });
+});
+
+describe("admin.content", () => {
+  /* The whole list, in the admin's own order: one page big enough. */
+  const tz = "America/Los_Angeles";
+  const page = { size: 25, offset: 0, tz, direction: "asc" };
+
+  const SEEDED = ["about-us", "index"];
+
+  const article = {
+    type: "root",
+    children: [
+      {
+        type: "element",
+        tagName: "div",
+        properties: { dataDirective: "invite-card" },
+        children: [
+          {
+            type: "element",
+            tagName: "p",
+            properties: {},
+            children: [
+              { type: "text", value: "Membership at the fellowship." },
+            ],
+          },
+        ],
+      },
+    ],
+  };
+
+  const slugs = async (
+    search: Partial<Parameters<typeof db.admin.content.list>[0]>,
+  ) =>
+    (await db.admin.content.list({ ...page, ...search })).map(
+      (row) => row.slug,
+    );
+
+  it("creates a page, which the web reads, and writes what is on it on its own", async () => {
+    const created = await db.admin.content.create.first({
+      slug: "membership",
+      title: "Membership – Butte Bible Fellowship",
+    });
+    expect(created?.created_at).toBeInstanceOf(Date);
+    const id = created!.id;
+
+    // A page is created with its metadata alone: its body is set on its own.
+    expect(await db.admin.content.fetch.first({ id })).toMatchObject({
+      slug: "membership",
+      description: null,
+      body: null,
+    });
+    expect((await db.web.content.list()).map((row) => row.slug)).toContain(
+      "membership",
+    );
+
+    const written = await db.admin.content.body.first({ id, body: article });
+    expect(written?.updated_at).toBeInstanceOf(Date);
+    expect(
+      await db.admin.content.body.first({ id: 0, body: article }),
+    ).toBeNull();
+
+    // An update replaces the metadata, and leaves the body.
+    const updated = await db.admin.content.update.first({
+      id,
+      slug: "membership",
+      title: "Belonging – Butte Bible Fellowship",
+      description: "How to join the fellowship.",
+    });
+    expect(updated?.updated_at).toBeInstanceOf(Date);
+    expect(await db.admin.content.fetch.first({ id })).toMatchObject({
+      title: "Belonging – Butte Bible Fellowship",
+      description: "How to join the fellowship.",
+      body: article,
+    });
+    expect(await db.web.content.fetch.first({ slug: "membership" })).toEqual({
+      slug: "membership",
+      title: "Belonging – Butte Bible Fellowship",
+      description: "How to join the fellowship.",
+      body: article,
+    });
+
+    // The free text reads the body's words, with the rest, the page that
+    // carries the text before any that only comes near it.
+    expect((await slugs({ q: "how to join" }))[0]).toBe("membership");
+    expect((await slugs({ q: "membership at the fellowship" }))[0]).toBe(
+      "membership",
+    );
+
+    await db.admin.content.body({ id, body: null });
+    expect(await db.admin.content.fetch.first({ id })).toMatchObject({
+      body: null,
+    });
+
+    expect(await db.admin.content.delete({ id })).toBe(1);
+    expect(await db.admin.content.fetch.first({ id })).toBeNull();
+    expect(await db.admin.content.delete({ id })).toBe(0);
+    expect(await db.web.content.fetch.first({ slug: "membership" })).toBeNull();
+  });
+
+  it("refuses a slug already taken", async () => {
+    expect(
+      await refusal(
+        db.admin.content.create({ slug: "index", title: "Another home" }),
+      ),
+    ).toMatch(/content_slug_key/);
+  });
+
+  it("lists a page of the pages, searched, filtered and sorted", async () => {
+    const today = new Intl.DateTimeFormat("en-CA", {
+      timeZone: tz,
+      dateStyle: "short",
+    }).format(new Date());
+
+    // In the admin's own order, by slug, each row with the whole count.
+    const listed = await db.admin.content.list(page);
+    expect(listed.map((row) => row.slug)).toEqual(SEEDED);
+    expect(listed.every((row) => row.total === 2)).toBe(true);
+    expect(listed[0]).toHaveProperty("body");
+    expect(listed[0]).not.toHaveProperty("search");
+
+    // A window of it.
+    expect(await slugs({ size: 1, offset: 1 })).toEqual(["index"]);
+    expect(
+      (await db.admin.content.list({ ...page, size: 1, offset: 1 }))[0]?.total,
+    ).toBe(2);
+
+    // The free text: a title, a slug, a description and the body's words, whatever the case, the page that carries the text first,
+    // and near enough when misspelled.
+    const nearest = async (q: string) => (await slugs({ q }))[0];
+    expect(await nearest("ABOUT-US")).toBe("about-us");
+    expect(await nearest("non-denominational local church")).toBe("index");
+    expect(await nearest("curious about christianity")).toBe("index");
+    expect(await nearest("core beleifs")).toBe("about-us");
+    expect(await slugs({ q: "100%" })).toEqual([]);
+    expect(await slugs({ q: "zzzz" })).toEqual([]);
+
+    // The text filters, on each text column.
+    expect(await slugs({ title_starts_with: "about" })).toEqual(["about-us"]);
+    expect(await slugs({ title_contains: "– butte bible" })).toEqual([
+      "about-us",
+    ]);
+    expect(await slugs({ title_not_contains: "– butte bible" })).toEqual([
+      "index",
+    ]);
+    expect(await slugs({ slug_is: "INDEX" })).toEqual(["index"]);
+    expect(await slugs({ slug_not: "index" })).toEqual(["about-us"]);
+    expect(await slugs({ slug_ends_with: "s" })).toEqual(["about-us"]);
+    expect(await slugs({ description_contains: "chico" })).toEqual(["index"]);
+    expect(await slugs({ description_is: "present" })).toEqual(SEEDED);
+    expect(await slugs({ description_is: "missing" })).toEqual([]);
+    expect(await slugs({ description_not: "present" })).toEqual([]);
+
+    // The day filters, read in the church's time zone.
+    expect(await slugs({ updated_on: today })).toEqual(SEEDED);
+    expect(await slugs({ updated_before: today })).toEqual([]);
+    expect(await slugs({ created_on_or_after: today })).toEqual(SEEDED);
+    expect(await slugs({ created_after: today })).toEqual([]);
+
+    // A sort, either way, and the admin's own order after it.
+    expect(await slugs({ sort: "title" })).toEqual(["about-us", "index"]);
+    expect(await slugs({ sort: "title", direction: "desc" })).toEqual([
+      "index",
+      "about-us",
+    ]);
+    expect(await slugs({ sort: "slug", direction: "desc" })).toEqual(
+      [...SEEDED].reverse(),
+    );
+    expect(await slugs({ sort: "updated_at", direction: "desc" })).toEqual(
+      SEEDED,
+    );
+
+    // Filters narrow together.
+    expect(
+      await slugs({ q: "butte", slug_ends_with: "s", title_not: "nothing" }),
+    ).toEqual(["about-us"]);
   });
 });
 
@@ -1329,6 +1558,7 @@ describe("roles", () => {
   it("reads the site as web", async () => {
     expect(await web.web.staff.list()).toHaveLength(3);
     expect(await web.web.events.weekly()).toHaveLength(8);
+    expect(await web.web.content.list()).toHaveLength(2);
   });
 
   it("refuses a write as web, by name and in the database", async () => {
@@ -1345,6 +1575,17 @@ describe("roles", () => {
     expect(
       await web.web.events.fetch.first({ slug: "prayer-meeting" }),
     ).not.toBeNull();
+  });
+
+  it("refuses a write of a page as web, by name and in the database", async () => {
+    await expect(
+      // @ts-expect-error: not a query of web.
+      web.query("admin.content.delete", { id: 1 }),
+    ).rejects.toBeInstanceOf(ForbiddenQueryError);
+    await expect(
+      web.build.deleteFrom("content").where("slug", "=", "index").execute(),
+    ).rejects.toThrow(/permission denied for table content/);
+    expect(await web.web.content.fetch.first({ slug: "index" })).not.toBeNull();
   });
 
   it("keeps the users from web", async () => {

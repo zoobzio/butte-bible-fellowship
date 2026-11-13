@@ -1,9 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { setContentPages, setRoutePath, useNuxtApp } from "#imports";
+import { setRoutePath, useNuxtApp } from "#imports";
 import EventWeek from "~/components/EventWeek.vue";
 import HomeWeek from "~/components/HomeWeek.vue";
-import { document } from "#test/support/content";
 import { mountSuspended } from "@bbf/nuxt/testing/mount";
 
 const WORSHIP = {
@@ -25,19 +24,19 @@ const DINNER = {
   start: "17:30",
 };
 
-const EVENTS_PAGE = document({
-  title: "Events – Test Church",
-  events: [PRAYER, DINNER, WORSHIP],
-});
+const EVENTS = [PRAYER, DINNER, WORSHIP];
 
 const { $t } = useNuxtApp();
 
-const mountWeek = async (
-  path = "/",
-  pages: Record<string, unknown> = { "/events": EVENTS_PAGE },
-) => {
+const mountWeek = async (path = "/", events: unknown = EVENTS) => {
   setRoutePath(path);
-  setContentPages(pages);
+  vi.stubGlobal(
+    "$fetch",
+    vi.fn(async () => {
+      if (events === null) throw new Error("The server is away.");
+      return events;
+    }),
+  );
   const { wrapper } = await mountSuspended(HomeWeek);
   return wrapper;
 };
@@ -78,7 +77,7 @@ describe("HomeWeek", () => {
   });
 
   it("has an empty week when the events cannot be read", async () => {
-    const wrapper = await mountWeek("/", {});
+    const wrapper = await mountWeek("/", null);
     expect(
       wrapper
         .findComponent(EventWeek)

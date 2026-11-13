@@ -31,6 +31,31 @@ const BARE = {
   body: null,
 };
 
+const HEADING = {
+  type: "element",
+  tagName: "h1",
+  properties: {},
+  children: [{ type: "text", value: "Our Vision" }],
+};
+
+const PAGES: Record<string, object> = {
+  "about-us": {
+    slug: "about-us",
+    title: "About Us – Test Church",
+    description: "Who we are.",
+    body: { type: "root", children: [HEADING] },
+  },
+  index: {
+    slug: "index",
+    title: "Test Church",
+    description: null,
+    body: null,
+  },
+};
+
+const pages = vi.fn(async () => Object.keys(PAGES).map((slug) => ({ slug })));
+const page = vi.fn(async (args: { slug: string }) => PAGES[args.slug] ?? null);
+
 const list = vi.fn(async (_args: { from: string }) => [ROW, BARE]);
 const first = vi.fn(async (args: { slug: string }) => {
   if (args.slug === ROW.slug) {
@@ -40,20 +65,60 @@ const first = vi.fn(async (args: { slug: string }) => {
 });
 
 Object.assign(service, {
-  web: { events: { list, fetch: { first } } },
+  web: {
+    content: { list: pages, fetch: { first: page } },
+    events: { list, fetch: { first } },
+  },
 });
 
 afterEach(() => {
+  pages.mockClear();
+  page.mockClear();
   list.mockClear();
   first.mockClear();
 });
 
 describe("useDocuments", () => {
-  it("lists a document for every event the site lists", async () => {
+  it("lists a document for every page, and for every event the site lists", async () => {
     expect(await useDocuments().list()).toEqual([
+      "about-us.json",
+      "index.json",
       "events/worship-service.json",
       "events/prayer-meeting.json",
     ]);
+  });
+
+  it("answers a page as a document: what is written on it under its front matter, its headings with ids", async () => {
+    expect(await useDocuments().get("about-us.json")).toEqual({
+      type: "root",
+      data: {
+        matter: { title: "About Us – Test Church", description: "Who we are." },
+      },
+      children: [{ ...HEADING, properties: { id: "our-vision" } }],
+    });
+    expect(page).toHaveBeenCalledWith({ slug: "about-us" });
+    expect(first).not.toHaveBeenCalled();
+  });
+
+  it("answers the home page as index, with no hero: that is the interface's own", async () => {
+    expect(await useDocuments().get("index.json")).toEqual({
+      type: "root",
+      data: { matter: { title: "Test Church" } },
+      children: [],
+    });
+    expect(list).not.toHaveBeenCalled();
+  });
+
+  it("answers nothing for the pages whose words are the interface's: they are no content", async () => {
+    for (const path of ["events.json", "sermons.json", "connect.json"]) {
+      expect(await useDocuments().get(path), path).toBeUndefined();
+    }
+    expect(list).not.toHaveBeenCalled();
+  });
+
+  it("answers nothing for a page the database does not hold", async () => {
+    expect(await useDocuments().get("nope.json")).toBeUndefined();
+    expect(page).toHaveBeenCalledWith({ slug: "nope" });
   });
 
   it("answers an event's page as a document: its body under its front matter", async () => {
@@ -83,10 +148,11 @@ describe("useDocuments", () => {
     expect(await useDocuments().get("events/nope.json")).toBeUndefined();
   });
 
-  it("answers nothing for a path that is not an event's page", async () => {
+  it("answers nothing for a path that is neither a page nor an event's", async () => {
     for (const path of [
-      "about-us.json",
-      "events.json",
+      "about-us.md",
+      "About Us.json",
+      "pages/about-us.json",
       "events/a/b.json",
       "events/Not A Slug.json",
       "events/worship-service.md",
@@ -94,5 +160,6 @@ describe("useDocuments", () => {
       expect(await useDocuments().get(path)).toBeUndefined();
     }
     expect(first).not.toHaveBeenCalled();
+    expect(page).not.toHaveBeenCalled();
   });
 });

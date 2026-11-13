@@ -6,5 +6,49 @@
   "description": {
     "defaultMessage": "We’d love to meet you. Here are the people to ask for, and how to reach us.",
     "description": "The line under the connect page's title, inviting the reader to get in touch with the church."
+  },
+  "head": {
+    "defaultMessage": "Connect – Butte Bible Fellowship",
+    "description": "The connect page's title as the browser's tab and search engines show it: the page, then the church's name."
+  },
+  "visit": {
+    "defaultMessage": "Visit Us",
+    "description": "The heading of the connect page's card with the church's address, phone number, fax number and email."
+  },
+  "address": {
+    "defaultMessage": "Address:",
+    "description": "The label before the church's street address, on the connect page."
+  },
+  "phone": {
+    "defaultMessage": "Phone:",
+    "description": "The label before the church's phone number, on the connect page."
+  },
+  "fax": {
+    "defaultMessage": "Fax:",
+    "description": "The label before the church's fax number, on the connect page."
+  },
+  "email": {
+    "defaultMessage": "Email:",
+    "description": "The label before the church's email address, on the connect page."
+  },
+  "hours": {
+    "defaultMessage": "Office Hours",
+    "description": "The heading of the connect page's card with the hours the church's office is open."
+  },
+  "open": {
+    "defaultMessage": "Tuesday–Thursday: 9am–4pm",
+    "description": "The office's hours on the days it is open all day."
+  },
+  "friday": {
+    "defaultMessage": "Friday: 9am–noon",
+    "description": "The office's hours on Friday, when it closes at noon."
+  },
+  "closed": {
+    "defaultMessage": "Saturday, Sunday, Monday: closed",
+    "description": "The days the church's office is closed."
+  },
+  "map": {
+    "defaultMessage": "Map to {address}",
+    "description": "The accessible name of the map on the connect page. `address` is the church's full street address, already written out."
   }
 }

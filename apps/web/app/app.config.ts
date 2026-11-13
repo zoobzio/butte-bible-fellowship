@@ -1,4 +1,4 @@
-import type { ContactConfig } from "~/types/contact";
+import type { ConnectConfig, ContactConfig, HeroConfig } from "~/types/contact";
 import type { EventsConfig } from "~/types/events";
 import type { FooterConfig } from "~/types/footer";
 import type { InvitationConfig } from "~/types/invitation";
@@ -21,6 +21,17 @@ const contact: ContactConfig = {
   address: "2255 Pillsbury Road, Chico",
   phone: "530-892-0521",
   email: "office@bbfchurchchico.org",
+};
+
+const connect: ConnectConfig = {
+  address: "2255 Pillsbury Road, Chico, California 95926",
+  fax: "530-898-1851",
+  map: "https://maps.google.com/maps?q=2255%20Pillsbury%20Road%2C%20Chico%2C%20California%2095926&t=m&z=13&output=embed&iwloc=near",
+};
+
+const hero: HeroConfig = {
+  image: "/images/church.jpg",
+  to: "/about-us",
 };
 
 const footer: FooterConfig = {
@@ -63,6 +74,8 @@ const events: EventsConfig = {
 export default defineAppConfig({
   header,
   contact,
+  connect,
+  hero,
   footer,
   invitation,
   events,

@@ -1,0 +1,26 @@
+{
+  "title": {
+    "defaultMessage": "Content",
+    "description": "The title of the page that lists the site's pages."
+  },
+  "description": {
+    "defaultMessage": "The pages of the site: what each says, and what search engines show for it.",
+    "description": "The line under the title of the page that lists the site's pages: what the list is."
+  },
+  "new": {
+    "defaultMessage": "New page",
+    "description": "The button that opens the form of a new page of the site, and the title of that form's dialog."
+  },
+  "newDescription": {
+    "defaultMessage": "Its metadata comes first. What is written on it is added on its own page, once it is saved.",
+    "description": "The line under the title of the dialog that adds a new page: what the form asks for, and where the rest is written."
+  },
+  "notFound": {
+    "defaultMessage": "Page not found",
+    "description": "The error shown when an address names a page of the site that does not exist."
+  },
+  "page": {
+    "defaultMessage": "Page",
+    "description": "The tab of a page's own page in the admin that holds its metadata and what is written on it."
+  }
+}
