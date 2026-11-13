@@ -48,9 +48,28 @@ const emit = defineEmits<{ saved: [record: StaffRecord] }>();
   min-width: 0;
 }
 
+/*
+ * The narrow column keeps to the screen as the wide one scrolls. It is at
+ * least as tall as the screen under the header and holds to the screen's
+ * foot from the row's end: short, that is its head held under the header;
+ * taller than the screen, it scrolls until its foot shows and stays there.
+ */
+.staff-page-side {
+  position: sticky;
+  bottom: var(--space-5);
+  align-self: end;
+  align-content: start;
+  min-height: calc(100dvh - var(--header-height) - 2 * var(--space-5));
+}
+
 @media (max-width: 60rem) {
   .staff-page {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  .staff-page-side {
+    position: static;
+    min-height: 0;
   }
 }
 </style>
