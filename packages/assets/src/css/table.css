@@ -314,9 +314,13 @@
 /*
  * The table, a card: a border around it, the headings on a darker ground.
  * The borders are kept apart so the card's corners can round; the cells
- * draw the rules between rows themselves.
+ * draw the rules between rows themselves. The layout is fixed, so a
+ * column's width is the width its `col` carries, whatever its cells hold:
+ * a resized column keeps the width it was dragged to, and the columns
+ * without one share what the sized ones leave.
  */
 .f-data-table .f-table {
+  table-layout: fixed;
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
@@ -335,21 +339,23 @@
 }
 
 /*
- * A cell keeps to one line, and what will not fit ends in an ellipsis.
- * The `max-width: 0` keeps a cell's content out of its column's intrinsic
- * width, so the columns share the card rather than stretch to the longest
- * value; the select and actions columns, sized to their own controls, are
- * left out. Narrow, where the card scrolls sideways instead, the cap is
- * lifted so the columns size to their content again.
+ * A cell keeps to one line, and what will not fit its column ends in an
+ * ellipsis; the select and actions columns, sized to their own controls,
+ * are left out.
  */
 .f-data-table .f-td:not(.f-data-table-select, .f-data-table-actions) {
-  max-width: 0;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
 }
 
+/*
+ * A heading is the box its resizer is placed in, and clips a label its
+ * column has been dragged too narrow to hold.
+ */
 .f-data-table .f-th {
+  position: relative;
+  overflow: hidden;
   background: var(--surface-container);
   font: var(--type-label);
   font-variant-caps: all-small-caps;
@@ -461,6 +467,43 @@
   box-shadow: inset -2px 0 0 var(--primary);
 }
 
+/*
+ * The resizer: a strip on a heading's trailing edge, inside the cell's
+ * padding so it stays clear of the drag handle. It draws a rule down the
+ * edge, faint as the pointer comes over the heading and in the primary as
+ * it comes over the strip, takes focus, or drags.
+ */
+.f-data-table-resizer {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-end: 0;
+  width: var(--space-2);
+  cursor: col-resize;
+  touch-action: none;
+  user-select: none;
+  outline: none;
+}
+
+.f-data-table-resizer::after {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  inset-inline-end: 0;
+  width: 2px;
+  background: transparent;
+  transition: background var(--transition-fast);
+}
+
+.f-data-table .f-th:hover .f-data-table-resizer::after {
+  background: var(--rule);
+}
+
+.f-data-table .f-th .f-data-table-resizer:hover::after,
+.f-data-table .f-th .f-data-table-resizer:focus-visible::after,
+.f-data-table .f-th.f-data-table-resizing .f-data-table-resizer::after {
+  background: var(--primary);
+}
+
 .f-data-table .f-tbody .f-tr:hover .f-td {
   background: color-mix(in oklab, var(--primary-container) 25%, transparent);
 }
@@ -497,12 +540,17 @@
   text-align: center;
 }
 
+/*
+ * The select and actions columns are as wide as their controls, a checkbox
+ * and an icon button, and the cell's padding around them: a fixed layout
+ * takes a column's width from its `col`, not from what the cells hold.
+ */
 .f-data-table-select {
-  width: 1%;
+  width: calc(var(--space-4) + 2 * var(--space-3));
 }
 
 .f-data-table-actions {
-  width: 1%;
+  width: calc(var(--space-4) + 2 * var(--space-2) + 2 * var(--space-3) + 2px);
   text-align: right;
 }
 
@@ -560,7 +608,11 @@
   border-color: color-mix(in oklab, var(--primary) 65%, transparent);
 }
 
-/* Narrow, the card scrolls sideways rather than squeezing its columns. */
+/*
+ * Narrow, the card scrolls sideways rather than squeezing its columns: as
+ * a block the table lays its columns out by their content again, and the
+ * resizers, which a sideways swipe would catch, are put away.
+ */
 @media (max-width: 44rem) {
   .f-data-table .f-table {
     display: block;
@@ -569,7 +621,7 @@
     -webkit-overflow-scrolling: touch;
   }
 
-  .f-data-table .f-td {
-    max-width: none;
+  .f-data-table-resizer {
+    display: none;
   }
 }
