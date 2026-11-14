@@ -9,15 +9,17 @@ import { body as address } from "~/composables/content/routes";
 import { Block } from "~/utils/blocks";
 import { toPageBody } from "~/utils/content";
 import { failure } from "~/utils/errors";
+import { Outline, outline as toOutline } from "~/utils/outline";
 
 /**
  * The editor of what is written on a page: the document as HTML, in and
  * out, with the site's own blocks among its nodes, so a page's cards and
- * its map are kept as they are through an edit.
+ * its map are kept as they are through an edit, and an id on each heading
+ * for the page's table of contents to link to.
  */
 const useBodyEditor = createEditor<string, string>("content-body", {
   ...html,
-  extensions: [Block],
+  extensions: [Block, Outline],
 });
 
 /** The HTML an editor holds for a record's body: nothing for none. */
@@ -33,6 +35,7 @@ const written = (record: ContentRecord): string =>
  * document settles and `view` moves on, which the editor is keyed by, so
  * a fresh one draws the body as a page again. A save that fails reports
  * through `error` and leaves the editor open on what was written.
+ * `outline` is the page's table of contents as it is written now.
  */
 export const useContentBody = (record: ContentRecord) => {
   const api = useApi();
@@ -47,6 +50,7 @@ export const useContentBody = (record: ContentRecord) => {
   const saving = ref(false);
   const error = ref<string | null>(null);
   const editing = computed(() => editor.mounted);
+  const outline = computed(() => toOutline(editor.json));
 
   editor.on("updated", () => {
     dirty.value = true;
@@ -82,5 +86,15 @@ export const useContentBody = (record: ContentRecord) => {
     }
   };
 
-  return { editor, view, editing, dirty, saving, error, save, cancel };
+  return {
+    editor,
+    view,
+    editing,
+    outline,
+    dirty,
+    saving,
+    error,
+    save,
+    cancel,
+  };
 };

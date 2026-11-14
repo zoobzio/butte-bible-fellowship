@@ -264,10 +264,13 @@ describe("page page", () => {
     const wrapper = mount(Page, { props: { record: HOME } });
     const panels = wrapper.find(".content-page").element.children;
     expect([...panels].map((panel) => panel.className)).toEqual([
-      "content-editor",
+      "content-page-side",
       "content-body",
       "save-bar",
     ]);
+    expect(wrapper.find(".content-page-side > .content-editor").exists()).toBe(
+      true,
+    );
     expect(wrapper.findComponent(ContentEditor).props("record")).toEqual(HOME);
     expect(wrapper.findComponent(ContentBody).props("record")).toEqual(HOME);
     expect(wrapper.find(".content-editor-title").text()).toBe("Metadata");
@@ -275,6 +278,39 @@ describe("page page", () => {
     expect(wrapper.findComponent(PageHeader).exists()).toBe(false);
   });
 
+  it("lists the page's headings under its metadata, each linked to its own", async () => {
+    const body = {
+      type: "root" as const,
+      children: [
+        {
+          type: "element" as const,
+          tagName: "h2",
+          properties: {},
+          children: [{ type: "text" as const, value: "Our Vision" }],
+        },
+        {
+          type: "element" as const,
+          tagName: "p",
+          properties: {},
+          children: [{ type: "text" as const, value: "Modern wisdom…" }],
+        },
+      ],
+    };
+    const wrapper = mount(Page, { props: { record: { ...HOME, body } } });
+    await wrapper.vm.$nextTick();
+    const link = wrapper.find(
+      ".content-page-side > .content-editor + nav.toc a.toc-link",
+    );
+    expect(link.text()).toBe("Our Vision");
+    expect(link.attributes("href")).toBe("#our-vision");
+    expect(wrapper.find(".content-body h2#our-vision").exists()).toBe(true);
+  });
+
+  it("lists nothing under the metadata of a page with no headings", async () => {
+    const wrapper = mount(Page, { props: { record: HOME } });
+    await wrapper.vm.$nextTick();
+    expect(wrapper.find("nav.toc").exists()).toBe(false);
+  });
   it("passes the record the form saved up to the page around it", () => {
     const wrapper = mount(Page, { props: { record: ABOUT } });
     const changed = { ...ABOUT, title: "Messages" };

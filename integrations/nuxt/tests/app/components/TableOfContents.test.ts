@@ -2,11 +2,11 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { mount } from "@vue/test-utils";
 import { nextTick } from "vue";
 
-import type { OutlineEntry } from "~/types/outline";
+import type { OutlineEntry } from "#layers/bbf/app/types/outline";
 
 import { useNuxtApp } from "#imports";
-import TableOfContents from "~/components/TableOfContents.vue";
-import { stubPage } from "#test/support/page";
+import TableOfContents from "#layers/bbf/app/components/TableOfContents.vue";
+import { stubPage } from "@bbf/nuxt/testing/page";
 
 const ENTRIES: OutlineEntry[] = [
   { id: "our-vision", depth: 1, text: "Our Vision" },

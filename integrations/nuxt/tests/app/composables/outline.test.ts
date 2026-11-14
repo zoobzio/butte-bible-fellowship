@@ -1,13 +1,13 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { ref } from "vue";
 
-import type { OutlineEntry } from "~/types/outline";
-import type { PageItem } from "~/types/page";
+import type { OutlineEntry } from "#layers/bbf/app/types/outline";
+import type { Root } from "hast";
 
-import { useOutline, useOutlineSpy } from "~/composables/outline";
-import { document as page, element } from "#test/support/content";
+import { useOutline, useOutlineSpy } from "#layers/bbf/app/composables/outline";
+import { element, tree } from "../../support/hast";
 import { withSetup } from "@bbf/nuxt/testing/mount";
-import { stubPage } from "#test/support/page";
+import { stubPage } from "@bbf/nuxt/testing/page";
 
 const ENTRIES: OutlineEntry[] = [
   { id: "our-vision", depth: 1, text: "Our Vision" },
@@ -136,28 +136,24 @@ describe("useOutlineSpy", () => {
 });
 
 describe("useOutline", () => {
-  const ABOUT: PageItem = {
-    title: "About",
-    body: page(
-      { title: "About" },
-      element("h1", { id: "our-vision" }, "Our Vision"),
-      element("p", {}, "Modern wisdom…"),
-      element("h2", { id: "dreams" }, "Dreams"),
-    ),
-  };
+  const ABOUT: Root = tree(
+    element("h1", { id: "our-vision" }, "Our Vision"),
+    element("p", {}, "Modern wisdom…"),
+    element("h2", { id: "dreams" }, "Dreams"),
+  );
 
-  it("lists the page's headings, in order, with their levels", () => {
+  it("lists the tree's headings, in order, with their levels", () => {
     expect(useOutline(ABOUT).value).toEqual([
       { id: "our-vision", depth: 1, text: "Our Vision" },
       { id: "dreams", depth: 2, text: "Dreams" },
     ]);
   });
 
-  it("has no entries for a page that is not there, and follows one that comes", async () => {
-    const page = ref<PageItem | null>(null);
-    const entries = useOutline(page);
+  it("has no entries for a tree that is not there, and follows one that comes", async () => {
+    const body = ref<Root | null>(null);
+    const entries = useOutline(body);
     expect(entries.value).toEqual([]);
-    page.value = ABOUT;
+    body.value = ABOUT;
     expect(entries.value.map((entry) => entry.id)).toEqual([
       "our-vision",
       "dreams",

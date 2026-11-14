@@ -7,7 +7,7 @@ import { useNuxtApp } from "#imports";
 import AboutArticle from "~/components/AboutArticle.vue";
 import MarkdownBody from "~/components/MarkdownBody.vue";
 import PageHeader from "~/components/PageHeader.vue";
-import TableOfContents from "~/components/TableOfContents.vue";
+import TableOfContents from "#layers/bbf/app/components/TableOfContents.vue";
 import { document, element } from "#test/support/content";
 
 const ABOUT: PageItem = {

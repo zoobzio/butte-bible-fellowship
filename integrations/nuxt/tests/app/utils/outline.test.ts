@@ -1,14 +1,13 @@
 import { describe, expect, it } from "vitest";
 
-import { outline, sectionsOnScreen } from "~/utils/outline";
-import { document, element } from "#test/support/content";
+import { outline, sectionsOnScreen } from "#layers/bbf/app/utils/outline";
+import { element, tree } from "../../support/hast";
 
 describe("outline", () => {
   it("lists the page's headings in order, with their level", () => {
     expect(
       outline(
-        document(
-          {},
+        tree(
           element("h1", { id: "our-vision" }, "Our Vision"),
           element("p", {}, "Modern wisdom…"),
           element("h2", { id: "dreams" }, "Dreams"),
@@ -27,8 +26,7 @@ describe("outline", () => {
   it("reads a heading's words through its markup", () => {
     expect(
       outline(
-        document(
-          {},
+        tree(
           element(
             "h2",
             { id: "the-church" },
@@ -44,8 +42,7 @@ describe("outline", () => {
   it("leaves out headings below the third level and ones with no id", () => {
     expect(
       outline(
-        document(
-          {},
+        tree(
           element("h4", { id: "aside" }, "Aside"),
           element("h2", {}, "Unnamed"),
           { type: "text", value: "text" },
@@ -57,8 +54,7 @@ describe("outline", () => {
   it("leaves out a heading that is not the page's own", () => {
     expect(
       outline(
-        document(
-          {},
+        tree(
           element("blockquote", {}, element("h2", { id: "quoted" }, "Quoted")),
         ),
       ),

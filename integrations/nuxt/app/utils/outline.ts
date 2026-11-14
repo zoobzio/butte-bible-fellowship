@@ -1,6 +1,6 @@
 import type { Root, RootContent } from "hast";
 
-import type { OutlineEntry } from "~/types/outline";
+import type { OutlineEntry } from "#layers/bbf/app/types/outline";
 
 const DEPTHS: Record<string, number> = { h1: 1, h2: 2, h3: 3 };
 

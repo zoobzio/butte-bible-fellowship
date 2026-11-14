@@ -1,5 +1,5 @@
 <script lang="ts">
-import type { OutlineEntry } from "~/types/outline";
+import type { OutlineEntry } from "#layers/bbf/app/types/outline";
 
 import { NuxtLink } from "#components";
 import {
@@ -12,7 +12,7 @@ import {
   watch,
 } from "#imports";
 
-import { useOutlineSpy } from "~/composables/outline";
+import { useOutlineSpy } from "#layers/bbf/app/composables/outline";
 </script>
 
 <script setup lang="ts">

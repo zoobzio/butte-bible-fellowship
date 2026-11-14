@@ -1,8 +1,8 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { useFrame } from "~/composables/motion";
+import { useFrame } from "#layers/bbf/app/composables/motion";
 import { withSetup } from "@bbf/nuxt/testing/mount";
-import { stubPage } from "#test/support/page";
+import { stubPage } from "@bbf/nuxt/testing/page";
 
 afterEach(() => {
   vi.unstubAllGlobals();

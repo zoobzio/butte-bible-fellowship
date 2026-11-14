@@ -1,10 +1,12 @@
 <script lang="ts">
 import type { ContentRecord } from "@bbf/schema/types";
+import type { OutlineEntry } from "#layers/bbf/app/types/outline";
 
 import { Editor } from "#components";
-import { computed, useId, useNuxtApp } from "#imports";
+import { computed, useId, useNuxtApp, useTemplateRef } from "#imports";
 import { useDraft } from "~/composables/drafts";
 import { useContentBody } from "~/composables/content/body";
+import { useContentOutline } from "~/composables/content/outline";
 </script>
 
 <script setup lang="ts">
@@ -12,9 +14,16 @@ defineOptions({ name: "ContentBody" });
 
 const { record } = defineProps<{ record: ContentRecord }>();
 
+/*
+ * The page's table of contents, as it is written now: told once its
+ * headings can be linked to, and again whenever it changes, for the page
+ * around this to list beside the writing.
+ */
+const emit = defineEmits<{ outline: [entries: OutlineEntry[]] }>();
+
 const { $t } = useNuxtApp();
 
-const { editor, view, editing, dirty, saving, error, save, cancel } =
+const { editor, view, editing, outline, dirty, saving, error, save, cancel } =
   useContentBody(record);
 
 /*
@@ -33,10 +42,17 @@ const pt = computed(() => ({
     "data-placeholder": $t.admin.page.bodyEmpty(),
   },
 }));
+
+/* The outline is told once the headings under here can be linked to. */
+useContentOutline(
+  useTemplateRef<HTMLElement>("root"),
+  { editor, view, editing, outline },
+  (entries) => emit("outline", entries),
+);
 </script>
 
 <template>
-  <section class="content-body" :data-editing="editing || undefined">
+  <section ref="root" class="content-body" :data-editing="editing || undefined">
     <h2 :id="title" class="content-body-title">{{ $t.admin.page.body() }}</h2>
     <Editor :key="view" :service="editor" :pt="pt" />
   </section>
@@ -47,6 +63,11 @@ const pt = computed(() => ({
   display: grid;
   gap: var(--space-3);
   min-width: 0;
+}
+
+/* A heading scrolled to clears the toolbar, which keeps under the header. */
+.content-body .f-data-editor-content [id] {
+  scroll-margin-top: calc(var(--header-height) + 5rem);
 }
 
 /* The heading reads as the labels of the form beside it do. */

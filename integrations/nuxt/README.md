@@ -104,6 +104,22 @@ The composables under the appearance controls — `useColorMode`, `useThemes`,
 selection held app-wide, persisted in a cookie so SSR renders it, and
 changed through a view-transition cross-fade where the browser has one.
 
+### The table of contents
+
+A page's headings as a list of links beside it, the ones whose sections are
+on screen marked: the web's About Us lists the page it serves, the admin
+the page being written.
+
+| file                             | what it is                                                                |
+| -------------------------------- | ------------------------------------------------------------------------- |
+| `components/TableOfContents.vue` | the list, of the `OutlineEntry`s it is handed: nothing for none           |
+| `composables/outline.ts`         | `useOutline`, a tree's outline; `useOutlineSpy`, the entries on screen    |
+| `composables/motion.ts`          | `useFrame`: a callback run once a frame however often it is scheduled     |
+| `utils/outline.ts`               | `outline`, a tree's own headings with an id; `sectionsOnScreen`, the math |
+
+Each entry links to its heading by id, so whoever hands the entries over
+sees that the headings on the page carry them.
+
 ### Testing
 
 The apps' tests share its support through the package, as `@bbf/nuxt/testing/…`:
@@ -114,6 +130,7 @@ The apps' tests share its support through the package, as `@bbf/nuxt/testing/…
 | `testing/components.ts` | the vitest shim for `#components` every app shares: `NuxtLink`, `Icon`, `Popover`, `Menu`…                     |
 | `testing/bezoar.ts`     | the vitest shim for `#bezoar/service`: a stub service a test fills                                             |
 | `testing/mount.ts`      | `withSetup` and `mountSuspended`, to run a composable or async setup                                           |
+| `testing/page.ts`       | `stubPage`: the window's scroll, size and frames, for a test to move                                           |
 
 An app's `tests/mocks/imports.ts` and `tests/mocks/components.ts` re-export
 the shared shims and add what the app's own modules put there (the web's

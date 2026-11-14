@@ -1,4 +1,4 @@
-import type { MotionFrame } from "~/types/motion";
+import type { MotionFrame } from "#layers/bbf/app/types/motion";
 
 import { onBeforeUnmount } from "vue";
 

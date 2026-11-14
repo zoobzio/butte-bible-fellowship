@@ -1,7 +1,7 @@
+import type { Root } from "hast";
 import type { ComputedRef, MaybeRefOrGetter, Ref } from "vue";
 
-import type { OutlineEntry } from "~/types/outline";
-import type { PageItem } from "~/types/page";
+import type { OutlineEntry } from "#layers/bbf/app/types/outline";
 
 import {
   computed,
@@ -12,15 +12,16 @@ import {
   toValue,
   watch,
 } from "#imports";
-import { useFrame } from "~/composables/motion";
-import { outline, sectionsOnScreen } from "~/utils/outline";
+import { useFrame } from "#layers/bbf/app/composables/motion";
+import { outline, sectionsOnScreen } from "#layers/bbf/app/utils/outline";
 
+/** The outline of a tree, which follows it: nothing for none. */
 export const useOutline = (
-  page: MaybeRefOrGetter<Pick<PageItem, "body"> | null | undefined>,
+  tree: MaybeRefOrGetter<Root | null | undefined>,
 ): ComputedRef<OutlineEntry[]> =>
   computed(() => {
-    const item = toValue(page);
-    return item ? outline(item.body) : [];
+    const body = toValue(tree);
+    return body ? outline(body) : [];
   });
 
 const headerHeight = () =>

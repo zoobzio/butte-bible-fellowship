@@ -5,8 +5,8 @@ import { useNuxtApp } from "#imports";
 
 import MarkdownBody from "~/components/MarkdownBody.vue";
 import PageHeader from "~/components/PageHeader.vue";
-import TableOfContents from "~/components/TableOfContents.vue";
-import { useOutline } from "~/composables/outline";
+import TableOfContents from "#layers/bbf/app/components/TableOfContents.vue";
+import { useOutline } from "#layers/bbf/app/composables/outline";
 </script>
 
 <script setup lang="ts">
@@ -15,7 +15,7 @@ defineOptions({ name: "AboutArticle" });
 const { page } = defineProps<{ page: PageItem }>();
 
 const { $t } = useNuxtApp();
-const entries = useOutline(() => page);
+const entries = useOutline(() => page.body);
 </script>
 
 <template>

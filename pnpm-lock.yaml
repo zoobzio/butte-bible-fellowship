@@ -60,6 +60,9 @@ catalogs:
     '@tiptap/core':
       specifier: 3.32.0
       version: 3.32.0
+    '@tiptap/pm':
+      specifier: 3.32.0
+      version: 3.32.0
     '@types/hast':
       specifier: ^3.0.5
       version: 3.0.5
@@ -108,6 +111,9 @@ catalogs:
     bezoar:
       specifier: 0.0.6
       version: 0.0.6
+    github-slugger:
+      specifier: ^2.0.0
+      version: 2.0.0
     h3:
       specifier: ^1.15.11
       version: 1.15.11
@@ -227,6 +233,9 @@ importers:
       '@tiptap/core':
         specifier: 'catalog:'
         version: 3.32.0(@tiptap/pm@3.32.0)
+      '@tiptap/pm':
+        specifier: 'catalog:'
+        version: 3.32.0
       '@vercel/blob':
         specifier: 'catalog:'
         version: 2.8.2
@@ -242,6 +251,9 @@ importers:
       bezoar:
         specifier: 'catalog:'
         version: 0.0.6
+      github-slugger:
+        specifier: 'catalog:'
+        version: 2.0.0
       h3:
         specifier: 'catalog:'
         version: 1.15.11
@@ -428,6 +440,9 @@ importers:
       '@bbf/toolbox':
         specifier: workspace:*
         version: link:../../packages/toolbox
+      '@types/hast':
+        specifier: 'catalog:'
+        version: 3.0.5
       '@vitejs/plugin-vue':
         specifier: 'catalog:'
         version: 6.0.8(vite@8.3.4(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(yaml@2.9.1))(vue@3.5.41(typescript@5.9.3))
