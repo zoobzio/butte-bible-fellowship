@@ -5,7 +5,7 @@ import HomeHero from "~/components/HomeHero.vue";
 import HomeSermons from "~/components/HomeSermons.vue";
 import HomeWeek from "~/components/HomeWeek.vue";
 import MarkdownBody from "~/components/MarkdownBody.vue";
-import { usePage } from "~/composables/page";
+import { useHomePage } from "~/composables/page";
 </script>
 
 <script setup lang="ts">
@@ -15,7 +15,7 @@ definePageMeta({
 
 const { $t } = useNuxtApp();
 
-const { data: page } = await usePage();
+const { data: page } = await useHomePage();
 
 if (!page.value) {
   throw createError({
@@ -29,7 +29,7 @@ useHead(() => ({ title: page.value?.title }));
 
 <template>
   <div v-if="page" class="home">
-    <HomeHero />
+    <HomeHero :hero="page.hero" />
 
     <section class="prose">
       <MarkdownBody :page="page" />

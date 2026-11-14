@@ -52,9 +52,7 @@ describe("ContentEditor", () => {
   it("says under a field what it is for, and ties the hint to it", () => {
     const wrapper = mount(ContentEditor, { props: { record: null } });
     const hint = (id: string) => wrapper.find(`#${id}-hint`).text();
-    expect(hint("content-slug")).toBe(
-      "Lowercase words joined by hyphens. The home page is index.",
-    );
+    expect(hint("content-slug")).toBe("Lowercase words joined by hyphens.");
     expect(wrapper.find("#content-slug").attributes("aria-describedby")).toBe(
       "content-slug-hint",
     );

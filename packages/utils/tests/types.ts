@@ -3,16 +3,22 @@ import type { StaffBody, StaffRecord } from "@bbf/schema/types";
 import type { Arguments, Row } from "bezoar";
 
 import type {
+  toAboutArguments,
   toContentArguments,
   toEventArguments,
+  toHomeArguments,
   toSermonArguments,
   toStaffArguments,
 } from "../src/dao";
 import {
+  toAboutDocument,
+  toAboutRecord,
   toChurchEvent,
   toContentDocument,
   toContentRecord,
   toEventRecord,
+  toHomeDocument,
+  toHomeRecord,
   toSermon,
   toStaffMember,
   toStaffRecord,
@@ -105,3 +111,26 @@ export const staffBody: StaffBody = toStaffBody(staffForm);
 
 // @ts-expect-error A form carries no bio: it is written on its own.
 export const noTree = toStaffBody({ ...staffForm, bio: staffRecord.bio });
+
+declare const webHome: Row<Contract, "web.home.fetch">;
+declare const adminHome: Row<Contract, "admin.home.fetch">;
+declare const webAbout: Row<Contract, "web.about.fetch">;
+declare const adminAbout: Row<Contract, "admin.about.fetch">;
+
+// The site's read of a page with a table of its own makes its document,
+// and so does the admin's; only the admin's makes its record.
+export const homeDocuments = [webHome, adminHome].map(toHomeDocument);
+export const aboutDocuments = [webAbout, adminAbout].map(toAboutDocument);
+export const homeRecordRead = toHomeRecord(adminHome);
+export const aboutRecordRead = toAboutRecord(adminAbout);
+// @ts-expect-error: the site's read carries no date.
+export const noHomeRecord = toHomeRecord(webHome);
+// @ts-expect-error: the site's read carries no date.
+export const noAboutRecord = toAboutRecord(webAbout);
+
+declare const homeArguments: ReturnType<typeof toHomeArguments>;
+export const updateHome: Arguments<Contract, "admin.home.update"> =
+  homeArguments;
+declare const aboutArguments: ReturnType<typeof toAboutArguments>;
+export const updateAbout: Arguments<Contract, "admin.about.update"> =
+  aboutArguments;

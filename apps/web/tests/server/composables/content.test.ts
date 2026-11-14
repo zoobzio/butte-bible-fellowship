@@ -17,7 +17,7 @@ const ROW = {
   body: { type: "root", children: [PARAGRAPH] },
 };
 
-const list = vi.fn(async () => [{ slug: "connect" }, { slug: "index" }]);
+const list = vi.fn(async () => [{ slug: "connect" }, { slug: "membership" }]);
 const first = vi.fn(async (args: { slug: string }) =>
   args.slug === ROW.slug ? ROW : null,
 );
@@ -31,7 +31,7 @@ afterEach(() => {
 
 describe("useContent", () => {
   it("lists the slug of every page", async () => {
-    expect(await useContent().list()).toEqual(["connect", "index"]);
+    expect(await useContent().list()).toEqual(["connect", "membership"]);
   });
 
   it("reads a page by its slug, as a document", async () => {

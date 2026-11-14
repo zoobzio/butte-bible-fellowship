@@ -1,4 +1,4 @@
-import type { AppProsaryMessage, Ref } from "#imports";
+import type { AppProsaryMessage, Ref, UseForm } from "#imports";
 
 /**
  * A value a field offers, named by a message.
@@ -29,6 +29,19 @@ export interface Draft {
   open: Readonly<Ref<boolean>>;
   saving: Readonly<Ref<boolean>>;
   error: Readonly<Ref<string | null>>;
+  save: () => Promise<void>;
+  reset: () => void;
+}
+
+/**
+ * The form of a page's metadata, as the panel that draws it takes it: the
+ * form itself, and what of it the bar that saves the whole page reads.
+ */
+export interface Metadata<T> {
+  form: ReturnType<UseForm<T>>;
+  error: Readonly<Ref<string | null>>;
+  dirty: Readonly<Ref<boolean>>;
+  saving: Readonly<Ref<boolean>>;
   save: () => Promise<void>;
   reset: () => void;
 }

@@ -10,6 +10,9 @@ import ContentBody from "~/components/ContentBody.vue";
 
 const { body: _, ...BARE } = HOME;
 
+/** Where the body of the page the tests write is written. */
+const address = "/api/content/5/body";
+
 const content = (wrapper: ReturnType<typeof mount>) =>
   wrapper.find(".f-data-editor-content");
 
@@ -25,7 +28,7 @@ const open = async (wrapper: ReturnType<typeof mount>) => {
 
 describe("ContentBody", () => {
   it("shows what is written as the page it is, under its heading, with nothing to save", () => {
-    const wrapper = mount(ContentBody, { props: { record: HOME } });
+    const wrapper = mount(ContentBody, { props: { record: HOME, address } });
     const title = wrapper.find("h2.content-body-title");
     expect(title.text()).toBe("Content");
     expect(content(wrapper).html()).toContain("<p>Has served since 2010.</p>");
@@ -55,7 +58,7 @@ describe("ContentBody", () => {
       ],
     };
     const wrapper = mount(ContentBody, {
-      props: { record: { ...HOME, body } },
+      props: { record: { ...HOME, body }, address },
     });
     expect(wrapper.emitted("outline")).toEqual([
       [[{ id: "dreams", depth: 2, text: "Dreams" }]],
@@ -75,7 +78,7 @@ describe("ContentBody", () => {
   });
 
   it("invites a click where nothing is written on a page", () => {
-    const wrapper = mount(ContentBody, { props: { record: BARE } });
+    const wrapper = mount(ContentBody, { props: { record: BARE, address } });
     expect(wrapper.find(".f-data-editor").attributes("data-empty")).toBe(
       "true",
     );
@@ -85,7 +88,7 @@ describe("ContentBody", () => {
   });
 
   it("becomes the editor on a click: its toolbar, and no button of its own, the page's bar saving and resetting it", async () => {
-    const { wrapper, drafts } = mountHeld(ContentBody, HOME);
+    const { wrapper, drafts } = mountHeld(ContentBody, HOME, { address });
     expect(drafts.open.value).toBe(false);
     await open(wrapper);
     expect(wrapper.find(".content-body").attributes("data-editing")).toBe(
@@ -106,7 +109,7 @@ describe("ContentBody", () => {
 
   it("becomes the editor from the keyboard too", async () => {
     const wrapper = mount(ContentBody, {
-      props: { record: HOME },
+      props: { record: HOME, address },
       attachTo: document.body,
     });
     await content(wrapper).trigger("focus");
@@ -137,7 +140,7 @@ describe("ContentBody", () => {
     };
     const fetch = vi.fn(async () => ({ ...HOME, body: written }));
     vi.stubGlobal("$fetch", fetch);
-    const { wrapper, drafts } = mountHeld(ContentBody, HOME);
+    const { wrapper, drafts } = mountHeld(ContentBody, HOME, { address });
     await open(wrapper);
     editor(wrapper).run((chain) => chain.selectAll().toggleBold());
     await wrapper.vm.$nextTick();
@@ -162,7 +165,7 @@ describe("ContentBody", () => {
   it("drops what was written on a reset, and reads as what was last saved", async () => {
     const fetch = vi.fn(async () => HOME);
     vi.stubGlobal("$fetch", fetch);
-    const { wrapper, drafts } = mountHeld(ContentBody, HOME);
+    const { wrapper, drafts } = mountHeld(ContentBody, HOME, { address });
     await open(wrapper);
     editor(wrapper).run((chain) =>
       chain.selectAll().insertContent("A slip of the keys."),
@@ -187,7 +190,7 @@ describe("ContentBody", () => {
   });
 
   it("leaves an editor that was only opened on a reset", async () => {
-    const { wrapper, drafts } = mountHeld(ContentBody, HOME);
+    const { wrapper, drafts } = mountHeld(ContentBody, HOME, { address });
     await open(wrapper);
     drafts.reset();
     await wrapper.vm.$nextTick();
@@ -204,7 +207,7 @@ describe("ContentBody", () => {
         throw new Error("The server is away.");
       }),
     );
-    const { wrapper, drafts } = mountHeld(ContentBody, HOME);
+    const { wrapper, drafts } = mountHeld(ContentBody, HOME, { address });
     await open(wrapper);
     editor(wrapper).run((chain) =>
       chain.selectAll().insertContent("Since 2010."),

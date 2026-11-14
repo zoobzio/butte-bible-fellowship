@@ -1,11 +1,10 @@
 import type { ContentRecord } from "@bbf/schema/types";
 
-import { contentArticle, contentRecord } from "@bbf/schema";
+import { contentArticle } from "@bbf/schema";
 import { fromHtml, toHtml } from "@bbf/utils/vm";
 import { html } from "@zoobzio/editor";
 import { computed, createEditor, ref, useNuxtApp } from "#imports";
 import { useApi } from "~/composables/api";
-import { body as address } from "~/composables/content/routes";
 import { Block } from "~/utils/blocks";
 import { toPageBody } from "~/utils/content";
 import { failure } from "~/utils/errors";
@@ -22,22 +21,28 @@ const useBodyEditor = createEditor<string, string>("content-body", {
   extensions: [Block, Outline],
 });
 
+/** What of a page its body is written from: what is written on it. */
+type Written = Pick<ContentRecord, "body">;
+
 /** The HTML an editor holds for a record's body: nothing for none. */
-const written = (record: ContentRecord): string =>
+const written = (record: Written): string =>
   record.body === undefined ? "" : toHtml(record.body);
 
 /**
  * What is written on a page, on its own, apart from the form of its
- * metadata. It reads as the page it is until it is clicked, which turns
- * the editor on over it; `editing` says so. `save` writes the document as
- * the tree the site renders, or nothing once the editor is emptied, and
- * `cancel` puts back what was last saved. Either one ends the edit: the
- * document settles and `view` moves on, which the editor is keyed by, so
- * a fresh one draws the body as a page again. A save that fails reports
- * through `error` and leaves the editor open on what was written.
- * `outline` is the page's table of contents as it is written now.
+ * metadata: a page written in the admin, or one of the site's own, the
+ * home page or About Us, each patched at the `address` given, which
+ * answers with the page as it then is. It reads as the page it is until
+ * it is clicked, which turns the editor on over it; `editing` says so.
+ * `save` writes the document as the tree the site renders, or nothing once
+ * the editor is emptied, and `cancel` puts back what was last saved.
+ * Either one ends the edit: the document settles and `view` moves on,
+ * which the editor is keyed by, so a fresh one draws the body as a page
+ * again. A save that fails reports through `error` and leaves the editor
+ * open on what was written. `outline` is the page's table of contents as
+ * it is written now.
  */
-export const useContentBody = (record: ContentRecord) => {
+export const useContentBody = (record: Written, address: string) => {
   const api = useApi();
   const { $t } = useNuxtApp();
 
@@ -76,8 +81,8 @@ export const useContentBody = (record: ContentRecord) => {
       const body = contentArticle.parse({
         body: editor.empty ? undefined : toPageBody(fromHtml(editor.document)),
       });
-      const answer = await api(address(record.id), { method: "PATCH", body });
-      saved = written(contentRecord.parse(answer));
+      const answer = await api(address, { method: "PATCH", body });
+      saved = written(contentArticle.parse(answer));
       close();
     } catch (caught) {
       error.value = failure(caught) ?? $t.admin.editor.failed();

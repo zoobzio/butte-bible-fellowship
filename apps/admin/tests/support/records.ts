@@ -1,6 +1,8 @@
 import type {
+  AboutRecord,
   ContentRecord,
   EventRecord,
+  HomeRecord,
   StaffRecord,
 } from "@bbf/schema/types";
 
@@ -71,4 +73,27 @@ export const ABOUT: ContentRecord = {
   title: "About Us",
   createdAt: "2026-10-17T18:00:00.000Z",
   updatedAt: "2026-10-17T18:00:00.000Z",
+};
+
+/** The heading the home page opens with: one line, its highlight between asterisks. */
+export const HEADING = "Discover God’s **Love, Grace & Truth**";
+
+/** The site's home page, as its tab of the settings reads it. */
+export const HOME_PAGE: HomeRecord = {
+  title: "Butte Bible Fellowship",
+  description: "A local church in Chico.",
+  heroHeading: HEADING,
+  heroDescription: "Join us in the pursuit of His character.",
+  heroAction: "Learn More",
+  heroLink: "/about-us",
+  body: BIO,
+  updatedAt: "2026-10-18T09:30:00.000Z",
+};
+
+/** The site's About Us page, as its tab of the settings reads it. */
+export const ABOUT_PAGE: AboutRecord = {
+  title: "About Us",
+  description: "A clean canvas.",
+  body: BIO,
+  updatedAt: "2026-10-18T09:30:00.000Z",
 };

@@ -9,12 +9,11 @@ export interface ConnectConfig {
 }
 
 /**
- * What the hero the home page opens with shows and leads to, which is no
- * one's to translate: the path of its picture, and where its button goes.
+ * The picture the hero the home page opens with shows until the admin
+ * uploads one of its own: the site's picture of the church.
  */
 export interface HeroConfig {
   image: string;
-  to: string;
 }
 
 export interface ContactConfig {

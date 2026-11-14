@@ -1,18 +1,25 @@
 <script lang="ts">
+import type { HomeHero } from "@bbf/schema/types";
+
 import { NuxtLink } from "#components";
-import { useAppConfig, useNuxtApp } from "#imports";
+
+import { useHeroHeading, useHeroImage } from "~/composables/hero";
 </script>
 
 <script setup lang="ts">
 defineOptions({ name: "HomeHero" });
 
 /*
- * What the home page opens with. Its words are the interface's own, so
- * they are messages, translated with the rest; its picture and where its
- * button leads are the app's config.
+ * What the home page opens with, every part of it the page's own, as the
+ * admin's settings write it: its words, where its button leads and its
+ * picture. The heading is one line of text, and what is written between
+ * asterisks in it (**like this**) is a span the styles draw as its
+ * highlight.
  */
-const { $t } = useNuxtApp();
-const { hero } = useAppConfig();
+const { hero } = defineProps<{ hero: HomeHero }>();
+
+const heading = useHeroHeading(() => hero);
+const image = useHeroImage(() => hero);
 </script>
 
 <template>
@@ -20,16 +27,20 @@ const { hero } = useAppConfig();
     <section class="home-hero-body">
       <div class="home-hero-content">
         <h1 class="page-title">
-          {{ $t.home.tagline() }}
-          <em>{{ $t.home.highlight() }}</em>
+          <template v-for="(part, index) in heading" :key="index">
+            <span v-if="part.highlight" class="home-hero-highlight">{{
+              part.text
+            }}</span>
+            <template v-else>{{ part.text }}</template>
+          </template>
         </h1>
-        <p>{{ $t.home.description() }}</p>
-        <NuxtLink :to="hero.to" class="cta">
-          {{ $t.home.cta() }}
+        <p>{{ hero.description }}</p>
+        <NuxtLink :to="hero.link" class="cta">
+          {{ hero.action }}
         </NuxtLink>
       </div>
       <div class="home-hero-media arch">
-        <img :src="hero.image" alt="" />
+        <img :src="image" alt="" />
       </div>
     </section>
   </div>
@@ -56,8 +67,10 @@ const { hero } = useAppConfig();
   margin: 0;
 }
 
-.home-hero h1 em {
+/* The highlight: on a line of its own, set apart as emphasis is. */
+.home-hero-highlight {
   display: block;
+  font-style: italic;
   color: var(--primary);
 }
 

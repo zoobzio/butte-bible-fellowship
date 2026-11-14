@@ -19,7 +19,10 @@ into a query's arguments before it runs.
 
 ```
 src/models/      what the API answers with: one file per kind of thing
-  content.ts     a page of the site as the admin reads it, and a listing of them
+  about.ts       About Us as the admin reads it
+  content.ts     a page written in the admin as the admin reads it, and a listing of them
+  home.ts        the home page as the admin reads it, its hero, and its front matter as the site reads it
+  link.ts        where a link leads: a path of the site, or a web address
   event.ts       an event of the church, the list of them, and the days and times it names
   hast.ts        rich text as the API serves it: an HTML syntax tree of elements and text
   staff.ts       someone who serves the church, the list of them, and their roles
@@ -28,7 +31,9 @@ src/models/      what the API answers with: one file per kind of thing
   page.ts        a page's front matter: its title, description and image
   slug.ts        what names a thing in an address
 src/input/       what a request carries, one file per group of endpoints
-  content.ts     the site's pages: the id of one, the query of the listing, the metadata and the body of a write
+  about.ts       About Us: the metadata and the body of a write
+  content.ts     the pages written in the admin: the id of one, the query of the listing, the metadata and the body of a write
+  home.ts        the home page: the metadata and the body of a write, and its hero's picture as it is uploaded
   event.ts       the events: the path of one, the query of the list, the body of a write
   staff.ts       the staff: the id of one, the body of a write
   sermon.ts      the sermons: the path of one, the query of the list, the body of a write
@@ -65,10 +70,16 @@ JPEG, PNG or WebP file of `STAFF_AVATAR_SIZE` at most. An event is written
 the same way: `eventBody` is its details, `eventArticle` what is written
 about it, and `eventImage` its picture as it is uploaded. A page of the site
 is written in two: `contentBody` is its metadata, what a page's front matter
-carried when the pages were Markdown — its slug, `index` for the home page,
+carried when the pages were Markdown — its slug,
 its title and its description — and `contentArticle` what is written on
 it, as `hast`, the site's own blocks among its elements. `contentForm` is
-the metadata as the admin's form holds it. An input is one part of a request, named for the
+the metadata as the admin's form holds it. The two pages with a table of
+their own are written the same way, without an id or a slug: `aboutBody`,
+a title and a description, and `aboutArticle`; `homeBody`, with the words
+of the hero the page opens with — `heroHeading` is one line of text, its
+highlight between asterisks — `homeArticle`, and `homeImage`, the hero's picture as it
+is uploaded. `homePage` is the home page's front matter as the site reads
+it: a page's, and its `hero`. An input is one part of a request, named for the
 group and the part: `eventPath` is the path parameters of one event,
 `eventsQuery` the query of the events list, `eventBody` what a write
 carries. An event is written with the date it is held and whether it is
@@ -147,6 +158,8 @@ what it renders: the components, their references, the parameters.
   `HastText`, `ContentStatus`, `StaffRole`, `StaffMember`, `StaffMembers`,
   `Page`, `Sermon`, `Sermons`, `Slug`, `EventPath`, `EventsQuery`,
   `EventBody`, `ContentRecord`, `ContentBody`, `ContentForm`, `ContentArticle`,
+  `HomeRecord`, `HomeHero`, `HomePage`, `HomeBody`, `HomeForm`, `HomeArticle`,
+  `HomeImage`, `AboutRecord`, `AboutBody`, `AboutForm`, `AboutArticle`, `Link`,
   `StaffId`, `StaffBody`, `StaffBio`, `SermonPath`, `SermonsQuery`,
   `SermonBody`. Nothing here
   reaches a bundle: a file that only needs the shape imports from here and

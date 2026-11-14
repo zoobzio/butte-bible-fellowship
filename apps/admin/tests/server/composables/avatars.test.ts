@@ -7,6 +7,7 @@ import {
   EVENT_FOLDER,
   useBlobStore,
   useEventImage,
+  useHomeImage,
   useLocalStore,
   useStaffAvatar,
 } from "~~/server/composables/avatars";
@@ -99,16 +100,43 @@ const pictured = vi.fn(
   },
 );
 
+const HOME_ROW = {
+  title: "Home",
+  description: null,
+  hero_heading: "Come and **see**",
+  hero_description: "Join us.",
+  hero_action: "Learn More",
+  hero_link: "/about-us",
+  hero_image: null as string | null,
+  body: null,
+  updated_at: new Date("2026-10-18T09:30:00Z"),
+};
+
+/* The home page, whose picture the queries read and write: one row, or none. */
+const home = { ...HOME_ROW };
+let housed = true;
+const opened = vi.fn(async () => (housed ? { ...home } : null));
+const hung = vi.fn(async ({ image }: { image: string | null }) => {
+  if (!housed) return null;
+  home.hero_image = image;
+  return { updated_at: HOME_ROW.updated_at };
+});
+
 Object.assign(service, {
   admin: {
     staff: { fetch: { first: fetched }, photo: { first: portrayed } },
     events: { fetch: { first: found }, image: { first: pictured } },
+    home: { fetch: { first: opened }, image: { first: hung } },
   },
 });
 
 afterEach(() => {
   member.photo = null;
   worship.image = null;
+  home.hero_image = null;
+  housed = true;
+  opened.mockClear();
+  hung.mockClear();
   found.mockClear();
   pictured.mockClear();
   kept.clear();
@@ -320,5 +348,56 @@ describe("useEventImage", () => {
     expect(pictured).not.toHaveBeenCalled();
     await useEventImage(EVENT).discard(`${EVENTS}/3-old.png`);
     expect(del).toHaveBeenCalledWith(`${EVENTS}/3-old.png`);
+  });
+});
+
+describe("useHomeImage", () => {
+  const HOME = "https://store.public.blob.vercel-storage.com/home";
+
+  it("keeps the image in a folder of the home page's own, points the page at it, and hands back the record", async () => {
+    const record = await useHomeImage(EVENT).replace(image("image/jpeg"));
+    expect(put).toHaveBeenCalledWith(
+      "home/1.jpg",
+      expect.any(File),
+      expect.any(Object),
+    );
+    expect(hung).toHaveBeenCalledWith({ image: `${HOME}/1-abc.jpg` });
+    expect(record).toMatchObject({
+      title: "Home",
+      heroImage: `${HOME}/1-abc.jpg`,
+    });
+    expect(del).not.toHaveBeenCalled();
+  });
+
+  it("drops the picture the page had, once it shows the new one", async () => {
+    home.hero_image = `${HOME}/1-old.png`;
+    await useHomeImage(EVENT).replace(image());
+    expect(del).toHaveBeenCalledTimes(1);
+    expect(del).toHaveBeenCalledWith(`${HOME}/1-old.png`);
+  });
+
+  it("drops the image again when the page cannot be pointed at it, and says so", async () => {
+    hung.mockRejectedValueOnce(new Error("The database is away."));
+    await expect(useHomeImage(EVENT).replace(image())).rejects.toThrow(
+      "The database is away.",
+    );
+    expect(del).toHaveBeenCalledWith(`${HOME}/1-abc.png`);
+  });
+
+  it("clears the page's picture, and drops it from the store", async () => {
+    home.hero_image = `${HOME}/1-old.png`;
+    const record = await useHomeImage(EVENT).clear();
+    expect(hung).toHaveBeenCalledWith({ image: null });
+    expect(record).toMatchObject({ title: "Home" });
+    expect(record?.heroImage).toBeUndefined();
+    expect(del).toHaveBeenCalledWith(`${HOME}/1-old.png`);
+  });
+
+  it("keeps and clears nothing should the page's row be missing", async () => {
+    housed = false;
+    expect(await useHomeImage(EVENT).replace(image())).toBeNull();
+    expect(await useHomeImage(EVENT).clear()).toBeNull();
+    expect(put).not.toHaveBeenCalled();
+    expect(hung).not.toHaveBeenCalled();
   });
 });

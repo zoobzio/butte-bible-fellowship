@@ -7,10 +7,11 @@ Postgres in memory, describes every query, and writes `.output/`, which is
 what this package exports. An app imports the build and has the database:
 the kit and the sources never reach it.
 
-The tables are the site's four kinds of data: `content`, the pages whose
-words are written in the admin, the home page and About Us, each named by its
-slug with the title and description its front matter carried and what is
-written on it; `staff`, who serve the
+The tables are the site's kinds of data: `home` and `about`, the two pages
+with a layout of their own, each a table of one row that holds whatever
+its layout shows; `content`, the pages written in the admin, each named by
+its slug with a title, a description and what is written on it, which a
+blog will be made of; `staff`, who serve the
 church, each in a `staff_role` — pastor, elder, staff — which is also the
 order the site lists them in; `events`, each held on a date, and every
 week on that date's day of the week when it is `recurring`, with the page
@@ -33,9 +34,9 @@ would not have offered.
 
 ```
 bezoar.config.ts   the kit config: the output directory, the defaults for the rest
-src/migrations/    the schema, forward only: staff, events, sermons, users, staff search, like escape, search cost, staff status, events search, events trim, content
-src/seeds/         the staff, the events, the first admin user and the site's pages, each safe to run again
-src/queries/web/   what the site reads: content, staff, events, sermons
+src/migrations/    the schema, forward only: staff, events, sermons, users, staff search, like escape, search cost, staff status, events search, events trim, content, pages
+src/seeds/         the staff, the events and the first admin user, each safe to run again
+src/queries/web/   what the site reads: home, about, content, staff, events, sermons
 src/queries/admin/ what the admin app will read and write: the same, in full
 src/roles/         what each app's role may do: web reads, admin reads and writes
 tests/             the build, run through @bezoar/testing
@@ -121,9 +122,25 @@ then the one-offs by date. An event's day of the week is never stored:
 `admin.sermons` has `list`, `fetch`, `create`, `update` and `delete`, by
 `id`.
 
-`web.content.fetch` is a page by its slug, `index` for the home page, with
+`web.home.fetch` and `web.about.fetch` each read the one row of their
+table, and take no argument: the page's title and description, what is
+written on it, and for the home page its hero — `hero_heading`, one line
+of text, of which the site draws what stands between asterisks as the
+highlight,
+`hero_description`, `hero_action` and `hero_link`, the button and where it
+leads, and `hero_image`, the URL of the picture uploaded for it, null
+until one is. `admin.home` and `admin.about` have `fetch`, which adds when
+the row was last changed, `update`, which writes the metadata, and `body`,
+what is written on the page, on its own; `admin.home.image` sets the
+picture's URL on its own too, null to clear it. None takes an id, and
+there is no `create` and no `delete`: the pages migration makes each row
+with its table, with the words the site had, and where the two pages were
+rows of the content, `index` and `about-us`, it moves what was written on
+them across and takes them out of the content.
+
+`web.content.fetch` is a page written in the admin, by its slug, with
 its title, description and body, and `web.content.list` the slug of
-every page. `admin.content` has `list`, `fetch`, `create`, `update` and
+every one. `admin.content` has `list`, `fetch`, `create`, `update` and
 `delete`, by `id`, and `body`, what is written on the page, on its own:
 `create` and `update` write the metadata — the slug, the title and the
 description — and leave the body alone. Its `list` is searched
@@ -132,9 +149,8 @@ migration keeps, the title, the slug, the description and the text of
 the body as one text; the text filters on the `title`,
 `slug` and `description`; the day filters on the days it was `updated` and
 `created`; and `sort` names `title`, `slug`, `created_at` or `updated_at`,
-the pages by slug after any sort. The
-seed writes the two pages that were Markdown with words of their own, the
-home page and About Us, each body the tree its build made.
+the pages by slug after any sort. No seed writes a page: the content is
+empty until the admin writes one.
 
 `admin.users` has the same, and two more for signing in. A user is added
 by their email and a `user_role` — `admin` or `editor`, the roles of
@@ -145,7 +161,7 @@ user by it on every request after. An `update` that changes the email
 unbinds the user until they sign in with the new one. The admin app passes
 `claim` only an email Google has verified.
 
-A member's `bio` and an event's `body` are `jsonb`: the HTML tree (hast)
+A member's `bio`, an event's `body` and a page's `body` are `jsonb`: the HTML tree (hast)
 the app renders, written as the admin's editor hands it over and served to
 the site as it is, where a sermon's `body` is the Markdown it was written
 as. The events trim migration made the events' bodies so, each paragraph
@@ -170,10 +186,11 @@ the next run. The build declares each role before the migrations and
 applies its grants after them, and then plans every query as every role,
 so the contract carries, by role, the queries the role may run.
 
-`web` has `SELECT` on `content`, `staff`, `events` and `sermons`, and nothing else.
+`web` has `SELECT` on `home`, `about`, `content`, `staff`, `events` and `sermons`, and nothing else.
 It may run every read of them, the admin app's plain reads among them, and
 no write; it may not read `users` at all. `admin` has `SELECT`, `INSERT`,
-`UPDATE` and `DELETE` on the five tables, and may run every query. Each `id` is an identity column, which
+`UPDATE` and `DELETE` on `content`, `staff`, `events`, `sermons` and `users`, and `SELECT` and `UPDATE` alone on
+`home` and `about`, whose one row is neither added nor removed, and may run every query. Each `id` is an identity column, which
 Postgres fills without a privilege on its sequence, so the tables are the
 whole of each grant.
 

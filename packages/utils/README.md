@@ -8,8 +8,8 @@ and writes them, runs the same ones, declared once here.
 
 A transform is a pure function, typed against both packages. `dto/` takes a
 row and builds the model the API answers with: `toChurchEvent`,
-`toStaffMember`, `toSermon`, and `toContentDocument`, a page of the site as
-the document its app renders. `dao/` takes an input a request carries and
+`toStaffMember`, `toSermon`, and `toContentDocument`, `toHomeDocument` and
+`toAboutDocument`, a page of the site as the document its app renders. `dao/` takes an input a request carries and
 builds the arguments a query takes: `toEventArguments`,
 `toStaffArguments`, `toSermonArguments`, `toContentArguments`. `vm/` takes a record the API
 answered with and builds what a form holds, and back: `toStaffForm`,
@@ -21,19 +21,26 @@ here, and a form hands its payload.
 
 ```
 src/dto/        a row into the model the API answers with, one file per kind
+  about.ts      toAboutRecord: About Us's row into an AboutRecord; toAboutDocument: into the document the site renders
   content.ts    toContentRecord: a page's row into a ContentRecord; toContentDocument: into the document the site renders
+  document.ts   toDocument: front matter over a body, every heading with an id; ContentDocument, its shape
+  home.ts       toHomeRecord: the home page's row into a HomeRecord; toHomeDocument: into the document the site renders, its hero in its front matter
   event.ts      toChurchEvent: any row of the events into a ChurchEvent
   hast.ts       toHast: a column of Markdown into the Hast the API answers with
   staff.ts      toStaffMember: a row of the staff into a StaffMember
   sermon.ts     toSermon: any row of the sermons into a Sermon
 src/dao/        an input into the arguments a query takes, one file per kind
+  about.ts      toAboutArguments: an AboutBody into what admin.about.update takes
   content.ts    toContentArguments: a ContentBody into what admin.content.create takes
+  home.ts       toHomeArguments: a HomeBody into what admin.home.update takes
   event.ts      toEventArguments: an EventBody into what admin.events.create takes
   staff.ts      toStaffArguments: a StaffBody into what admin.staff.create takes
   sermon.ts     toSermonArguments: a SermonBody into what admin.sermons.create takes
 src/vm/         a record into what a form holds, and a form's payload into a body
+  about.ts      toAboutForm: an AboutRecord into an AboutForm; toAboutBody: back
   content.ts    toContentForm: a ContentRecord into a ContentForm; toContentBody: back
   hast.ts       toHtml: a Hast into the HTML an editor holds; fromHtml: back
+  home.ts       toHomeForm: a HomeRecord into a HomeForm; toHomeBody: back
   staff.ts      toStaffForm: a StaffRecord's details into a StaffForm; toStaffBody: a StaffForm into a StaffBody
 src/hast.ts     toContent: any hast tree into the schema's shape, for dto/ and vm/
 src/types.ts    the rows and the arguments the transforms speak, from the contract, and the forms
@@ -94,7 +101,10 @@ as they read it.
 
 A page of the site is stored as the tree too. `toContentDocument` builds what the site's `usePage`
 fetches, the document a build of Markdown wrote: the title and the
-description as `data.matter`, over the body's children. The admin's editor
+description as `data.matter`, over the body's children. `toAboutDocument`
+builds the same of About Us's row, and `toHomeDocument` of the home
+page's, with its hero in the front matter beside them; all three go
+through `toDocument`. The admin's editor
 writes no id on a heading, so each is given one here, by `rehype-slug`, as
 the page is served, for the table of contents to link to.
 

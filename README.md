@@ -51,35 +51,50 @@ host, by the package's `prepare` script.
 
 ## Content
 
-What the home page and About Us say is content: rows of
-[`@bbf/database`](packages/database)'s `content` table, each named by its
-slug, `index` for the home page, with the title and the description its
-front matter carried when it was Markdown, and what is written on it as
-rich text. The admin's Content section lists them in a table that
-searches every word of them, and each opens on a page of its own: its
-metadata in a form on the left, what is written on it in an editor on the
-right, the site's own blocks — an `invite-card` — kept as they are through
-an edit.
+The site's pages come in three kinds, by where their words are kept.
+
+The home page and About Us each have a layout of their own, and a table
+of their own in [`@bbf/database`](packages/database), `home` and `about`,
+of one row: whatever the layout shows is a column of it. Both carry a
+title, a description and what is written on the page, as rich text; the
+home page carries its hero too — a heading of one line of text, of which
+the site draws what stands between asterisks (`**like this**`) as the
+highlight, a paragraph, a
+button and where it leads, and the picture, uploaded as an event's is,
+with the site's own (`hero.image` in `app.config.ts`) standing in for
+none. The migration that makes each table makes its row, and nothing adds
+or removes one after: the structure of a page stays as it is deployed, and
+every word of it is changed in the admin's Settings, a page of tabs, each
+at an address of its own — Home, About Us and Appearance, the last still
+blank. A tab is the editor a page of the content has: the page's metadata
+in a form on the left, over its table of contents, and what is written on
+it in an editor on the right, the site's own blocks — an `invite-card` —
+kept as they are through an edit.
+
+Content is the pages written in the admin, rows of the `content` table,
+each named by its slug with a title, a description and what is written on
+it: what a blog will be made of. The admin's Content section lists them in
+a table that searches every word of them, and each opens on a page of its
+own. One with no layout of its own is served at `/<slug>` by
+`app/pages/[page].vue`, as it is written. The database holds none until
+one is written.
+
+Connect, Events and Sermons are neither: each is its own layout over the
+staff, the events and the sermons the API serves, and its title, with the
+connect page's cards, is a message of [`@bbf/prose`](packages/prose),
+translated with the rest of the interface. What is kept in the database
+is written in one language, as an event is.
 
 The site answers for a page where a built one was served, from
-`server/routes/i18n/[...path].ts`, and `usePage` fetches the one the route
-names, checking its front matter against [`@bbf/schema`](packages/schema).
-A page's body renders through the module's `<Prose>`, with the components
+`server/routes/i18n/[...path].ts`: `index` and `about-us` from their own
+tables, any other slug from the content. `useHomePage`, `useAboutPage`
+and `usePage` fetch one and check its front matter against
+[`@bbf/schema`](packages/schema); the home page's carries its hero. A
+page's body renders through the module's `<Prose>`, with the components
 under `app/components/prose/` in place of the elements and blocks they are
 named for: `A.vue` renders every link as a NuxtLink in the reader's locale,
-`InviteCard.vue` every `invite-card` block. A page the admin adds that has
-no layout of its own is served at `/<slug>` by `app/pages/[page].vue`, as
-it is written. The images the pages show are in
-[`@bbf/assets`](packages/assets), served from the site's root.
-
-The hero the home page opens with is not content either: `HomeHero.vue`
-writes it from the messages of `home.json`, with its picture and where its
-button leads in `app.config.ts`. Connect, Events and Sermons are not
-content: each is its own layout over
-the staff, the events and the sermons the API serves, and its title, with
-the connect page's cards, is a message of [`@bbf/prose`](packages/prose),
-translated with the rest of the interface. What is content is written in
-one language, as an event is.
+`InviteCard.vue` every `invite-card` block. The images the pages show are
+in [`@bbf/assets`](packages/assets), served from the site's root.
 
 ## Language
 

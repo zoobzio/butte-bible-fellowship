@@ -55,7 +55,7 @@ export const useContentEditor = (
         type: "text",
         key: "slug",
         label: $t.admin.editor.slug(),
-        hint: $t.admin.page.slugHint(),
+        hint: $t.admin.editor.slugHint(),
         required: true,
       },
       {

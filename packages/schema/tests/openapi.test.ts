@@ -2,6 +2,9 @@ import { describe, expect, it } from "vitest";
 import { createDocument } from "zod-openapi";
 
 import {
+  aboutArticle,
+  aboutBody,
+  aboutRecord,
   churchEvent,
   churchEvents,
   contentArticle,
@@ -17,6 +20,10 @@ import {
   eventQuery,
   eventRecord,
   eventsQuery,
+  homeArticle,
+  homeBody,
+  homePage,
+  homeRecord,
   page,
   sermon,
   sermonBody,
@@ -140,6 +147,43 @@ const document = createDocument(
           responses: { 200: json(contentRecord) },
         },
       },
+      "/api/pages/index": {
+        get: { responses: { 200: json(homePage) } },
+      },
+      "/admin/api/settings/home": {
+        get: { responses: { 200: json(homeRecord) } },
+        put: {
+          requestBody: {
+            content: { "application/json": { schema: homeBody } },
+          },
+          responses: { 200: json(homeRecord) },
+        },
+      },
+      "/admin/api/settings/home/body": {
+        patch: {
+          requestBody: {
+            content: { "application/json": { schema: homeArticle } },
+          },
+          responses: { 200: json(homeRecord) },
+        },
+      },
+      "/admin/api/settings/about": {
+        get: { responses: { 200: json(aboutRecord) } },
+        put: {
+          requestBody: {
+            content: { "application/json": { schema: aboutBody } },
+          },
+          responses: { 200: json(aboutRecord) },
+        },
+      },
+      "/admin/api/settings/about/body": {
+        patch: {
+          requestBody: {
+            content: { "application/json": { schema: aboutArticle } },
+          },
+          responses: { 200: json(aboutRecord) },
+        },
+      },
       "/admin/api/events": {
         get: {
           requestParams: { query: eventQuery },
@@ -185,6 +229,9 @@ const parameters = (path: string, method: "get" | "post" | "put") => {
 describe("the components", () => {
   it("name every model and every body", () => {
     expect(Object.keys(schemas).sort()).toEqual([
+      "AboutArticle",
+      "AboutBody",
+      "AboutRecord",
       "ChurchEvent",
       "ContentArticle",
       "ContentBody",
@@ -199,6 +246,11 @@ describe("the components", () => {
       "Hast",
       "HastElement",
       "HastText",
+      "HomeArticle",
+      "HomeBody",
+      "HomeHero",
+      "HomePage",
+      "HomeRecord",
       "Page",
       "Sermon",
       "SermonBody",

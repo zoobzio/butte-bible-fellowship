@@ -3,12 +3,17 @@ import { migrations } from "@bbf/database/migrations";
 import { queries } from "@bbf/database/queries";
 import { seeds } from "@bbf/database/seeds";
 import {
+  aboutBody,
+  aboutRecord,
   churchEvent,
   contentBody,
   contentRecord,
   eventBody,
   eventRecord,
   hast,
+  homeBody,
+  homePage,
+  homeRecord,
   page,
   sermon,
   sermonBody,
@@ -22,20 +27,28 @@ import { pg_trgm } from "@electric-sql/pglite/contrib/pg_trgm";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import {
+  toAboutArguments,
   toContentArguments,
   toEventArguments,
+  toHomeArguments,
   toSermonArguments,
   toStaffArguments,
 } from "../src/dao";
 import {
   toChurchEvent,
+  toAboutDocument,
+  toAboutRecord,
   toContentDocument,
   toContentRecord,
   toEventRecord,
+  toHomeDocument,
+  toHomeRecord,
   toSermon,
   toStaffMember,
   toStaffRecord,
 } from "../src/dto";
+
+import { toAboutBody, toAboutForm, toHomeBody, toHomeForm } from "../src/vm";
 
 let db: Awaited<ReturnType<typeof makeTestBezoar<typeof contract>>>;
 
@@ -50,32 +63,65 @@ beforeAll(async () => {
 
 afterAll(() => db.close());
 
-describe("content", () => {
-  it("reads every seeded page as a document the schema accepts, its headings with ids", async () => {
-    for (const { slug } of await db.web.content.list()) {
-      const row = await db.web.content.fetch.first({ slug });
-      const document = toContentDocument(row!);
-      expect(page.parse(document.data.matter), slug).toEqual(
-        document.data.matter,
-      );
-      expect(hast.safeParse(document).success, slug).toBe(true);
-    }
-    const about = toContentDocument(
-      (await db.web.content.fetch.first({ slug: "about-us" }))!,
+describe("the pages with a table of their own", () => {
+  it("reads the home page as a document the schema accepts, its hero in its front matter", async () => {
+    const home = toHomeDocument((await db.web.home.fetch.first())!);
+    expect(homePage.parse(home.data.matter)).toEqual(home.data.matter);
+    expect(hast.safeParse(home).success).toBe(true);
+    expect(home.data.matter).toMatchObject({
+      title: "Butte Bible Fellowship – The Church on Pillsbury Road",
+      hero: { action: "Learn More", link: "/about-us" },
+    });
+    // One line, its highlight marked in it; no picture yet.
+    expect(home.data.matter.hero.heading).toBe(
+      "Discover God’s **Love, Grace & Truth**",
     );
+    expect(home.data.matter.hero.image).toBeUndefined();
+  });
+
+  it("reads About Us as a document the schema accepts, its headings with ids", async () => {
+    const about = toAboutDocument((await db.web.about.fetch.first())!);
+    expect(page.parse(about.data.matter)).toEqual(about.data.matter);
+    expect(hast.safeParse(about).success).toBe(true);
+    expect(about.data.matter).toMatchObject({ title: "About Us" });
     expect(about.children[0]).toMatchObject({
       tagName: "h1",
       properties: { id: "our-vision" },
     });
-    const home = toContentDocument(
-      (await db.web.content.fetch.first({ slug: "index" }))!,
-    );
-    expect(home.data.matter).toEqual({
-      title: "Butte Bible Fellowship – The Church on Pillsbury Road",
-      description: "A non-denominational local church in Chico, California.",
-    });
   });
 
+  it("writes each page's metadata from its form, and reads it back as the admin does", async () => {
+    const home = toHomeRecord((await db.admin.home.fetch.first())!);
+    expect(homeRecord.parse(home)).toEqual(home);
+    const changed = homeBody.parse({
+      ...toHomeBody({
+        ...toHomeForm(home),
+        heroHeading: " Come and **see** ",
+      }),
+      description: undefined,
+    });
+    await db.admin.home.update(toHomeArguments(changed));
+    const read = toHomeRecord((await db.admin.home.fetch.first())!);
+    expect(read.heroHeading).toBe("Come and **see**");
+    expect(read.body).toEqual(home.body);
+    expect(read.description).toBeUndefined();
+
+    const about = toAboutRecord((await db.admin.about.fetch.first())!);
+    expect(aboutRecord.parse(about)).toEqual(about);
+    await db.admin.about.update(
+      toAboutArguments(
+        aboutBody.parse(
+          toAboutBody({ ...toAboutForm(about), description: " " }),
+        ),
+      ),
+    );
+    expect(
+      toAboutDocument((await db.web.about.fetch.first())!).data.matter,
+    ).toEqual({ title: "About Us" });
+  });
+});
+
+describe("content", () => {
   it("writes a page from its body, and reads it back as the admin and the site do", async () => {
     const body = contentBody.parse({
       slug: "membership",

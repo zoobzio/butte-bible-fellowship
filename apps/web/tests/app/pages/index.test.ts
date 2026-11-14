@@ -9,7 +9,16 @@ import Page from "~/pages/index.vue";
 import { document } from "#test/support/content";
 import { mountSuspended } from "@bbf/nuxt/testing/mount";
 
-const home = () => document({ title: "Home – Test Church" });
+const HEADING = "Discover God’s **Love, Grace & Truth**";
+
+const HERO = {
+  heading: HEADING,
+  description: "Join us.",
+  action: "Learn More",
+  link: "/about-us",
+};
+
+const home = () => document({ title: "Home – Test Church", hero: HERO });
 
 const SERMON = {
   slug: "abc123",
@@ -19,7 +28,7 @@ const SERMON = {
 };
 
 beforeEach(() => {
-  setAppConfig({ hero: { image: "/images/church.jpg", to: "/about-us" } });
+  setAppConfig({ hero: { image: "/images/church.jpg" } });
   vi.stubGlobal(
     "$fetch",
     vi.fn(async () => [SERMON]),
@@ -31,12 +40,14 @@ afterEach(() => {
 });
 
 describe("home page", () => {
-  it("opens with the hero, which is the interface's own and takes nothing from the page", async () => {
+  it("opens with the hero, which is the page's own", async () => {
     setContentPages({ "/": home() });
     const { wrapper } = await mountSuspended(Page);
     const hero = wrapper.findComponent(HomeHero);
-    expect(hero.props()).toEqual({});
-    expect(hero.find("h1 em").text()).toBe("Love, Grace & Truth");
+    expect(hero.props()).toEqual({ hero: HERO });
+    expect(hero.find(".home-hero-media img").attributes("src")).toBe(
+      "/images/church.jpg",
+    );
   });
 
   it("renders the page body as markdown", async () => {
@@ -45,7 +56,7 @@ describe("home page", () => {
     const { wrapper } = await mountSuspended(Page);
     expect(
       wrapper.find("section.prose").findComponent(MarkdownBody).props("page"),
-    ).toEqual({ title: "Home – Test Church", body: page });
+    ).toEqual({ title: "Home – Test Church", hero: HERO, body: page });
   });
 
   it("keeps the site's measure around the hero, the body, the week and the sermons, in that order", async () => {

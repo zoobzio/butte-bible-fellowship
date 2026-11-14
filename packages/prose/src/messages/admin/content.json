@@ -4,8 +4,8 @@
     "description": "The title of the page that lists the site's pages."
   },
   "description": {
-    "defaultMessage": "The pages of the site: what each says, and what search engines show for it.",
-    "description": "The line under the title of the page that lists the site's pages: what the list is."
+    "defaultMessage": "The pages written here: what each says, and what search engines show for it.",
+    "description": "The line under the title of the page that lists the pages written in the admin: what the list is. The home page and About Us are not among them: they are in the settings."
   },
   "new": {
     "defaultMessage": "New page",

@@ -10,5 +10,9 @@
   "content": {
     "defaultMessage": "Content",
     "description": "The header link to the list of the site's pages."
+  },
+  "settings": {
+    "defaultMessage": "Settings",
+    "description": "The header link to the settings of the site: the pages with a layout of their own, and how the site looks."
   }
 }

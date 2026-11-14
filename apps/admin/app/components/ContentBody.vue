@@ -12,7 +12,14 @@ import { useContentBody } from "~/composables/content/body";
 <script setup lang="ts">
 defineOptions({ name: "ContentBody" });
 
-const { record } = defineProps<{ record: ContentRecord }>();
+/*
+ * The page whose body this is, a page written in the admin or one of the
+ * site's own, and where its body is written, on its own.
+ */
+const { record, address } = defineProps<{
+  record: Pick<ContentRecord, "body">;
+  address: string;
+}>();
 
 /*
  * The page's table of contents, as it is written now: told once its
@@ -24,7 +31,7 @@ const emit = defineEmits<{ outline: [entries: OutlineEntry[]] }>();
 const { $t } = useNuxtApp();
 
 const { editor, view, editing, outline, dirty, saving, error, save, cancel } =
-  useContentBody(record);
+  useContentBody(record, address);
 
 /*
  * The page saves the record as a whole, from its bar: the body hands

@@ -14,8 +14,7 @@ export const contentRecord = z
         examples: [1],
       }),
     slug: slug.meta({
-      description:
-        "What the page is called in its address: /<slug>, and index for the home page.",
+      description: "What the page is called in its address: /<slug>.",
       examples: ["about-us"],
     }),
     title: z.string().meta({ examples: ["About Us – Butte Bible Fellowship"] }),
@@ -38,7 +37,7 @@ export const contentRecord = z
   .meta({
     id: "ContentRecord",
     description:
-      "A page of the site, as the admin reads it: every column of its row. Its title and description are what a page's front matter carried.",
+      "A page written in the admin, as the admin reads it: every column of its row. Its title and description are what a page's front matter carried.",
   });
 
 export const contentListing = listing(contentRecord).meta({

@@ -32,7 +32,7 @@ describe("content page", () => {
     expect(wrapper.findComponent(PageHeader).props()).toEqual({
       title: "Content",
       description:
-        "The pages of the site: what each says, and what search engines show for it.",
+        "The pages written here: what each says, and what search engines show for it.",
       action: "New page",
     });
     expect(wrapper.find("a.page-header-action").exists()).toBe(false);

@@ -9,13 +9,17 @@ import { useDrafts } from "~/composables/drafts";
  * A panel as a record's page draws it: under a page that saves the record
  * as a whole, with that whole to save and reset it by.
  */
-export const mountHeld = (panel: Component, record: object | null) => {
+export const mountHeld = (
+  panel: Component,
+  record: object | null,
+  props: object = {},
+) => {
   let drafts!: ReturnType<typeof useDrafts>;
   const wrapper = mount(
     defineComponent({
       setup() {
         drafts = useDrafts();
-        return () => h(panel, { record });
+        return () => h(panel, { record, ...props });
       },
     }),
     { attachTo: document.body },

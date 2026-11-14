@@ -1,5 +1,6 @@
 import type { z } from "zod";
 
+import type { aboutArticle, aboutBody, aboutForm } from "./input/about";
 import type {
   contentArticle,
   contentBody,
@@ -19,6 +20,7 @@ import type {
   eventSort,
   eventsQuery,
 } from "./input/event";
+import type { homeArticle, homeBody, homeForm, homeImage } from "./input/home";
 import type { listingQuery, sortDirection } from "./input/listing";
 import type {
   DATE_OPERATORS,
@@ -34,6 +36,7 @@ import type {
   staffQuery,
   staffSort,
 } from "./input/staff";
+import type { aboutRecord } from "./models/about";
 import type { contentListing, contentRecord } from "./models/content";
 import type {
   churchEvent,
@@ -44,6 +47,8 @@ import type {
   eventTime,
 } from "./models/event";
 import type { hast, hastElement, hastText } from "./models/hast";
+import type { homeHero, homePage, homeRecord } from "./models/home";
+import type { link } from "./models/link";
 import type { page } from "./models/page";
 import type { sermon, sermons } from "./models/sermon";
 import type { slug } from "./models/slug";
@@ -93,6 +98,30 @@ export type Sermon = z.infer<typeof sermon>;
 export type Sermons = z.infer<typeof sermons>;
 
 export type Page = z.infer<typeof page>;
+
+export type Link = z.infer<typeof link>;
+
+export type HomeHero = z.infer<typeof homeHero>;
+
+export type HomePage = z.infer<typeof homePage>;
+
+export type HomeRecord = z.infer<typeof homeRecord>;
+
+export type HomeBody = z.infer<typeof homeBody>;
+
+export type HomeForm = z.infer<typeof homeForm>;
+
+export type HomeArticle = z.infer<typeof homeArticle>;
+
+export type HomeImage = z.infer<typeof homeImage>;
+
+export type AboutRecord = z.infer<typeof aboutRecord>;
+
+export type AboutBody = z.infer<typeof aboutBody>;
+
+export type AboutForm = z.infer<typeof aboutForm>;
+
+export type AboutArticle = z.infer<typeof aboutArticle>;
 
 export type ContentRecord = z.infer<typeof contentRecord>;
 

@@ -8,6 +8,7 @@ import TableOfContents from "#layers/bbf/app/components/TableOfContents.vue";
 import ContentBody from "~/components/ContentBody.vue";
 import ContentEditor from "~/components/ContentEditor.vue";
 import SaveBar from "~/components/SaveBar.vue";
+import { body } from "~/composables/content/routes";
 import { useDrafts } from "~/composables/drafts";
 </script>
 
@@ -41,7 +42,11 @@ const contents = ref<OutlineEntry[]>([]);
       <ContentEditor :record="record" @saved="emit('saved', $event)" />
       <TableOfContents :entries="contents" />
     </div>
-    <ContentBody :record="record" @outline="contents = $event" />
+    <ContentBody
+      :record="record"
+      :address="body(record.id)"
+      @outline="contents = $event"
+    />
     <SaveBar
       :dirty="dirty"
       :open="open"

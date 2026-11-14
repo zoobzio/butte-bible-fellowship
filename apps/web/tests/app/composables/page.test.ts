@@ -6,7 +6,7 @@ import {
   setLocale,
   setRoutePath,
 } from "#imports";
-import { usePage } from "~/composables/page";
+import { useAboutPage, useHomePage, usePage } from "~/composables/page";
 import { document, element } from "#test/support/content";
 
 const ABOUT = document({ title: "About" }, element("p", {}, "Modern wisdom…"));
@@ -56,5 +56,58 @@ describe("usePage", () => {
     setContentPages({ "/about-us": document({}) });
     setRoutePath("/about-us");
     await expect(usePage()).rejects.toThrow();
+  });
+});
+
+const HEADING = "Discover God’s **Love, Grace & Truth**";
+
+const HERO = {
+  heading: HEADING,
+  description: "Join us.",
+  action: "Learn More",
+  link: "/about-us",
+};
+
+describe("useHomePage", () => {
+  it("resolves the home page, whatever the route: its hero with its front matter, and its body", async () => {
+    const home = document({ title: "Home", hero: HERO, image: "/no.jpg" });
+    setContentPages({ "/": home });
+    setRoutePath("/somewhere");
+    const { data } = await useHomePage();
+    expect(requestedDocuments).toEqual(["en/index.json"]);
+    expect(data.value).toEqual({ title: "Home", hero: HERO, body: home });
+  });
+
+  it("resolves to null when there is no home page", async () => {
+    const { data } = await useHomePage();
+    expect(data.value).toBeNull();
+  });
+
+  it("refuses a home page with no hero", async () => {
+    setContentPages({ "/": document({ title: "Home" }) });
+    await expect(useHomePage()).rejects.toThrow();
+  });
+});
+
+describe("useAboutPage", () => {
+  it("resolves About Us, whatever the route: the title and description it opens with, and its body", async () => {
+    const about = document({
+      title: "About Us",
+      description: "A clean canvas.",
+    });
+    setContentPages({ "/about-us": about });
+    setRoutePath("/");
+    const { data } = await useAboutPage();
+    expect(requestedDocuments).toEqual(["en/about-us.json"]);
+    expect(data.value).toEqual({
+      title: "About Us",
+      description: "A clean canvas.",
+      body: about,
+    });
+  });
+
+  it("resolves to null when there is no such page", async () => {
+    const { data } = await useAboutPage();
+    expect(data.value).toBeNull();
   });
 });

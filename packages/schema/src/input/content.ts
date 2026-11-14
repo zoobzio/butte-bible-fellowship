@@ -46,8 +46,7 @@ export const contentQuery = listingQuery.extend({
 export const contentBody = z
   .object({
     slug: slug.meta({
-      description:
-        "What the page is called in its address: /<slug>, and index for the home page.",
+      description: "What the page is called in its address: /<slug>.",
     }),
     title: z
       .string()

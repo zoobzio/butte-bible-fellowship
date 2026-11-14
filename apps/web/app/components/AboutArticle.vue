@@ -1,8 +1,6 @@
 <script lang="ts">
 import type { PageItem } from "~/types/page";
 
-import { useNuxtApp } from "#imports";
-
 import MarkdownBody from "~/components/MarkdownBody.vue";
 import PageHeader from "~/components/PageHeader.vue";
 import TableOfContents from "#layers/bbf/app/components/TableOfContents.vue";
@@ -14,16 +12,12 @@ defineOptions({ name: "AboutArticle" });
 
 const { page } = defineProps<{ page: PageItem }>();
 
-const { $t } = useNuxtApp();
 const entries = useOutline(() => page.body);
 </script>
 
 <template>
   <div class="about">
-    <PageHeader
-      :title="$t.about.title()"
-      :description="$t.about.description()"
-    />
+    <PageHeader :title="page.title" :description="page.description" />
     <aside class="about-contents">
       <TableOfContents :entries="entries" />
     </aside>

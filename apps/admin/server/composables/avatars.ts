@@ -1,4 +1,4 @@
-import type { EventRecord, StaffRecord } from "@bbf/schema/types";
+import type { EventRecord, HomeRecord, StaffRecord } from "@bbf/schema/types";
 import type { H3Event } from "h3";
 
 import { randomUUID } from "node:crypto";
@@ -9,6 +9,7 @@ import { useStorage } from "nitropack/runtime";
 import { keys } from "objectively";
 
 import { useEvents } from "~~/server/composables/events";
+import { useHome } from "~~/server/composables/home";
 import { useStaff } from "~~/server/composables/staff";
 import {
   AVATAR_KEY,
@@ -31,6 +32,13 @@ export interface AvatarStore {
 /** The folder the staff's photos are kept in, and the events' pictures. */
 export const STAFF_FOLDER = "staff";
 export const EVENT_FOLDER = "events";
+
+/**
+ * The folder the home page's picture is kept in, and what names it there:
+ * the page is one row, with no id of its own.
+ */
+export const HOME_FOLDER = "home";
+export const HOME_PICTURE = 1;
 
 /** The extension a photo is kept under, by its kind. */
 const extension = (file: File): string =>
@@ -169,4 +177,23 @@ export const useEventImage = (event: H3Event) => {
     set: events.setImage,
     of: (record) => record.image,
   });
+};
+
+/**
+ * The picture of the home page's hero, written on its own, kept apart
+ * from the rest. There is one home page, so nothing names it: `replace`
+ * keeps the file and points the page at it, and `clear` leaves the page
+ * without one, for the site's own picture to stand in.
+ */
+export const useHomeImage = (event: H3Event) => {
+  const home = useHome();
+  const pictures = usePictures<HomeRecord>(useAvatarStore(event, HOME_FOLDER), {
+    fetch: () => home.fetch(),
+    set: (_id, url) => home.setImage(url),
+    of: (record) => record.heroImage,
+  });
+  return {
+    replace: (file: File) => pictures.replace(HOME_PICTURE, file),
+    clear: () => pictures.clear(HOME_PICTURE),
+  };
 };

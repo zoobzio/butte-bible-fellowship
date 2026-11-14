@@ -7,10 +7,6 @@
     "defaultMessage": "Title",
     "description": "The label of the field, and the heading of the table column, for a page's title: what the browser's tab and search engines show."
   },
-  "slugHint": {
-    "defaultMessage": "Lowercase words joined by hyphens. The home page is index.",
-    "description": "The hint under a page's slug field: how a slug is written, and the slug the home page takes."
-  },
   "description": {
     "defaultMessage": "Description",
     "description": "The label of the field, and the heading of the table column, for a page's description: what search engines show under its title."

@@ -1,34 +1,11 @@
-import type { ContentRecord, Hast, Page } from "@bbf/schema/types";
-import type { Root } from "hast";
+import type { ContentRecord } from "@bbf/schema/types";
 
 import { hast } from "@bbf/schema";
-import rehypeSlug from "rehype-slug";
 
-import { toContent } from "../hast";
 import type { ContentRecordRow, ContentRow } from "../types";
+import type { ContentDocument } from "./document";
 
-/**
- * A page as a content document: what is written on it, under the front
- * matter a page carries, as the build wrote a page's from Markdown.
- */
-export interface ContentDocument {
-  type: "root";
-  data: { matter: Page };
-  children: Hast["children"];
-}
-
-const slugger = rehypeSlug();
-
-/**
- * The tree with an id on every heading, which a page's table of contents
- * links to: the editor writes none, so each is given as the page is served,
- * as the build gave a Markdown page's.
- */
-const toOutlined = (tree: Hast): Hast["children"] => {
-  const outlined = structuredClone(tree) as Root;
-  slugger(outlined);
-  return outlined.children.flatMap(toContent);
-};
+import { toDocument } from "./document";
 
 export const toContentRecord = (row: ContentRecordRow): ContentRecord => ({
   id: row.id,
@@ -44,13 +21,8 @@ export const toContentRecord = (row: ContentRecordRow): ContentRecord => ({
  * A page as the site reads it: its title and description as its front
  * matter, over what is written on it, every heading with an id.
  */
-export const toContentDocument = (row: ContentRow): ContentDocument => ({
-  type: "root",
-  data: {
-    matter: {
-      title: row.title,
-      description: row.description ?? undefined,
-    },
-  },
-  children: row.body === null ? [] : toOutlined(hast.parse(row.body)),
-});
+export const toContentDocument = (row: ContentRow): ContentDocument =>
+  toDocument(
+    { title: row.title, description: row.description ?? undefined },
+    row.body,
+  );

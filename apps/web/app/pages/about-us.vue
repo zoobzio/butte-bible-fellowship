@@ -2,7 +2,7 @@
 import { createError, definePageMeta, useHead, useNuxtApp } from "#imports";
 
 import AboutArticle from "~/components/AboutArticle.vue";
-import { usePage } from "~/composables/page";
+import { useAboutPage } from "~/composables/page";
 </script>
 
 <script setup lang="ts">
@@ -12,7 +12,7 @@ definePageMeta({
 
 const { $t } = useNuxtApp();
 
-const { data: page } = await usePage("/about-us");
+const { data: page } = await useAboutPage();
 
 if (!page.value) {
   throw createError({
@@ -21,7 +21,10 @@ if (!page.value) {
   });
 }
 
-useHead(() => ({ title: page.value?.title }));
+/* The tab reads as the other pages' do: the page, then the church. */
+useHead(() => ({
+  title: page.value && `${page.value.title} – ${$t.site.name()}`,
+}));
 </script>
 
 <template>

@@ -10,6 +10,9 @@ export default defineConfig({
       "content:write": "Create, edit and remove the site's pages",
       "events:read": "View events",
       "events:write": "Create, edit and remove events",
+      "settings:read":
+        "View the site's settings: its home page, About Us and how it looks",
+      "settings:write": "Change the site's settings",
       "staff:read": "View staff",
       "staff:write": "Create, edit and remove staff",
       "users:read": "View who may sign in to the admin",

@@ -7,7 +7,7 @@ import { document, element } from "#test/support/content";
 import { mountSuspended } from "@bbf/nuxt/testing/mount";
 
 const ABOUT = document(
-  { title: "About – Test Church" },
+  { title: "About Us", description: "A clean canvas." },
   element("h1", { id: "our-vision" }, "Vision"),
 );
 
@@ -17,16 +17,17 @@ describe("about us page", () => {
     setLocale("es");
     const { wrapper } = await mountSuspended(Page);
     expect(wrapper.findComponent(AboutArticle).props("page")).toEqual({
-      title: "About – Test Church",
+      title: "About Us",
+      description: "A clean canvas.",
       body: ABOUT,
     });
   });
 
-  it("titles the document after the page", async () => {
+  it("titles the document after the page, then the church, as the other pages' tabs read", async () => {
     setContentPages({ "/about-us": ABOUT });
     await mountSuspended(Page);
     expect(useHead.mock.calls[0]![0]()).toEqual({
-      title: "About – Test Church",
+      title: "About Us – Butte Bible Fellowship",
     });
   });
 

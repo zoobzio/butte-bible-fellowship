@@ -106,6 +106,10 @@ describe("requiredScope", () => {
     expect(requiredScope("/api/events/3", "DELETE")).toBe("events:write");
     expect(requiredScope("/api/content", "GET")).toBe("content:read");
     expect(requiredScope("/api/content/3/body", "PATCH")).toBe("content:write");
+    expect(requiredScope("/api/settings/home", "GET")).toBe("settings:read");
+    expect(requiredScope("/api/settings/about/body", "PATCH")).toBe(
+      "settings:write",
+    );
   });
 
   it("needs a scope nobody holds for records the contract does not name", () => {

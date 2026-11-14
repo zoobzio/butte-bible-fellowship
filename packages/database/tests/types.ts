@@ -56,10 +56,27 @@ export type Checks = [
       false
     >
   >,
+  Assert<Equal<Row<Contract, "web.home.fetch">["hero_heading"], string>>,
+  Assert<Equal<Row<Contract, "web.home.fetch">["hero_image"], string | null>>,
   Assert<
     Equal<
-      "hero" extends keyof Row<Contract, "web.content.fetch"> ? true : false,
+      Arguments<Contract, "admin.home.image">["image"],
+      string | null | undefined
+    >
+  >,
+  Assert<Equal<Row<Contract, "web.home.fetch">["body"], unknown>>,
+  Assert<Equal<Row<Contract, "web.about.fetch">["description"], string | null>>,
+  Assert<
+    Equal<
+      "id" extends keyof Row<Contract, "admin.home.fetch"> ? true : false,
       false
+    >
+  >,
+  Assert<Equal<Row<Contract, "admin.about.fetch">["updated_at"], Date>>,
+  Assert<
+    Equal<
+      Arguments<Contract, "admin.about.update">["description"],
+      string | null | undefined
     >
   >,
   Assert<Equal<Row<Contract, "web.content.fetch">["body"], unknown>>,

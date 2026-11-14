@@ -31,7 +31,6 @@ const connect: ConnectConfig = {
 
 const hero: HeroConfig = {
   image: "/images/church.jpg",
-  to: "/about-us",
 };
 
 const footer: FooterConfig = {

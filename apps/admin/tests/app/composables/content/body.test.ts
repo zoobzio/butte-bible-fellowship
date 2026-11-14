@@ -15,13 +15,19 @@ const paragraph = (value: string) => ({
   ],
 });
 
+/** Where the body of the page the tests write is written. */
+const ADDRESS = "/api/content/5/body";
+
+const useBody = (record: Parameters<typeof useContentBody>[0]) =>
+  useContentBody(record, ADDRESS);
+
 /** Writes over the whole body, as typing over a selection does. */
 const write = (bio: ReturnType<typeof useContentBody>, text: string) =>
   bio.editor.run((chain) => chain.selectAll().insertContent(text));
 
 describe("useContentBody", () => {
   it("is the body's editor, on the record's body as a page, not yet edited", () => {
-    const bio = useContentBody(HOME);
+    const bio = useBody(HOME);
     expect(bio.editor.id).toBe("content-body");
     expect(bio.editor.document).toBe("<p>Has served since 2010.</p>");
     expect(bio.editing.value).toBe(false);
@@ -31,18 +37,16 @@ describe("useContentBody", () => {
 
   it("opens empty for a page with nothing written", () => {
     const { body: _, ...bare } = HOME;
-    expect(useContentBody(bare).editor.empty).toBe(true);
+    expect(useBody(bare).editor.empty).toBe(true);
   });
 
   it("starts over from the record, whatever the last visit left", () => {
-    write(useContentBody(HOME), "Someone else.");
-    expect(useContentBody(HOME).editor.document).toBe(
-      "<p>Has served since 2010.</p>",
-    );
+    write(useBody(HOME), "Someone else.");
+    expect(useBody(HOME).editor.document).toBe("<p>Has served since 2010.</p>");
   });
 
   it("knows the body has changed once it is written in", () => {
-    const bio = useContentBody(HOME);
+    const bio = useBody(HOME);
     write(bio, "Since 2010.");
     expect(bio.dirty.value).toBe(true);
     expect(bio.editor.document).toBe("<p>Since 2010.</p>");
@@ -54,7 +58,7 @@ describe("useContentBody", () => {
       body: paragraph("Since 2010."),
     }));
     vi.stubGlobal("$fetch", fetch);
-    const bio = useContentBody(HOME);
+    const bio = useBody(HOME);
     write(bio, "Since 2010.");
     const saving = bio.save();
     expect(bio.saving.value).toBe(true);
@@ -75,7 +79,7 @@ describe("useContentBody", () => {
     const { body: _, ...bare } = HOME;
     const fetch = vi.fn(async () => bare);
     vi.stubGlobal("$fetch", fetch);
-    const bio = useContentBody(HOME);
+    const bio = useBody(HOME);
     bio.editor.run((chain) => chain.clearContent(true));
     expect(bio.editor.empty).toBe(true);
     await bio.save();
@@ -92,7 +96,7 @@ describe("useContentBody", () => {
       body: paragraph("Since 2010."),
     }));
     vi.stubGlobal("$fetch", fetch);
-    const bio = useContentBody(HOME);
+    const bio = useBody(HOME);
     write(bio, "A slip of the keys.");
     bio.cancel();
     expect(fetch).not.toHaveBeenCalled();
@@ -113,7 +117,7 @@ describe("useContentBody", () => {
       throw new Error("The server is away.");
     });
     vi.stubGlobal("$fetch", fetch);
-    const bio = useContentBody(HOME);
+    const bio = useBody(HOME);
     write(bio, "Since 2010.");
     await bio.save();
     expect(bio.error.value).toBe("The server is away.");
@@ -133,7 +137,7 @@ describe("useContentBody", () => {
       () => new Promise<unknown>((resolve) => (answer = resolve)),
     );
     vi.stubGlobal("$fetch", fetch);
-    const bio = useContentBody(HOME);
+    const bio = useBody(HOME);
     write(bio, "Since 2010.");
     const first = bio.save();
     await bio.save();
@@ -183,7 +187,7 @@ describe("useContentBody", () => {
     const record = { ...HOME, body: CONNECT };
     const fetch = vi.fn(async () => record);
     vi.stubGlobal("$fetch", fetch);
-    const body = useContentBody(record);
+    const body = useBody(record);
     expect(body.editor.document).toContain('data-directive="connect-card"');
     body.editor.run((chain) =>
       chain.setTextSelection(1).insertContent("Come and "),
@@ -202,5 +206,24 @@ describe("useContentBody", () => {
     });
     expect(first).toEqual(element("p", {}, text("Find us.")));
     expect(body.error.value).toBeNull();
+  });
+
+  it("writes the body of one of the site's own pages where that page is written, and reads what answers, whatever else it carries", async () => {
+    const fetch = vi.fn(async () => ({
+      title: "Home",
+      heroAction: "Learn More",
+      body: paragraph("Since 2010."),
+      updatedAt: "2026-10-18T09:30:00.000Z",
+    }));
+    vi.stubGlobal("$fetch", fetch);
+    const body = useContentBody({ body: BIO }, "/api/settings/home/body");
+    write(body, "Since 2010.");
+    await body.save();
+    expect(fetch).toHaveBeenCalledWith("/api/settings/home/body", {
+      method: "PATCH",
+      body: { body: paragraph("Since 2010.") },
+    });
+    expect(body.error.value).toBeNull();
+    expect(body.editor.document).toBe("<p>Since 2010.</p>");
   });
 });

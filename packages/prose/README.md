@@ -34,8 +34,6 @@ through the `@bbf/nuxt` layer.
 | `appearance.json` | the header's controls: color scheme, theme and its settings |
 | `language.json`   | the language picker: its button, its list and its search    |
 | `page.json`       | page-level words: not found, contents, the way back         |
-| `home.json`       | the home page's hero: its heading, paragraph and button     |
-| `about.json`      | the about page: its title                                   |
 | `sermons.json`    | the sermons page: its titles, play button, channel link     |
 | `events.json`     | the events pages, their title, an event’s days, the week    |
 | `connect.json`    | the connect page: its titles, its cards, its map’s name     |
@@ -55,6 +53,8 @@ through the `@bbf/nuxt` layer.
 | `admin/member.json`     | a staff member's fields, their photo's controls, and the hints |
 | `admin/content.json`    | the content section: its pages' titles and not found           |
 | `admin/page.json`       | a page's metadata fields, its body's editor, and the hints     |
+| `admin/settings.json`   | the settings page: its title, its tabs and not found           |
+| `admin/home.json`       | the home page's hero: its fields, its picture's controls       |
 
 Messages are ICU MessageFormat, where an ASCII apostrophe is the escape
 character — write a typographic one (`You’re`).
@@ -62,9 +62,10 @@ character — write a typographic one (`You’re`).
 ## Pages
 
 The site's pages are not written here as Markdown any more. What two of
-them say, the home page and About Us, is in the database, in
-`@bbf/database`'s `content` table, where the admin's Content section
-writes it, as an event's own page is. The other three, Connect, Events and
+them say, the home page and About Us, is in the database, each in a table
+of its own in `@bbf/database`, `home` and `about`, where the admin's
+Settings write it — the home page's hero with it, which was messages
+here. The other three, Connect, Events and
 Sermons, had only a title to their name, and the connect page its cards:
 those are messages here now (`connect.head`, `events.head`,
 `sermons.head`, and the rest of `connect.json`), translated as every
@@ -156,7 +157,7 @@ place. Listing a new locale under `translate.targets` is all it takes to
 offer it in both apps.
 
 A page reaches the app through `usePage`, which fetches the page the route
-names, from the database's `content`, checks its front matter against
+names, from the database, checks its front matter against
 `@bbf/schema`, and hands back the front matter over the page's body. The
 body renders through `<Prose>`, with the overrides under
 `app/components/prose/`.

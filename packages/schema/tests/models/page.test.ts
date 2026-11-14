@@ -8,7 +8,7 @@ describe("page", () => {
     expect(page.safeParse({}).success).toBe(false);
   });
 
-  it("carries no hero: the home page's is the interface's own", () => {
+  it("carries no hero: that is the home page's own front matter", () => {
     expect(page.parse({ title: "Home", hero: { tagline: "Welcome" } })).toEqual(
       { title: "Home" },
     );

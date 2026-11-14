@@ -38,7 +38,7 @@ describe("contentId", () => {
 });
 
 describe("contentPath", () => {
-  it("names a page by its slug, the home page by index", () => {
+  it("names a page by its slug", () => {
     expect(contentPath.parse({ slug: "about-us" })).toEqual({
       slug: "about-us",
     });
@@ -68,7 +68,7 @@ describe("contentBody", () => {
     expect(contentBody.parse({ ...PAGE, body: ARTICLE })).toEqual(PAGE);
   });
 
-  it("carries no hero: the home page's is the interface's own", () => {
+  it("carries no hero: that is the home page's, which is no content", () => {
     expect(
       contentBody.parse({ ...PAGE, hero: { tagline: "Welcome" } }),
     ).toEqual(PAGE);

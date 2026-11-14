@@ -3,7 +3,6 @@ import { mount } from "@vue/test-utils";
 
 import type { PageItem } from "~/types/page";
 
-import { useNuxtApp } from "#imports";
 import AboutArticle from "~/components/AboutArticle.vue";
 import MarkdownBody from "~/components/MarkdownBody.vue";
 import PageHeader from "~/components/PageHeader.vue";
@@ -11,16 +10,15 @@ import TableOfContents from "#layers/bbf/app/components/TableOfContents.vue";
 import { document, element } from "#test/support/content";
 
 const ABOUT: PageItem = {
-  title: "About – Test Church",
+  title: "About Us",
+  description: "A clean canvas.",
   body: document(
-    { title: "About – Test Church" },
+    { title: "About Us", description: "A clean canvas." },
     element("h1", { id: "our-vision" }, "Our Vision"),
     element("p", {}, "Modern wisdom…"),
     element("h2", { id: "dreams" }, "Dreams"),
   ),
 };
-
-const { $t } = useNuxtApp();
 
 const mountAbout = (page = ABOUT) => mount(AboutArticle, { props: { page } });
 
@@ -34,15 +32,22 @@ describe("AboutArticle", () => {
     ).toEqual(ABOUT);
   });
 
-  it("heads the page with its title and description", () => {
+  it("heads the page with its own title and description", () => {
     const wrapper = mountAbout();
     const header = wrapper.findComponent(PageHeader);
     expect(header.element).toBe(wrapper.find(".about > :first-child").element);
     expect(header.props()).toEqual({
-      title: $t.about.title(),
-      description: $t.about.description(),
+      title: "About Us",
+      description: "A clean canvas.",
     });
     expect(header.find(".page-header-slot").exists()).toBe(false);
+  });
+
+  it("heads a page with no description with its title alone", () => {
+    const { description: _, ...bare } = ABOUT;
+    const header = mountAbout(bare).findComponent(PageHeader);
+    expect(header.props("description")).toBeUndefined();
+    expect(header.find("p").exists()).toBe(false);
   });
 
   it("lists the page's headings beside it, ahead of the article", () => {
