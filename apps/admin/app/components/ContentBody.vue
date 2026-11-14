@@ -5,8 +5,8 @@ import type { OutlineEntry } from "#layers/bbf/app/types/outline";
 import { Editor } from "#components";
 import { computed, useId, useNuxtApp, useTemplateRef } from "#imports";
 import { useDraft } from "~/composables/drafts";
+import { useEditorOutline } from "~/composables/outline";
 import { useContentBody } from "~/composables/content/body";
-import { useContentOutline } from "~/composables/content/outline";
 </script>
 
 <script setup lang="ts">
@@ -44,7 +44,7 @@ const pt = computed(() => ({
 }));
 
 /* The outline is told once the headings under here can be linked to. */
-useContentOutline(
+useEditorOutline(
   useTemplateRef<HTMLElement>("root"),
   { editor, view, editing, outline },
   (entries) => emit("outline", entries),

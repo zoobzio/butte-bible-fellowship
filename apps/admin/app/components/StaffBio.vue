@@ -1,9 +1,11 @@
 <script lang="ts">
 import type { StaffRecord } from "@bbf/schema/types";
+import type { OutlineEntry } from "#layers/bbf/app/types/outline";
 
 import { Editor } from "#components";
-import { computed, useId, useNuxtApp } from "#imports";
+import { computed, useId, useNuxtApp, useTemplateRef } from "#imports";
 import { useDraft } from "~/composables/drafts";
+import { useEditorOutline } from "~/composables/outline";
 import { useStaffBio } from "~/composables/staff/bio";
 </script>
 
@@ -12,9 +14,16 @@ defineOptions({ name: "StaffBio" });
 
 const { record } = defineProps<{ record: StaffRecord }>();
 
+/*
+ * The bio's table of contents, as it is written now: told once its
+ * headings can be linked to, and again whenever it changes, for the page
+ * around this to list beside the writing.
+ */
+const emit = defineEmits<{ outline: [entries: OutlineEntry[]] }>();
+
 const { $t } = useNuxtApp();
 
-const { editor, view, editing, dirty, saving, error, save, cancel } =
+const { editor, view, editing, outline, dirty, saving, error, save, cancel } =
   useStaffBio(record);
 
 /*
@@ -33,10 +42,17 @@ const pt = computed(() => ({
     "data-placeholder": $t.admin.member.bioEmpty(),
   },
 }));
+
+/* The outline is told once the headings under here can be linked to. */
+useEditorOutline(
+  useTemplateRef<HTMLElement>("root"),
+  { editor, view, editing, outline },
+  (entries) => emit("outline", entries),
+);
 </script>
 
 <template>
-  <section class="staff-bio" :data-editing="editing || undefined">
+  <section ref="root" class="staff-bio" :data-editing="editing || undefined">
     <h2 :id="title" class="staff-bio-title">{{ $t.admin.member.bio() }}</h2>
     <Editor :key="view" :service="editor" :pt="pt" />
   </section>
@@ -47,6 +63,11 @@ const pt = computed(() => ({
   display: grid;
   gap: var(--space-3);
   min-width: 0;
+}
+
+/* A heading scrolled to clears the toolbar, which keeps under the header. */
+.staff-bio .f-data-editor-content [id] {
+  scroll-margin-top: calc(var(--header-height) + 5rem);
 }
 
 /* The heading reads as the labels of the form beside it do. */

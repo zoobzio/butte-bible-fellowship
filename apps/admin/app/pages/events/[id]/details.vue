@@ -1,8 +1,10 @@
 <script lang="ts">
 import type { EventRecord } from "@bbf/schema/types";
+import type { OutlineEntry } from "#layers/bbf/app/types/outline";
 
-import { definePageMeta } from "#imports";
+import { definePageMeta, ref } from "#imports";
 
+import TableOfContents from "#layers/bbf/app/components/TableOfContents.vue";
 import EventBody from "~/components/EventBody.vue";
 import EventEditor from "~/components/EventEditor.vue";
 import EventImage from "~/components/EventImage.vue";
@@ -26,6 +28,12 @@ const emit = defineEmits<{ saved: [record: EventRecord] }>();
  * the screen: each panel hands in its own part of it.
  */
 const { dirty, open, saving, errors, save, reset } = useDrafts();
+
+/*
+ * The table of contents of what is written about the event, which the
+ * writing tells as it is written: under the details, to move about it by.
+ */
+const contents = ref<OutlineEntry[]>([]);
 </script>
 
 <template>
@@ -33,8 +41,9 @@ const { dirty, open, saving, errors, save, reset } = useDrafts();
     <div class="event-page-side">
       <EventImage :record="record" />
       <EventEditor :record="record" @saved="emit('saved', $event)" />
+      <TableOfContents :entries="contents" />
     </div>
-    <EventBody :record="record" />
+    <EventBody :record="record" @outline="contents = $event" />
     <SaveBar
       :dirty="dirty"
       :open="open"
@@ -48,9 +57,9 @@ const { dirty, open, saving, errors, save, reset } = useDrafts();
 
 <style>
 /*
- * Two panels: the event's picture over its details in a narrow column,
- * and what is written about it in what is left. Narrow, one follows the
- * other.
+ * Two panels: the event's picture over its details and its table of
+ * contents in a narrow column, and what is written about it in what is
+ * left. Narrow, one follows the other.
  */
 .event-page {
   display: grid;

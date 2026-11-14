@@ -5,7 +5,7 @@ import type { Ref } from "#imports";
 import { onMounted, watch } from "#imports";
 import { anchor } from "~/utils/outline";
 
-/** What of a page's body its outline is told from. */
+/** What of a piece of writing its outline is told from. */
 interface Written {
   editor: Service<string, string>;
   view: Readonly<Ref<number>>;
@@ -14,13 +14,14 @@ interface Written {
 }
 
 /**
- * Tells a page's table of contents as it is written, once its headings can
- * be linked to. The editor gives its headings their ids once it is on.
- * Until then the page is drawn as plain HTML under `root`, whose headings
+ * Tells the table of contents of a piece of writing, a page's body, an
+ * event's or a member's bio, as it is written, once its headings can be
+ * linked to. The editor gives its headings their ids once it is on. Until
+ * then the writing is drawn as plain HTML under `root`, whose headings
  * are given theirs here, each time it is drawn; `tell` is called only
  * after, so that whatever lists the outline finds the headings it links to.
  */
-export const useContentOutline = (
+export const useEditorOutline = (
   root: Readonly<Ref<HTMLElement | null>>,
   { editor, view, editing, outline }: Written,
   tell: (entries: OutlineEntry[]) => void,

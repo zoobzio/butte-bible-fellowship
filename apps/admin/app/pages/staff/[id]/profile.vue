@@ -1,8 +1,10 @@
 <script lang="ts">
 import type { StaffRecord } from "@bbf/schema/types";
+import type { OutlineEntry } from "#layers/bbf/app/types/outline";
 
-import { definePageMeta } from "#imports";
+import { definePageMeta, ref } from "#imports";
 
+import TableOfContents from "#layers/bbf/app/components/TableOfContents.vue";
 import SaveBar from "~/components/SaveBar.vue";
 import StaffAvatar from "~/components/StaffAvatar.vue";
 import StaffBio from "~/components/StaffBio.vue";
@@ -26,6 +28,12 @@ const emit = defineEmits<{ saved: [record: StaffRecord] }>();
  * the screen: each panel hands in its own part of it.
  */
 const { dirty, open, saving, errors, save, reset } = useDrafts();
+
+/*
+ * The bio's table of contents, which the bio tells as it is written:
+ * under the member's details, to move about it by.
+ */
+const contents = ref<OutlineEntry[]>([]);
 </script>
 
 <template>
@@ -33,8 +41,9 @@ const { dirty, open, saving, errors, save, reset } = useDrafts();
     <div class="staff-page-side">
       <StaffAvatar :record="record" />
       <StaffEditor :record="record" @saved="emit('saved', $event)" />
+      <TableOfContents :entries="contents" />
     </div>
-    <StaffBio :record="record" />
+    <StaffBio :record="record" @outline="contents = $event" />
     <SaveBar
       :dirty="dirty"
       :open="open"
@@ -48,8 +57,9 @@ const { dirty, open, saving, errors, save, reset } = useDrafts();
 
 <style>
 /*
- * Two panels: the member's photo over their details in a narrow column,
- * and their bio in what is left. Narrow, one follows the other.
+ * Two panels: the member's photo over their details and their bio's table
+ * of contents in a narrow column, and their bio in what is left. Narrow,
+ * one follows the other.
  */
 .staff-page {
   display: grid;

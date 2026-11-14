@@ -42,6 +42,38 @@ describe("EventBody", () => {
     expect(wrapper.find(".event-body-actions").exists()).toBe(false);
   });
 
+  it("tells the event's outline, its headings given the ids it links to, and again as it is written", async () => {
+    const body = {
+      type: "root" as const,
+      children: [
+        {
+          type: "element" as const,
+          tagName: "h2",
+          properties: {},
+          children: [{ type: "text" as const, value: "Dreams" }],
+        },
+      ],
+    };
+    const wrapper = mount(EventBody, {
+      props: { record: { ...WORSHIP, body } },
+    });
+    expect(wrapper.emitted("outline")).toEqual([
+      [[{ id: "dreams", depth: 2, text: "Dreams" }]],
+    ]);
+    expect(content(wrapper).find("h2").attributes("id")).toBe("dreams");
+
+    await open(wrapper);
+    expect(content(wrapper).find("h2").attributes("id")).toBe("dreams");
+    editor(wrapper).run((chain) =>
+      chain.setTextSelection({ from: 1, to: 7 }).insertContent("Hopes"),
+    );
+    await wrapper.vm.$nextTick();
+    expect(wrapper.emitted("outline")!.at(-1)).toEqual([
+      [{ id: "hopes", depth: 2, text: "Hopes" }],
+    ]);
+    expect(content(wrapper).find("h2").attributes("id")).toBe("hopes");
+  });
+
   it("invites a click where nothing is written about an event", () => {
     const wrapper = mount(EventBody, { props: { record: BARE } });
     expect(wrapper.find(".f-data-editor").attributes("data-empty")).toBe(

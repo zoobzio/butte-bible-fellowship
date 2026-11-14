@@ -289,6 +289,36 @@ describe("details page", () => {
     expect(wrapper.findComponent(PageHeader).exists()).toBe(false);
   });
 
+  it("lists the headings of what is written about the event under its details, each linked to its own", async () => {
+    const body = {
+      type: "root" as const,
+      children: [
+        {
+          type: "element" as const,
+          tagName: "h2",
+          properties: {},
+          children: [{ type: "text" as const, value: "Our Vision" }],
+        },
+      ],
+    };
+    const wrapper = mount(Details, {
+      props: { record: { ...WORSHIP, body } },
+    });
+    await wrapper.vm.$nextTick();
+    const link = wrapper.find(
+      ".event-page-side > .event-editor + nav.toc a.toc-link",
+    );
+    expect(link.text()).toBe("Our Vision");
+    expect(link.attributes("href")).toBe("#our-vision");
+    expect(wrapper.find(".event-body h2#our-vision").exists()).toBe(true);
+  });
+
+  it("lists nothing under the details of an event with no headings", async () => {
+    const wrapper = mount(Details, { props: { record: WORSHIP } });
+    await wrapper.vm.$nextTick();
+    expect(wrapper.find("nav.toc").exists()).toBe(false);
+  });
+
   it("passes the record the form saved up to the page around it", () => {
     const wrapper = mount(Details, { props: { record: DINNER } });
     const changed = { ...DINNER, title: "Harvest Supper" };

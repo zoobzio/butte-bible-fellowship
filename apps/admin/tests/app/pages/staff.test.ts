@@ -316,6 +316,36 @@ describe("profile page", () => {
     expect(wrapper.findComponent(PageHeader).exists()).toBe(false);
   });
 
+  it("lists the headings of the member's bio under their details, each linked to its own", async () => {
+    const bio = {
+      type: "root" as const,
+      children: [
+        {
+          type: "element" as const,
+          tagName: "h2",
+          properties: {},
+          children: [{ type: "text" as const, value: "Our Vision" }],
+        },
+      ],
+    };
+    const wrapper = mount(Profile, {
+      props: { record: { ...STAFF, bio } },
+    });
+    await wrapper.vm.$nextTick();
+    const link = wrapper.find(
+      ".staff-page-side > .staff-editor + nav.toc a.toc-link",
+    );
+    expect(link.text()).toBe("Our Vision");
+    expect(link.attributes("href")).toBe("#our-vision");
+    expect(wrapper.find(".staff-bio h2#our-vision").exists()).toBe(true);
+  });
+
+  it("lists nothing under the details of a member whose bio has no headings", async () => {
+    const wrapper = mount(Profile, { props: { record: STAFF } });
+    await wrapper.vm.$nextTick();
+    expect(wrapper.find("nav.toc").exists()).toBe(false);
+  });
+
   it("passes the record the form saved up to the page around it", () => {
     const wrapper = mount(Profile, { props: { record: STAFF } });
     const changed = { ...STAFF, name: "Jane Roe" };
