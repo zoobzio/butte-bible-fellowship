@@ -1,7 +1,6 @@
 import { z } from "zod";
 
 import { hast } from "./hast";
-import { listing } from "./listing";
 import { slug } from "./slug";
 
 export const contentRecord = z
@@ -11,6 +10,15 @@ export const contentRecord = z
       .positive()
       .meta({
         description: "What names it to the admin: its row's number.",
+        examples: [1],
+      }),
+    folder: z
+      .int()
+      .positive()
+      .optional()
+      .meta({
+        description:
+          "The folder it is filed in, by its id. Left out, it is at the top, in no folder.",
         examples: [1],
       }),
     slug: slug.meta({
@@ -40,7 +48,8 @@ export const contentRecord = z
       "A page written in the admin, as the admin reads it: every column of its row. Its title and description are what a page's front matter carried.",
   });
 
-export const contentListing = listing(contentRecord).meta({
-  id: "ContentListing",
-  description: "A page of the site's pages, as the admin lists them: by slug.",
+export const contentRecords = z.array(contentRecord).meta({
+  id: "ContentRecords",
+  description:
+    "The pages filed in one folder, or at the top, as the admin lists them: by title.",
 });

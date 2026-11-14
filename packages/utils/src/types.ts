@@ -29,7 +29,13 @@ type SermonColumns = Row<Contract, "web.sermons.fetch">;
 export type SermonRow = Omit<SermonColumns, "body"> &
   Partial<Pick<SermonColumns, "body">>;
 
-export type ContentArguments = Arguments<Contract, "admin.content.create">;
+export type ContentArguments = Arguments<Contract, "admin.content.update">;
+
+export type ContentDraftArguments = Arguments<Contract, "admin.content.create">;
+
+export type FolderRecordRow = Row<Contract, "admin.folders.fetch">;
+
+export type FolderArguments = Arguments<Contract, "admin.folders.create">;
 
 export type HomeArguments = Arguments<Contract, "admin.home.update">;
 

@@ -2,6 +2,7 @@ export * from "./about";
 export * from "./content";
 export * from "./document";
 export * from "./event";
+export * from "./folder";
 export * from "./hast";
 export * from "./home";
 export * from "./sermon";

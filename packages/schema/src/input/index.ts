@@ -1,6 +1,7 @@
 export * from "./about";
 export * from "./content";
 export * from "./event";
+export * from "./folder";
 export * from "./home";
 export * from "./listing";
 export * from "./operators";

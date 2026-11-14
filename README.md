@@ -73,9 +73,9 @@ kept as they are through an edit.
 
 Content is the pages written in the admin, rows of the `content` table,
 each named by its slug with a title, a description and what is written on
-it: what a blog will be made of. The admin's Content section lists them in
-a table that searches every word of them, and each opens on a page of its
-own. One with no layout of its own is served at `/<slug>` by
+it: a collection of documents. The admin's Content section browses them
+by folder, each filed in one of the folders made there or at the top, and
+each opens on a page of its own. One with no layout of its own is served at `/<slug>` by
 `app/pages/[page].vue`, as it is written. The database holds none until
 one is written.
 

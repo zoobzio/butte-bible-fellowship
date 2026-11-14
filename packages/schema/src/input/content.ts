@@ -2,7 +2,7 @@ import { z } from "zod";
 
 import { hast } from "../models/hast";
 import { slug } from "../models/slug";
-import { dayColumn, listingQuery, sorting, textColumn } from "./listing";
+import { sorting } from "./listing";
 
 export const contentPath = z.object({
   slug: slug.meta({
@@ -34,13 +34,18 @@ export const contentSort = z.enum(CONTENT_SORT_KEYS).meta({
   examples: ["title"],
 });
 
-export const contentQuery = listingQuery.extend({
+export const contentQuery = z.object({
+  folder: z.coerce
+    .number()
+    .int()
+    .positive()
+    .optional()
+    .meta({
+      description:
+        "The folder whose pages are listed, by its id. Left out, the pages at the top, in no folder.",
+      examples: [1],
+    }),
   ...sorting(contentSort),
-  ...textColumn("title", "title"),
-  ...textColumn("slug", "slug"),
-  ...textColumn("description", "description"),
-  ...dayColumn("updatedAt", "The day the pages listed were last changed"),
-  ...dayColumn("createdAt", "The day the pages listed were added"),
 });
 
 export const contentBody = z
@@ -61,6 +66,30 @@ export const contentBody = z
     description:
       "A page's metadata as it is written, what its front matter carried: what creating one takes, and what updating one replaces. What is written on the page is written on its own.",
   });
+
+export const contentPlacement = z
+  .object({
+    folder: z
+      .int()
+      .positive()
+      .optional()
+      .meta({
+        description:
+          "The folder the page is filed in, by its id. Left out, it is at the top, in no folder.",
+        examples: [1],
+      }),
+  })
+  .meta({
+    id: "ContentPlacement",
+    description:
+      "Where a page is filed, on its own: what moving it to another folder takes.",
+  });
+
+export const contentDraft = contentBody.extend(contentPlacement.shape).meta({
+  id: "ContentDraft",
+  description:
+    "A new page as it is written: its metadata, and the folder it is made in.",
+});
 
 export const contentForm = z
   .object({

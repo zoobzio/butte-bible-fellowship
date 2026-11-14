@@ -9,7 +9,7 @@
   },
   "content": {
     "defaultMessage": "Content",
-    "description": "The header link to the list of the site's pages."
+    "description": "The header link to the content: its documents, by folder."
   },
   "settings": {
     "defaultMessage": "Settings",

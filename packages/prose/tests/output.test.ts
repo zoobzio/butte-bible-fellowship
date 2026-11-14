@@ -93,6 +93,7 @@ describe("bundles", () => {
       "admin.editor.confirm",
       "admin.member.photoConfirm",
       "admin.event.imageConfirm",
+      "admin.content.moving",
       "connect.map",
     ];
     for (const [key, message] of Object.entries(source)) {
@@ -133,6 +134,9 @@ describe("bundles", () => {
     expect(
       prosary.format("admin.editor.confirm", { name: "Harvest Dinner" }),
     ).toBe("Delete Harvest Dinner? This cannot be undone.");
+    expect(
+      prosary.format("admin.content.moving", { name: "Sermon notes" }),
+    ).toBe("Moving Sermon notes. Open the folder it belongs in.");
     expect(
       prosary.format("admin.member.photoConfirm", { name: "Jane Doe" }),
     ).toBe("Remove Jane Doe’s photo?");

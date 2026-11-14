@@ -40,6 +40,7 @@ const BARE = {
 
 const STAMPS = {
   id: 4,
+  folder_id: null,
   created_at: new Date("2026-10-17T18:00:00.000Z"),
   updated_at: new Date("2026-10-18T09:30:00.000Z"),
 };
@@ -59,8 +60,15 @@ describe("toContentRecord", () => {
     expect(contentRecord.parse(record)).toEqual(record);
   });
 
+  it("carries the folder a page is filed in", () => {
+    const record = toContentRecord({ ...BARE, ...STAMPS, folder_id: 7 });
+    expect(record.folder).toBe(7);
+    expect(contentRecord.parse(record)).toEqual(record);
+  });
+
   it("leaves out what a row has null in", () => {
     const record = toContentRecord({ ...BARE, ...STAMPS });
+    expect(record.folder).toBeUndefined();
     expect(record.description).toBeUndefined();
     expect(record.body).toBeUndefined();
     expect(contentRecord.safeParse(record).success).toBe(true);

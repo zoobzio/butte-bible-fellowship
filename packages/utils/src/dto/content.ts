@@ -9,6 +9,7 @@ import { toDocument } from "./document";
 
 export const toContentRecord = (row: ContentRecordRow): ContentRecord => ({
   id: row.id,
+  folder: row.folder_id ?? undefined,
   slug: row.slug,
   title: row.title,
   description: row.description ?? undefined,

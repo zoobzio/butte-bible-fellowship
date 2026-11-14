@@ -33,7 +33,7 @@ afterAll(() => db.close());
 const HEADING = "Discover God’s **Love, Grace & Truth**";
 
 describe("the build", () => {
-  it("carries the staff, events, sermons, users, staff search, like escape, search cost, staff status, events search, events trim, content and pages migrations in order", () => {
+  it("carries the staff, events, sermons, users, staff search, like escape, search cost, staff status, events search, events trim, content, pages and folders migrations in order", () => {
     expect(migrations.map((migration) => migration.name)).toEqual([
       "staff",
       "events",
@@ -47,6 +47,7 @@ describe("the build", () => {
       "events_trim",
       "content",
       "pages",
+      "folders",
     ]);
   });
 
@@ -101,8 +102,8 @@ describe("the build", () => {
       "web.sermons.list",
       "web.staff.list",
     ]);
-    expect(names.filter((name) => name.startsWith("admin."))).toHaveLength(39);
-    expect(names).toHaveLength(50);
+    expect(names.filter((name) => name.startsWith("admin."))).toHaveLength(46);
+    expect(names).toHaveLength(57);
   });
 });
 
@@ -672,9 +673,8 @@ describe("admin.staff", () => {
 });
 
 describe("admin.content", () => {
-  /* The whole list, in the admin's own order: one page big enough. */
-  const tz = "America/Los_Angeles";
-  const page = { size: 25, offset: 0, tz, direction: "asc" };
+  /* The top of the content, in the admin's own order. */
+  const top = { direction: "asc" };
 
   /* Two pages to list, written here: the content holds none of its own. */
   const WRITTEN = ["core-beliefs", "welcome"];
@@ -736,9 +736,7 @@ describe("admin.content", () => {
   const slugs = async (
     search: Partial<Parameters<typeof db.admin.content.list>[0]>,
   ) =>
-    (await db.admin.content.list({ ...page, ...search })).map(
-      (row) => row.slug,
-    );
+    (await db.admin.content.list({ ...top, ...search })).map((row) => row.slug);
 
   it("creates a page, which the web reads, and writes what is on it on its own", async () => {
     const created = await db.admin.content.create.first({
@@ -784,13 +782,6 @@ describe("admin.content", () => {
       body: article,
     });
 
-    // The free text reads the body's words, with the rest, the page that
-    // carries the text before any that only comes near it.
-    expect((await slugs({ q: "how to join" }))[0]).toBe("membership");
-    expect((await slugs({ q: "membership at the fellowship" }))[0]).toBe(
-      "membership",
-    );
-
     await db.admin.content.body({ id, body: null });
     expect(await db.admin.content.fetch.first({ id })).toMatchObject({
       body: null,
@@ -810,76 +801,189 @@ describe("admin.content", () => {
     ).toMatch(/content_slug_key/);
   });
 
-  it("lists a page of the pages, searched, filtered and sorted", async () => {
-    const today = new Intl.DateTimeFormat("en-CA", {
-      timeZone: tz,
-      dateStyle: "short",
-    }).format(new Date());
-
-    // In the admin's own order, by slug, each row with the whole count.
-    const listed = await db.admin.content.list(page);
+  it("lists the pages filed in one folder, or at the top, sorted", async () => {
+    // At the top, in the admin's own order, by title, each with its body.
+    const listed = await db.admin.content.list(top);
     expect(listed.map((row) => row.slug)).toEqual(WRITTEN);
-    expect(listed.every((row) => row.total === 2)).toBe(true);
+    expect(listed.every((row) => row.folder_id === null)).toBe(true);
     expect(listed[0]).toHaveProperty("body");
     expect(listed[0]).not.toHaveProperty("search");
 
-    // A window of it.
-    expect(await slugs({ size: 1, offset: 1 })).toEqual(["welcome"]);
-    expect(
-      (await db.admin.content.list({ ...page, size: 1, offset: 1 }))[0]?.total,
-    ).toBe(2);
-
-    // The free text: a title, a slug, a description and the body's words, whatever the case, the page that carries the text first,
-    // and near enough when misspelled.
-    const nearest = async (q: string) => (await slugs({ q }))[0];
-    expect(await nearest("CORE-BELIEFS")).toBe("core-beliefs");
-    expect(await nearest("non-denominational local church")).toBe("welcome");
-    expect(await nearest("curious about christianity")).toBe("welcome");
-    expect(await nearest("core beleifs")).toBe("core-beliefs");
-    expect(await slugs({ q: "100%" })).toEqual([]);
-    expect(await slugs({ q: "zzzz" })).toEqual([]);
-
-    // The text filters, on each text column.
-    expect(await slugs({ title_starts_with: "core" })).toEqual([
-      "core-beliefs",
-    ]);
-    expect(await slugs({ title_contains: "– butte bible" })).toEqual([
-      "core-beliefs",
-    ]);
-    expect(await slugs({ title_not_contains: "– butte bible" })).toEqual([
-      "welcome",
-    ]);
-    expect(await slugs({ slug_is: "WELCOME" })).toEqual(["welcome"]);
-    expect(await slugs({ slug_not: "welcome" })).toEqual(["core-beliefs"]);
-    expect(await slugs({ slug_ends_with: "s" })).toEqual(["core-beliefs"]);
-    expect(await slugs({ description_contains: "chico" })).toEqual(["welcome"]);
-    expect(await slugs({ description_is: "present" })).toEqual(WRITTEN);
-    expect(await slugs({ description_is: "missing" })).toEqual([]);
-    expect(await slugs({ description_not: "present" })).toEqual([]);
-
-    // The day filters, read in the church's time zone.
-    expect(await slugs({ updated_on: today })).toEqual(WRITTEN);
-    expect(await slugs({ updated_before: today })).toEqual([]);
-    expect(await slugs({ created_on_or_after: today })).toEqual(WRITTEN);
-    expect(await slugs({ created_after: today })).toEqual([]);
-
     // A sort, either way, and the admin's own order after it.
-    expect(await slugs({ sort: "title" })).toEqual(["core-beliefs", "welcome"]);
-    expect(await slugs({ sort: "title", direction: "desc" })).toEqual([
-      "welcome",
-      "core-beliefs",
-    ]);
+    expect(await slugs({ sort: "title" })).toEqual(WRITTEN);
+    expect(await slugs({ sort: "title", direction: "desc" })).toEqual(
+      [...WRITTEN].reverse(),
+    );
     expect(await slugs({ sort: "slug", direction: "desc" })).toEqual(
       [...WRITTEN].reverse(),
     );
-    expect(await slugs({ sort: "updated_at", direction: "desc" })).toEqual(
+    expect(await slugs({ sort: "slug" })).toEqual(WRITTEN);
+    expect(await slugs({ sort: "created_at", direction: "desc" })).toEqual(
       WRITTEN,
     );
+    expect(await slugs({ sort: "updated_at" })).toEqual([...WRITTEN].reverse());
 
-    // Filters narrow together.
+    // A folder no page is filed in lists none.
+    expect(await slugs({ folder_id: 0 })).toEqual([]);
+  });
+
+  it("files a page in a folder, and back at the top, and leaves when it was changed", async () => {
+    const folder = await db.admin.folders.create.first({ name: "Filed" });
+    const id = (await db.admin.content.list(top))[0]!.id;
+    const before = await db.admin.content.fetch.first({ id });
+
     expect(
-      await slugs({ q: "butte", slug_ends_with: "s", title_not: "nothing" }),
-    ).toEqual(["core-beliefs"]);
+      await db.admin.content.folder.first({ id, folder_id: folder!.id }),
+    ).toEqual({ id, folder_id: folder!.id });
+    expect(await slugs({ folder_id: folder!.id })).toEqual(["core-beliefs"]);
+    expect(await slugs({})).toEqual(["welcome"]);
+    expect(await db.admin.content.fetch.first({ id })).toMatchObject({
+      folder_id: folder!.id,
+      updated_at: before!.updated_at,
+    });
+
+    // A page is written straight into a folder, too.
+    const created = await db.admin.content.create.first({
+      slug: "filed-at-birth",
+      title: "Filed at birth",
+      folder_id: folder!.id,
+    });
+    expect(await slugs({ folder_id: folder!.id })).toEqual([
+      "core-beliefs",
+      "filed-at-birth",
+    ]);
+    await db.admin.content.delete({ id: created!.id });
+
+    // Neither a folder that is not there, nor a page that is not.
+    expect(
+      await refusal(db.admin.content.folder({ id, folder_id: 0 })),
+    ).toMatch(/content_folder_id_fkey/);
+    expect(
+      await db.admin.content.folder.first({ id: 0, folder_id: null }),
+    ).toBeNull();
+
+    expect(await db.admin.content.folder.first({ id })).toEqual({
+      id,
+      folder_id: null,
+    });
+    expect(await slugs({})).toEqual(WRITTEN);
+    await db.admin.folders.delete({ id: folder!.id });
+  });
+});
+
+describe("admin.folders", () => {
+  const names = async (parent_id?: number) =>
+    (await db.admin.folders.list({ parent_id })).map((row) => row.name);
+
+  it("nests folders, lists each level by name, and counts what each holds", async () => {
+    expect(await names()).toEqual([]);
+
+    const sermons = await db.admin.folders.create.first({ name: "Sermons" });
+    const news = await db.admin.folders.create.first({ name: "News" });
+    expect(sermons?.created_at).toBeInstanceOf(Date);
+    const series = await db.admin.folders.create.first({
+      name: "Romans",
+      parent_id: sermons!.id,
+    });
+    const deep = await db.admin.folders.create.first({
+      name: "Chapter 8",
+      parent_id: series!.id,
+    });
+    const document = await db.admin.content.create.first({
+      slug: "no-condemnation",
+      title: "No Condemnation",
+      folder_id: sermons!.id,
+    });
+
+    expect(await names()).toEqual(["News", "Sermons"]);
+    expect(await names(sermons!.id)).toEqual(["Romans"]);
+    expect(await names(series!.id)).toEqual(["Chapter 8"]);
+    expect(await names(deep!.id)).toEqual([]);
+
+    // A folder counts the folders and the pages it holds itself, and none
+    // of what those hold.
+    const listed = await db.admin.folders.list({});
+    expect(listed.map((row) => [row.name, row.count])).toEqual([
+      ["News", 0],
+      ["Sermons", 2],
+    ]);
+    expect(
+      await db.admin.folders.fetch.first({ id: series!.id }),
+    ).toMatchObject({ name: "Romans", parent_id: sermons!.id, count: 1 });
+    expect(await db.admin.folders.fetch.first({ id: 0 })).toBeNull();
+
+    // A name is a folder's own among those beside it, the top's too.
+    expect(await refusal(db.admin.folders.create({ name: "News" }))).toMatch(
+      /folders_parent_id_name_key/,
+    );
+    expect(
+      await refusal(
+        db.admin.folders.create({ name: "Romans", parent_id: sermons!.id }),
+      ),
+    ).toMatch(/folders_parent_id_name_key/);
+    expect(await refusal(db.admin.folders.create({ name: "" }))).toMatch(
+      /folders_name_check/,
+    );
+    // The same name under another folder is another folder's.
+    const twin = await db.admin.folders.create.first({
+      name: "Romans",
+      parent_id: news!.id,
+    });
+
+    // Renamed, it stays where it is.
+    const renamed = await db.admin.folders.update.first({
+      id: series!.id,
+      name: "Letter to the Romans",
+    });
+    expect(renamed?.updated_at).toBeInstanceOf(Date);
+    expect(await names(sermons!.id)).toEqual(["Letter to the Romans"]);
+    expect(
+      await db.admin.folders.update.first({ id: 0, name: "Nothing" }),
+    ).toBeNull();
+
+    // Moved, it takes what it holds with it: never into itself, nor under
+    // a folder of its own.
+    expect(
+      await db.admin.folders.parent.first({
+        id: sermons!.id,
+        parent_id: sermons!.id,
+      }),
+    ).toBeNull();
+    expect(
+      await db.admin.folders.parent.first({
+        id: sermons!.id,
+        parent_id: deep!.id,
+      }),
+    ).toBeNull();
+    expect(
+      await db.admin.folders.parent.first({
+        id: series!.id,
+        parent_id: news!.id,
+      }),
+    ).toMatchObject({ id: series!.id });
+    expect(await names(news!.id)).toEqual(["Letter to the Romans", "Romans"]);
+    expect(await names(series!.id)).toEqual(["Chapter 8"]);
+    expect(await names(sermons!.id)).toEqual([]);
+    // To the top, when no folder is named.
+    expect(
+      await db.admin.folders.parent.first({ id: series!.id }),
+    ).toMatchObject({ id: series!.id });
+    expect(await names()).toEqual(["Letter to the Romans", "News", "Sermons"]);
+    expect(
+      await refusal(db.admin.folders.parent({ id: series!.id, parent_id: 0 })),
+    ).toMatch(/folders_parent_id_fkey/);
+
+    // A folder that holds a folder or a page stays; emptied, it goes.
+    expect(await db.admin.folders.delete({ id: sermons!.id })).toBe(0);
+    expect(await db.admin.folders.delete({ id: series!.id })).toBe(0);
+    await db.admin.content.delete({ id: document!.id });
+    expect(await db.admin.folders.delete({ id: sermons!.id })).toBe(1);
+    expect(await db.admin.folders.delete({ id: deep!.id })).toBe(1);
+    expect(await db.admin.folders.delete({ id: series!.id })).toBe(1);
+    expect(await db.admin.folders.delete({ id: twin!.id })).toBe(1);
+    expect(await db.admin.folders.delete({ id: news!.id })).toBe(1);
+    expect(await db.admin.folders.delete({ id: news!.id })).toBe(0);
+    expect(await names()).toEqual([]);
   });
 });
 
@@ -1803,6 +1907,7 @@ describe("roles", () => {
       names.filter(
         (name) =>
           !name.startsWith("admin.users.") &&
+          !name.startsWith("admin.folders.") &&
           /\.(fetch|list|upcoming|weekly)$/.test(name),
       ),
     );

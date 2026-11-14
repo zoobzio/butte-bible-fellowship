@@ -10,7 +10,11 @@ import { useContentEditor } from "~/composables/content/editor";
 <script setup lang="ts">
 defineOptions({ name: "ContentEditor" });
 
-const { record } = defineProps<{ record: ContentRecord | null }>();
+/* `folder` is where a new page is filed: the folder open as it is added. */
+const { record, folder } = defineProps<{
+  record: ContentRecord | null;
+  folder?: number;
+}>();
 
 const emit = defineEmits<{ saved: [record: ContentRecord] }>();
 
@@ -19,6 +23,7 @@ const { $t } = useNuxtApp();
 const { form, error, dirty, saving, save, reset } = useContentEditor(
   record,
   (saved) => emit("saved", saved),
+  folder,
 );
 
 /*

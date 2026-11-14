@@ -1,29 +1,75 @@
 <script lang="ts">
-import { Dialog, Icon, Table } from "#components";
-import { definePageMeta, ref, useHead, useNuxtApp } from "#imports";
+import { Browser, Dialog, Icon, NuxtLink } from "#components";
+import { computed, definePageMeta, ref, useHead, useNuxtApp } from "#imports";
 
 import ContentEditor from "~/components/ContentEditor.vue";
+import FolderEditor from "~/components/FolderEditor.vue";
 import PageHeader from "~/components/PageHeader.vue";
-import { useContentTable } from "~/composables/content/table";
-import { useTableRequest } from "~/composables/listing";
+import {
+  useBrowserRequest,
+  useContentBrowser,
+} from "~/composables/content/browser";
+import { useContentTasks } from "~/composables/content/tasks";
+import { link } from "~/constants/content";
 </script>
 
 <script setup lang="ts">
 definePageMeta({ middleware: "auth", auth: { scopes: ["content:read"] } });
 
 const { $t } = useNuxtApp();
-const table = useContentTable();
+const browser = useContentBrowser();
 
 useHead(() => ({ title: $t.admin.content.title() }));
 
 /*
- * A new page is written in a dialog over the list. Its form is drawn only
- * while it is open, so each opening starts blank; once saved, the form
- * itself leads on to the page's own page.
+ * What the rows ask for, carried out on the folder that is open: a folder
+ * renamed or removed, and a document or a folder moved, picked up on its row
+ * and put down in whichever folder is opened next.
  */
-const adding = ref(false);
+const {
+  here,
+  busy,
+  error,
+  renaming,
+  renamed,
+  cancel,
+  held,
+  droppable,
+  drop,
+  release,
+} = useContentTasks(browser);
 
-await useTableRequest(table);
+/*
+ * A new document, or a new folder, is written in a dialog over the browser, and
+ * made in the folder that is open. Its form is drawn only while it is open,
+ * so each opening starts blank; a document saved leads on to its own page, and
+ * a folder saved shuts the dialog on the folder listed afresh.
+ */
+const adding = ref<"document" | "folder" | null>(null);
+
+const posting = computed({
+  get: () => adding.value === "document",
+  set: (open) => {
+    adding.value = open ? "document" : null;
+  },
+});
+
+/* One dialog holds a folder's form: a new folder's, or one being renamed. */
+const naming = computed({
+  get: () => adding.value === "folder" || renaming.value !== null,
+  set: (open) => {
+    if (open) return;
+    adding.value = null;
+    cancel();
+  },
+});
+
+const named = async () => {
+  adding.value = null;
+  await renamed();
+};
+
+await useBrowserRequest(browser);
 </script>
 
 <template>
@@ -31,11 +77,36 @@ await useTableRequest(table);
     :title="$t.admin.content.title()"
     :description="$t.admin.content.description()"
     :action="$t.admin.content.new()"
-    @action="adding = true"
-  />
-  <Table :service="table" />
+    @action="adding = 'document'"
+  >
+    <button type="button" class="content-new-folder" @click="adding = 'folder'">
+      {{ $t.admin.content.newFolder() }}
+    </button>
+  </PageHeader>
+  <div v-if="held" class="content-move" role="status">
+    <p class="content-move-text">
+      {{ $t.admin.content.moving({ name: held.name }) }}
+    </p>
+    <button
+      type="button"
+      class="content-move-drop"
+      :disabled="busy || !droppable"
+      @click="drop"
+    >
+      {{ $t.admin.content.moveHere() }}
+    </button>
+    <button type="button" class="content-move-release" @click="release">
+      {{ $t.admin.editor.cancel() }}
+    </button>
+  </div>
+  <p v-if="error" class="content-error" role="alert">{{ error }}</p>
+  <Browser :service="browser">
+    <template #cell:title="{ row }">
+      <NuxtLink :to="link(row)" class="f-anchor">{{ row.title }}</NuxtLink>
+    </template>
+  </Browser>
   <Dialog
-    v-model:open="adding"
+    v-model:open="posting"
     :title="$t.admin.content.new()"
     :description="$t.admin.content.newDescription()"
   >
@@ -43,16 +114,37 @@ await useTableRequest(table);
       type="button"
       class="content-new-close"
       :aria-label="$t.admin.editor.cancel()"
-      @click="adding = false"
+      @click="posting = false"
     >
       <Icon name="x" aria-hidden="true" />
     </button>
-    <ContentEditor :record="null" />
+    <ContentEditor :record="null" :folder="here" />
+  </Dialog>
+  <Dialog
+    v-model:open="naming"
+    :title="
+      renaming ? $t.admin.content.renameFolder() : $t.admin.content.newFolder()
+    "
+    :description="
+      renaming
+        ? $t.admin.content.renameFolderDescription()
+        : $t.admin.content.newFolderDescription()
+    "
+  >
+    <button
+      type="button"
+      class="content-new-close"
+      :aria-label="$t.admin.editor.cancel()"
+      @click="naming = false"
+    >
+      <Icon name="x" aria-hidden="true" />
+    </button>
+    <FolderEditor :folder="renaming" :parent="here" @saved="named" />
   </Dialog>
 </template>
 
 <style>
-/* The way out of the dialog, in its corner, level with its title. */
+/* The way out of a dialog, in its corner, level with its title. */
 .content-new-close {
   position: absolute;
   top: var(--space-5);
@@ -76,5 +168,80 @@ await useTableRequest(table);
   display: block;
   width: var(--space-4);
   height: var(--space-4);
+}
+
+/*
+ * The way to a new folder, beside the way to a new document and second to it:
+ * outlined where that one is filled. What a move puts down or lets go of
+ * is dressed the same.
+ */
+.content-new-folder,
+.content-move-drop,
+.content-move-release {
+  padding: var(--space-2) var(--space-4);
+  border: 1px var(--stroke-solid) var(--rule);
+  border-radius: var(--shape-full);
+  background: transparent;
+  color: var(--on-surface);
+  font: var(--type-label);
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--type-label-letter-spacing);
+  cursor: pointer;
+  transition:
+    color var(--transition-fast),
+    border-color var(--transition-fast);
+}
+
+.content-new-folder:hover,
+.content-move-drop:hover:not(:disabled),
+.content-move-release:hover {
+  color: var(--on-surface-high-contrast);
+  border-color: color-mix(in oklab, var(--primary) 65%, transparent);
+}
+
+/*
+ * What is being moved, over the browser, for as long as it is held: what
+ * it is and what to do with it, then the way to put it down here and the
+ * way to let it go.
+ */
+.content-move {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--shape-md);
+  background: var(--primary-container);
+  color: var(--on-primary-container);
+}
+
+.content-move-text {
+  flex: 1;
+  min-width: 12rem;
+  margin: 0;
+}
+
+.content-move-drop {
+  border-color: transparent;
+  background: var(--primary);
+  color: var(--on-primary);
+}
+
+.content-move-drop:hover:not(:disabled) {
+  color: var(--on-primary);
+}
+
+.content-move-drop:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.content-error {
+  margin: 0 0 var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--shape-sm);
+  background: var(--error-container);
+  color: var(--on-error-container);
 }
 </style>

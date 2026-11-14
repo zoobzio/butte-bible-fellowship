@@ -10,8 +10,10 @@ the kit and the sources never reach it.
 The tables are the site's kinds of data: `home` and `about`, the two pages
 with a layout of their own, each a table of one row that holds whatever
 its layout shows; `content`, the pages written in the admin, each named by
-its slug with a title, a description and what is written on it, which a
-blog will be made of; `staff`, who serve the
+its slug with a title, a description and what is written on it, which the
+admin keeps as its content, each filed in one of the `folders` or at the top;
+`folders`, the content's folders, each named and inside another or at the
+top, however whoever writes it sorts them; `staff`, who serve the
 church, each in a `staff_role` — pastor, elder, staff — which is also the
 order the site lists them in; `events`, each held on a date, and every
 week on that date's day of the week when it is `recurring`, with the page
@@ -34,7 +36,7 @@ would not have offered.
 
 ```
 bezoar.config.ts   the kit config: the output directory, the defaults for the rest
-src/migrations/    the schema, forward only: staff, events, sermons, users, staff search, like escape, search cost, staff status, events search, events trim, content, pages
+src/migrations/    the schema, forward only: staff, events, sermons, users, staff search, like escape, search cost, staff status, events search, events trim, content, pages, folders
 src/seeds/         the staff, the events and the first admin user, each safe to run again
 src/queries/web/   what the site reads: home, about, content, staff, events, sermons
 src/queries/admin/ what the admin app will read and write: the same, in full
@@ -143,14 +145,27 @@ its title, description and body, and `web.content.list` the slug of
 every one. `admin.content` has `list`, `fetch`, `create`, `update` and
 `delete`, by `id`, and `body`, what is written on the page, on its own:
 `create` and `update` write the metadata — the slug, the title and the
-description — and leave the body alone. Its `list` is searched
-as the others are: `q` looked for in the `search` column the content
-migration keeps, the title, the slug, the description and the text of
-the body as one text; the text filters on the `title`,
-`slug` and `description`; the day filters on the days it was `updated` and
-`created`; and `sort` names `title`, `slug`, `created_at` or `updated_at`,
-the pages by slug after any sort. No seed writes a page: the content is
-empty until the admin writes one.
+description — and leave the body alone, and `create` takes the `folder_id`
+the page is filed in from the start; `folder` files a page in another
+folder afterwards, on its own, null for the top, and leaves when it was
+changed as it was. Its `list` is not a page of a search, as the others'
+are: it is every page filed in the folder `folder_id` names, or at the top
+when it is null, and `sort` names `title`, `slug`, `created_at` or
+`updated_at`, the pages by title after any sort. The `search` column the
+content migration keeps is still there, and no query reads it. No seed
+writes a page: the content is empty until the admin writes one.
+
+`admin.folders` has `list`, `fetch`, `create`, `update` and `delete`, by
+`id`, and `parent`, where the folder is, on its own. `list` is the folders
+inside the one `parent_id` names, or at the top when it is null, by name,
+and each row carries `count`, how many folders and pages the folder holds
+itself. `create` takes a name and the folder it is made in; `update`
+renames one where it stands; `parent` moves one into another folder, or to
+the top, and changes nothing when that folder is the folder itself or one
+under it, so no folder is cut loose from the top. `delete` removes a folder
+that holds nothing and leaves one that holds anything, which is how the
+two tell a caller apart from a folder that is not there: a `fetch` first.
+A name is a folder's own among the folders beside it.
 
 `admin.users` has the same, and two more for signing in. A user is added
 by their email and a `user_role` — `admin` or `editor`, the roles of
@@ -188,8 +203,8 @@ so the contract carries, by role, the queries the role may run.
 
 `web` has `SELECT` on `home`, `about`, `content`, `staff`, `events` and `sermons`, and nothing else.
 It may run every read of them, the admin app's plain reads among them, and
-no write; it may not read `users` at all. `admin` has `SELECT`, `INSERT`,
-`UPDATE` and `DELETE` on `content`, `staff`, `events`, `sermons` and `users`, and `SELECT` and `UPDATE` alone on
+no write; it may not read `users` at all, nor `folders`, which the site has no use for yet. `admin` has `SELECT`, `INSERT`,
+`UPDATE` and `DELETE` on `content`, `folders`, `staff`, `events`, `sermons` and `users`, and `SELECT` and `UPDATE` alone on
 `home` and `about`, whose one row is neither added nor removed, and may run every query. Each `id` is an identity column, which
 Postgres fills without a privilege on its sequence, so the tables are the
 whole of each grant.

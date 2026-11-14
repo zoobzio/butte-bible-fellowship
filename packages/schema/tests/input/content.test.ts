@@ -4,9 +4,11 @@ import {
   CONTENT_SORT_KEYS,
   contentArticle,
   contentBody,
+  contentDraft,
   contentForm,
   contentId,
   contentPath,
+  contentPlacement,
   contentQuery,
 } from "../../src/input/content";
 
@@ -82,44 +84,17 @@ describe("contentBody", () => {
 });
 
 describe("contentQuery", () => {
-  it("is the listing query", () => {
-    expect(contentQuery.parse({})).toEqual({ page: 1, size: 25 });
-    expect(contentQuery.parse({ page: "2", q: "vision" })).toEqual({
-      page: 2,
-      size: 25,
-      q: "vision",
-    });
+  it("lists the pages at the top, or those filed in the folder it names", () => {
+    expect(contentQuery.parse({})).toEqual({});
+    expect(contentQuery.parse({ folder: "4" })).toEqual({ folder: 4 });
+    expect(contentQuery.safeParse({ folder: "0" }).success).toBe(false);
+    expect(contentQuery.safeParse({ folder: "sermons" }).success).toBe(false);
   });
 
-  it("takes what each text column is or is not, carries, starts or ends with", () => {
-    const filters = {
-      titleContains: "about",
-      titleNotContains: "events",
-      titleStartsWith: "a",
-      titleEndsWith: "fellowship",
-      titleIs: "About Us",
-      titleNot: "Events",
-      slugIs: "index",
-      slugStartsWith: "about",
-      descriptionIs: "missing",
-      descriptionNot: "present",
-      descriptionContains: "pillsbury",
-    };
-    expect(contentQuery.parse(filters)).toEqual({
-      page: 1,
-      size: 25,
-      ...filters,
-    });
-    expect(contentQuery.safeParse({ titleContains: "" }).success).toBe(false);
-  });
-
-  it("narrows by nothing a page does not carry as a column", () => {
-    const parsed = contentQuery.parse({
-      heroIs: "true",
-      bodyContains: "vision",
-      statusIs: "published",
-    });
-    expect(parsed).toEqual({ page: 1, size: 25 });
+  it("is no page of a search: it carries neither a page nor a text", () => {
+    expect(contentQuery.parse({ page: "2", q: "vision", size: "5" })).toEqual(
+      {},
+    );
   });
 
   it("sorts by a column of the record, either way", () => {
@@ -138,19 +113,29 @@ describe("contentQuery", () => {
     expect(contentQuery.safeParse({ sort: "description" }).success).toBe(false);
     expect(contentQuery.safeParse({ direction: "down" }).success).toBe(false);
   });
+});
 
-  it("takes a day each page was changed or was added before, after, on, on or after or on or before, as YYYY-MM-DD", () => {
-    const days = {
-      updatedAtBefore: "2026-10-17",
-      updatedAtAfter: "2026-10-01",
-      updatedAtOn: "2026-10-10",
-      createdAtOnOrAfter: "2026-01-01",
-      createdAtOnOrBefore: "2026-12-31",
-    };
-    expect(contentQuery.parse(days)).toEqual({ page: 1, size: 25, ...days });
-    expect(contentQuery.safeParse({ updatedAtOn: "10/17/2026" }).success).toBe(
-      false,
-    );
+describe("contentPlacement", () => {
+  it("files a page in a folder, or at the top when it names none", () => {
+    expect(contentPlacement.parse({ folder: 4 })).toEqual({ folder: 4 });
+    expect(contentPlacement.parse({})).toEqual({});
+    expect(contentPlacement.safeParse({ folder: 0 }).success).toBe(false);
+    expect(contentPlacement.safeParse({ folder: "4" }).success).toBe(false);
+  });
+});
+
+describe("contentDraft", () => {
+  it("is a new page's metadata, and the folder it is made in", () => {
+    expect(contentDraft.parse(PAGE)).toEqual(PAGE);
+    expect(contentDraft.parse({ ...PAGE, folder: 4 })).toEqual({
+      ...PAGE,
+      folder: 4,
+    });
+    expect(contentDraft.safeParse({ folder: 4 }).success).toBe(false);
+  });
+
+  it("is where alone a folder is written with the metadata: an update leaves a page where it is", () => {
+    expect(contentBody.parse({ ...PAGE, folder: 4 })).toEqual(PAGE);
   });
 });
 

@@ -1,26 +1,62 @@
 {
   "title": {
     "defaultMessage": "Content",
-    "description": "The title of the page that lists the site's pages."
+    "description": "The title of the page that browses the documents by folder, and the name of the top of the content in the trail of folders over them."
   },
   "description": {
-    "defaultMessage": "The pages written here: what each says, and what search engines show for it.",
-    "description": "The line under the title of the page that lists the pages written in the admin: what the list is. The home page and About Us are not among them: they are in the settings."
+    "defaultMessage": "The documents written here, in folders of your own making: what each says, and what search engines show for it.",
+    "description": "The line under the title of the page that browses the content: what it holds. The home page and About Us are not among the documents: they are in the settings."
   },
   "new": {
-    "defaultMessage": "New page",
-    "description": "The button that opens the form of a new page of the site, and the title of that form's dialog."
+    "defaultMessage": "New document",
+    "description": "The button that opens the form of a new document, and the title of that form's dialog."
   },
   "newDescription": {
-    "defaultMessage": "Its metadata comes first. What is written on it is added on its own page, once it is saved.",
-    "description": "The line under the title of the dialog that adds a new page: what the form asks for, and where the rest is written."
+    "defaultMessage": "Its metadata comes first, and it is filed in the folder that is open. What is written on it is added on its own page, once it is saved.",
+    "description": "The line under the title of the dialog that adds a new document: what the form asks for, where the document is filed, and where the rest is written."
   },
   "notFound": {
-    "defaultMessage": "Page not found",
-    "description": "The error shown when an address names a page of the site that does not exist."
+    "defaultMessage": "Document not found",
+    "description": "The error shown when an address names a document that does not exist."
   },
   "page": {
-    "defaultMessage": "Page",
-    "description": "The tab of a page's own page in the admin that holds its metadata and what is written on it."
+    "defaultMessage": "Document",
+    "description": "The tab of a document's own page in the admin that holds its metadata and what is written on it."
+  },
+  "newFolder": {
+    "defaultMessage": "New folder",
+    "description": "The button that opens the form of a new folder, and the title of that form's dialog."
+  },
+  "newFolderDescription": {
+    "defaultMessage": "It is made inside the folder that is open.",
+    "description": "The line under the title of the dialog that adds a new folder: where the folder is made."
+  },
+  "folderName": {
+    "defaultMessage": "Name",
+    "description": "The label of the field for a folder's name."
+  },
+  "rename": {
+    "defaultMessage": "Rename",
+    "description": "The action on a folder's row that opens the form of its name."
+  },
+  "renameFolder": {
+    "defaultMessage": "Rename folder",
+    "description": "The title of the dialog that renames a folder."
+  },
+  "renameFolderDescription": {
+    "defaultMessage": "It stays where it is, with everything in it.",
+    "description": "The line under the title of the dialog that renames a folder: what a new name leaves as it is."
+  },
+  "move": {
+    "defaultMessage": "Move",
+    "description": "The action on a document's or a folder's row that picks it up, to be put down in another folder."
+  },
+  "moving": {
+    "defaultMessage": "Moving {name}. Open the folder it belongs in.",
+    "description": "What the page says over the folders while a document or a folder is picked up to be moved, and what to do next. `name` is the document's title or the folder's name."
+  },
+  "moveHere": {
+    "defaultMessage": "Move here",
+    "description": "The button that puts what was picked up down in the folder that is open."
   }
 }

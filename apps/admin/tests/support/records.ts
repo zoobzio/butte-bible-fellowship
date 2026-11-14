@@ -2,6 +2,7 @@ import type {
   AboutRecord,
   ContentRecord,
   EventRecord,
+  FolderRecord,
   HomeRecord,
   StaffRecord,
 } from "@bbf/schema/types";
@@ -71,6 +72,25 @@ export const ABOUT: ContentRecord = {
   id: 6,
   slug: "about-us",
   title: "About Us",
+  createdAt: "2026-10-17T18:00:00.000Z",
+  updatedAt: "2026-10-17T18:00:00.000Z",
+};
+
+/** A folder at the top of the content, which holds the one inside it. */
+export const NOTES: FolderRecord = {
+  id: 2,
+  name: "Sermon notes",
+  count: 1,
+  createdAt: "2026-10-17T18:00:00.000Z",
+  updatedAt: "2026-10-17T18:00:00.000Z",
+};
+
+/** A folder inside it, which holds nothing. */
+export const ROMANS: FolderRecord = {
+  id: 3,
+  parent: 2,
+  name: "Romans",
+  count: 0,
   createdAt: "2026-10-17T18:00:00.000Z",
   updatedAt: "2026-10-17T18:00:00.000Z",
 };

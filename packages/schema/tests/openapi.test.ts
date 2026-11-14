@@ -9,10 +9,12 @@ import {
   churchEvents,
   contentArticle,
   contentBody,
+  contentDraft,
   contentId,
-  contentListing,
+  contentPlacement,
   contentQuery,
   contentRecord,
+  contentRecords,
   eventBody,
   eventId,
   eventListing,
@@ -20,6 +22,13 @@ import {
   eventQuery,
   eventRecord,
   eventsQuery,
+  folderBody,
+  folderDraft,
+  folderId,
+  folderPlacement,
+  folderRecord,
+  folderRecords,
+  foldersQuery,
   homeArticle,
   homeBody,
   homePage,
@@ -129,13 +138,61 @@ const document = createDocument(
       "/admin/api/content": {
         get: {
           requestParams: { query: contentQuery },
-          responses: { 200: json(contentListing) },
+          responses: { 200: json(contentRecords) },
         },
         post: {
           requestBody: {
-            content: { "application/json": { schema: contentBody } },
+            content: { "application/json": { schema: contentDraft } },
           },
           responses: { 201: json(contentRecord) },
+        },
+      },
+      "/admin/api/content/{id}": {
+        put: {
+          requestParams: { path: contentId },
+          requestBody: {
+            content: { "application/json": { schema: contentBody } },
+          },
+          responses: { 200: json(contentRecord) },
+        },
+      },
+      "/admin/api/content/{id}/folder": {
+        patch: {
+          requestParams: { path: contentId },
+          requestBody: {
+            content: { "application/json": { schema: contentPlacement } },
+          },
+          responses: { 200: json(contentRecord) },
+        },
+      },
+      "/admin/api/folders": {
+        get: {
+          requestParams: { query: foldersQuery },
+          responses: { 200: json(folderRecords) },
+        },
+        post: {
+          requestBody: {
+            content: { "application/json": { schema: folderDraft } },
+          },
+          responses: { 201: json(folderRecord) },
+        },
+      },
+      "/admin/api/folders/{id}": {
+        put: {
+          requestParams: { path: folderId },
+          requestBody: {
+            content: { "application/json": { schema: folderBody } },
+          },
+          responses: { 200: json(folderRecord) },
+        },
+      },
+      "/admin/api/folders/{id}/parent": {
+        patch: {
+          requestParams: { path: folderId },
+          requestBody: {
+            content: { "application/json": { schema: folderPlacement } },
+          },
+          responses: { 200: json(folderRecord) },
         },
       },
       "/admin/api/content/{id}/body": {
@@ -235,14 +292,21 @@ describe("the components", () => {
       "ChurchEvent",
       "ContentArticle",
       "ContentBody",
-      "ContentListing",
+      "ContentDraft",
+      "ContentPlacement",
       "ContentRecord",
+      "ContentRecords",
       "ContentStatus",
       "EventBody",
       "EventDay",
       "EventListing",
       "EventRecord",
       "EventTime",
+      "FolderBody",
+      "FolderDraft",
+      "FolderPlacement",
+      "FolderRecord",
+      "FolderRecords",
       "Hast",
       "HastElement",
       "HastText",

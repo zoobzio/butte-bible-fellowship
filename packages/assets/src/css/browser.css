@@ -1,0 +1,256 @@
+/*
+ * Foundation's data browser, as the admin browses its content: the trail of
+ * folders from the top and the refresh over a card of rows, the folders
+ * first and the files after. Each rule is scoped to the browser's own root
+ * so a Fab or a menu elsewhere keeps its own dress. The layer's icons are
+ * bare `svg` elements, and its reset lays an `svg` out as a block: every
+ * part that holds one is a flex box here, so an icon sits in line with its
+ * label.
+ */
+
+.f-data-browser {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.f-data-browser svg {
+  flex: none;
+  width: var(--space-4);
+  height: var(--space-4);
+}
+
+/* While the folder is fetched, what it held last waits, dimmed. */
+.f-data-browser-loading .f-table {
+  opacity: 0.6;
+}
+
+/* The toolbar: the trail takes the width the refresh after it leaves. */
+.f-data-browser-toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.f-data-browser-breadcrumb {
+  flex: 1;
+  min-width: 0;
+}
+
+/*
+ * The trail: each folder above the open one a button back to it, a slash
+ * between two, and the open one named in full after them.
+ */
+.f-data-browser-breadcrumb .f-ol {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/*
+ * A crumb is a list item, and the site's prose draws a dash before every
+ * one and makes room for it: a crumb has neither.
+ */
+.f-data-browser-breadcrumb .f-li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding-left: 0;
+  line-height: inherit;
+}
+
+.f-data-browser-breadcrumb .f-li::before {
+  content: none;
+}
+
+.f-data-browser-breadcrumb .f-li:not(:last-child)::after {
+  content: "/";
+  color: var(--on-surface-muted);
+}
+
+.f-data-browser-breadcrumb .f-li > .f-button,
+.f-data-browser-breadcrumb .f-li > .f-span {
+  padding: var(--space-1) var(--space-2);
+  border: 0;
+  border-radius: var(--shape-sm);
+  background: transparent;
+  font: var(--type-label);
+  font-weight: var(--weight-medium);
+}
+
+.f-data-browser-breadcrumb .f-li > .f-button {
+  color: var(--on-surface-muted);
+  cursor: pointer;
+  transition:
+    color var(--transition-fast),
+    background var(--transition-fast);
+}
+
+.f-data-browser-breadcrumb .f-li > .f-button:hover {
+  color: var(--on-surface-high-contrast);
+  background: color-mix(in oklab, var(--primary-container) 30%, transparent);
+}
+
+.f-data-browser-breadcrumb .f-li > .f-span {
+  color: var(--on-surface-high-contrast);
+}
+
+/* The controls: the refresh and each row's actions, outlined. */
+.f-data-browser-toolbar > .f-button,
+.f-data-browser-actions .f-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-2);
+  border: 1px var(--stroke-solid) var(--rule);
+  border-radius: var(--shape-sm);
+  background: transparent;
+  color: var(--on-surface);
+  cursor: pointer;
+  transition:
+    color var(--transition-fast),
+    border-color var(--transition-fast),
+    background var(--transition-fast);
+}
+
+.f-data-browser-toolbar > .f-button:hover,
+.f-data-browser-actions .f-button:hover {
+  color: var(--on-surface-high-contrast);
+  border-color: color-mix(in oklab, var(--primary) 65%, transparent);
+  background: color-mix(in oklab, var(--primary-container) 30%, transparent);
+}
+
+/*
+ * The rows, a card: a border around it. The borders are kept apart so the
+ * card's corners can round; the cells draw the rules between rows
+ * themselves, the last row of the card none.
+ */
+.f-data-browser .f-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  border: 1px var(--stroke-solid) var(--rule);
+  border-radius: var(--shape-md);
+  background: var(--surface);
+  font-size: var(--body-size);
+  transition: opacity var(--transition-fast);
+}
+
+.f-data-browser .f-td {
+  padding: var(--space-3);
+  border-bottom: 1px var(--stroke-solid) var(--rule);
+  text-align: left;
+  vertical-align: middle;
+}
+
+.f-data-browser .f-tbody:last-child .f-tr:last-child .f-td {
+  border-bottom: none;
+}
+
+.f-data-browser .f-tbody .f-tr:hover .f-td {
+  background: color-mix(in oklab, var(--primary-container) 25%, transparent);
+}
+
+.f-data-browser .f-tbody:first-child .f-tr:first-child .f-td:first-child {
+  border-top-left-radius: calc(var(--shape-md) - 1px);
+}
+
+.f-data-browser .f-tbody:first-child .f-tr:first-child .f-td:last-child {
+  border-top-right-radius: calc(var(--shape-md) - 1px);
+}
+
+.f-data-browser .f-tbody:last-child .f-tr:last-child .f-td:first-child {
+  border-bottom-left-radius: calc(var(--shape-md) - 1px);
+}
+
+.f-data-browser .f-tbody:last-child .f-tr:last-child .f-td:last-child {
+  border-bottom-right-radius: calc(var(--shape-md) - 1px);
+}
+
+/*
+ * A folder: its row is the way into it, the whole of its cell a button,
+ * its icon before its name and how much it holds after.
+ */
+.f-data-browser-folder-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--on-surface-high-contrast);
+  font: inherit;
+  font-weight: var(--weight-medium);
+  text-align: left;
+  cursor: pointer;
+}
+
+.f-data-browser-folder-btn > svg {
+  color: var(--primary);
+}
+
+.f-data-browser-folder-btn:hover > .f-span {
+  color: var(--primary-high-contrast);
+  text-decoration: underline;
+}
+
+.f-data-browser-folder-count {
+  padding: 0 var(--space-2);
+  border-radius: var(--shape-full);
+  background: var(--surface-container);
+  color: var(--on-surface-muted);
+  font-size: var(--label-size);
+  font-weight: var(--weight-regular);
+}
+
+/*
+ * A cell that links, a document's title the way to its own page: it reads as
+ * the cells beside it do, a shade darker, and underlines as the pointer
+ * comes over it.
+ */
+.f-data-browser .f-td > .f-anchor {
+  color: var(--on-surface-high-contrast);
+  font-weight: var(--weight-medium);
+  text-decoration-color: transparent;
+  transition: text-decoration-color var(--transition-fast);
+}
+
+.f-data-browser .f-td > .f-anchor:hover {
+  color: var(--primary-high-contrast);
+  text-decoration-color: currentColor;
+}
+
+/* A folder with no document in it, or with nothing in it at all, says so. */
+.f-data-browser-no-files .f-td,
+.f-data-browser-empty {
+  padding: var(--space-6) var(--space-3);
+  color: var(--on-surface-muted);
+  text-align: center;
+}
+
+.f-data-browser-empty {
+  border: 1px var(--stroke-solid) var(--rule);
+  border-radius: var(--shape-md);
+  background: var(--surface);
+}
+
+.f-data-browser-actions {
+  width: 1%;
+  text-align: right;
+}
+
+/* Narrow, the card scrolls sideways rather than squeeze its columns. */
+@media (max-width: 44rem) {
+  .f-data-browser .f-table {
+    display: block;
+    overflow-x: auto;
+  }
+
+  .f-data-browser .f-td {
+    white-space: nowrap;
+  }
+}

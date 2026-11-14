@@ -23,6 +23,9 @@ const blank = (value: string | undefined): string | undefined =>
  * the form. The form's store is shared under its id, so
  * each visit starts over from the record.
  *
+ * A new page is filed in the `folder` given, the one open as it is added,
+ * or at the top when there is none; a page that exists stays where it is.
+ *
  * A new page saved opens on its own page, where the writing waits; one
  * changed stays on the page, its fields showing what was kept, and the
  * record saved is handed to `saved`, for the page to name it afresh. A save
@@ -35,6 +38,7 @@ const blank = (value: string | undefined): string | undefined =>
 export const useContentEditor = (
   record: ContentRecord | null,
   saved: (record: ContentRecord) => void = () => {},
+  folder?: number,
 ) => {
   const api = useApi();
   const router = useRouter();
@@ -70,7 +74,10 @@ export const useContentEditor = (
     submit: async (form) => {
       const body = toContentBody(contentForm.parse(form.payload));
       if (record === null) {
-        const created = await api(ROUTE, { method: "POST", body });
+        const created = await api(ROUTE, {
+          method: "POST",
+          body: { ...body, folder },
+        });
         await router.push(link(contentRecord.parse(created)));
         return;
       }

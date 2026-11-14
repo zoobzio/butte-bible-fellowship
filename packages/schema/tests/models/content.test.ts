@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { contentListing, contentRecord } from "../../src/models/content";
+import { contentRecord, contentRecords } from "../../src/models/content";
 
 const BODY = {
   type: "root",
@@ -74,10 +74,14 @@ describe("contentRecord", () => {
   });
 });
 
-describe("contentListing", () => {
-  it("is a page of records and the count of them all", () => {
-    const listing = { items: [HOME, BARE], total: 12 };
-    expect(contentListing.parse(listing)).toEqual(listing);
-    expect(contentListing.safeParse({ items: [HOME] }).success).toBe(false);
+describe("contentRecords", () => {
+  it("is the pages of one folder, each a record, the folder it is filed in with it", () => {
+    const filed = [{ ...HOME, folder: 3 }, BARE];
+    expect(contentRecords.parse(filed)).toEqual(filed);
+    expect(contentRecords.parse([])).toEqual([]);
+    expect(contentRecords.safeParse([{ id: 1 }]).success).toBe(false);
+    expect(contentRecords.safeParse([{ ...BARE, folder: 0 }]).success).toBe(
+      false,
+    );
   });
 });
