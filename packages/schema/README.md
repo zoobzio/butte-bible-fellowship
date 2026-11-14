@@ -20,6 +20,7 @@ into a query's arguments before it runs.
 ```
 src/models/      what the API answers with: one file per kind of thing
   about.ts       About Us as the admin reads it
+  connect.ts     the connect page as the admin reads it, and its front matter as the site reads it
   content.ts     a page written in the admin as the admin reads it, and the pages of one folder
   folder.ts      a folder of the content as the admin reads it, and the folders of one level
   home.ts        the home page as the admin reads it, its hero, and its front matter as the site reads it
@@ -33,6 +34,7 @@ src/models/      what the API answers with: one file per kind of thing
   slug.ts        what names a thing in an address
 src/input/       what a request carries, one file per group of endpoints
   about.ts       About Us: the metadata and the body of a write
+  connect.ts     the connect page: the metadata and the body of a write
   content.ts     the pages written in the admin: the id of one, the query of a folder's, the metadata and the body of a write, and where one is filed
   folder.ts      the content's folders: the id of one, the query of a level's, the name of a write, and where one is
   home.ts        the home page: the metadata and the body of a write, and its hero's picture as it is uploaded
@@ -80,13 +82,18 @@ written on its own too: `contentPlacement` is the folder it is moved to,
 none for the top, and `contentDraft` is the one write that carries both,
 a new page's metadata and the folder it is made in. A folder of the content
 follows: `folderBody` is its name, `folderPlacement` the folder it is
-inside, and `folderDraft` a new one's name and where it is made. The two pages with a table of
+inside, and `folderDraft` a new one's name and where it is made. The three pages with a table of
 their own are written the same way, without an id or a slug: `aboutBody`,
 a title and a description, and `aboutArticle`; `homeBody`, with the words
 of the hero the page opens with — `heroHeading` is one line of text, its
 highlight between asterisks — `homeArticle`, and `homeImage`, the hero's picture as it
 is uploaded. `homePage` is the home page's front matter as the site reads
-it: a page's, and its `hero`. An input is one part of a request, named for the
+it: a page's, and its `hero`. The connect page follows: `connectBody` is
+its title and description and how to find and reach the church — the
+`address`, which alone must be written, the `phone`, the `fax`, the
+`email` and the `hours` its office keeps, a line of text to a line of the
+page — `connectArticle` what is written on it, and `connectPage` its front
+matter as the site reads it. An input is one part of a request, named for the
 group and the part: `eventPath` is the path parameters of one event,
 `eventsQuery` the query of the events list, `eventBody` what a write
 carries. An event is written with the date it is held and whether it is

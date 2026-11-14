@@ -33,7 +33,7 @@ afterAll(() => db.close());
 const HEADING = "Discover God’s **Love, Grace & Truth**";
 
 describe("the build", () => {
-  it("carries the staff, events, sermons, users, staff search, like escape, search cost, staff status, events search, events trim, content, pages and folders migrations in order", () => {
+  it("carries the staff, events, sermons, users, staff search, like escape, search cost, staff status, events search, events trim, content, pages, folders and connect migrations in order", () => {
     expect(migrations.map((migration) => migration.name)).toEqual([
       "staff",
       "events",
@@ -48,6 +48,7 @@ describe("the build", () => {
       "content",
       "pages",
       "folders",
+      "connect",
     ]);
   });
 
@@ -91,6 +92,7 @@ describe("the build", () => {
     const names = Object.keys(contract.queries);
     expect(names.filter((name) => name.startsWith("web."))).toEqual([
       "web.about.fetch",
+      "web.connect.fetch",
       "web.content.fetch",
       "web.content.list",
       "web.events.fetch",
@@ -102,8 +104,8 @@ describe("the build", () => {
       "web.sermons.list",
       "web.staff.list",
     ]);
-    expect(names.filter((name) => name.startsWith("admin."))).toHaveLength(46);
-    expect(names).toHaveLength(57);
+    expect(names.filter((name) => name.startsWith("admin."))).toHaveLength(49);
+    expect(names).toHaveLength(61);
   });
 });
 
@@ -233,6 +235,24 @@ describe("web", () => {
     ]);
     expect(about?.body).toMatchObject({ type: "root" });
     expect(await db.web.about.fetch()).toHaveLength(1);
+  });
+
+  it("reads the connect page: the header it opens with, how to find and reach the church, and nothing written yet", async () => {
+    const connect = await db.web.connect.fetch.first();
+    expect(connect).toEqual({
+      title: "Connect",
+      description:
+        "We’d love to meet you. Here are the people to ask for, and how to reach us.",
+      address: "2255 Pillsbury Road, Chico, California 95926",
+      phone: "530-892-0521",
+      fax: "530-898-1851",
+      email: "office@bbfchurchchico.org",
+      // The hours the office keeps: a line of text to a line of the page.
+      hours:
+        "Tuesday–Thursday: 9am–4pm\nFriday: 9am–noon\nSaturday, Sunday, Monday: closed",
+      body: null,
+    });
+    expect(await db.web.connect.fetch()).toHaveLength(1);
   });
 
   it("makes each page as rich text, the site's blocks among its elements", async () => {
@@ -1130,6 +1150,61 @@ describe("admin.about", () => {
   });
 });
 
+describe("admin.connect", () => {
+  it("writes its metadata and what is written on it each on its own, which the web reads", async () => {
+    const before = await db.admin.connect.fetch.first();
+    expect(before?.updated_at).toBeInstanceOf(Date);
+    const metadata = {
+      title: "Find Us",
+      description: null,
+      address: "1 Main Street, Chico",
+      phone: null,
+      fax: null,
+      email: null,
+      hours: null,
+    };
+
+    const updated = await db.admin.connect.update.first(metadata);
+    expect(updated?.updated_at).toBeInstanceOf(Date);
+    expect(await db.web.connect.fetch.first()).toEqual({
+      ...metadata,
+      body: null,
+    });
+
+    const body = { type: "root", children: [] };
+    const written = await db.admin.connect.body.first({ body });
+    expect(written?.updated_at).toBeInstanceOf(Date);
+    expect(await db.web.connect.fetch.first()).toEqual({ ...metadata, body });
+
+    // Put back, for the tests after this one.
+    const { updated_at: _, body: none, ...kept } = before!;
+    await db.admin.connect.update(kept);
+    await db.admin.connect.body({ body: none });
+    expect(await db.web.connect.fetch.first()).toEqual({ ...kept, body: none });
+  });
+
+  it("needs an address, which its map is drawn from", async () => {
+    const {
+      updated_at: _,
+      body: __,
+      ...kept
+    } = (await db.admin.connect.fetch.first())!;
+    await expect(
+      // @ts-expect-error: the address is required.
+      db.admin.connect.update({ ...kept, address: null }),
+    ).rejects.toThrow(/address/);
+  });
+
+  it("is one row, and no more", async () => {
+    await expect(
+      db.build
+        .insertInto("connect")
+        .values({ title: "Another", address: "Elsewhere" })
+        .execute(),
+    ).rejects.toThrow(/connect_pkey/);
+  });
+});
+
 describe("the pages migration", () => {
   /*
    * A database the content seed had written the two pages to, as it did
@@ -1919,6 +1994,7 @@ describe("roles", () => {
     expect(await web.web.content.list()).toHaveLength(0);
     expect(await web.web.home.fetch()).toHaveLength(1);
     expect(await web.web.about.fetch()).toHaveLength(1);
+    expect(await web.web.connect.fetch()).toHaveLength(1);
   });
 
   it("refuses a write as web, by name and in the database", async () => {
@@ -1970,6 +2046,9 @@ describe("roles", () => {
     );
     await expect(admin.build.deleteFrom("home").execute()).rejects.toThrow(
       /permission denied for table home/,
+    );
+    await expect(admin.build.deleteFrom("connect").execute()).rejects.toThrow(
+      /permission denied for table connect/,
     );
   });
 

@@ -216,10 +216,10 @@ describe("useContentBody", () => {
       updatedAt: "2026-10-18T09:30:00.000Z",
     }));
     vi.stubGlobal("$fetch", fetch);
-    const body = useContentBody({ body: BIO }, "/api/settings/home/body");
+    const body = useContentBody({ body: BIO }, "/api/site/home/body");
     write(body, "Since 2010.");
     await body.save();
-    expect(fetch).toHaveBeenCalledWith("/api/settings/home/body", {
+    expect(fetch).toHaveBeenCalledWith("/api/site/home/body", {
       method: "PATCH",
       body: { body: paragraph("Since 2010.") },
     });

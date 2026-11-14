@@ -13,6 +13,10 @@ export type AboutRow = Row<Contract, "web.about.fetch">;
 
 export type AboutRecordRow = Row<Contract, "admin.about.fetch">;
 
+export type ConnectRow = Row<Contract, "web.connect.fetch">;
+
+export type ConnectRecordRow = Row<Contract, "admin.connect.fetch">;
+
 type EventColumns = Row<Contract, "web.events.fetch">;
 
 export type EventRow = Omit<EventColumns, "body"> &
@@ -40,6 +44,8 @@ export type FolderArguments = Arguments<Contract, "admin.folders.create">;
 export type HomeArguments = Arguments<Contract, "admin.home.update">;
 
 export type AboutArguments = Arguments<Contract, "admin.about.update">;
+
+export type ConnectArguments = Arguments<Contract, "admin.connect.update">;
 
 export type EventArguments = Arguments<Contract, "admin.events.create">;
 

@@ -36,7 +36,7 @@ through the `@bbf/nuxt` layer.
 | `page.json`       | page-level words: not found, contents, the way back         |
 | `sermons.json`    | the sermons page: its titles, play button, channel link     |
 | `events.json`     | the events pages, their title, an event’s days, the week    |
-| `connect.json`    | the connect page: its titles, its cards, its map’s name     |
+| `connect.json`    | the connect page: its cards’ headings and labels, its map   |
 | `roles.json`      | a staff member's roles, as the site and the admin name them |
 
 | File                    | Messages                                                       |
@@ -53,23 +53,25 @@ through the `@bbf/nuxt` layer.
 | `admin/member.json`     | a staff member's fields, their photo's controls, and the hints |
 | `admin/content.json`    | the content section: its pages' titles and not found           |
 | `admin/page.json`       | a page's metadata fields, its body's editor, and the hints     |
-| `admin/settings.json`   | the settings page: its title, its tabs and not found           |
+| `admin/pages.json`      | the site's own pages: their list, their names and not found    |
 | `admin/home.json`       | the home page's hero: its fields, its picture's controls       |
+| `admin/connect.json`    | the connect page's fields: how to reach the church, the hints  |
+| `admin/settings.json`   | the settings page: its title and its tab                       |
 
 Messages are ICU MessageFormat, where an ASCII apostrophe is the escape
 character — write a typographic one (`You’re`).
 
 ## Pages
 
-The site's pages are not written here as Markdown any more. What two of
-them say, the home page and About Us, is in the database, each in a table
-of its own in `@bbf/database`, `home` and `about`, where the admin's
-Settings write it — the home page's hero with it, which was messages
-here. The other three, Connect, Events and
-Sermons, had only a title to their name, and the connect page its cards:
-those are messages here now (`connect.head`, `events.head`,
-`sermons.head`, and the rest of `connect.json`), translated as every
-message is. The site answers for each at the
+The site's pages are not written here as Markdown any more. What three of
+them say, the home page, About Us and the connect page, is in the
+database, each in a table of its own in `@bbf/database`, `home`, `about`
+and `connect`, where the admin's Site pages write it — the home page's
+hero with it, and the connect page's title, description and office hours,
+which were messages here. What is left of `connect.json` is the headings
+and labels of its cards, and its map's name. The other two, Events and
+Sermons, had only a title to their name: those are messages here now
+(`events.head`, `sermons.head`), translated as every message is. The site answers for each at the
 address a built page had, `/i18n/content/<locale>/<page>.json`, from
 `server/routes/i18n/[...path].ts`, in the one language it is written in.
 

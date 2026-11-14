@@ -97,7 +97,7 @@ describe("HomeImage", () => {
       string,
       { method: string; body: FormData },
     ];
-    expect(path).toBe("/api/settings/home/image");
+    expect(path).toBe("/api/site/home/image");
     expect(request.method).toBe("PATCH");
     expect(request.body.get("file")).toBe(file);
     expect(wrapper.find("img.home-image-picture").attributes("src")).toBe(
@@ -133,7 +133,7 @@ describe("HomeImage", () => {
     const wrapper = mount(HomeImage, { props: { record: PICTURED } });
     await wrapper.find(".home-image-remove").trigger("click");
     await flushPromises();
-    expect(fetch).toHaveBeenCalledWith("/api/settings/home/image", {
+    expect(fetch).toHaveBeenCalledWith("/api/site/home/image", {
       method: "DELETE",
     });
     expect(wrapper.find("img").exists()).toBe(false);

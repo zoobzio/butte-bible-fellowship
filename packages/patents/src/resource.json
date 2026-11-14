@@ -8,6 +8,8 @@
     "events:write",
     "settings:read",
     "settings:write",
+    "site:read",
+    "site:write",
     "staff:read",
     "staff:write",
     "users:read",

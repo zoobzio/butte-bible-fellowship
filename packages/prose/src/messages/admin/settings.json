@@ -4,23 +4,11 @@
     "description": "The title of the admin's settings page, over its tabs."
   },
   "description": {
-    "defaultMessage": "The pages of the site with a layout of their own, and how the site looks.",
+    "defaultMessage": "How the site looks.",
     "description": "The line under the title of the settings page: what is set there."
-  },
-  "home": {
-    "defaultMessage": "Home",
-    "description": "The tab of the settings page that holds the site's home page: its metadata, its hero and what is written on it."
-  },
-  "about": {
-    "defaultMessage": "About Us",
-    "description": "The tab of the settings page that holds the site's About Us page: its title, its description and what is written on it."
   },
   "appearance": {
     "defaultMessage": "Appearance",
     "description": "The tab of the settings page for how the site looks."
-  },
-  "notFound": {
-    "defaultMessage": "Page not found",
-    "description": "The error shown when a tab of the settings page finds no row for its page of the site."
   }
 }

@@ -53,20 +53,27 @@ host, by the package's `prepare` script.
 
 The site's pages come in three kinds, by where their words are kept.
 
-The home page and About Us each have a layout of their own, and a table
-of their own in [`@bbf/database`](packages/database), `home` and `about`,
-of one row: whatever the layout shows is a column of it. Both carry a
-title, a description and what is written on the page, as rich text; the
-home page carries its hero too — a heading of one line of text, of which
+The home page, About Us and the connect page each have a layout of their
+own, and a table of their own in [`@bbf/database`](packages/database),
+`home`, `about` and `connect`, of one row: whatever the layout shows is a
+column of it. All three carry a title, a description and what is written
+on the page, as rich text; the connect page carries how to find and reach
+the church too — its address, which its map is drawn from, its phone
+number, fax number and email, and the hours its office keeps, a line of
+text to a line of the page — and the
+home page carries its hero — a heading of one line of text, of which
 the site draws what stands between asterisks (`**like this**`) as the
 highlight, a paragraph, a
 button and where it leads, and the picture, uploaded as an event's is,
 with the site's own (`hero.image` in `app.config.ts`) standing in for
 none. The migration that makes each table makes its row, and nothing adds
 or removes one after: the structure of a page stays as it is deployed, and
-every word of it is changed in the admin's Settings, a page of tabs, each
-at an address of its own — Home, About Us and Appearance, the last still
-blank. A tab is the editor a page of the content has: the page's metadata
+every word of it is changed in the admin's Site section: a page of cards,
+one for each of the three, each leading to that page's own in the admin,
+at an address under `/site`, whose first tab, Content, and its only one
+yet, edits it. The admin's Settings are apart from them, a page of one
+tab, Appearance, still blank. The Content tab is the editor a page of the
+content has: the page's metadata
 in a form on the left, over its table of contents, and what is written on
 it in an editor on the right, the site's own blocks — an `invite-card` —
 kept as they are through an edit.
@@ -79,17 +86,18 @@ each opens on a page of its own. One with no layout of its own is served at `/<s
 `app/pages/[page].vue`, as it is written. The database holds none until
 one is written.
 
-Connect, Events and Sermons are neither: each is its own layout over the
-staff, the events and the sermons the API serves, and its title, with the
-connect page's cards, is a message of [`@bbf/prose`](packages/prose),
-translated with the rest of the interface. What is kept in the database
+Events and Sermons are neither: each is its own layout over the events
+and the sermons the API serves, and its title is a message of
+[`@bbf/prose`](packages/prose), translated with the rest of the
+interface, as the headings and labels of the connect page's cards are. What is kept in the database
 is written in one language, as an event is.
 
 The site answers for a page where a built one was served, from
-`server/routes/i18n/[...path].ts`: `index` and `about-us` from their own
-tables, any other slug from the content. `useHomePage`, `useAboutPage`
-and `usePage` fetch one and check its front matter against
-[`@bbf/schema`](packages/schema); the home page's carries its hero. A
+`server/routes/i18n/[...path].ts`: `index`, `about-us` and `connect` from
+their own tables, any other slug from the content. `useHomePage`,
+`useAboutPage`, `useConnectPage` and `usePage` fetch one and check its
+front matter against [`@bbf/schema`](packages/schema); the home page's
+carries its hero, and the connect page's how to reach the church. A
 page's body renders through the module's `<Prose>`, with the components
 under `app/components/prose/` in place of the elements and blocks they are
 named for: `A.vue` renders every link as a NuxtLink in the reader's locale,

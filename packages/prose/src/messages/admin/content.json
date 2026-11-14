@@ -5,7 +5,7 @@
   },
   "description": {
     "defaultMessage": "The documents written here, in folders of your own making: what each says, and what search engines show for it.",
-    "description": "The line under the title of the page that browses the content: what it holds. The home page and About Us are not among the documents: they are in the settings."
+    "description": "The line under the title of the page that browses the content: what it holds. The home page, About Us and the connect page are not among the documents: they are under Site."
   },
   "new": {
     "defaultMessage": "New document",

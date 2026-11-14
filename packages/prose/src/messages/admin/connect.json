@@ -1,0 +1,30 @@
+{
+  "address": {
+    "defaultMessage": "Address",
+    "description": "The label of the field for the church's full street address, on the connect page."
+  },
+  "addressHint": {
+    "defaultMessage": "The street address in full. The page’s map is drawn from it.",
+    "description": "The hint under the field for the church's street address: how to write it, and what else it is used for."
+  },
+  "phone": {
+    "defaultMessage": "Phone",
+    "description": "The label of the field for the church's phone number, on the connect page."
+  },
+  "fax": {
+    "defaultMessage": "Fax",
+    "description": "The label of the field for the church's fax number, on the connect page."
+  },
+  "email": {
+    "defaultMessage": "Email",
+    "description": "The label of the field for the church's email address, on the connect page."
+  },
+  "hours": {
+    "defaultMessage": "Office hours",
+    "description": "The label of the field for the hours the church's office keeps, on the connect page."
+  },
+  "hoursHint": {
+    "defaultMessage": "One line for each line of the page.",
+    "description": "The hint under the field for the office's hours: each line typed is a line of the card on the site."
+  }
+}

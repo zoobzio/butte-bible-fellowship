@@ -1,0 +1,46 @@
+{
+  "title": {
+    "defaultMessage": "Site",
+    "description": "The title of the admin's page that lists the pages of the site with a layout of their own, each on a card, and the way back to it from the page of one."
+  },
+  "description": {
+    "defaultMessage": "The pages of the site with a layout of their own. Open one to change what it says.",
+    "description": "The line under the title of the page that lists the site's own pages: what it holds, and what to do there."
+  },
+  "content": {
+    "defaultMessage": "Content",
+    "description": "The first tab of the admin's page for one of the site's own pages: the editor of its metadata and of what is written on it."
+  },
+  "list": {
+    "defaultMessage": "Pages",
+    "description": "The accessible name of the list of cards, one for each of the site's own pages."
+  },
+  "home": {
+    "defaultMessage": "Home",
+    "description": "The name of the site's home page: the heading of its card, and the title of its page in the admin."
+  },
+  "homeDescription": {
+    "defaultMessage": "The hero the site opens with, its picture, and the welcome written under it.",
+    "description": "The line on the home page's card, and under the title of its page in the admin: what of the home page is changed there."
+  },
+  "about": {
+    "defaultMessage": "About Us",
+    "description": "The name of the site's About Us page: the heading of its card, and the title of its page in the admin."
+  },
+  "aboutDescription": {
+    "defaultMessage": "The title and description the page opens with, and the church’s vision and beliefs written under them.",
+    "description": "The line on the About Us page's card, and under the title of its page in the admin: what of About Us is changed there."
+  },
+  "connect": {
+    "defaultMessage": "Connect",
+    "description": "The name of the site's connect page: the heading of its card, and the title of its page in the admin."
+  },
+  "connectDescription": {
+    "defaultMessage": "How to find and reach the church: its address, phone, fax and email, and its office hours.",
+    "description": "The line on the connect page's card, and under the title of its page in the admin: what of the connect page is changed there."
+  },
+  "notFound": {
+    "defaultMessage": "Page not found",
+    "description": "The error shown when the editor of one of the site's own pages finds no row for it."
+  }
+}

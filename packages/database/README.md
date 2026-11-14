@@ -7,9 +7,9 @@ Postgres in memory, describes every query, and writes `.output/`, which is
 what this package exports. An app imports the build and has the database:
 the kit and the sources never reach it.
 
-The tables are the site's kinds of data: `home` and `about`, the two pages
-with a layout of their own, each a table of one row that holds whatever
-its layout shows; `content`, the pages written in the admin, each named by
+The tables are the site's kinds of data: `home`, `about` and `connect`,
+the three pages with a layout of their own, each a table of one row that
+holds whatever its layout shows; `content`, the pages written in the admin, each named by
 its slug with a title, a description and what is written on it, which the
 admin keeps as its content, each filed in one of the `folders` or at the top;
 `folders`, the content's folders, each named and inside another or at the
@@ -36,9 +36,9 @@ would not have offered.
 
 ```
 bezoar.config.ts   the kit config: the output directory, the defaults for the rest
-src/migrations/    the schema, forward only: staff, events, sermons, users, staff search, like escape, search cost, staff status, events search, events trim, content, pages, folders
+src/migrations/    the schema, forward only: staff, events, sermons, users, staff search, like escape, search cost, staff status, events search, events trim, content, pages, folders, connect
 src/seeds/         the staff, the events and the first admin user, each safe to run again
-src/queries/web/   what the site reads: home, about, content, staff, events, sermons
+src/queries/web/   what the site reads: home, about, connect, content, staff, events, sermons
 src/queries/admin/ what the admin app will read and write: the same, in full
 src/roles/         what each app's role may do: web reads, admin reads and writes
 tests/             the build, run through @bezoar/testing
@@ -140,6 +140,16 @@ with its table, with the words the site had, and where the two pages were
 rows of the content, `index` and `about-us`, it moves what was written on
 them across and takes them out of the content.
 
+`web.connect.fetch` reads the connect page the same way: its title and
+description, the header it opens with, and how to find and reach the
+church — the `address`, which the site draws the page's map from too, the
+`phone`, the `fax`, the `email` and the `hours` its office keeps, a line
+of text to a line of the page, each but the address null when the page
+says nothing of it — over what is written on it, which is null until the
+admin writes it. `admin.connect` has `fetch`, `update` and `body`, as the
+other two have. The connect migration makes its row, with the words the
+site had in its interface's messages and its configuration.
+
 `web.content.fetch` is a page written in the admin, by its slug, with
 its title, description and body, and `web.content.list` the slug of
 every one. `admin.content` has `list`, `fetch`, `create`, `update` and
@@ -201,11 +211,11 @@ the next run. The build declares each role before the migrations and
 applies its grants after them, and then plans every query as every role,
 so the contract carries, by role, the queries the role may run.
 
-`web` has `SELECT` on `home`, `about`, `content`, `staff`, `events` and `sermons`, and nothing else.
+`web` has `SELECT` on `home`, `about`, `connect`, `content`, `staff`, `events` and `sermons`, and nothing else.
 It may run every read of them, the admin app's plain reads among them, and
 no write; it may not read `users` at all, nor `folders`, which the site has no use for yet. `admin` has `SELECT`, `INSERT`,
 `UPDATE` and `DELETE` on `content`, `folders`, `staff`, `events`, `sermons` and `users`, and `SELECT` and `UPDATE` alone on
-`home` and `about`, whose one row is neither added nor removed, and may run every query. Each `id` is an identity column, which
+`home`, `about` and `connect`, whose one row is neither added nor removed, and may run every query. Each `id` is an identity column, which
 Postgres fills without a privilege on its sequence, so the tables are the
 whole of each grant.
 

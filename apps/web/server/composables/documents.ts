@@ -3,6 +3,7 @@ import type { ContentDocument } from "@bbf/utils";
 import { contentPath, eventPath } from "@bbf/schema";
 
 import { useAbout } from "~~/server/composables/about";
+import { useConnect } from "~~/server/composables/connect";
 import { useContent } from "~~/server/composables/content";
 import { useEvents } from "~~/server/composables/events";
 import { useHome } from "~~/server/composables/home";
@@ -24,8 +25,9 @@ const eventOf = (path: string): string | undefined => {
 
 /**
  * The documents the database holds, as the content catalog asks for them:
- * the pages with a table of their own, the home page as `index` and About
- * Us; the pages written in the admin; and the events' own. They are
+ * the pages with a table of their own, the home page as `index`, About Us
+ * and the connect page; the pages written in the admin; and the events'
+ * own. They are
  * written in one language, so every locale is answered with the same one.
  */
 export const useDocuments = () => {
@@ -39,6 +41,7 @@ export const useDocuments = () => {
   const own: Record<string, () => Promise<ContentDocument<unknown> | null>> = {
     index: () => useHome().fetch(),
     "about-us": () => useAbout().fetch(),
+    connect: () => useConnect().fetch(),
   };
 
   const list = async (): Promise<string[]> => {

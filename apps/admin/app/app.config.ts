@@ -8,6 +8,7 @@ const header: HeaderConfig = {
     { label: "admin.navigation.staff", to: "/staff" },
     { label: "admin.navigation.events", to: "/events" },
     { label: "admin.navigation.content", to: "/content" },
+    { label: "admin.navigation.site", to: "/site" },
     { label: "admin.navigation.settings", to: "/settings" },
   ],
 };

@@ -1,6 +1,7 @@
 import type { z } from "zod";
 
 import type { aboutArticle, aboutBody, aboutForm } from "./input/about";
+import type { connectArticle, connectBody, connectForm } from "./input/connect";
 import type {
   contentArticle,
   contentBody,
@@ -46,6 +47,7 @@ import type {
   staffSort,
 } from "./input/staff";
 import type { aboutRecord } from "./models/about";
+import type { connectPage, connectRecord } from "./models/connect";
 import type { contentRecord, contentRecords } from "./models/content";
 import type {
   churchEvent,
@@ -132,6 +134,16 @@ export type AboutBody = z.infer<typeof aboutBody>;
 export type AboutForm = z.infer<typeof aboutForm>;
 
 export type AboutArticle = z.infer<typeof aboutArticle>;
+
+export type ConnectPage = z.infer<typeof connectPage>;
+
+export type ConnectRecord = z.infer<typeof connectRecord>;
+
+export type ConnectBody = z.infer<typeof connectBody>;
+
+export type ConnectForm = z.infer<typeof connectForm>;
+
+export type ConnectArticle = z.infer<typeof connectArticle>;
 
 export type ContentRecord = z.infer<typeof contentRecord>;
 

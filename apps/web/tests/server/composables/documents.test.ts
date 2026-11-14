@@ -71,10 +71,22 @@ const ABOUT = {
   body: { type: "root", children: [HEADING] },
 };
 
+const CONNECT = {
+  title: "Connect",
+  description: null,
+  address: "1 Test Street, Testville",
+  phone: "555-010-0100",
+  fax: null,
+  email: null,
+  hours: "Friday: 9am–noon",
+  body: null,
+};
+
 const pages = vi.fn(async () => Object.keys(PAGES).map((slug) => ({ slug })));
 const page = vi.fn(async (args: { slug: string }) => PAGES[args.slug] ?? null);
 const home = vi.fn(async (): Promise<object | null> => HOME);
 const about = vi.fn(async (): Promise<object | null> => ABOUT);
+const connect = vi.fn(async (): Promise<object | null> => CONNECT);
 
 const list = vi.fn(async (_args: { from: string }) => [ROW, BARE]);
 const first = vi.fn(async (args: { slug: string }) => {
@@ -89,6 +101,7 @@ Object.assign(service, {
     content: { list: pages, fetch: { first: page } },
     home: { fetch: { first: home } },
     about: { fetch: { first: about } },
+    connect: { fetch: { first: connect } },
     events: { list, fetch: { first } },
   },
 });
@@ -98,6 +111,7 @@ afterEach(() => {
   page.mockClear();
   home.mockClear();
   about.mockClear();
+  connect.mockClear();
   list.mockClear();
   first.mockClear();
 });
@@ -107,6 +121,7 @@ describe("useDocuments", () => {
     expect(await useDocuments().list()).toEqual([
       "index.json",
       "about-us.json",
+      "connect.json",
       "membership.json",
       "events/worship-service.json",
       "events/prayer-meeting.json",
@@ -169,7 +184,7 @@ describe("useDocuments", () => {
   });
 
   it("answers nothing for the pages whose words are the interface's: they are no content", async () => {
-    for (const path of ["events.json", "sermons.json", "connect.json"]) {
+    for (const path of ["events.json", "sermons.json"]) {
       expect(await useDocuments().get(path), path).toBeUndefined();
     }
     expect(list).not.toHaveBeenCalled();
@@ -193,6 +208,24 @@ describe("useDocuments", () => {
       children: [PARAGRAPH],
     });
     expect(first).toHaveBeenCalledWith({ slug: "worship-service" });
+  });
+
+  it("answers the connect page from its own table, how to reach the church in its front matter", async () => {
+    expect(await useDocuments().get("connect.json")).toEqual({
+      type: "root",
+      data: {
+        matter: {
+          title: "Connect",
+          address: "1 Test Street, Testville",
+          phone: "555-010-0100",
+          hours: "Friday: 9am–noon",
+        },
+      },
+      children: [],
+    });
+    expect(page).not.toHaveBeenCalled();
+    connect.mockResolvedValueOnce(null);
+    expect(await useDocuments().get("connect.json")).toBeUndefined();
   });
 
   it("answers an event nothing is written about as an empty document", async () => {

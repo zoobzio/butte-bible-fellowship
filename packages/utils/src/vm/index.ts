@@ -1,4 +1,5 @@
 export * from "./about";
+export * from "./connect";
 export * from "./content";
 export * from "./event";
 export * from "./hast";

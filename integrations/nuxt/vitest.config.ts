@@ -17,6 +17,7 @@ export default defineConfig({
   },
   test: {
     environment: "happy-dom",
+    pool: "vmThreads",
     include: ["tests/**/*.test.ts"],
     fsModuleCache: true,
     setupFiles: ["tests/setup.ts"],

@@ -4,6 +4,7 @@ import type { Arguments, Row } from "bezoar";
 
 import type {
   toAboutArguments,
+  toConnectArguments,
   toContentArguments,
   toEventArguments,
   toHomeArguments,
@@ -14,6 +15,8 @@ import {
   toAboutDocument,
   toAboutRecord,
   toChurchEvent,
+  toConnectDocument,
+  toConnectRecord,
   toContentDocument,
   toContentRecord,
   toEventRecord,
@@ -116,11 +119,19 @@ declare const webHome: Row<Contract, "web.home.fetch">;
 declare const adminHome: Row<Contract, "admin.home.fetch">;
 declare const webAbout: Row<Contract, "web.about.fetch">;
 declare const adminAbout: Row<Contract, "admin.about.fetch">;
+declare const webConnect: Row<Contract, "web.connect.fetch">;
+declare const adminConnect: Row<Contract, "admin.connect.fetch">;
 
 // The site's read of a page with a table of its own makes its document,
 // and so does the admin's; only the admin's makes its record.
 export const homeDocuments = [webHome, adminHome].map(toHomeDocument);
 export const aboutDocuments = [webAbout, adminAbout].map(toAboutDocument);
+export const connectDocuments = [webConnect, adminConnect].map(
+  toConnectDocument,
+);
+export const connectRecordRead = toConnectRecord(adminConnect);
+// @ts-expect-error: the site's read carries no date.
+export const noConnectRecord = toConnectRecord(webConnect);
 export const homeRecordRead = toHomeRecord(adminHome);
 export const aboutRecordRead = toAboutRecord(adminAbout);
 // @ts-expect-error: the site's read carries no date.
@@ -134,3 +145,6 @@ export const updateHome: Arguments<Contract, "admin.home.update"> =
 declare const aboutArguments: ReturnType<typeof toAboutArguments>;
 export const updateAbout: Arguments<Contract, "admin.about.update"> =
   aboutArguments;
+declare const connectArguments: ReturnType<typeof toConnectArguments>;
+export const updateConnect: Arguments<Contract, "admin.connect.update"> =
+  connectArguments;

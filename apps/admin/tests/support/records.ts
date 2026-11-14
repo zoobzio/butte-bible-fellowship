@@ -1,5 +1,6 @@
 import type {
   AboutRecord,
+  ConnectRecord,
   ContentRecord,
   EventRecord,
   FolderRecord,
@@ -98,7 +99,7 @@ export const ROMANS: FolderRecord = {
 /** The heading the home page opens with: one line, its highlight between asterisks. */
 export const HEADING = "Discover God’s **Love, Grace & Truth**";
 
-/** The site's home page, as its tab of the settings reads it. */
+/** The site's home page, as the page that edits it reads it. */
 export const HOME_PAGE: HomeRecord = {
   title: "Butte Bible Fellowship",
   description: "A local church in Chico.",
@@ -110,10 +111,23 @@ export const HOME_PAGE: HomeRecord = {
   updatedAt: "2026-10-18T09:30:00.000Z",
 };
 
-/** The site's About Us page, as its tab of the settings reads it. */
+/** The site's About Us page, as the page that edits it reads it. */
 export const ABOUT_PAGE: AboutRecord = {
   title: "About Us",
   description: "A clean canvas.",
+  body: BIO,
+  updatedAt: "2026-10-18T09:30:00.000Z",
+};
+
+/** The site's connect page, as the page that edits it reads it. */
+export const CONNECT_PAGE: ConnectRecord = {
+  title: "Connect",
+  description: "We’d love to meet you.",
+  address: "2255 Pillsbury Road, Chico, California 95926",
+  phone: "530-892-0521",
+  fax: "530-898-1851",
+  email: "office@bbfchurchchico.org",
+  hours: "Tuesday–Thursday: 9am–4pm\nFriday: 9am–noon",
   body: BIO,
   updatedAt: "2026-10-18T09:30:00.000Z",
 };

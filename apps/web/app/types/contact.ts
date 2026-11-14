@@ -1,11 +1,22 @@
+/** A line of the connect page that calls or writes: what it says, and its link. */
+export interface ContactLink {
+  text: string;
+  href: string;
+}
+
 /**
- * What the connect page says of finding the church, which is no one's to
- * translate: its full street address, its fax number, and the map of it.
+ * How to find and reach the church, as the connect page draws it from what
+ * the admin wrote: its full street address and the map of it, its phone
+ * number, fax number and email, each there only when it is written, and
+ * the hours its office keeps, a line each.
  */
-export interface ConnectConfig {
+export interface Connect {
   address: string;
-  fax: string;
   map: string;
+  phone?: ContactLink;
+  fax?: string;
+  email?: ContactLink;
+  hours: string[];
 }
 
 /**

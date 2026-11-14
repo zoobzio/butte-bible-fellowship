@@ -1,12 +1,20 @@
 <script lang="ts">
-import { computed, definePageMeta, useHead, useNuxtApp } from "#imports";
+import {
+  computed,
+  createError,
+  definePageMeta,
+  useHead,
+  useNuxtApp,
+} from "#imports";
 
 import ConnectCard from "~/components/ConnectCard.vue";
 import ConnectGrid from "~/components/ConnectGrid.vue";
 import MapEmbed from "~/components/MapEmbed.vue";
+import MarkdownBody from "~/components/MarkdownBody.vue";
 import PageHeader from "~/components/PageHeader.vue";
 import StaffCard from "~/components/StaffCard.vue";
 import { useConnect } from "~/composables/contact";
+import { useConnectPage } from "~/composables/page";
 import { useStaff } from "~/composables/staff";
 </script>
 
@@ -16,47 +24,61 @@ definePageMeta({
 });
 
 const { $t } = useNuxtApp();
-const connect = useConnect();
 
-useHead(() => ({ title: $t.connect.head() }));
+/*
+ * The page's own row, as the admin wrote it: the header it opens with and
+ * how to find and reach the church in its front matter, over what is
+ * written on it. The headings and labels of its cards are the interface's.
+ */
+const { data: page } = await useConnectPage();
+
+if (!page.value) {
+  throw createError({
+    statusCode: 404,
+    message: $t.page.notFound(),
+  });
+}
+
+/* The tab reads as the other pages' do: the page, then the church. */
+useHead(() => ({
+  title: page.value && `${page.value.title} – ${$t.site.name()}`,
+}));
+
+const connect = useConnect(() => page.value);
 
 const { data } = await useStaff();
 const staff = computed(() => data.value ?? []);
 </script>
 
 <template>
-  <div class="connect">
-    <PageHeader
-      :title="$t.connect.title()"
-      :description="$t.connect.description()"
-    />
+  <div v-if="page && connect" class="connect">
+    <PageHeader :title="page.title" :description="page.description" />
     <section v-if="staff.length" class="connect-staff">
       <StaffCard v-for="member in staff" :key="member.id" :member="member" />
     </section>
     <article class="prose">
+      <MarkdownBody v-if="page.body.children.length" :page="page" />
       <ConnectGrid>
         <ConnectCard>
           <h2>{{ $t.connect.visit() }}</h2>
           <p>
             <strong>{{ $t.connect.address() }}</strong> {{ connect.address }}
           </p>
-          <p>
+          <p v-if="connect.phone">
             <strong>{{ $t.connect.phone() }}</strong>
             <a :href="connect.phone.href">{{ connect.phone.text }}</a>
           </p>
-          <p>
+          <p v-if="connect.fax">
             <strong>{{ $t.connect.fax() }}</strong> {{ connect.fax }}
           </p>
-          <p>
+          <p v-if="connect.email">
             <strong>{{ $t.connect.email() }}</strong>
             <a :href="connect.email.href">{{ connect.email.text }}</a>
           </p>
         </ConnectCard>
-        <ConnectCard>
+        <ConnectCard v-if="connect.hours.length">
           <h2>{{ $t.connect.hours() }}</h2>
-          <p>{{ $t.connect.open() }}</p>
-          <p>{{ $t.connect.friday() }}</p>
-          <p>{{ $t.connect.closed() }}</p>
+          <p v-for="line in connect.hours" :key="line">{{ line }}</p>
         </ConnectCard>
       </ConnectGrid>
       <MapEmbed

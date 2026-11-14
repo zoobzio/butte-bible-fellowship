@@ -11,8 +11,12 @@
     "defaultMessage": "Content",
     "description": "The header link to the content: its documents, by folder."
   },
+  "site": {
+    "defaultMessage": "Site",
+    "description": "The header link to the pages of the site with a layout of their own: the home page, About Us and the connect page."
+  },
   "settings": {
     "defaultMessage": "Settings",
-    "description": "The header link to the settings of the site: the pages with a layout of their own, and how the site looks."
+    "description": "The header link to the settings of the site: how it looks."
   }
 }

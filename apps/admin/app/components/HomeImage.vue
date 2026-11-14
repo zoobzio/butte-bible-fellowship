@@ -3,7 +3,7 @@ import type { HomeRecord } from "@bbf/schema/types";
 
 import { FileInput, Icon } from "#components";
 import { computed, useId, useNuxtApp } from "#imports";
-import { useHomeImage } from "~/composables/settings/image";
+import { useHomeImage } from "~/composables/site/image";
 </script>
 
 <script setup lang="ts">
@@ -11,7 +11,7 @@ defineOptions({ name: "HomeImage" });
 
 /*
  * The picture of the home page's hero, uploaded on its own, as an event's
- * is: the page's settings show it over the form of its metadata.
+ * is: the page's editor shows it over the form of its metadata.
  */
 const { record } = defineProps<{ record: HomeRecord }>();
 

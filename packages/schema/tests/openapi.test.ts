@@ -7,6 +7,10 @@ import {
   aboutRecord,
   churchEvent,
   churchEvents,
+  connectArticle,
+  connectBody,
+  connectPage,
+  connectRecord,
   contentArticle,
   contentBody,
   contentDraft,
@@ -207,7 +211,7 @@ const document = createDocument(
       "/api/pages/index": {
         get: { responses: { 200: json(homePage) } },
       },
-      "/admin/api/settings/home": {
+      "/admin/api/site/home": {
         get: { responses: { 200: json(homeRecord) } },
         put: {
           requestBody: {
@@ -216,7 +220,7 @@ const document = createDocument(
           responses: { 200: json(homeRecord) },
         },
       },
-      "/admin/api/settings/home/body": {
+      "/admin/api/site/home/body": {
         patch: {
           requestBody: {
             content: { "application/json": { schema: homeArticle } },
@@ -224,7 +228,7 @@ const document = createDocument(
           responses: { 200: json(homeRecord) },
         },
       },
-      "/admin/api/settings/about": {
+      "/admin/api/site/about": {
         get: { responses: { 200: json(aboutRecord) } },
         put: {
           requestBody: {
@@ -233,12 +237,32 @@ const document = createDocument(
           responses: { 200: json(aboutRecord) },
         },
       },
-      "/admin/api/settings/about/body": {
+      "/admin/api/site/about/body": {
         patch: {
           requestBody: {
             content: { "application/json": { schema: aboutArticle } },
           },
           responses: { 200: json(aboutRecord) },
+        },
+      },
+      "/api/pages/connect": {
+        get: { responses: { 200: json(connectPage) } },
+      },
+      "/admin/api/site/connect": {
+        get: { responses: { 200: json(connectRecord) } },
+        put: {
+          requestBody: {
+            content: { "application/json": { schema: connectBody } },
+          },
+          responses: { 200: json(connectRecord) },
+        },
+      },
+      "/admin/api/site/connect/body": {
+        patch: {
+          requestBody: {
+            content: { "application/json": { schema: connectArticle } },
+          },
+          responses: { 200: json(connectRecord) },
         },
       },
       "/admin/api/events": {
@@ -290,6 +314,10 @@ describe("the components", () => {
       "AboutBody",
       "AboutRecord",
       "ChurchEvent",
+      "ConnectArticle",
+      "ConnectBody",
+      "ConnectPage",
+      "ConnectRecord",
       "ContentArticle",
       "ContentBody",
       "ContentDraft",

@@ -2,7 +2,7 @@ import type { Root } from "hast";
 
 import type { PageItem } from "~/types/page";
 
-import { homePage, page as plain } from "@bbf/schema";
+import { connectPage, homePage, page as plain } from "@bbf/schema";
 import { CONTENT, PREFIX } from "@prosary/nuxt/constant";
 
 import { useAsyncData, useLocale, useRequestFetch, useRoute } from "#imports";
@@ -55,3 +55,9 @@ export const useHomePage = () => read("/", homePage);
 
 /** About Us: the title and description it opens with, over what is written. */
 export const useAboutPage = () => read("/about-us", plain);
+
+/**
+ * The connect page: the title and description it opens with, and how to
+ * find and reach the church, over what is written.
+ */
+export const useConnectPage = () => read("/connect", connectPage);

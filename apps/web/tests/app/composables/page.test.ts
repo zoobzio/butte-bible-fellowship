@@ -6,7 +6,12 @@ import {
   setLocale,
   setRoutePath,
 } from "#imports";
-import { useAboutPage, useHomePage, usePage } from "~/composables/page";
+import {
+  useAboutPage,
+  useConnectPage,
+  useHomePage,
+  usePage,
+} from "~/composables/page";
 import { document, element } from "#test/support/content";
 
 const ABOUT = document({ title: "About" }, element("p", {}, "Modern wisdom…"));
@@ -109,5 +114,32 @@ describe("useAboutPage", () => {
   it("resolves to null when there is no such page", async () => {
     const { data } = await useAboutPage();
     expect(data.value).toBeNull();
+  });
+});
+
+describe("useConnectPage", () => {
+  it("resolves the connect page, whatever the route: how to reach the church with its front matter, and its body", async () => {
+    const matter = {
+      title: "Connect",
+      address: "1 Test Street, Testville",
+      phone: "555-010-0100",
+      hours: "Friday: 9am–noon",
+    };
+    const connect = document({ ...matter, image: "/no.jpg" });
+    setContentPages({ "/connect": connect });
+    setRoutePath("/");
+    const { data } = await useConnectPage();
+    expect(requestedDocuments).toEqual(["en/connect.json"]);
+    expect(data.value).toEqual({ ...matter, body: connect });
+  });
+
+  it("resolves to null when there is no such page", async () => {
+    const { data } = await useConnectPage();
+    expect(data.value).toBeNull();
+  });
+
+  it("refuses a connect page with no address", async () => {
+    setContentPages({ "/connect": document({ title: "Connect" }) });
+    await expect(useConnectPage()).rejects.toThrow();
   });
 });

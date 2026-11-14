@@ -6,6 +6,9 @@ import {
   aboutBody,
   aboutRecord,
   churchEvent,
+  connectBody,
+  connectPage,
+  connectRecord,
   contentBody,
   contentRecord,
   eventBody,
@@ -28,6 +31,7 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import {
   toAboutArguments,
+  toConnectArguments,
   toContentArguments,
   toEventArguments,
   toHomeArguments,
@@ -38,6 +42,8 @@ import {
   toChurchEvent,
   toAboutDocument,
   toAboutRecord,
+  toConnectDocument,
+  toConnectRecord,
   toContentDocument,
   toContentRecord,
   toEventRecord,
@@ -48,7 +54,14 @@ import {
   toStaffRecord,
 } from "../src/dto";
 
-import { toAboutBody, toAboutForm, toHomeBody, toHomeForm } from "../src/vm";
+import {
+  toAboutBody,
+  toAboutForm,
+  toConnectBody,
+  toConnectForm,
+  toHomeBody,
+  toHomeForm,
+} from "../src/vm";
 
 let db: Awaited<ReturnType<typeof makeTestBezoar<typeof contract>>>;
 
@@ -88,6 +101,40 @@ describe("the pages with a table of their own", () => {
       tagName: "h1",
       properties: { id: "our-vision" },
     });
+  });
+
+  it("reads the connect page as a document the schema accepts, how to reach the church in its front matter", async () => {
+    const connect = toConnectDocument((await db.web.connect.fetch.first())!);
+    expect(connectPage.parse(connect.data.matter)).toEqual(connect.data.matter);
+    expect(hast.safeParse(connect).success).toBe(true);
+    expect(connect.data.matter).toMatchObject({
+      title: "Connect",
+      address: "2255 Pillsbury Road, Chico, California 95926",
+      phone: "530-892-0521",
+    });
+    expect(connect.data.matter.hours?.split("\n")).toHaveLength(3);
+    // Nothing is written on it until the admin writes it.
+    expect(connect.children).toEqual([]);
+  });
+
+  it("writes the connect page's metadata from its form, and reads it back as the admin does", async () => {
+    const connect = toConnectRecord((await db.admin.connect.fetch.first())!);
+    expect(connectRecord.parse(connect)).toEqual(connect);
+    await db.admin.connect.update(
+      toConnectArguments(
+        connectBody.parse(
+          toConnectBody({
+            ...toConnectForm(connect),
+            address: " 1 Main Street, Chico ",
+            fax: " ",
+          }),
+        ),
+      ),
+    );
+    const read = toConnectRecord((await db.admin.connect.fetch.first())!);
+    expect(read.address).toBe("1 Main Street, Chico");
+    expect(read.fax).toBeUndefined();
+    expect(read.phone).toBe(connect.phone);
   });
 
   it("writes each page's metadata from its form, and reads it back as the admin does", async () => {
