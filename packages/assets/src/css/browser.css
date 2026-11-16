@@ -1,7 +1,8 @@
 /*
- * Foundation's data browser, as the admin browses its content: the trail of
- * folders from the top and the refresh over a card of rows, the folders
- * first and the files after. Each rule is scoped to the browser's own root
+ * Foundation's data browser, as the admin browses its content: the sort
+ * and the refresh over a card of rows, headed by the trail of folders from
+ * the top and what the open one holds, the folders first and the files
+ * after. Each rule is scoped to the browser's own root
  * so a Fab or a menu elsewhere keeps its own dress. The layer's icons are
  * bare `svg` elements, and its reset lays an `svg` out as a block: every
  * part that holds one is a flex box here, so an icon sits in line with its
@@ -24,16 +25,50 @@
   opacity: 0.6;
 }
 
-/* The toolbar: the trail takes the width the refresh after it leaves. */
+/* The toolbar: the sort and the refresh, at the card's trailing edge. */
 .f-data-browser-toolbar {
   display: flex;
   align-items: center;
+  justify-content: flex-end;
   gap: var(--space-2);
+}
+
+/*
+ * The head of the card, on a darker ground: the trail takes the width the
+ * count of what is listed, after it, leaves.
+ */
+.f-data-browser .f-th {
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px var(--stroke-solid) var(--rule);
+  background: var(--surface-container);
+  font-weight: var(--weight-regular);
+  text-align: left;
+}
+
+.f-data-browser .f-th:first-child {
+  border-top-left-radius: calc(var(--shape-md) - 1px);
+}
+
+.f-data-browser .f-th:last-child {
+  border-top-right-radius: calc(var(--shape-md) - 1px);
+}
+
+.f-data-browser-header-wrap {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
 }
 
 .f-data-browser-breadcrumb {
   flex: 1;
   min-width: 0;
+}
+
+.f-data-browser-summary {
+  flex: none;
+  color: var(--on-surface-muted);
+  font: var(--type-label);
+  white-space: nowrap;
 }
 
 /*
@@ -71,8 +106,12 @@
   color: var(--on-surface-muted);
 }
 
+/* A crumb's icon, the open folder at the top of the trail, leads its name. */
 .f-data-browser-breadcrumb .f-li > .f-button,
 .f-data-browser-breadcrumb .f-li > .f-span {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
   padding: var(--space-1) var(--space-2);
   border: 0;
   border-radius: var(--shape-sm);
@@ -98,7 +137,7 @@
   color: var(--on-surface-high-contrast);
 }
 
-/* The controls: the refresh and each row's actions, outlined. */
+/* The controls: the sort, the refresh and each row's actions, outlined. */
 .f-data-browser-toolbar > .f-button,
 .f-data-browser-actions .f-button {
   display: inline-flex;
@@ -126,7 +165,8 @@
 /*
  * The rows, a card: a border around it. The borders are kept apart so the
  * card's corners can round; the cells draw the rules between rows
- * themselves, the last row of the card none.
+ * themselves, the last row of the card none. The head rounds the card's
+ * top corners, its last row the bottom ones.
  */
 .f-data-browser .f-table {
   width: 100%;
@@ -150,16 +190,12 @@
   border-bottom: none;
 }
 
-.f-data-browser .f-tbody .f-tr:hover .f-td {
+/* A row lights as the pointer comes over it; one that only says there is nothing does not. */
+.f-data-browser
+  .f-tbody:not(.f-data-browser-empty)
+  .f-tr:not(.f-data-browser-no-files):hover
+  .f-td {
   background: color-mix(in oklab, var(--primary-container) 25%, transparent);
-}
-
-.f-data-browser .f-tbody:first-child .f-tr:first-child .f-td:first-child {
-  border-top-left-radius: calc(var(--shape-md) - 1px);
-}
-
-.f-data-browser .f-tbody:first-child .f-tr:first-child .f-td:last-child {
-  border-top-right-radius: calc(var(--shape-md) - 1px);
 }
 
 .f-data-browser .f-tbody:last-child .f-tr:last-child .f-td:first-child {
@@ -224,18 +260,15 @@
   text-decoration-color: currentColor;
 }
 
-/* A folder with no document in it, or with nothing in it at all, says so. */
+/*
+ * A folder with no document in it, or with nothing in it at all, says so,
+ * in a row of its own under the head: the trail there is the way back out.
+ */
 .f-data-browser-no-files .f-td,
-.f-data-browser-empty {
+.f-data-browser-empty .f-td {
   padding: var(--space-6) var(--space-3);
   color: var(--on-surface-muted);
   text-align: center;
-}
-
-.f-data-browser-empty {
-  border: 1px var(--stroke-solid) var(--rule);
-  border-radius: var(--shape-md);
-  background: var(--surface);
 }
 
 .f-data-browser-actions {

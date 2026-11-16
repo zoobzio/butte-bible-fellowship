@@ -91,23 +91,23 @@ catalogs:
       specifier: ^2.4.11
       version: 2.4.11
     '@zoobzio/editor':
-      specifier: 0.1.9
-      version: 0.1.9
+      specifier: 0.1.11
+      version: 0.1.11
     '@zoobzio/icons':
-      specifier: 0.1.9
-      version: 0.1.9
+      specifier: 0.1.11
+      version: 0.1.11
     '@zoobzio/nuxt':
-      specifier: 0.1.9
-      version: 0.1.9
+      specifier: 0.1.11
+      version: 0.1.11
     '@zoobzio/prose':
-      specifier: 0.1.9
-      version: 0.1.9
+      specifier: 0.1.11
+      version: 0.1.11
     '@zoobzio/theme':
-      specifier: 0.1.9
-      version: 0.1.9
+      specifier: 0.1.11
+      version: 0.1.11
     '@zoobzio/vue':
-      specifier: 0.1.9
-      version: 0.1.9
+      specifier: 0.1.11
+      version: 0.1.11
     bezoar:
       specifier: 0.0.6
       version: 0.0.6
@@ -241,13 +241,13 @@ importers:
         version: 2.8.2
       '@zoobzio/editor':
         specifier: 'catalog:'
-        version: 0.1.9(happy-dom@20.11.6)
+        version: 0.1.11(happy-dom@20.11.6)
       '@zoobzio/nuxt':
         specifier: 'catalog:'
-        version: 0.1.9(@nuxt/schema@4.6.1)(@prosary/kit@0.0.11(@prosary/translate@0.0.11(@ai-sdk/anthropic@4.0.82(zod@4.6.5))))(confbox@0.3.1)(dotenv@17.4.2)(giget@3.3.1)(happy-dom@20.11.6)(jiti@2.7.0)(magic-string@1.4.3)(mlly@1.8.2)(rolldown@1.2.14)(typescript@5.9.3)(unplugin@3.4.0(esbuild@0.28.2)(rolldown@1.2.14)(rollup@4.62.4)(vite@8.3.4(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(yaml@2.9.1)))(vue@3.5.41(typescript@5.9.3))(yaml-to-momoa@0.1.0)
+        version: 0.1.11(@nuxt/schema@4.6.1)(@prosary/kit@0.0.11(@prosary/translate@0.0.11(@ai-sdk/anthropic@4.0.82(zod@4.6.5))))(confbox@0.3.1)(dotenv@17.4.2)(giget@3.3.1)(happy-dom@20.11.6)(jiti@2.7.0)(magic-string@1.4.3)(mlly@1.8.2)(rolldown@1.2.14)(typescript@5.9.3)(unplugin@3.4.0(esbuild@0.28.2)(rolldown@1.2.14)(rollup@4.62.4)(vite@8.3.4(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(yaml@2.9.1)))(vue@3.5.41(typescript@5.9.3))(yaml-to-momoa@0.1.0)
       '@zoobzio/vue':
         specifier: 'catalog:'
-        version: 0.1.9(happy-dom@20.11.6)(vue@3.5.41(typescript@5.9.3))
+        version: 0.1.11(happy-dom@20.11.6)(vue@3.5.41(typescript@5.9.3))
       bezoar:
         specifier: 'catalog:'
         version: 0.0.6
@@ -338,7 +338,7 @@ importers:
         version: 0.0.11(@nuxt/schema@4.6.1)(@prosary/kit@0.0.11(@prosary/translate@0.0.11(@ai-sdk/anthropic@4.0.82(zod@4.6.5))))(confbox@0.3.1)(dotenv@17.4.2)(giget@3.3.1)(jiti@2.7.0)(magic-string@1.4.3)(mlly@1.8.2)(rolldown@1.2.14)(typescript@5.9.3)(unplugin@3.4.0(esbuild@0.28.2)(rolldown@1.2.14)(rollup@4.62.4)(vite@8.3.4(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(yaml@2.9.1)))
       '@zoobzio/vue':
         specifier: 'catalog:'
-        version: 0.1.9(happy-dom@20.11.6)(vue@3.5.41(typescript@5.9.3))
+        version: 0.1.11(happy-dom@20.11.6)(vue@3.5.41(typescript@5.9.3))
       bezoar:
         specifier: 'catalog:'
         version: 0.0.6
@@ -426,10 +426,10 @@ importers:
         version: 0.6.0(@nuxt/schema@4.6.1)(confbox@0.3.1)(dotenv@17.4.2)(giget@3.3.1)(jiti@2.7.0)(magic-string@1.4.3)(mlly@1.8.2)(rolldown@1.2.14)(typescript@5.9.3)(unplugin@3.4.0(esbuild@0.28.2)(rolldown@1.2.14)(rollup@4.62.4)(vite@8.3.4(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(yaml@2.9.1)))(yaml-to-momoa@0.1.0)
       '@zoobzio/nuxt':
         specifier: 'catalog:'
-        version: 0.1.9(@nuxt/schema@4.6.1)(@prosary/kit@0.0.11(@prosary/translate@0.0.11(@ai-sdk/anthropic@4.0.82(zod@4.6.5))))(confbox@0.3.1)(dotenv@17.4.2)(giget@3.3.1)(happy-dom@20.11.6)(jiti@2.7.0)(magic-string@1.4.3)(mlly@1.8.2)(rolldown@1.2.14)(typescript@5.9.3)(unplugin@3.4.0(esbuild@0.28.2)(rolldown@1.2.14)(rollup@4.62.4)(vite@8.3.4(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(yaml@2.9.1)))(vue@3.5.41(typescript@5.9.3))(yaml-to-momoa@0.1.0)
+        version: 0.1.11(@nuxt/schema@4.6.1)(@prosary/kit@0.0.11(@prosary/translate@0.0.11(@ai-sdk/anthropic@4.0.82(zod@4.6.5))))(confbox@0.3.1)(dotenv@17.4.2)(giget@3.3.1)(happy-dom@20.11.6)(jiti@2.7.0)(magic-string@1.4.3)(mlly@1.8.2)(rolldown@1.2.14)(typescript@5.9.3)(unplugin@3.4.0(esbuild@0.28.2)(rolldown@1.2.14)(rollup@4.62.4)(vite@8.3.4(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(yaml@2.9.1)))(vue@3.5.41(typescript@5.9.3))(yaml-to-momoa@0.1.0)
       '@zoobzio/vue':
         specifier: 'catalog:'
-        version: 0.1.9(happy-dom@20.11.6)(vue@3.5.41(typescript@5.9.3))
+        version: 0.1.11(happy-dom@20.11.6)(vue@3.5.41(typescript@5.9.3))
       prosary:
         specifier: 'catalog:'
         version: 0.0.11
@@ -505,7 +505,7 @@ importers:
     dependencies:
       '@zoobzio/icons':
         specifier: 'catalog:'
-        version: 0.1.9
+        version: 0.1.11
       icon-sheets:
         specifier: 'catalog:'
         version: 0.0.8
@@ -552,7 +552,7 @@ importers:
         version: 0.0.11
       '@zoobzio/prose':
         specifier: 'catalog:'
-        version: 0.1.9(@prosary/kit@0.0.11(@prosary/translate@0.0.11(@ai-sdk/anthropic@4.0.82(zod@4.6.5))))(prosary@0.0.11)
+        version: 0.1.11(@prosary/kit@0.0.11(@prosary/translate@0.0.11(@ai-sdk/anthropic@4.0.82(zod@4.6.5))))(prosary@0.0.11)
       prosary:
         specifier: 'catalog:'
         version: 0.0.11
@@ -606,7 +606,7 @@ importers:
         version: 0.6.0(yaml-to-momoa@0.1.0)
       '@zoobzio/theme':
         specifier: 'catalog:'
-        version: 0.1.9
+        version: 0.1.11
       vitest:
         specifier: 'catalog:'
         version: 5.0.3(@opentelemetry/api@1.9.1)(@types/node@26.2.0)(@vitest/coverage-v8@5.0.3)(happy-dom@20.11.6)(vite@8.3.4(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(yaml@2.9.1))
@@ -2262,6 +2262,13 @@ packages:
   '@swc/helpers@0.5.23':
     resolution: {integrity: sha512-5lSsMOTXURePglDfvuAQUqkGek9Hg2kksOYay2m0+XR++b2NWYL/4sWyuvVBIs8oKnJaxkdi9whaL/sqN13afw==}
 
+  '@tanstack/store@0.11.2':
+    resolution: {integrity: sha512-sJ4mjol8uQsHV0gOJzzjwXfh2Fwm+Sz0+8deqiTm4jGbMdjzNSW+xZCFm0kUa870uhd8yi+DpKnZb5Kc4apa0Q==}
+
+  '@tanstack/table-core@9.3.1':
+    resolution: {integrity: sha512-zQvlxSNi2qGM3L4jh85Z6hqMfdIR5qOfD9KHOU32nuKFJGN0RlJ7UvV1lsPb1fPVhpFYI0VP3jJGxLdLDpTKjQ==}
+    engines: {node: '>=20'}
+
   '@tanstack/virtual-core@3.17.8':
     resolution: {integrity: sha512-BfEvehNpOT75r5Ksc5xW6NZuXujTfb7nlSEyVu4XHG3gdxNg1KqXruWbDewXOUaUYIo4oRbSfkjIajz4MAT8tA==}
 
@@ -2820,44 +2827,50 @@ packages:
   '@workflow/serde@4.1.0':
     resolution: {integrity: sha512-pav4F2BoirECWR7Nf1TKt+2eETcBj7jj4cBefQ8VXQCA6NPkaKeLfj/zMgi+3zYV5ZIBT4GuUiphsj0/b9hPQQ==}
 
-  '@zoobzio/browser@0.1.9':
-    resolution: {integrity: sha512-QD+KVSwlJCPAmc3xGxtSas/QpjS7PW5Sf4FlqErHsGh8QTXIW77Yr+ge0N4YEipIIihnECy0KweOLJalVFsY2Q==}
+  '@zoobzio/browser@0.1.11':
+    resolution: {integrity: sha512-PJPkHXoD/wxZeyMvpypukFKLl/aryir+uBzIybHtPl/3pf3d5nwrqvYNDUZEwNYyvTdw+Gsgs+Z0Le9nwuwl0Q==}
 
-  '@zoobzio/code@0.1.9':
-    resolution: {integrity: sha512-qsnzp/sHAqnYjf1VJf0yzJPzrGiiFNuuenUzOSCQhWljOIH+AVOTRJLpSwnhbpy3tdpbQaBjAYTOMCw8Rzsj1w==}
+  '@zoobzio/calendar@0.1.11':
+    resolution: {integrity: sha512-+JGMtnjKsneHCLJr6AHa9Ev9FYExFo+fYOStwyf5BoxenhA3BbKGQ6nf9rrC37XeF3n+pd+IKUmFHTTAUkqmhg==}
 
-  '@zoobzio/editor@0.1.9':
-    resolution: {integrity: sha512-yYIpRoi0DuBkwSMgU36SuyaxgY22NQEGBZuWjP1hqJ/Itbu4/5pDyQQAahfy0ZrH7QZPzeAt2oT6Wc9L9I61fQ==}
+  '@zoobzio/code@0.1.11':
+    resolution: {integrity: sha512-HEBj26KnrkHH56clh9ZjRrb7tSUVkPmUZ1DZQaSgfiuqgTNybJhVoB9Rq3ODyQe3aAt8aOggVRaBBhEGA/qkvA==}
 
-  '@zoobzio/form@0.1.9':
-    resolution: {integrity: sha512-APNlHqOpWHaXQqx5Czm5Nhqo8OQhyPR0WiWnbucB+1N7fkLmulf1eQBznoKtVnJwfbqkukVXB/gYi8wCwZJGgQ==}
+  '@zoobzio/editor@0.1.11':
+    resolution: {integrity: sha512-FAf7qXvg2PMdNMjMkgLhvIx/2YQ0XJRGi3QrxypQ8ed3/5EN4kXvANYuHNvYNV1lFiEY2N049WH0pEqDLZxTWw==}
 
-  '@zoobzio/icons@0.1.9':
-    resolution: {integrity: sha512-HZFWJo0fnWDE/PrUuZhZNtVYoXERQvL8X41DIdKY8gFo5dkOEsuGHZT6ZB3yhES38NtH76MdyS3WSA0TigFwkw==}
+  '@zoobzio/form@0.1.11':
+    resolution: {integrity: sha512-931C2sliZhB0fOHkLah5d1PUj6qthDkZcSwZsm/Trs8Fl4fXwcNM/c5f7nQrTjmJ3PuQyM8yJetCuTsR0H43CA==}
 
-  '@zoobzio/kit@0.1.9':
-    resolution: {integrity: sha512-zOuq7KeL9os/voCS4Tqeqc8SwvNMD9E1JmS3EbjxKV91z6oA7e+ttgP8/UHsSABJDTr+lZ73KZQCy8rHDYSPlw==}
+  '@zoobzio/icons@0.1.11':
+    resolution: {integrity: sha512-mNIWxVfJb0IxHF8CdV0KeKBTR+QgqywpFb4Ld9lpSsmXg0OSwJ8hABwMZg+ei1Q6620QlPk5AL4AxU9gW8Dnag==}
 
-  '@zoobzio/nuxt@0.1.9':
-    resolution: {integrity: sha512-w+0wG5JdtiOfX1MOZNvyajysjHpBSx7vgz61WTw8piK5xcHs+zn86VXK2XuQj/J2sUf0/NtEvxXjLio6H9RuHQ==}
+  '@zoobzio/kit@0.1.11':
+    resolution: {integrity: sha512-ZO7A5drNmHE7imsEm/ArNfpEi2mfwSe0bKzVMg5EPOLEvgyYaR7eft+e3u1uPWy1jjSriCzP1M8ZM9KvdR3CYA==}
 
-  '@zoobzio/prose@0.1.9':
-    resolution: {integrity: sha512-+F4gAgpSxgFf9Hep4KKbr3ak4vkzBpfFm4ywRrdYByTnANtuENwwP1Jh4ICjWtBOlGYgikODEHS3wkodiDcTYg==}
+  '@zoobzio/nuxt@0.1.11':
+    resolution: {integrity: sha512-BHtUiZAJZq83R3/3SAekYXW08YX34RVdqbKcMclK9OJ3gsGXImDliVMnFkIVGEjdrG8dHsCkjdQUxb3ZK92IGA==}
+
+  '@zoobzio/prose@0.1.11':
+    resolution: {integrity: sha512-ftGuDRjo2HEgHhOmWTrE4lZ6P/dPqC7QfZu7QFshpVZIQS3WTTE5vDr7fA2DOkbVo6hBS1Fc7x1IP54InP8tFg==}
     peerDependencies:
       '@prosary/kit': 0.0.11
       prosary: 0.0.11
 
-  '@zoobzio/query@0.1.9':
-    resolution: {integrity: sha512-SL46muCr2WbOBvo5avzF4oCm3Mw6HGEvqaDP8iRXuSUTY+pfajXYpaC4yoQHYvsr/11Uc+X+HNve4Bc5lHsJVQ==}
+  '@zoobzio/query@0.1.11':
+    resolution: {integrity: sha512-IGfh0X/Z1nVg7k0PNit6KQUhwOueitihTmFlDEyACxK574h8q1s6tiaj808pAChFrWUfV/MrBZC/ybx1nB2Lig==}
 
-  '@zoobzio/table@0.1.9':
-    resolution: {integrity: sha512-V3KSxe8FlR89CsNpde2NVG/6jMfAW4paTyLWOf1ZVGUX5TPEKW4uQvkLvx5c1zPFfX7N4NV9/fqczf+ynVgnyw==}
+  '@zoobzio/table@0.1.11':
+    resolution: {integrity: sha512-qCkqB9Kv3lcW0LFGr4LD4VHTLD2e5rqhxceQwG12DA5ID1yjKXJ18xghl01MiokroHYFig6D8WvqrqyFqohulw==}
 
-  '@zoobzio/theme@0.1.9':
-    resolution: {integrity: sha512-H7SLUk/AHKrr20hMOXPF3WrzHec1xLQ3Rz15h+1EwL34RbxaXDQGH5gjcU1CW1HNeWKqooajqaLMn6bSNkTrnw==}
+  '@zoobzio/theme@0.1.11':
+    resolution: {integrity: sha512-OwXcACUkJWHzYDXemkSlJupQWYMgqlJxp5eY+Ys4DCbP4TcKG0R00UJ9gRYr20dFkr6rZNFjYKjnoR+5hijgEg==}
 
-  '@zoobzio/vue@0.1.9':
-    resolution: {integrity: sha512-zx1QhL2v0oJXHuZBB3XxCevW8mYfS8Y2uPAF8TGe6sKBQTPR/Fga95vASd7YpJ/I/LLMPK7YLCQl+gyylSxFsg==}
+  '@zoobzio/views@0.1.11':
+    resolution: {integrity: sha512-MusqHLPD1xtOKUQt/oPqgkwYiVe6dZoVH8j5Lp69phVy3Rk/vCemFFJ/1TtZoAfr/vfmkuB1fFjoNGHhtMPv1g==}
+
+  '@zoobzio/vue@0.1.11':
+    resolution: {integrity: sha512-GYZP9tr21hfKIoSdpHSWpKsBx0AUGDyi4LhUkNwRj733z0HHdpVoyWu8B+jy+C/8olTW0jKYTShkFW67OZB5qw==}
     peerDependencies:
       vue: ^3.5.0
 
@@ -5109,6 +5122,9 @@ packages:
   rou3@0.9.2:
     resolution: {integrity: sha512-3SOzvaAg8rkHrXtRjpCvCvbyO5to9oOO27Z/XqHEYXfMRVSw/qMIVdmaOk9W2lcRLtR6dlqTjo9hDeJk70QBYQ==}
 
+  rrule-temporal@2.2.9:
+    resolution: {integrity: sha512-5Bc+IxlGKZtOF/JtkM+39VtK9uYvg1NRWGzZCy2QQj9KFZ4mMMa949GMtGv0Ud/bzyk2KuGhwxmVDuq8cnbzuA==}
+
   run-applescript@7.1.0:
     resolution: {integrity: sha512-DPe5pVFaAsinSaV6QjQ6gdiedWDcRCbUuiQfQa2wmWV7+xC9bGulGI8+TdRmoFkAPaBXk8CrAbnlY2ISniJ47Q==}
     engines: {node: '>=18'}
@@ -5319,6 +5335,15 @@ packages:
 
   teex@1.0.1:
     resolution: {integrity: sha512-eYE6iEI62Ni1H8oIa7KlDU6uQBtqr4Eajni3wX7rpfXD8ysFx8z0+dri+KWEPWpBsxXfxu58x/0jvTVT1ekOSg==}
+
+  temporal-polyfill@1.0.8:
+    resolution: {integrity: sha512-RCCGa0GddT099XG49ijdD0tDf86L8vfuZun1+JyJiO4Y2NP9PACQsG0OnvNPXwVLisdvhr/zqL2nhKQmXXx08A==}
+
+  temporal-spec@1.0.1:
+    resolution: {integrity: sha512-wxVoanmDeavXie1vu2JaQ3WIc3JZnWAOYFBsJyATaVsXsycKYUflGsyBmrRSnoCpZJpwPyr38VpgSUlQ8CbFxg==}
+
+  temporal-utils@1.0.4:
+    resolution: {integrity: sha512-4mAcgbWlaxe+gn23gk8g0iHxCVGVOhKzSCfF5HM3lfvH8BdT+/pBmH/R/E4CrIse+koUgs8ThkPzCLnui6Fi8w==}
 
   terser@5.50.0:
     resolution: {integrity: sha512-CN9BVxWhgS/hRxtUMjtC2uRWSTcSfQFHMDWma6sKKfIivCD91sM+FOPfvwoaRMqCSrUpe1nv3jDamd9eEQ4y+w==}
@@ -8165,6 +8190,12 @@ snapshots:
     dependencies:
       tslib: 2.8.1
 
+  '@tanstack/store@0.11.2': {}
+
+  '@tanstack/table-core@9.3.1':
+    dependencies:
+      '@tanstack/store': 0.11.2
+
   '@tanstack/virtual-core@3.17.8': {}
 
   '@tanstack/vue-virtual@3.13.36(vue@3.5.41(typescript@5.9.3))':
@@ -8908,63 +8939,73 @@ snapshots:
 
   '@workflow/serde@4.1.0': {}
 
-  '@zoobzio/browser@0.1.9':
+  '@zoobzio/browser@0.1.11':
     dependencies:
-      '@zoobzio/kit': 0.1.9
+      '@zoobzio/kit': 0.1.11
+      '@zoobzio/query': 0.1.11
       objectively: 0.3.0
 
-  '@zoobzio/code@0.1.9':
+  '@zoobzio/calendar@0.1.11':
+    dependencies:
+      '@zoobzio/kit': 0.1.11
+      rrule-temporal: 2.2.9
+      temporal-polyfill: 1.0.8
+
+  '@zoobzio/code@0.1.11':
     dependencies:
       '@codemirror/commands': 6.11.1
       '@codemirror/state': 6.7.6
       '@codemirror/view': 6.43.15
-      '@zoobzio/kit': 0.1.9
+      '@zoobzio/kit': 0.1.11
 
-  '@zoobzio/editor@0.1.9(happy-dom@20.11.6)':
+  '@zoobzio/editor@0.1.11(happy-dom@20.11.6)':
     dependencies:
       '@tiptap/core': 3.32.0(@tiptap/pm@3.32.0)
       '@tiptap/html': 3.32.0(@tiptap/core@3.32.0(@tiptap/pm@3.32.0))(@tiptap/pm@3.32.0)(happy-dom@20.11.6)
       '@tiptap/pm': 3.32.0
       '@tiptap/starter-kit': 3.32.0
       '@types/hast': 3.0.5
-      '@zoobzio/kit': 0.1.9
+      '@zoobzio/kit': 0.1.11
       hast-util-from-html: 2.0.3
       hast-util-to-html: 9.0.5
     transitivePeerDependencies:
       - happy-dom
 
-  '@zoobzio/form@0.1.9':
+  '@zoobzio/form@0.1.11':
     dependencies:
-      '@zoobzio/kit': 0.1.9
+      '@zoobzio/kit': 0.1.11
       objectively: 0.3.0
       zod: 4.6.5
 
-  '@zoobzio/icons@0.1.9':
+  '@zoobzio/icons@0.1.11':
     dependencies:
       icon-sheets: 0.0.8
 
-  '@zoobzio/kit@0.1.9':
+  '@zoobzio/kit@0.1.11':
     dependencies:
       objectively: 0.3.0
 
-  '@zoobzio/nuxt@0.1.9(@nuxt/schema@4.6.1)(@prosary/kit@0.0.11(@prosary/translate@0.0.11(@ai-sdk/anthropic@4.0.82(zod@4.6.5))))(confbox@0.3.1)(dotenv@17.4.2)(giget@3.3.1)(happy-dom@20.11.6)(jiti@2.7.0)(magic-string@1.4.3)(mlly@1.8.2)(rolldown@1.2.14)(typescript@5.9.3)(unplugin@3.4.0(esbuild@0.28.2)(rolldown@1.2.14)(rollup@4.62.4)(vite@8.3.4(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(yaml@2.9.1)))(vue@3.5.41(typescript@5.9.3))(yaml-to-momoa@0.1.0)':
+  '@zoobzio/nuxt@0.1.11(@nuxt/schema@4.6.1)(@prosary/kit@0.0.11(@prosary/translate@0.0.11(@ai-sdk/anthropic@4.0.82(zod@4.6.5))))(confbox@0.3.1)(dotenv@17.4.2)(giget@3.3.1)(happy-dom@20.11.6)(jiti@2.7.0)(magic-string@1.4.3)(mlly@1.8.2)(rolldown@1.2.14)(typescript@5.9.3)(unplugin@3.4.0(esbuild@0.28.2)(rolldown@1.2.14)(rollup@4.62.4)(vite@8.3.4(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(yaml@2.9.1)))(vue@3.5.41(typescript@5.9.3))(yaml-to-momoa@0.1.0)':
     dependencies:
       '@icon-sheets/nuxt': 0.0.8(@nuxt/schema@4.6.1)(confbox@0.3.1)(dotenv@17.4.2)(giget@3.3.1)(jiti@2.7.0)(magic-string@1.4.3)(mlly@1.8.2)(rolldown@1.2.14)(typescript@5.9.3)(unplugin@3.4.0(esbuild@0.28.2)(rolldown@1.2.14)(rollup@4.62.4)(vite@8.3.4(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(yaml@2.9.1)))
       '@nuxt/kit': 4.6.2(@nuxt/schema@4.6.1)(confbox@0.3.1)(dotenv@17.4.2)(giget@3.3.1)(jiti@2.7.0)(magic-string@1.4.3)(mlly@1.8.2)(rolldown@1.2.14)(unplugin@3.4.0(esbuild@0.28.2)(rolldown@1.2.14)(rollup@4.62.4)(vite@8.3.4(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(yaml@2.9.1)))
       '@prosary/nuxt': 0.0.11(@nuxt/schema@4.6.1)(@prosary/kit@0.0.11(@prosary/translate@0.0.11(@ai-sdk/anthropic@4.0.82(zod@4.6.5))))(confbox@0.3.1)(dotenv@17.4.2)(giget@3.3.1)(jiti@2.7.0)(magic-string@1.4.3)(mlly@1.8.2)(rolldown@1.2.14)(typescript@5.9.3)(unplugin@3.4.0(esbuild@0.28.2)(rolldown@1.2.14)(rollup@4.62.4)(vite@8.3.4(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(yaml@2.9.1)))
+      '@tanstack/table-core': 9.3.1
       '@untheme/nuxt': 0.6.1(@nuxt/schema@4.6.1)(confbox@0.3.1)(dotenv@17.4.2)(giget@3.3.1)(jiti@2.7.0)(magic-string@1.4.3)(mlly@1.8.2)(rolldown@1.2.14)(typescript@5.9.3)(unplugin@3.4.0(esbuild@0.28.2)(rolldown@1.2.14)(rollup@4.62.4)(vite@8.3.4(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(yaml@2.9.1)))(yaml-to-momoa@0.1.0)
       '@vueuse/core': 14.4.0(vue@3.5.41(typescript@5.9.3))
-      '@zoobzio/browser': 0.1.9
-      '@zoobzio/code': 0.1.9
-      '@zoobzio/editor': 0.1.9(happy-dom@20.11.6)
-      '@zoobzio/form': 0.1.9
-      '@zoobzio/icons': 0.1.9
-      '@zoobzio/kit': 0.1.9
-      '@zoobzio/prose': 0.1.9(@prosary/kit@0.0.11(@prosary/translate@0.0.11(@ai-sdk/anthropic@4.0.82(zod@4.6.5))))(prosary@0.0.11)
-      '@zoobzio/query': 0.1.9
-      '@zoobzio/table': 0.1.9
-      '@zoobzio/theme': 0.1.9
-      '@zoobzio/vue': 0.1.9(happy-dom@20.11.6)(vue@3.5.41(typescript@5.9.3))
+      '@zoobzio/browser': 0.1.11
+      '@zoobzio/calendar': 0.1.11
+      '@zoobzio/code': 0.1.11
+      '@zoobzio/editor': 0.1.11(happy-dom@20.11.6)
+      '@zoobzio/form': 0.1.11
+      '@zoobzio/icons': 0.1.11
+      '@zoobzio/kit': 0.1.11
+      '@zoobzio/prose': 0.1.11(@prosary/kit@0.0.11(@prosary/translate@0.0.11(@ai-sdk/anthropic@4.0.82(zod@4.6.5))))(prosary@0.0.11)
+      '@zoobzio/query': 0.1.11
+      '@zoobzio/table': 0.1.11
+      '@zoobzio/theme': 0.1.11
+      '@zoobzio/views': 0.1.11
+      '@zoobzio/vue': 0.1.11(happy-dom@20.11.6)(vue@3.5.41(typescript@5.9.3))
       ltrl-http: 0.0.20
       objectively: 0.3.0
       prosary: 0.0.11
@@ -8988,37 +9029,45 @@ snapshots:
       - vue
       - yaml-to-momoa
 
-  '@zoobzio/prose@0.1.9(@prosary/kit@0.0.11(@prosary/translate@0.0.11(@ai-sdk/anthropic@4.0.82(zod@4.6.5))))(prosary@0.0.11)':
+  '@zoobzio/prose@0.1.11(@prosary/kit@0.0.11(@prosary/translate@0.0.11(@ai-sdk/anthropic@4.0.82(zod@4.6.5))))(prosary@0.0.11)':
     dependencies:
       '@prosary/kit': 0.0.11(@prosary/translate@0.0.11(@ai-sdk/anthropic@4.0.82(zod@4.6.5)))
       prosary: 0.0.11
 
-  '@zoobzio/query@0.1.9':
+  '@zoobzio/query@0.1.11':
     dependencies:
-      '@zoobzio/kit': 0.1.9
+      '@zoobzio/kit': 0.1.11
       objectively: 0.3.0
 
-  '@zoobzio/table@0.1.9':
+  '@zoobzio/table@0.1.11':
     dependencies:
-      '@zoobzio/kit': 0.1.9
-      '@zoobzio/query': 0.1.9
+      '@tanstack/table-core': 9.3.1
+      '@zoobzio/kit': 0.1.11
+      '@zoobzio/query': 0.1.11
       objectively: 0.3.0
 
-  '@zoobzio/theme@0.1.9':
+  '@zoobzio/theme@0.1.11':
     dependencies:
       '@untheme/aurora': 0.6.1
       untheme: 0.6.1
 
-  '@zoobzio/vue@0.1.9(happy-dom@20.11.6)(vue@3.5.41(typescript@5.9.3))':
+  '@zoobzio/views@0.1.11':
+    dependencies:
+      '@zoobzio/kit': 0.1.11
+      zod: 4.6.5
+
+  '@zoobzio/vue@0.1.11(happy-dom@20.11.6)(vue@3.5.41(typescript@5.9.3))':
     dependencies:
       '@internationalized/date': 3.12.3
-      '@zoobzio/browser': 0.1.9
-      '@zoobzio/code': 0.1.9
-      '@zoobzio/editor': 0.1.9(happy-dom@20.11.6)
-      '@zoobzio/form': 0.1.9
-      '@zoobzio/kit': 0.1.9
-      '@zoobzio/query': 0.1.9
-      '@zoobzio/table': 0.1.9
+      '@zoobzio/browser': 0.1.11
+      '@zoobzio/calendar': 0.1.11
+      '@zoobzio/code': 0.1.11
+      '@zoobzio/editor': 0.1.11(happy-dom@20.11.6)
+      '@zoobzio/form': 0.1.11
+      '@zoobzio/kit': 0.1.11
+      '@zoobzio/query': 0.1.11
+      '@zoobzio/table': 0.1.11
+      '@zoobzio/views': 0.1.11
       defu: 6.1.7
       objectively: 0.3.0
       reka-ui: 2.10.3(vue@3.5.41(typescript@5.9.3))
@@ -12322,6 +12371,10 @@ snapshots:
 
   rou3@0.9.2: {}
 
+  rrule-temporal@2.2.9:
+    dependencies:
+      temporal-spec: 1.0.1
+
   run-applescript@7.1.0: {}
 
   run-parallel@1.2.0:
@@ -12532,6 +12585,15 @@ snapshots:
     transitivePeerDependencies:
       - bare-abort-controller
       - react-native-b4a
+
+  temporal-polyfill@1.0.8:
+    dependencies:
+      temporal-spec: 1.0.1
+      temporal-utils: 1.0.4
+
+  temporal-spec@1.0.1: {}
+
+  temporal-utils@1.0.4: {}
 
   terser@5.50.0:
     dependencies:

@@ -32,10 +32,11 @@ export const toFoldersQuery = (
 
 /**
  * The documents filed in the open folder, as the API is asked for them: the
- * folder, and the sort when the browser holds one.
+ * folder, and the sort when the browser holds one. What the browser's
+ * search commits is asked for by nothing: the API does not search a folder.
  */
 export const toContentQuery = (
-  params: BrowserFetchParams,
+  params: Pick<BrowserFetchParams, "path" | "sortField" | "sortDirection">,
 ): Record<string, number | string> => {
   const folder = folderOf(params.path);
   return {

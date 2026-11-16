@@ -1,12 +1,17 @@
 import type { ZodType } from "zod";
 
-import type { Listing, TableFetch, TableService } from "~/types/listing";
+import type {
+  Listing,
+  TableFetch,
+  TableRecord,
+  TableService,
+} from "~/types/listing";
 
 import { useRequest } from "#imports";
 import { useApi } from "~/composables/api";
 import { toFetchResult, toListingQuery } from "~/utils/listing";
 
-export const useListingFetch = <T>(
+export const useListingFetch = <T extends TableRecord>(
   path: string,
   schema: ZodType<Listing<T>>,
 ) => {
@@ -14,7 +19,7 @@ export const useListingFetch = <T>(
 
   const fetch: TableFetch<T> = async (params) => {
     const data = await api(path, { query: toListingQuery(params) });
-    return toFetchResult(schema.parse(data), params.pageSize);
+    return toFetchResult(schema.parse(data));
   };
 
   return fetch;
@@ -26,7 +31,9 @@ export const useListingFetch = <T>(
  * through it would show the rows as they stood on the first visit. The
  * page, sort and filters the table holds are kept and asked for again.
  */
-export const useTableRequest = <T>(table: TableService<T>) =>
+export const useTableRequest = <T extends TableRecord>(
+  table: TableService<T>,
+) =>
   useRequest(`table:${table.id}`, async () => {
     await table.fetch();
     return true;

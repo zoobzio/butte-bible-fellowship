@@ -13,34 +13,51 @@ export type RecordLink<T> = (record: T) => string;
  */
 export type ListingRequest = ListingQuery & Record<string, string | number>;
 
+/** A record a table lists: what each of its rows is read from. */
+export type TableRecord = Record<string, unknown>;
+
+type ColumnDefinition<T extends TableRecord> =
+  TableOptions<T>["columns"][number];
+
+/** What a column says of itself beyond its definition, for the table to read. */
+type ColumnMeta<T extends TableRecord> = NonNullable<
+  ColumnDefinition<T>["meta"]
+>;
+
 /**
- * A column as the app configures it: its label a message of the prose,
- * never a bare string, which the layer's factory resolves as the table is
- * built. The icon the heading, the search's field option and the column
- * manager's item lead with is the layer's own field.
+ * A column as the app configures it: a column of the table over one key of
+ * the record, which is its id, the key the API sorts and filters it by.
+ * What the table and its search read of it sits on its `meta`: its label a
+ * message of the prose, never a bare string, which the layer's factory
+ * resolves as the table is built, and the icon the heading, the search's
+ * field option and the column manager's item lead with, the layer's own
+ * field.
  */
-export type TableColumn<T> = Omit<
-  TableOptions<T>["columns"][number],
-  "label"
+export type TableColumn<T extends TableRecord> = Omit<
+  Extract<ColumnDefinition<T>, { accessorKey: unknown }>,
+  "accessorKey" | "meta"
 > & {
-  label: AppProsaryMessage;
+  accessorKey: keyof T & string;
+  meta: Omit<ColumnMeta<T>, "label"> & { label: AppProsaryMessage };
 };
 
 /**
- * A table as the app configures it: the descriptors alone. The fetch, the
- * actions and the initial state are wired where the table is created.
+ * A table as the app configures it: the descriptors alone. The fetch and
+ * the actions are wired where the table is created.
  */
-export type TableConfig<T> = Omit<
+export type TableConfig<T extends TableRecord> = Omit<
   TableOptions<T>,
-  "columns" | "fetch" | "actions" | "bulkActions" | "initial"
+  "columns" | "fetch" | "actions" | "bulkActions"
 > & {
   columns: TableColumn<T>[];
 };
 
-export type TableFetch<T> = TableOptions<T>["fetch"];
+export type TableFetch<T extends TableRecord> = TableOptions<T>["fetch"];
 
-export type TableFetchParams = Parameters<TableFetch<unknown>>[0];
+export type TableFetchParams = Parameters<TableFetch<TableRecord>>[0];
 
-export type TableFetchResult<T> = Awaited<ReturnType<TableFetch<T>>>;
+export type TableFetchResult<T extends TableRecord> = Awaited<
+  ReturnType<TableFetch<T>>
+>;
 
-export type TableService<T> = ReturnType<UseTable<T>>;
+export type TableService<T extends TableRecord> = ReturnType<UseTable<T>>;

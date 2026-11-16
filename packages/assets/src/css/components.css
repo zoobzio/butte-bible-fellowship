@@ -131,6 +131,20 @@
   height: var(--space-4);
 }
 
+/*
+ * The item a browser sorts by, in its sort menu: it reads darker, and the
+ * way it sorts is drawn at its end.
+ */
+.f-dropdown-menu-item[data-current] {
+  color: var(--on-surface-high-contrast);
+  font-weight: var(--weight-medium);
+}
+
+.f-dropdown-menu-item[data-current] > svg:last-child {
+  margin-left: auto;
+  color: var(--primary);
+}
+
 /* A group's label, over its items, and the rule between groups. */
 .f-dropdown-menu-label .f-caption {
   display: block;

@@ -3,6 +3,7 @@ import type {
   ListingRequest,
   TableFetchParams,
   TableFetchResult,
+  TableRecord,
 } from "~/types/listing";
 
 import { DATE_OPERATORS, MATCH_OPERATORS, TEXT_OPERATORS } from "@bbf/schema";
@@ -28,30 +29,39 @@ const keyOf = ({ key, op }: TableFetchParams["filters"][number]): string => {
 };
 
 /**
- * What a table asks the API for: the page, the free text as `q`, one
- * column filter per key, and the sort as `sort` and `direction` once a
- * column is sorted. Unsorted, the API lists in its own order.
+ * What a table asks the API for: the page, counted from one as the API
+ * counts it, the free text as `q`, one column filter per key, and the sort
+ * as `sort` and `direction` once a column is sorted. The API sorts by one
+ * column, so the first of the table's sorts is the one asked for; unsorted,
+ * the API lists in its own order.
  */
 export const toListingQuery = ({
-  page,
-  pageSize,
-  sortField,
-  sortDirection,
+  pagination,
+  sorting,
   query,
   filters,
-}: TableFetchParams): ListingRequest => ({
-  ...Object.fromEntries(filters.map((filter) => [keyOf(filter), filter.value])),
-  page,
-  size: pageSize,
-  ...(query === "" ? {} : { q: query }),
-  ...(sortField === null ? {} : { sort: sortField, direction: sortDirection }),
-});
+}: TableFetchParams): ListingRequest => {
+  const [sort] = sorting;
+  return {
+    ...Object.fromEntries(
+      filters.map((filter) => [keyOf(filter), filter.value]),
+    ),
+    page: pagination.pageIndex + 1,
+    size: pagination.pageSize,
+    ...(query === "" ? {} : { q: query }),
+    ...(sort === undefined
+      ? {}
+      : { sort: sort.id, direction: sort.desc ? "desc" : "asc" }),
+  };
+};
 
-export const toFetchResult = <T>(
+/**
+ * A page of a listing as the table takes it: its rows, and how many the
+ * whole search holds, which the table counts its pages from.
+ */
+export const toFetchResult = <T extends TableRecord>(
   listing: Listing<T>,
-  size: number,
 ): TableFetchResult<T> => ({
   data: listing.items,
-  total: listing.total,
-  pageCount: Math.max(1, Math.ceil(listing.total / size)),
+  rowCount: listing.total,
 });

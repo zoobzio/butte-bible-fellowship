@@ -9,6 +9,9 @@ import {
 } from "@bbf/schema";
 import { keys } from "objectively";
 
+/** How many rows a table lists on a page until its size is changed. */
+export const PAGE_SIZE = 25;
+
 /*
  * The filters a table's column takes, by the kind of column: the operators
  * the search offers on it, and the one a bare value takes. Each is spread

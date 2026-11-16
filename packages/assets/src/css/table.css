@@ -1,7 +1,8 @@
 /*
  * Foundation's data table, as every app lists its records: the toolbar of
  * search, column manager and refresh over a card of rows, the pagination
- * under it. Each rule is scoped to the table's own root so a Fab, chip or
+ * under it. The one track of its grid is free to shrink, so a table wider
+ * than the page scrolls within its card rather than widening the page. Each rule is scoped to the table's own root so a Fab, chip or
  * select elsewhere keeps its own dress. The layer's icons are bare `svg`
  * elements, and its reset lays an `svg` out as a block: every part that
  * holds one is a flex box here, so an icon sits in line with its label.
@@ -9,6 +10,7 @@
 
 .f-data-table {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--space-4);
 }
 
@@ -312,21 +314,55 @@
 }
 
 /*
- * The table, a card: a border around it, the headings on a darker ground.
- * The borders are kept apart so the card's corners can round; the cells
- * draw the rules between rows themselves. The layout is fixed, so a
- * column's width is the width its `col` carries, whatever its cells hold:
- * a resized column keeps the width it was dragged to, and the columns
- * without one share what the sized ones leave.
+ * The card: the scroller the table sits in, a border around it, its
+ * corners rounded and what passes them clipped. The table scrolls sideways
+ * within it once its columns outgrow it, under a bar along the card's foot
+ * that shows while there is somewhere to scroll.
+ */
+.f-data-table-scroller {
+  position: relative;
+  overflow: hidden;
+  border: 1px var(--stroke-solid) var(--rule);
+  border-radius: var(--shape-md);
+  background: var(--surface);
+}
+
+.f-data-table-scroller > .f-scroll-area-viewport {
+  width: 100%;
+}
+
+.f-data-table-scroller > .f-scroll-area-scrollbar {
+  display: flex;
+  flex-direction: column;
+  height: var(--space-2);
+  padding: calc(var(--space-1) / 2);
+  touch-action: none;
+  user-select: none;
+}
+
+.f-data-table-scroller .f-scroll-area-thumb {
+  flex: 1;
+  border-radius: var(--shape-full);
+  background: var(--rule);
+}
+
+/* The scroller offers a way back to the top; a table has no use for it. */
+.f-data-table-scroller > .f-button {
+  display: none;
+}
+
+/*
+ * The table: the headings on a darker ground, the cells drawing the rules
+ * between rows themselves. The layout is fixed, so a column's width is the
+ * width its `col` carries, whatever its cells hold: each keeps its size,
+ * the last takes what the card has left, and the table is never narrower
+ * than its columns together.
  */
 .f-data-table .f-table {
   table-layout: fixed;
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
-  border: 1px var(--stroke-solid) var(--rule);
-  border-radius: var(--shape-md);
-  background: var(--surface);
   font-size: var(--body-size);
 }
 
@@ -364,24 +400,8 @@
   white-space: nowrap;
 }
 
-.f-data-table .f-th:first-child {
-  border-top-left-radius: calc(var(--shape-md) - 1px);
-}
-
-.f-data-table .f-th:last-child {
-  border-top-right-radius: calc(var(--shape-md) - 1px);
-}
-
 .f-data-table .f-tbody .f-tr:last-child .f-td {
   border-bottom: none;
-}
-
-.f-data-table .f-tbody .f-tr:last-child .f-td:first-child {
-  border-bottom-left-radius: calc(var(--shape-md) - 1px);
-}
-
-.f-data-table .f-tbody .f-tr:last-child .f-td:last-child {
-  border-bottom-right-radius: calc(var(--shape-md) - 1px);
 }
 
 /*
@@ -609,18 +629,10 @@
 }
 
 /*
- * Narrow, the card scrolls sideways rather than squeezing its columns: as
- * a block the table lays its columns out by their content again, and the
- * resizers, which a sideways swipe would catch, are put away.
+ * Narrow, the card scrolls sideways under a finger, and the resizers,
+ * which a sideways swipe would catch, are put away.
  */
 @media (max-width: 44rem) {
-  .f-data-table .f-table {
-    display: block;
-    overflow-x: auto;
-    white-space: nowrap;
-    -webkit-overflow-scrolling: touch;
-  }
-
   .f-data-table-resizer {
     display: none;
   }

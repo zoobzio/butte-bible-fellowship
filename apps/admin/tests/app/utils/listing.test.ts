@@ -3,13 +3,11 @@ import { describe, expect, it } from "vitest";
 import { toFetchResult, toListingQuery } from "~/utils/listing";
 
 describe("toListingQuery", () => {
-  it("asks for the page and size the table is on", () => {
+  it("asks for the page the table is on, counted from one, at its size", () => {
     expect(
       toListingQuery({
-        page: 3,
-        pageSize: 10,
-        sortField: null,
-        sortDirection: "asc",
+        pagination: { pageIndex: 2, pageSize: 10 },
+        sorting: [],
         query: "",
         filters: [],
       }),
@@ -19,10 +17,8 @@ describe("toListingQuery", () => {
   it("carries the free text as q, and each committed column filter under its key", () => {
     expect(
       toListingQuery({
-        page: 1,
-        pageSize: 25,
-        sortField: null,
-        sortDirection: "asc",
+        pagination: { pageIndex: 0, pageSize: 25 },
+        sorting: [],
         query: "jane",
         filters: [
           { key: "role", value: "elder" },
@@ -41,23 +37,33 @@ describe("toListingQuery", () => {
   it("carries the sort as its column and its direction, once a column is sorted", () => {
     expect(
       toListingQuery({
-        page: 1,
-        pageSize: 25,
-        sortField: "updatedAt",
-        sortDirection: "desc",
+        pagination: { pageIndex: 0, pageSize: 25 },
+        sorting: [{ id: "updatedAt", desc: true }],
         query: "",
         filters: [],
       }),
     ).toEqual({ page: 1, size: 25, sort: "updatedAt", direction: "desc" });
   });
 
+  it("asks for the first of the table's sorts alone, as the API sorts by one column", () => {
+    expect(
+      toListingQuery({
+        pagination: { pageIndex: 0, pageSize: 25 },
+        sorting: [
+          { id: "role", desc: false },
+          { id: "name", desc: true },
+        ],
+        query: "",
+        filters: [],
+      }),
+    ).toEqual({ page: 1, size: 25, sort: "role", direction: "asc" });
+  });
+
   it("names an operator filter by its column and its operator, each word of it capitalised", () => {
     expect(
       toListingQuery({
-        page: 1,
-        pageSize: 25,
-        sortField: null,
-        sortDirection: "asc",
+        pagination: { pageIndex: 0, pageSize: 25 },
+        sorting: [],
         query: "",
         filters: [
           { key: "updatedAt", op: "before", value: "2026-10-17" },
@@ -79,10 +85,8 @@ describe("toListingQuery", () => {
   it("refuses an operator the schema does not name", () => {
     expect(() =>
       toListingQuery({
-        page: 1,
-        pageSize: 25,
-        sortField: null,
-        sortDirection: "asc",
+        pagination: { pageIndex: 0, pageSize: 25 },
+        sorting: [],
         query: "",
         filters: [{ key: "name", op: "between", value: "a" }],
       }),
@@ -91,19 +95,17 @@ describe("toListingQuery", () => {
 });
 
 describe("toFetchResult", () => {
-  it("hands the table its rows, the total and the pages at the size asked", () => {
-    expect(toFetchResult({ items: ["a", "b"], total: 42 }, 10)).toEqual({
+  it("hands the table its rows and how many the whole search holds", () => {
+    expect(toFetchResult({ items: ["a", "b"], total: 42 })).toEqual({
       data: ["a", "b"],
-      total: 42,
-      pageCount: 5,
+      rowCount: 42,
     });
   });
 
-  it("counts an empty list as one page", () => {
-    expect(toFetchResult({ items: [], total: 0 }, 25)).toEqual({
+  it("hands on an empty list as no rows of none", () => {
+    expect(toFetchResult({ items: [], total: 0 })).toEqual({
       data: [],
-      total: 0,
-      pageCount: 1,
+      rowCount: 0,
     });
   });
 });

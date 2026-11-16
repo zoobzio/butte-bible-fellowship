@@ -4,7 +4,13 @@ import type { RecordLink, TableConfig } from "~/types/listing";
 
 import { STAFF_ROLES } from "@bbf/schema";
 import { TIME_ZONE } from "#layers/bbf/shared/constants/time";
-import { dated, matching, optional, textual } from "~/constants/listing";
+import {
+  PAGE_SIZE,
+  dated,
+  matching,
+  optional,
+  textual,
+} from "~/constants/listing";
 
 /** The way to a member's profile: the page a row's name leads to. */
 export const link: RecordLink<StaffRecord> = (record) =>
@@ -14,9 +20,10 @@ export const link: RecordLink<StaffRecord> = (record) =>
  * The staff as the admin lists them: every column of a member's record a
  * cell can show, the bio aside. The name, the way to the member's editor,
  * the role and the contact details are shown at first; the summary, the
- * photo and the day added wait in the column manager. A column the API
- * sorts by is sortable. The free text searches the name, the email, the
- * phone, the summary and the bio; beside it, each text column filters on
+ * photo and the day added wait in the column manager, and the name is
+ * never hidden. A column sorts unless the API does not sort by it, and by
+ * one column at a time, as the API does. The free text searches the name,
+ * the email, the phone, the summary and the bio; beside it, each text column filters on
  * the text it holds, carries, starts or ends with, an optional one on
  * whether it is filled in too, the role on a value held or not, and the
  * days on before, after or on, or on or after or on or before. The
@@ -24,71 +31,94 @@ export const link: RecordLink<StaffRecord> = (record) =>
  * cell formats in the church's time zone.
  */
 export const STAFF_TABLE: TableConfig<StaffRecord> = {
-  rowKey: "id",
+  getRowId: (record) => String(record.id),
   timeZone: TIME_ZONE,
-  searchable: true,
-  pinnedColumns: ["name"],
-  defaultColumnOrder: ["name", "role", "email", "phone", "updatedAt"],
+  permissions: { multiSort: false },
+  initialState: {
+    pagination: { pageIndex: 0, pageSize: PAGE_SIZE },
+    columnVisibility: {
+      summary: false,
+      photo: false,
+      createdAt: false,
+    },
+  },
   columns: [
     {
-      key: "name",
-      label: "admin.member.name",
-      icon: "user",
-      link,
-      ...textual,
-      sortable: true,
+      accessorKey: "name",
+      size: 240,
+      enableHiding: false,
+      meta: {
+        label: "admin.member.name",
+        icon: "user",
+        link,
+        ...textual,
+      },
     },
     {
-      key: "role",
-      label: "admin.member.role",
-      icon: "briefcase",
-      type: "enum",
-      values: [...STAFF_ROLES],
-      ...matching,
-      sortable: true,
+      accessorKey: "role",
+      meta: {
+        label: "admin.member.role",
+        icon: "briefcase",
+        type: "enum",
+        values: [...STAFF_ROLES],
+        ...matching,
+      },
     },
     {
-      key: "email",
-      label: "admin.member.email",
-      icon: "mail",
-      sortable: true,
-      ...optional,
+      accessorKey: "email",
+      size: 220,
+      meta: {
+        label: "admin.member.email",
+        icon: "mail",
+        ...optional,
+      },
     },
     {
-      key: "phone",
-      label: "admin.member.phone",
-      icon: "phone",
-      sortable: true,
-      ...optional,
+      accessorKey: "phone",
+      meta: {
+        label: "admin.member.phone",
+        icon: "phone",
+        ...optional,
+      },
     },
     {
-      key: "summary",
-      label: "admin.editor.summary",
-      icon: "text",
-      ...optional,
+      accessorKey: "summary",
+      enableSorting: false,
+      meta: {
+        label: "admin.editor.summary",
+        icon: "text",
+        ...optional,
+      },
     },
     {
-      key: "photo",
-      label: "admin.member.photo",
-      icon: "image",
-      type: "url",
-      ...optional,
+      accessorKey: "photo",
+      enableSorting: false,
+      meta: {
+        label: "admin.member.photo",
+        icon: "image",
+        type: "url",
+        ...optional,
+      },
     },
     {
-      key: "updatedAt",
-      label: "admin.editor.updated",
-      icon: "calendar-clock",
-      type: "datetime",
-      ...dated,
-      sortable: true,
+      accessorKey: "updatedAt",
+      size: 200,
+      meta: {
+        label: "admin.editor.updated",
+        icon: "calendar-clock",
+        type: "datetime",
+        ...dated,
+      },
     },
     {
-      key: "createdAt",
-      label: "admin.editor.created",
-      icon: "calendar",
-      type: "datetime",
-      ...dated,
-      sortable: true,
+      accessorKey: "createdAt",
+      size: 200,
+      meta: {
+        label: "admin.editor.created",
+        icon: "calendar",
+        type: "datetime",
+        ...dated,
+      },
     },
   ],
 };

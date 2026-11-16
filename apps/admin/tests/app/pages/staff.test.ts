@@ -50,7 +50,10 @@ describe("staff page", () => {
 
   it("lists the members under the columns shown at first, the row's actions after them", async () => {
     const { wrapper } = await mountStaff([STAFF]);
-    expect(wrapper.find(".f-data-table table").exists()).toBe(true);
+    // The table sits in its scroller, which is the card that scrolls it.
+    expect(wrapper.find(".f-data-table-scroller table.f-table").exists()).toBe(
+      true,
+    );
     expect(
       wrapper
         .findAll(".f-th:not(.f-data-table-actions)")
@@ -66,9 +69,28 @@ describe("staff page", () => {
       .find((th) => th.text() === "Email")!;
     expect(heading.classes()).toContain("f-data-table-sortable");
     expect(heading.classes()).not.toContain("f-data-table-sorted");
+    expect(heading.attributes("aria-sort")).toBeUndefined();
     await heading.find("button").trigger("click");
     await flushPromises();
     expect(heading.classes()).toContain("f-data-table-sorted");
+    expect(heading.attributes("aria-sort")).toBe("ascending");
+  });
+
+  it("leaves a column the API does not sort by as plain text, and the name out of what can be hidden", async () => {
+    const { wrapper } = await mountStaff([STAFF]);
+    const service = wrapper.findComponent(Table).props("service");
+    service.table.getColumn("summary").toggleVisibility(true);
+    await flushPromises();
+    const heading = wrapper
+      .findAll(".f-th")
+      .find((th) => th.text() === "Summary")!;
+    expect(heading.classes()).not.toContain("f-data-table-sortable");
+    expect(heading.find("button").exists()).toBe(false);
+    service.table.getColumn("name").toggleVisibility(false);
+    await flushPromises();
+    expect(wrapper.findAll(".f-th").some((th) => th.text() === "Name")).toBe(
+      true,
+    );
   });
 
   it("opens a panel of options under the search box when it takes focus", async () => {

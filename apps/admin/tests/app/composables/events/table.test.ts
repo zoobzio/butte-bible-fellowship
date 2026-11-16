@@ -22,12 +22,17 @@ describe("useEventsTable", () => {
   it("is the events table, in the church's time zone, its columns and its search named by the prose, the title the way to an event's details", () => {
     const table = withSetup(() => useEventsTable()).result;
     expect(table.id).toBe("events");
-    expect(table.rowKey).toBe("id");
+    expect(table.table.getRowId(DINNER, 0)).toBe("4");
     expect(table.timeZone).toBe(TIME_ZONE);
-    expect(table.searchable).toBe(true);
-    expect(table.columns[0]?.link?.(DINNER)).toBe("/events/4/details");
-    expect(table.columns.slice(1).every((column) => !column.link)).toBe(true);
-    expect(table.columns.map((column) => column.label)).toEqual([
+    expect(table.can("search")).toBe(true);
+    const columns = table.table.getAllLeafColumns();
+    expect(columns[0]?.columnDef.meta?.link?.(DINNER)).toBe(
+      "/events/4/details",
+    );
+    expect(
+      columns.slice(1).every((column) => !column.columnDef.meta?.link),
+    ).toBe(true);
+    expect(columns.map((column) => column.columnDef.meta?.label)).toEqual([
       "Title",
       "Day",
       "Date",
@@ -43,7 +48,7 @@ describe("useEventsTable", () => {
     expect(table.query.literals).toEqual({
       text: { label: "Search", open: '"', close: '"' },
     });
-    expect(table.columns.map((column) => column.key)).toEqual([
+    expect(columns.map((column) => column.id)).toEqual([
       "title",
       "day",
       "date",
@@ -56,15 +61,10 @@ describe("useEventsTable", () => {
       "updatedAt",
       "createdAt",
     ]);
-    expect(table.visibleColumns.map((column) => column.key)).toEqual([
-      "title",
-      "day",
-      "date",
-      "recurring",
-      "start",
-      "updatedAt",
-    ]);
-    expect(table.filterableColumns.map((column) => column.key)).toEqual([
+    expect(
+      table.table.getVisibleLeafColumns().map((column) => column.id),
+    ).toEqual(["title", "day", "date", "recurring", "start", "updatedAt"]);
+    expect(Object.keys(table.query.fields)).toEqual([
       "title",
       "day",
       "date",
@@ -76,9 +76,9 @@ describe("useEventsTable", () => {
       "createdAt",
     ]);
     expect(
-      table.columns
-        .filter((column) => column.sortable)
-        .map((column) => column.key),
+      columns
+        .filter((column) => column.getCanSort())
+        .map((column) => column.id),
     ).toEqual([
       "title",
       "day",
@@ -89,7 +89,12 @@ describe("useEventsTable", () => {
       "updatedAt",
       "createdAt",
     ]);
-    expect(table.isColumnPinned("title")).toBe(true);
+    expect(columns.every((column) => !column.getCanMultiSort())).toBe(true);
+    expect(
+      columns
+        .filter((column) => !column.getCanHide())
+        .map((column) => column.id),
+    ).toEqual(["title"]);
   });
 
   it("offers whether an event recurs and its day held or not, a bare value the one held, and no status", () => {
@@ -172,15 +177,16 @@ describe("useEventsTable", () => {
       query: { page: 1, size: 25 },
     });
     expect(table.data).toEqual([WORSHIP, DINNER]);
-    expect(table.total).toBe(2);
-    expect(table.pageCount).toBe(1);
+    expect(table.rowCount).toBe(2);
+    expect(table.table.getPageCount()).toBe(1);
   });
 
   it("searches the events by the text and the filters the search box commits, from the first page, as the API names each", async () => {
     const fetch = vi.fn(async () => ({ items: [DINNER], total: 1 }));
     vi.stubGlobal("$fetch", fetch);
     const table = withSetup(() => useEventsTable()).result;
-    table.goToPage(2);
+    table.table.setPageIndex(1);
+    await flushPromises();
     table.query.add({ kind: "literal", key: "text", value: "dinner" });
     table.query.add({ kind: "filter", key: "recurring", value: "false" });
     table.query.add({ kind: "filter", key: "day", op: "not", value: "sunday" });
@@ -230,13 +236,15 @@ describe("useEventsTable", () => {
     const fetch = vi.fn(async () => ({ items: [DINNER], total: 1 }));
     vi.stubGlobal("$fetch", fetch);
     const table = withSetup(() => useEventsTable()).result;
-    table.goToPage(2);
-    table.sortBy("start");
+    // The first way a column sorts is read from the rows it holds.
+    await table.fetch();
+    const start = table.table.getColumn("start")!;
+    start.toggleSorting();
     await flushPromises();
     expect(fetch).toHaveBeenLastCalledWith("/api/events", {
       query: { page: 1, size: 25, sort: "start", direction: "asc" },
     });
-    table.sortBy("start");
+    start.toggleSorting();
     await flushPromises();
     expect(fetch).toHaveBeenLastCalledWith("/api/events", {
       query: { page: 1, size: 25, sort: "start", direction: "desc" },
@@ -247,16 +255,17 @@ describe("useEventsTable", () => {
     const { EVENT_SORT_KEYS, eventQuery } = await import("@bbf/schema");
     const table = withSetup(() => useEventsTable()).result;
     expect(
-      table.columns
-        .filter((column) => column.sortable)
-        .map((column) => column.key)
+      table.table
+        .getAllLeafColumns()
+        .filter((column) => column.getCanSort())
+        .map((column) => column.id)
         .sort(),
     ).toEqual([...EVENT_SORT_KEYS].sort());
     const keys = Object.keys(eventQuery.shape);
-    for (const column of table.filterableColumns) {
+    for (const field of Object.keys(table.query.fields)) {
       expect(
-        keys.some((key) => key.startsWith(String(column.key))),
-        String(column.key),
+        keys.some((key) => key.startsWith(field)),
+        field,
       ).toBe(true);
     }
   });

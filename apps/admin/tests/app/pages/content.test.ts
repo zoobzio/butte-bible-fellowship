@@ -186,10 +186,50 @@ describe("content page", () => {
     ).toEqual(["Butte Bible Fellowship"]);
   });
 
+  it("counts what the open folder lists beside the trail, and draws no search, which the API does not answer", async () => {
+    const { wrapper } = await mountContent({
+      folders: [NOTES],
+      documents: [HOME, ABOUT],
+    });
+    expect(wrapper.find(".f-data-browser-summary").text()).toBe(
+      "1 folder, 2 files",
+    );
+    expect(wrapper.find(".f-data-browser-search").exists()).toBe(false);
+    expect(wrapper.findComponent(Browser).props("service").searchable).toBe(
+      false,
+    );
+  });
+
+  it("sorts the documents by a column the sort menu offers, and the other way on a second ask", async () => {
+    const { wrapper, fetch } = await mountContent({ documents: [HOME, ABOUT] });
+    const browser = wrapper.findComponent(Browser).props("service");
+    expect(
+      browser.sortableColumns.map((column: { key: string }) => column.key),
+    ).toEqual(["title", "slug", "updatedAt"]);
+    const trigger = wrapper.find(".f-data-browser-toolbar button");
+    await trigger.trigger("pointerdown", { button: 0, ctrlKey: false });
+    await trigger.trigger("click");
+    await flushPromises();
+    await pick("Slug");
+    expect(fetch).toHaveBeenLastCalledWith("/api/content", {
+      query: { sort: "slug", direction: "asc" },
+    });
+    browser.sortBy("slug");
+    await flushPromises();
+    expect(fetch).toHaveBeenLastCalledWith("/api/content", {
+      query: { sort: "slug", direction: "desc" },
+    });
+  });
+
   it("says when a folder holds nothing", async () => {
     const { wrapper } = await mountContent({});
-    expect(wrapper.find(".f-data-browser-empty").exists()).toBe(true);
-    expect(wrapper.find(".f-data-browser table").exists()).toBe(false);
+    // Under the head: the trail there is the way back out of it.
+    expect(wrapper.find(".f-data-browser-breadcrumb").exists()).toBe(true);
+    expect(wrapper.find("tbody.f-data-browser-empty .f-td").exists()).toBe(
+      true,
+    );
+    expect(wrapper.find(FOLDER).exists()).toBe(false);
+    expect(wrapper.find(POST).exists()).toBe(false);
   });
 
   it("leads to a document's editor from its row's actions", async () => {
@@ -522,10 +562,11 @@ describe("moving", () => {
 
   it("picks a folder up from its row, and puts it down inside another, never inside itself", async () => {
     const { wrapper, fetch } = await mountContent(
-      { folders: [NOTES, { ...ROMANS, parent: undefined }] },
+      { folders: [{ ...ROMANS, parent: undefined }, NOTES] },
       { 2: {}, 3: {} },
     );
-    // Folders are listed by name: Romans first, then the sermon notes.
+    // Folders are listed as the API orders them, by name: Romans first,
+    // then the sermon notes.
     await act(wrapper, `${FOLDER}:nth-child(1)`, "Move");
     expect(wrapper.find(".content-move-text").text()).toBe(
       "Moving Romans. Open the folder it belongs in.",

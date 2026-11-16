@@ -8,23 +8,21 @@ import { useListingFetch, useTableRequest } from "~/composables/listing";
 import { STAFF_TABLE } from "~/constants/staff";
 
 const PARAMS = {
-  page: 2,
-  pageSize: 10,
-  sortField: null,
-  sortDirection: "asc" as const,
+  pagination: { pageIndex: 1, pageSize: 10 },
+  sorting: [],
   query: "",
   filters: [],
 };
 
 describe("useListingFetch", () => {
-  it("fetches the page the table asks for, and hands back its rows and pages", async () => {
+  it("fetches the page the table asks for, and hands back its rows and their count", async () => {
     const fetch = vi.fn(async () => ({ items: [STAFF], total: 42 }));
     vi.stubGlobal("$fetch", fetch);
     const result = await useListingFetch("/api/staff", staffListing)(PARAMS);
     expect(fetch).toHaveBeenCalledWith("/api/staff", {
       query: { page: 2, size: 10 },
     });
-    expect(result).toEqual({ data: [STAFF], total: 42, pageCount: 5 });
+    expect(result).toEqual({ data: [STAFF], rowCount: 42 });
   });
 
   it("refuses an answer that is not the listing", async () => {
@@ -40,11 +38,7 @@ describe("useListingFetch", () => {
 
 describe("useTableRequest", () => {
   it("fetches the table's page on every load", async () => {
-    const fetch = vi.fn(async () => ({
-      data: [STAFF],
-      total: 1,
-      pageCount: 1,
-    }));
+    const fetch = vi.fn(async () => ({ data: [STAFF], rowCount: 1 }));
     const useTable = createTable("listing-request", { ...STAFF_TABLE, fetch });
     const table = withSetup(() => useTable()).result;
     await useTableRequest(table);

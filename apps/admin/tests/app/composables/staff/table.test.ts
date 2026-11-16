@@ -17,12 +17,15 @@ describe("useStaffTable", () => {
   it("is the staff table, in the church's time zone, its columns and its search named by the prose, the name the way to a member's editor", () => {
     const table = withSetup(() => useStaffTable()).result;
     expect(table.id).toBe("staff");
-    expect(table.rowKey).toBe("id");
+    expect(table.table.getRowId(STAFF, 0)).toBe("1");
     expect(table.timeZone).toBe(TIME_ZONE);
-    expect(table.searchable).toBe(true);
-    expect(table.columns[0]?.link?.(STAFF)).toBe("/staff/1/profile");
-    expect(table.columns.slice(1).every((column) => !column.link)).toBe(true);
-    expect(table.columns.map((column) => column.label)).toEqual([
+    expect(table.can("search")).toBe(true);
+    const columns = table.table.getAllLeafColumns();
+    expect(columns[0]?.columnDef.meta?.link?.(STAFF)).toBe("/staff/1/profile");
+    expect(
+      columns.slice(1).every((column) => !column.columnDef.meta?.link),
+    ).toBe(true);
+    expect(columns.map((column) => column.columnDef.meta?.label)).toEqual([
       "Name",
       "Role",
       "Email",
@@ -35,24 +38,7 @@ describe("useStaffTable", () => {
     expect(table.query.literals).toEqual({
       text: { label: "Search", open: '"', close: '"' },
     });
-    expect(table.columns.map((column) => column.key)).toEqual([
-      "name",
-      "role",
-      "email",
-      "phone",
-      "summary",
-      "photo",
-      "updatedAt",
-      "createdAt",
-    ]);
-    expect(table.visibleColumns.map((column) => column.key)).toEqual([
-      "name",
-      "role",
-      "email",
-      "phone",
-      "updatedAt",
-    ]);
-    expect(table.filterableColumns.map((column) => column.key)).toEqual([
+    expect(columns.map((column) => column.id)).toEqual([
       "name",
       "role",
       "email",
@@ -63,11 +49,29 @@ describe("useStaffTable", () => {
       "createdAt",
     ]);
     expect(
-      table.columns
-        .filter((column) => column.sortable)
-        .map((column) => column.key),
+      table.table.getVisibleLeafColumns().map((column) => column.id),
+    ).toEqual(["name", "role", "email", "phone", "updatedAt"]);
+    expect(Object.keys(table.query.fields)).toEqual([
+      "name",
+      "role",
+      "email",
+      "phone",
+      "summary",
+      "photo",
+      "updatedAt",
+      "createdAt",
+    ]);
+    expect(
+      columns
+        .filter((column) => column.getCanSort())
+        .map((column) => column.id),
     ).toEqual(["name", "role", "email", "phone", "updatedAt", "createdAt"]);
-    expect(table.isColumnPinned("name")).toBe(true);
+    expect(columns.every((column) => !column.getCanMultiSort())).toBe(true);
+    expect(
+      columns
+        .filter((column) => !column.getCanHide())
+        .map((column) => column.id),
+    ).toEqual(["name"]);
   });
 
   it("offers each date filter the days the term names, today first before one is typed, each way of a span its own filter", () => {
@@ -208,15 +212,16 @@ describe("useStaffTable", () => {
       query: { page: 1, size: 25 },
     });
     expect(table.data).toEqual([STAFF]);
-    expect(table.total).toBe(1);
-    expect(table.pageCount).toBe(1);
+    expect(table.rowCount).toBe(1);
+    expect(table.table.getPageCount()).toBe(1);
   });
 
   it("searches the staff by the text and the filters the search box commits, from the first page", async () => {
     const fetch = vi.fn(async () => ({ items: [STAFF], total: 1 }));
     vi.stubGlobal("$fetch", fetch);
     const table = withSetup(() => useStaffTable()).result;
-    table.goToPage(2);
+    table.table.setPageIndex(1);
+    await flushPromises();
     table.query.add({ kind: "literal", key: "text", value: "jane" });
     table.query.add({ kind: "filter", key: "role", value: "elder" });
     table.query.add({
@@ -267,20 +272,40 @@ describe("useStaffTable", () => {
     });
   });
 
-  it("sorts the staff by a column, from the first page, and the other way on a second ask", async () => {
+  it("sorts the staff by a column on the page it is on, the other way on a second ask, and not at all on a third", async () => {
+    const fetch = vi.fn(async () => ({ items: [STAFF], total: 60 }));
+    vi.stubGlobal("$fetch", fetch);
+    const table = withSetup(() => useStaffTable()).result;
+    await table.fetch();
+    table.table.setPageIndex(1);
+    const updated = table.table.getColumn("updatedAt")!;
+    updated.toggleSorting();
+    await flushPromises();
+    expect(fetch).toHaveBeenLastCalledWith("/api/staff", {
+      query: { page: 2, size: 25, sort: "updatedAt", direction: "asc" },
+    });
+    updated.toggleSorting();
+    await flushPromises();
+    expect(fetch).toHaveBeenLastCalledWith("/api/staff", {
+      query: { page: 2, size: 25, sort: "updatedAt", direction: "desc" },
+    });
+    updated.toggleSorting();
+    await flushPromises();
+    expect(fetch).toHaveBeenLastCalledWith("/api/staff", {
+      query: { page: 2, size: 25 },
+    });
+  });
+
+  it("sorts by one column at a time: a second column sorted takes the first's place", async () => {
     const fetch = vi.fn(async () => ({ items: [STAFF], total: 1 }));
     vi.stubGlobal("$fetch", fetch);
     const table = withSetup(() => useStaffTable()).result;
-    table.goToPage(2);
-    table.sortBy("updatedAt");
+    table.table.getColumn("name")!.toggleSorting(false, true);
+    table.table.getColumn("role")!.toggleSorting(true, true);
     await flushPromises();
+    expect(table.snapshot().sorting).toEqual([{ id: "role", desc: true }]);
     expect(fetch).toHaveBeenLastCalledWith("/api/staff", {
-      query: { page: 1, size: 25, sort: "updatedAt", direction: "asc" },
-    });
-    table.sortBy("updatedAt");
-    await flushPromises();
-    expect(fetch).toHaveBeenLastCalledWith("/api/staff", {
-      query: { page: 1, size: 25, sort: "updatedAt", direction: "desc" },
+      query: { page: 1, size: 25, sort: "role", direction: "desc" },
     });
   });
 
