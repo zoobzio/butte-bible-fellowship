@@ -693,8 +693,8 @@ describe("admin.staff", () => {
 });
 
 describe("admin.content", () => {
-  /* The top of the content, in the admin's own order. */
-  const top = { direction: "asc" };
+  /* The top of the content, in the admin's own order, in the church's time. */
+  const top = { direction: "asc", tz: "America/Los_Angeles" };
 
   /* Two pages to list, written here: the content holds none of its own. */
   const WRITTEN = ["core-beliefs", "welcome"];
@@ -847,6 +847,70 @@ describe("admin.content", () => {
     expect(await slugs({ folder_id: 0 })).toEqual([]);
   });
 
+  it("searches a folder's pages for a text, in all that is written of them, the nearest first", async () => {
+    // The title, the slug, the description and the body, whatever the case.
+    expect(await slugs({ q: "WELCOME" })).toEqual(["welcome"]);
+    expect(await slugs({ q: "core-beliefs" })).toEqual(["core-beliefs"]);
+    expect(await slugs({ q: "cause of christ" })).toEqual(["core-beliefs"]);
+    expect(await slugs({ q: "curious about" })).toEqual(["welcome"]);
+    expect(await slugs({ q: "fellowship" })).toEqual(WRITTEN);
+    expect(await slugs({ q: "sermon" })).toEqual([]);
+    // What is typed is the text itself, never a wildcard.
+    expect(await slugs({ q: "%" })).toEqual([]);
+    expect(await slugs({ q: "_" })).toEqual([]);
+    // A misspelling still finds its page.
+    expect(await slugs({ q: "beleifs" })).toEqual(["core-beliefs"]);
+    // A sort asked for holds over the nearness.
+    expect(
+      await slugs({ q: "fellowship", sort: "title", direction: "desc" }),
+    ).toEqual([...WRITTEN].reverse());
+    // The folder alone is searched: one that holds nothing finds nothing.
+    expect(await slugs({ q: "welcome", folder_id: 0 })).toEqual([]);
+  });
+
+  it("filters a folder's pages on the title, the slug and the day last changed", async () => {
+    expect(await slugs({ title_contains: "BELIEFS" })).toEqual([
+      "core-beliefs",
+    ]);
+    expect(await slugs({ title_not_contains: "beliefs" })).toEqual(["welcome"]);
+    expect(await slugs({ title_starts_with: "welcome" })).toEqual(["welcome"]);
+    expect(await slugs({ title_ends_with: "fellowship" })).toEqual(WRITTEN);
+    expect(await slugs({ title_is: "welcome to the fellowship" })).toEqual([
+      "welcome",
+    ]);
+    expect(await slugs({ title_not: "Welcome to the Fellowship" })).toEqual([
+      "core-beliefs",
+    ]);
+    expect(await slugs({ slug_is: "welcome" })).toEqual(["welcome"]);
+    expect(await slugs({ slug_not: "welcome" })).toEqual(["core-beliefs"]);
+    expect(await slugs({ slug_contains: "-" })).toEqual(["core-beliefs"]);
+    expect(await slugs({ slug_not_contains: "-" })).toEqual(["welcome"]);
+    expect(await slugs({ slug_starts_with: "core" })).toEqual(["core-beliefs"]);
+    expect(await slugs({ slug_ends_with: "come" })).toEqual(["welcome"]);
+    // Every page has a title and a slug.
+    expect(await slugs({ title_is: "missing" })).toEqual([]);
+    expect(await slugs({ slug_is: "present" })).toEqual(WRITTEN);
+    // What is typed is the text itself, never a wildcard.
+    expect(await slugs({ title_contains: "%" })).toEqual([]);
+
+    const today = new Intl.DateTimeFormat("en-CA", {
+      timeZone: top.tz,
+    }).format(new Date());
+    expect(await slugs({ updated_on: today })).toEqual(WRITTEN);
+    expect(await slugs({ updated_on_or_after: today })).toEqual(WRITTEN);
+    expect(await slugs({ updated_on_or_before: today })).toEqual(WRITTEN);
+    expect(await slugs({ updated_before: today })).toEqual([]);
+    expect(await slugs({ updated_after: today })).toEqual([]);
+
+    // A filter narrows a search, and another filter.
+    expect(await slugs({ q: "fellowship", slug_starts_with: "wel" })).toEqual([
+      "welcome",
+    ]);
+    expect(
+      await slugs({ title_contains: "fellowship", slug_contains: "core" }),
+    ).toEqual(["core-beliefs"]);
+  });
+
   it("files a page in a folder, and back at the top, and leaves when it was changed", async () => {
     const folder = await db.admin.folders.create.first({ name: "Filed" });
     const id = (await db.admin.content.list(top))[0]!.id;
@@ -917,6 +981,17 @@ describe("admin.folders", () => {
 
     expect(await names()).toEqual(["News", "Sermons"]);
     expect(await names(sermons!.id)).toEqual(["Romans"]);
+
+    // Searched, a level lists the folders its text names, whatever the
+    // case, a misspelling forgiven, and no folder of another level.
+    const found = async (q: string, parent_id?: number) =>
+      (await db.admin.folders.list({ q, parent_id })).map((row) => row.name);
+    expect(await found("SERM")).toEqual(["Sermons"]);
+    expect(await found("s")).toEqual(["News", "Sermons"]);
+    expect(await found("sermosn")).toEqual(["Sermons"]);
+    expect(await found("romans")).toEqual([]);
+    expect(await found("romans", sermons!.id)).toEqual(["Romans"]);
+    expect(await found("%")).toEqual([]);
     expect(await names(series!.id)).toEqual(["Chapter 8"]);
     expect(await names(deep!.id)).toEqual([]);
 

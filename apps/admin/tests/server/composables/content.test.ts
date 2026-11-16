@@ -57,6 +57,35 @@ type Order = { sort: string | null; direction: string };
 
 const ORDER: Order = { sort: null, direction: "asc" };
 
+const TEXT_OPERATORS = [
+  "contains",
+  "not_contains",
+  "starts_with",
+  "ends_with",
+  "is",
+  "not",
+] as const;
+
+const DAY_OPERATORS = [
+  "before",
+  "after",
+  "on",
+  "on_or_after",
+  "on_or_before",
+] as const;
+
+/* Every part of the search left out: null, but for the time zone. */
+const NONE: Record<string, string | null> = {
+  q: null,
+  tz: "America/Los_Angeles",
+  ...Object.fromEntries([
+    ...["title", "slug"].flatMap((column) =>
+      TEXT_OPERATORS.map((operator) => [`${column}_${operator}`, null]),
+    ),
+    ...DAY_OPERATORS.map((operator) => [`updated_${operator}`, null]),
+  ]),
+};
+
 /* The pages filed in one folder: the two at the top, and none anywhere else. */
 const list = vi.fn(
   async ({ folder_id }: Order & { folder_id: number | null }) =>
@@ -128,15 +157,46 @@ describe("useContent", () => {
   it("asks the database for the pages at the top, or those filed in the folder the query names", async () => {
     expect(await useContent().list({})).toEqual([RECORD, HOME]);
     expect(list).toHaveBeenCalledTimes(1);
-    expect(list).toHaveBeenCalledWith({ folder_id: null, ...ORDER });
+    expect(list).toHaveBeenCalledWith({ folder_id: null, ...NONE, ...ORDER });
     expect(await useContent().list({ folder: 7 })).toEqual([]);
-    expect(list).toHaveBeenLastCalledWith({ folder_id: 7, ...ORDER });
+    expect(list).toHaveBeenLastCalledWith({ folder_id: 7, ...NONE, ...ORDER });
+  });
+
+  it("searches the folder for the text and the filters the query carries, each as the list query names it, in the church's time", async () => {
+    await useContent().list({
+      folder: 7,
+      q: "vision",
+      titleContains: "about",
+      titleNot: "Welcome",
+      slugStartsWith: "about",
+      updatedAtOnOrAfter: "2026-10-01",
+      updatedAtBefore: "2026-11-01",
+    });
+    expect(list).toHaveBeenLastCalledWith({
+      folder_id: 7,
+      ...NONE,
+      q: "vision",
+      title_contains: "about",
+      title_not: "Welcome",
+      slug_starts_with: "about",
+      updated_on_or_after: "2026-10-01",
+      updated_before: "2026-11-01",
+      ...ORDER,
+    });
+    // Nothing typed is no search.
+    await useContent().list({ q: "" });
+    expect(list).toHaveBeenLastCalledWith({
+      folder_id: null,
+      ...NONE,
+      ...ORDER,
+    });
   });
 
   it("asks for the sort the query names, by the row's column, ascending unless told", async () => {
     await useContent().list({ sort: "title" });
     expect(list).toHaveBeenLastCalledWith({
       folder_id: null,
+      ...NONE,
       sort: "title",
       direction: "asc",
     });
@@ -147,6 +207,7 @@ describe("useContent", () => {
     });
     expect(list).toHaveBeenLastCalledWith({
       folder_id: 7,
+      ...NONE,
       sort: "updated_at",
       direction: "desc",
     });

@@ -32,10 +32,14 @@ export type FolderConflict =
 export const useFolders = () => {
   const db = useDatabase();
 
-  /** The folders inside one, or at the top when the query names none. */
+  /**
+   * The folders inside one, or at the top when the query names none: all
+   * of them, or the ones the text searched for names.
+   */
   const list = async (query: FoldersQuery): Promise<FolderRecords> => {
     const rows = await db.admin.folders.list({
       parent_id: query.parent ?? null,
+      q: query.q === undefined || query.q === "" ? null : query.q,
     });
     return rows.map(toFolderRecord);
   };

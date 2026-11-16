@@ -186,7 +186,7 @@ describe("content page", () => {
     ).toEqual(["Butte Bible Fellowship"]);
   });
 
-  it("counts what the open folder lists beside the trail, and draws no search, which the API does not answer", async () => {
+  it("counts what the open folder lists beside the trail", async () => {
     const { wrapper } = await mountContent({
       folders: [NOTES],
       documents: [HOME, ABOUT],
@@ -194,10 +194,102 @@ describe("content page", () => {
     expect(wrapper.find(".f-data-browser-summary").text()).toBe(
       "1 folder, 2 files",
     );
-    expect(wrapper.find(".f-data-browser-search").exists()).toBe(false);
-    expect(wrapper.findComponent(Browser).props("service").searchable).toBe(
-      false,
+  });
+
+  it("offers a search of the open folder: its text, and the title, the slug and the day last changed, each by the operators the API answers", async () => {
+    const { wrapper } = await mountContent({ documents: [HOME] });
+    expect(
+      wrapper.find(".f-data-browser-search .f-autocomplete-input").exists(),
+    ).toBe(true);
+    const { query } = wrapper.findComponent(Browser).props("service");
+    expect(query.literals).toEqual({
+      text: { label: "Search", open: '"', close: '"' },
+    });
+    expect(Object.keys(query.fields)).toEqual(["title", "slug", "updatedAt"]);
+    for (const key of ["title", "slug"]) {
+      expect(query.fields[key].operators, key).toEqual([
+        "contains",
+        "not contains",
+        "starts with",
+        "ends with",
+        "is",
+        "not",
+      ]);
+      expect(query.fields[key].values, key).toBeUndefined();
+    }
+    expect(query.fields.updatedAt.operators).toEqual([
+      "before",
+      "after",
+      "on",
+      "on or after",
+      "on or before",
+    ]);
+    const { contentQuery } = await import("@bbf/schema");
+    const keys = Object.keys(contentQuery.shape);
+    for (const field of Object.keys(query.fields)) {
+      expect(
+        keys.some((key) => key.startsWith(field)),
+        field,
+      ).toBe(true);
+    }
+  });
+
+  it("searches the open folder by the text and the filters the search commits: its documents by both, its folders by the text", async () => {
+    const { wrapper, fetch } = await mountContent(
+      { folders: [NOTES] },
+      { 2: { documents: [HOME] } },
     );
+    const { query } = wrapper.findComponent(Browser).props("service");
+    await wrapper.find(`${FOLDER} .f-data-browser-folder-btn`).trigger("click");
+    await flushPromises();
+    query.add({ kind: "literal", key: "text", value: "fellowship" });
+    await flushPromises();
+    expect(fetch).toHaveBeenLastCalledWith("/api/content", {
+      query: { folder: 2, q: "fellowship" },
+    });
+    expect(fetch).toHaveBeenCalledWith("/api/content/folders", {
+      query: { parent: 2, q: "fellowship" },
+    });
+    query.setDraft("Title: butte");
+    query.submit();
+    query.add({
+      kind: "filter",
+      key: "updatedAt",
+      op: "on or after",
+      value: "2026-10-01",
+    });
+    await flushPromises();
+    expect(fetch).toHaveBeenLastCalledWith("/api/content", {
+      query: {
+        folder: 2,
+        q: "fellowship",
+        titleContains: "butte",
+        updatedAtOnOrAfter: "2026-10-01",
+      },
+    });
+    expect(fetch).toHaveBeenCalledWith("/api/content/folders", {
+      query: { parent: 2, q: "fellowship" },
+    });
+  });
+
+  it("drops the search on leaving the folder it was typed in, and says when one finds nothing", async () => {
+    const { wrapper, fetch } = await mountContent(
+      { folders: [NOTES] },
+      { 2: {} },
+    );
+    const browser = wrapper.findComponent(Browser).props("service");
+    await wrapper.find(`${FOLDER} .f-data-browser-folder-btn`).trigger("click");
+    await flushPromises();
+    browser.query.add({ kind: "literal", key: "text", value: "nothing" });
+    await flushPromises();
+    expect(browser.isFiltered).toBe(true);
+    expect(wrapper.find("tbody.f-data-browser-empty .f-td").text()).toBe(
+      "No matches",
+    );
+    await wrapper.find(".f-data-browser-breadcrumb button").trigger("click");
+    await flushPromises();
+    expect(browser.isFiltered).toBe(false);
+    expect(fetch).toHaveBeenLastCalledWith("/api/content", { query: {} });
   });
 
   it("sorts the documents by a column the sort menu offers, and the other way on a second ask", async () => {

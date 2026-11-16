@@ -29,6 +29,16 @@ const keyOf = ({ key, op }: TableFetchParams["filters"][number]): string => {
 };
 
 /**
+ * The committed column filters as the API is asked for them: each under
+ * its query key, with the value the search committed. A table's and a
+ * browser's are named alike.
+ */
+export const toFilterQuery = (
+  filters: TableFetchParams["filters"],
+): Record<string, string> =>
+  Object.fromEntries(filters.map((filter) => [keyOf(filter), filter.value]));
+
+/**
  * What a table asks the API for: the page, counted from one as the API
  * counts it, the free text as `q`, one column filter per key, and the sort
  * as `sort` and `direction` once a column is sorted. The API sorts by one
@@ -43,9 +53,7 @@ export const toListingQuery = ({
 }: TableFetchParams): ListingRequest => {
   const [sort] = sorting;
   return {
-    ...Object.fromEntries(
-      filters.map((filter) => [keyOf(filter), filter.value]),
-    ),
+    ...toFilterQuery(filters),
     page: pagination.pageIndex + 1,
     size: pagination.pageSize,
     ...(query === "" ? {} : { q: query }),

@@ -74,11 +74,18 @@ afterEach(() => {
 describe("useFolders", () => {
   it("lists the folders at the top, or those inside the folder the query names", async () => {
     expect(await useFolders().list({})).toEqual([RECORD]);
-    expect(list).toHaveBeenLastCalledWith({ parent_id: null });
+    expect(list).toHaveBeenLastCalledWith({ parent_id: null, q: null });
     expect(await useFolders().list({ parent: 3 })).toEqual([
       { ...RECORD, id: 4, parent: 3, name: "Romans", count: 0 },
     ]);
-    expect(list).toHaveBeenLastCalledWith({ parent_id: 3 });
+    expect(list).toHaveBeenLastCalledWith({ parent_id: 3, q: null });
+  });
+
+  it("searches a level's names for the text the query carries, and for nothing when none is typed", async () => {
+    await useFolders().list({ parent: 3, q: "romans" });
+    expect(list).toHaveBeenLastCalledWith({ parent_id: 3, q: "romans" });
+    await useFolders().list({ q: "" });
+    expect(list).toHaveBeenLastCalledWith({ parent_id: null, q: null });
   });
 
   it("fetches one folder by id, or nothing", async () => {

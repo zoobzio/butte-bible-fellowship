@@ -2,7 +2,7 @@ import { z } from "zod";
 
 import { hast } from "../models/hast";
 import { slug } from "../models/slug";
-import { sorting } from "./listing";
+import { dayColumn, listingQuery, sorting, textColumn } from "./listing";
 
 export const contentPath = z.object({
   slug: slug.meta({
@@ -45,7 +45,15 @@ export const contentQuery = z.object({
         "The folder whose pages are listed, by its id. Left out, the pages at the top, in no folder.",
       examples: [1],
     }),
+  q: listingQuery.shape.q.meta({
+    description:
+      "Free text the folder's pages are searched for, in their title, slug, description and what is written on them, without regard to case. Left out or empty, every page of the folder.",
+    examples: ["beliefs"],
+  }),
   ...sorting(contentSort),
+  ...textColumn("title", "title"),
+  ...textColumn("slug", "slug"),
+  ...dayColumn("updatedAt", "The day the pages listed were last changed"),
 });
 
 export const contentBody = z

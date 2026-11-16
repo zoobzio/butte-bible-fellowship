@@ -1,6 +1,7 @@
 @import "./base.css";
 @import "./prose.css";
 @import "./components.css";
+@import "./search.css";
 @import "./table.css";
 @import "./browser.css";
 /* Keep last. Its longhands must override the font shorthands above. */

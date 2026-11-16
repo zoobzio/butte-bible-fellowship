@@ -14,10 +14,12 @@ import {
   toContentDraftArguments,
   toContentRecord,
 } from "@bbf/utils";
+import { TIME_ZONE } from "#layers/bbf/shared/constants/time";
 import { useDatabase } from "#layers/bbf/server/composables/database";
 
 import { CONTENT_REFUSALS } from "~~/server/constants/folders";
 import { orRefused } from "~~/server/utils/conflicts";
+import { toDaySearch, toTextSearch } from "~~/server/utils/listing";
 
 /**
  * What filing a page comes to when it is not the page filed: `gone`, the
@@ -25,6 +27,23 @@ import { orRefused } from "~~/server/utils/conflicts";
  */
 export type ContentRefusal =
   (typeof CONTENT_REFUSALS)[keyof typeof CONTENT_REFUSALS];
+
+/** The text columns of a page, each filtered by the text operators. */
+const TEXT_COLUMNS = ["title", "slug"] as const;
+
+/** The day columns of a page, by the name the list query gives each. */
+const DAY_COLUMNS = { updated: "updatedAt" } as const;
+
+/**
+ * The search as the list query takes it: null for each part left out, and
+ * the church's time zone, which decides what day a page was changed on.
+ */
+const toSearch = (query: ContentQuery) => ({
+  q: query.q === undefined || query.q === "" ? null : query.q,
+  ...toTextSearch(TEXT_COLUMNS, query),
+  tz: TIME_ZONE,
+  ...toDaySearch(DAY_COLUMNS, query),
+});
 
 /**
  * The column of the row each sort key names.
@@ -38,8 +57,9 @@ const SORT_COLUMNS: Record<ContentSort, string> = {
 
 /**
  * The order as the list query takes it: the column asked for, ascending
- * unless told otherwise. Asked for nothing, null: the admin's order holds,
- * the pages by their title, which the query falls back to after any sort.
+ * unless told otherwise. Asked for nothing, null: a search then lists the
+ * nearest first, and otherwise the admin's order holds, the pages by their
+ * title, which the query falls back to after any sort.
  */
 const toOrder = (query: ContentQuery) => ({
   sort: query.sort === undefined ? null : SORT_COLUMNS[query.sort],
@@ -49,10 +69,15 @@ const toOrder = (query: ContentQuery) => ({
 export const useContent = () => {
   const db = useDatabase();
 
-  /** The pages filed in one folder, or at the top when the query names none. */
+  /**
+   * The pages filed in one folder, or at the top when the query names none,
+   * which its search leaves: the folder alone is searched, and none inside
+   * it.
+   */
   const list = async (query: ContentQuery): Promise<ContentRecords> => {
     const rows = await db.admin.content.list({
       folder_id: query.folder ?? null,
+      ...toSearch(query),
       ...toOrder(query),
     });
     return rows.map(toContentRecord);

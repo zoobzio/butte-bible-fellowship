@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { listingQuery } from "./listing";
+
 export const folderId = z.object({
   id: z.coerce
     .number()
@@ -22,6 +24,11 @@ export const foldersQuery = z.object({
         "The folder whose folders are listed, by its id. Left out, the folders at the top.",
       examples: [1],
     }),
+  q: listingQuery.shape.q.meta({
+    description:
+      "Free text the folders' names are searched for, without regard to case. Left out or empty, every folder of the level.",
+    examples: ["sermons"],
+  }),
 });
 
 export const folderBody = z

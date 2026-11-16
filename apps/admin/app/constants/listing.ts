@@ -13,7 +13,7 @@ import { keys } from "objectively";
 export const PAGE_SIZE = 25;
 
 /*
- * The filters a table's column takes, by the kind of column: the operators
+ * The filters a table's or a browser's column takes, by the kind of column: the operators
  * the search offers on it, and the one a bare value takes. Each is spread
  * into the column it filters.
  */

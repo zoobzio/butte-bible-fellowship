@@ -91,10 +91,41 @@ describe("contentQuery", () => {
     expect(contentQuery.safeParse({ folder: "sermons" }).success).toBe(false);
   });
 
-  it("is no page of a search: it carries neither a page nor a text", () => {
-    expect(contentQuery.parse({ page: "2", q: "vision", size: "5" })).toEqual(
-      {},
+  it("searches the folder for a text, trimmed, and is no page of a listing: it carries neither a page nor a size", () => {
+    expect(contentQuery.parse({ page: "2", q: " vision ", size: "5" })).toEqual(
+      { q: "vision" },
     );
+    expect(contentQuery.parse({ folder: "4", q: "" })).toEqual({
+      folder: 4,
+      q: "",
+    });
+  });
+
+  it("filters on the title and the slug by every text operator, and on the day last changed each way", () => {
+    expect(
+      contentQuery.parse({
+        titleContains: "beliefs",
+        titleNot: "Welcome",
+        slugStartsWith: "core",
+        slugEndsWith: "beliefs",
+        updatedAtOnOrAfter: "2026-10-01",
+        updatedAtBefore: "2026-11-01",
+      }),
+    ).toEqual({
+      titleContains: "beliefs",
+      titleNot: "Welcome",
+      slugStartsWith: "core",
+      slugEndsWith: "beliefs",
+      updatedAtOnOrAfter: "2026-10-01",
+      updatedAtBefore: "2026-11-01",
+    });
+    expect(contentQuery.safeParse({ titleContains: "" }).success).toBe(false);
+    expect(contentQuery.safeParse({ updatedAtOn: "October" }).success).toBe(
+      false,
+    );
+    // A column the browser does not show is filtered by nothing.
+    expect(contentQuery.parse({ descriptionContains: "church" })).toEqual({});
+    expect(contentQuery.parse({ createdAtOn: "2026-10-01" })).toEqual({});
   });
 
   it("sorts by a column of the record, either way", () => {

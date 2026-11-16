@@ -11,6 +11,9 @@ import {
 
 const UNSORTED = { sortField: null, sortDirection: "asc" as const };
 
+/* Nothing searched for: no text, and no column filtered. */
+const UNSEARCHED = { query: "", filters: [] };
+
 describe("toBrowserFolder", () => {
   it("names a folder by its id, as text, with its name and what it holds", () => {
     expect(toBrowserFolder(NOTES)).toEqual({
@@ -42,15 +45,31 @@ describe("folderOf", () => {
 
 describe("toFoldersQuery", () => {
   it("asks for the folders inside the open one, or the top's with nothing", () => {
-    expect(toFoldersQuery({ path: [] })).toEqual({});
-    expect(toFoldersQuery({ path: ["2", "3"] })).toEqual({ parent: 3 });
+    expect(toFoldersQuery({ path: [], query: "" })).toEqual({});
+    expect(toFoldersQuery({ path: ["2", "3"], query: "" })).toEqual({
+      parent: 3,
+    });
+  });
+
+  it("carries the free text as q, for the folders it names", () => {
+    expect(toFoldersQuery({ path: [], query: "romans" })).toEqual({
+      q: "romans",
+    });
+    expect(toFoldersQuery({ path: ["2"], query: "romans" })).toEqual({
+      parent: 2,
+      q: "romans",
+    });
   });
 });
 
 describe("toContentQuery", () => {
   it("asks for the documents filed in the open folder, or the top's with nothing", () => {
-    expect(toContentQuery({ path: [], ...UNSORTED })).toEqual({});
-    expect(toContentQuery({ path: ["2"], ...UNSORTED })).toEqual({ folder: 2 });
+    expect(toContentQuery({ path: [], ...UNSORTED, ...UNSEARCHED })).toEqual(
+      {},
+    );
+    expect(toContentQuery({ path: ["2"], ...UNSORTED, ...UNSEARCHED })).toEqual(
+      { folder: 2 },
+    );
   });
 
   it("carries the sort the browser holds, and its direction with it", () => {
@@ -59,7 +78,40 @@ describe("toContentQuery", () => {
         path: ["2"],
         sortField: "title",
         sortDirection: "desc",
+        ...UNSEARCHED,
       }),
     ).toEqual({ folder: 2, sort: "title", direction: "desc" });
+  });
+
+  it("carries the free text as q, and each committed column filter under its column and its operator", () => {
+    expect(
+      toContentQuery({
+        path: ["2"],
+        ...UNSORTED,
+        query: "vision",
+        filters: [
+          { key: "title", op: "contains", value: "about" },
+          { key: "slug", op: "starts with", value: "about" },
+          { key: "updatedAt", op: "on or after", value: "2026-10-01" },
+        ],
+      }),
+    ).toEqual({
+      folder: 2,
+      q: "vision",
+      titleContains: "about",
+      slugStartsWith: "about",
+      updatedAtOnOrAfter: "2026-10-01",
+    });
+  });
+
+  it("refuses an operator the schema does not name", () => {
+    expect(() =>
+      toContentQuery({
+        path: [],
+        ...UNSORTED,
+        query: "",
+        filters: [{ key: "title", op: "between", value: "a" }],
+      }),
+    ).toThrow('"between" is not an operator the schema names.');
   });
 });

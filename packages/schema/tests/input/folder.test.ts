@@ -22,6 +22,14 @@ describe("foldersQuery", () => {
     expect(foldersQuery.parse({ parent: "4" })).toEqual({ parent: 4 });
     expect(foldersQuery.safeParse({ parent: "0" }).success).toBe(false);
   });
+
+  it("searches the level's names for a text, trimmed", () => {
+    expect(foldersQuery.parse({ parent: "4", q: " romans " })).toEqual({
+      parent: 4,
+      q: "romans",
+    });
+    expect(foldersQuery.parse({ q: "" })).toEqual({ q: "" });
+  });
 });
 
 describe("folderBody", () => {
