@@ -41,6 +41,10 @@ export type FolderRecordRow = Row<Contract, "admin.folders.fetch">;
 
 export type FolderArguments = Arguments<Contract, "admin.folders.create">;
 
+export type ViewRecordRow = Row<Contract, "admin.views.list">;
+
+export type ViewArguments = Arguments<Contract, "admin.views.save">;
+
 export type HomeArguments = Arguments<Contract, "admin.home.update">;
 
 export type AboutArguments = Arguments<Contract, "admin.about.update">;

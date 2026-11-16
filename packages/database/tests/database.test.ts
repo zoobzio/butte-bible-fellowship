@@ -33,7 +33,7 @@ afterAll(() => db.close());
 const HEADING = "Discover God’s **Love, Grace & Truth**";
 
 describe("the build", () => {
-  it("carries the staff, events, sermons, users, staff search, like escape, search cost, staff status, events search, events trim, content, pages, folders and connect migrations in order", () => {
+  it("carries the staff, events, sermons, users, staff search, like escape, search cost, staff status, events search, events trim, content, pages, folders, connect and views migrations in order", () => {
     expect(migrations.map((migration) => migration.name)).toEqual([
       "staff",
       "events",
@@ -49,6 +49,7 @@ describe("the build", () => {
       "pages",
       "folders",
       "connect",
+      "views",
     ]);
   });
 
@@ -104,8 +105,8 @@ describe("the build", () => {
       "web.sermons.list",
       "web.staff.list",
     ]);
-    expect(names.filter((name) => name.startsWith("admin."))).toHaveLength(49);
-    expect(names).toHaveLength(61);
+    expect(names.filter((name) => name.startsWith("admin."))).toHaveLength(52);
+    expect(names).toHaveLength(64);
   });
 });
 
@@ -2016,6 +2017,136 @@ describe("admin.users", () => {
   });
 });
 
+describe("admin.views", () => {
+  const sub = "117000000000000000001";
+  const other = "117000000000000000002";
+  const id = "0b1f4c4e-6f0a-4d0e-9a57-3f0c1c2d4e5f";
+  const payload = {
+    sorting: [{ id: "name", desc: true }],
+    columnVisibility: { email: false },
+    pageSize: 50,
+    entries: [{ kind: "filter", key: "role", op: "is", value: "elder" }],
+  };
+  const users: number[] = [];
+
+  beforeAll(async () => {
+    for (const [email, bound] of [
+      ["views@example.com", sub],
+      ["other@example.com", other],
+    ] as const) {
+      const created = await db.admin.users.create.first({
+        email,
+        role: "editor",
+      });
+      await db.admin.users.claim.first({ sub: bound, email });
+      users.push(created!.id);
+    }
+  });
+
+  const names = async (of: string, surface = "staff") =>
+    (await db.admin.views.list({ sub: of, surface })).map((row) => row.name);
+
+  it("saves a view under the id it comes with, and lists a user's own of one list", async () => {
+    expect(await names(sub)).toEqual([]);
+
+    const saved = await db.admin.views.save.first({
+      id,
+      sub,
+      surface: "staff",
+      name: "Elders",
+      payload,
+    });
+    expect(saved).toMatchObject({ id, surface: "staff", name: "Elders" });
+    expect(saved?.payload).toEqual(payload);
+    expect(saved?.created_at).toBeInstanceOf(Date);
+
+    expect(await names(sub)).toEqual(["Elders"]);
+    expect(await names(sub, "content")).toEqual([]);
+    expect(await names(other)).toEqual([]);
+  });
+
+  it("saves over a view of the user's own: its name and its payload, and when it was changed", async () => {
+    const saved = await db.admin.views.save.first({
+      id,
+      sub,
+      surface: "staff",
+      name: "The elders",
+      payload: { ...payload, pageSize: 10 },
+    });
+    expect(saved).toMatchObject({ id, name: "The elders" });
+    expect(saved?.payload).toMatchObject({ pageSize: 10 });
+    expect(saved!.updated_at.getTime()).toBeGreaterThanOrEqual(
+      saved!.created_at.getTime(),
+    );
+    expect(await names(sub)).toEqual(["The elders"]);
+  });
+
+  it("leaves a view to its user and its list, and saves nothing for no one", async () => {
+    const view = { id, name: "Taken", payload: {} };
+    expect(
+      await db.admin.views.save.first({
+        ...view,
+        sub: other,
+        surface: "staff",
+      }),
+    ).toBeNull();
+    expect(
+      await db.admin.views.save.first({ ...view, sub, surface: "content" }),
+    ).toBeNull();
+    expect(
+      await db.admin.views.save.first({
+        ...view,
+        id: "5d2a8a7e-2b1c-4c3d-8e9f-0a1b2c3d4e5f",
+        sub: "nobody",
+        surface: "staff",
+      }),
+    ).toBeNull();
+    expect(await names(sub)).toEqual(["The elders"]);
+
+    expect(
+      await db.admin.views.delete({ id, sub: other, surface: "staff" }),
+    ).toBe(0);
+    expect(await db.admin.views.delete({ id, sub, surface: "content" })).toBe(
+      0,
+    );
+    expect(await names(sub)).toEqual(["The elders"]);
+  });
+
+  it("refuses an id that is not one, and a name or a list left empty", async () => {
+    const view = { id, sub, surface: "staff", name: "Elders", payload };
+    await expect(
+      db.admin.views.save({ ...view, id: "elders" }),
+    ).rejects.toThrow();
+    const fresh = { ...view, id: "9c3b7a6d-1e2f-4a5b-8c7d-6e5f4a3b2c1d" };
+    expect(await refusal(db.admin.views.save({ ...fresh, name: "" }))).toMatch(
+      /views_name_check/,
+    );
+    expect(
+      await refusal(db.admin.views.save({ ...fresh, surface: "" })),
+    ).toMatch(/views_surface_check/);
+  });
+
+  it("removes a view, and every view of a user removed", async () => {
+    expect(await db.admin.views.delete({ id, sub, surface: "staff" })).toBe(1);
+    expect(await names(sub)).toEqual([]);
+
+    await db.admin.views.save({
+      id,
+      sub: other,
+      surface: "staff",
+      name: "Mine",
+      payload,
+    });
+    expect(await names(other)).toEqual(["Mine"]);
+    for (const user of users) {
+      expect(await db.admin.users.delete({ id: user })).toBe(1);
+    }
+    expect(
+      await db.build.selectFrom("views").selectAll().execute(),
+    ).toHaveLength(0);
+  });
+});
+
 describe("roles", () => {
   type Scoped<R extends keyof typeof contract.roles> = Awaited<
     ReturnType<typeof makeTestBezoar<typeof contract, R>>
@@ -2058,6 +2189,7 @@ describe("roles", () => {
         (name) =>
           !name.startsWith("admin.users.") &&
           !name.startsWith("admin.folders.") &&
+          !name.startsWith("admin.views.") &&
           /\.(fetch|list|upcoming|weekly)$/.test(name),
       ),
     );

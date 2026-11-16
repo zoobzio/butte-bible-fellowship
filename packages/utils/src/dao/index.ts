@@ -6,3 +6,4 @@ export * from "./folder";
 export * from "./home";
 export * from "./sermon";
 export * from "./staff";
+export * from "./view";

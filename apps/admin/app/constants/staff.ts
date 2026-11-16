@@ -1,8 +1,9 @@
-import type { StaffRecord } from "@bbf/schema/types";
+import type { StaffRecord, StaffView } from "@bbf/schema/types";
+import type { AppProsaryMessage } from "#imports";
 
 import type { RecordLink, TableConfig } from "~/types/listing";
 
-import { STAFF_ROLES } from "@bbf/schema";
+import { STAFF_ROLES, staffView } from "@bbf/schema";
 import { TIME_ZONE } from "#layers/bbf/shared/constants/time";
 import {
   PAGE_SIZE,
@@ -122,3 +123,25 @@ export const STAFF_TABLE: TableConfig<StaffRecord> = {
     },
   ],
 };
+
+/**
+ * The views of the staff the admin itself has, before any a user saves:
+ * the table as it starts, which is what its tab goes back to. Its payload
+ * is read from the table's own config, so the two never part, and the view
+ * is not marked as edited until the table is. Its name is a message of the
+ * prose, which the tabs resolve.
+ */
+export const STAFF_VIEWS: {
+  id: string;
+  name: Extract<AppProsaryMessage, string>;
+  payload: StaffView;
+}[] = [
+  {
+    id: "all",
+    name: "admin.staff.allView",
+    payload: staffView.parse({
+      pageSize: STAFF_TABLE.initialState?.pagination?.pageSize,
+      columnVisibility: STAFF_TABLE.initialState?.columnVisibility,
+    }),
+  },
+];

@@ -18,3 +18,4 @@ export { default as FileInput } from "@zoobzio/vue/components/file-input.vue";
 export { default as Form } from "@zoobzio/vue/components/form.vue";
 export { default as Table } from "@zoobzio/vue/components/table.vue";
 export { default as Tabs } from "@zoobzio/vue/components/tabs.vue";
+export { default as Views } from "@zoobzio/vue/components/views.vue";

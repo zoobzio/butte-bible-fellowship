@@ -46,6 +46,12 @@ import type {
   staffQuery,
   staffSort,
 } from "./input/staff";
+import type {
+  staffView,
+  staffViewBody,
+  viewList,
+  viewPath,
+} from "./input/view";
 import type { aboutRecord } from "./models/about";
 import type { connectPage, connectRecord } from "./models/connect";
 import type { contentRecord, contentRecords } from "./models/content";
@@ -72,6 +78,7 @@ import type {
   staffRole,
 } from "./models/staff";
 import type { contentStatus } from "./models/status";
+import type { viewRecord, viewRecords, viewSurface } from "./models/view";
 
 export type Slug = z.infer<typeof slug>;
 
@@ -224,3 +231,23 @@ export type SermonPath = z.infer<typeof sermonPath>;
 export type SermonsQuery = z.infer<typeof sermonsQuery>;
 
 export type SermonBody = z.infer<typeof sermonBody>;
+
+export type ViewSurface = z.infer<typeof viewSurface>;
+
+export type ViewRecord = z.infer<typeof viewRecord>;
+
+export type ViewRecords = z.infer<typeof viewRecords>;
+
+export type ViewList = z.infer<typeof viewList>;
+
+export type ViewPath = z.infer<typeof viewPath>;
+
+/** A view as a save carries it, whatever its list: the payload as its schema left it. */
+export interface ViewBody {
+  name: string;
+  payload: unknown;
+}
+
+export type StaffView = z.infer<typeof staffView>;
+
+export type StaffViewBody = z.infer<typeof staffViewBody>;

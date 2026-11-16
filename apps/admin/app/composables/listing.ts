@@ -27,14 +27,16 @@ export const useListingFetch = <T extends TableRecord>(
 
 /**
  * Loads a table for the page it sits on. Every visit fetches: the table's
- * state outlives the page, and its own `init` fetches once only, so going
- * through it would show the rows as they stood on the first visit. The
- * page, sort and filters the table holds are kept and asked for again.
+ * state outlives the page, and what it lists may have changed since. Its
+ * own `init` fetches once only, and is what lets a saved view put in place
+ * later list afresh: so the first visit goes through it, as a browser's
+ * does, and the page, sort and filters the table holds are kept and asked
+ * for again on the rest.
  */
 export const useTableRequest = <T extends TableRecord>(
   table: TableService<T>,
 ) =>
   useRequest(`table:${table.id}`, async () => {
-    await table.fetch();
+    await (table.initialized ? table.fetch() : table.init());
     return true;
   });

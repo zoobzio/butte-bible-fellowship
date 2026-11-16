@@ -54,6 +54,8 @@ describe("the contract", () => {
     expect(Object.keys(grants)).toEqual(roles);
     expect([...grants.admin].sort()).toEqual([...scopes].sort());
     expect(grants.editor).not.toContain("users:write");
+    expect(grants.editor).toContain("views:read");
+    expect(grants.editor).toContain("views:write");
   });
 });
 
@@ -108,6 +110,10 @@ describe("requiredScope", () => {
     expect(requiredScope("/api/content/3/body", "PATCH")).toBe("content:write");
     expect(requiredScope("/api/site/home", "GET")).toBe("site:read");
     expect(requiredScope("/api/site/about/body", "PATCH")).toBe("site:write");
+    expect(requiredScope("/api/views/staff", "GET")).toBe("views:read");
+    expect(requiredScope("/api/views/staff/0b1f4c4e", "PUT")).toBe(
+      "views:write",
+    );
   });
 
   it("needs a scope nobody holds for records the contract does not name", () => {

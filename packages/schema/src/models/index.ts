@@ -12,3 +12,4 @@ export * from "./sermon";
 export * from "./slug";
 export * from "./staff";
 export * from "./status";
+export * from "./view";

@@ -75,5 +75,18 @@ export const useAuthentication = () => {
     }
   };
 
-  return { provider, user, authorize };
+  /**
+   * Who is signed in, as their session names them: the `sub` what is a
+   * user's own, their saved views, is kept under. A request with no one
+   * signed in is refused.
+   */
+  const subject = async (event: H3Event): Promise<string> => {
+    const signedIn = await user(event);
+    if (signedIn === null) {
+      throw createError({ statusCode: 401, statusMessage: "Unauthorized" });
+    }
+    return signedIn.sub;
+  };
+
+  return { provider, user, subject, authorize };
 };

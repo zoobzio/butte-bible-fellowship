@@ -51,6 +51,11 @@ import {
   staffMembers,
   staffQuery,
   staffRecord,
+  staffViewBody,
+  viewList,
+  viewPath,
+  viewRecord,
+  viewRecords,
 } from "../src";
 
 const json = (schema: unknown) => ({
@@ -197,6 +202,21 @@ const document = createDocument(
             content: { "application/json": { schema: folderPlacement } },
           },
           responses: { 200: json(folderRecord) },
+        },
+      },
+      "/admin/api/views/{surface}": {
+        get: {
+          requestParams: { path: viewList },
+          responses: { 200: json(viewRecords) },
+        },
+      },
+      "/admin/api/views/{surface}/{id}": {
+        put: {
+          requestParams: { path: viewPath },
+          requestBody: {
+            content: { "application/json": { schema: staffViewBody } },
+          },
+          responses: { 200: json(viewRecord) },
         },
       },
       "/admin/api/content/{id}/body": {
@@ -352,6 +372,11 @@ describe("the components", () => {
       "StaffMember",
       "StaffRecord",
       "StaffRole",
+      "StaffView",
+      "StaffViewBody",
+      "ViewRecord",
+      "ViewRecords",
+      "ViewSurface",
     ]);
   });
 

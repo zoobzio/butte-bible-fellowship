@@ -19,6 +19,10 @@
     "defaultMessage": "The people who serve the church, as the site introduces them.",
     "description": "The line under the title of the page that lists the staff members: what the list is."
   },
+  "allView": {
+    "defaultMessage": "All staff",
+    "description": "The name of the view of the staff list that the admin starts with: every member, in the list's own order, with its usual columns. Shown as the first tab over the list, beside the views a user has saved."
+  },
   "profile": {
     "defaultMessage": "Profile",
     "description": "The tab of a staff member's page that holds their details, their photo and their bio."

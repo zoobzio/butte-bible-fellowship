@@ -1,9 +1,9 @@
-import type { StaffRecord } from "@bbf/schema/types";
+import type { StaffRecord, ViewRecord } from "@bbf/schema/types";
 
 import { describe, expect, it, vi } from "vitest";
 import { flushPromises, mount } from "@vue/test-utils";
 
-import { Dialog, Editor, NuxtPage, Table } from "#components";
+import { Dialog, Editor, NuxtPage, Table, Views } from "#components";
 import { setRoutePath, useRouter } from "#imports";
 import Select from "@zoobzio/vue/components/select.vue";
 import PageHeader from "~/components/PageHeader.vue";
@@ -19,14 +19,48 @@ import { STAFF } from "#test/support/records";
 import { head } from "#test/support/head";
 import { mountSuspended } from "@bbf/nuxt/testing/mount";
 
-/** The staff page over the admin's API listing the members given. */
-const mountStaff = async (items: StaffRecord[]) => {
-  const fetch = vi.fn(async () => ({ items, total: items.length }));
+/** A view of the staff someone saved: the elders, by name, fifty to a page. */
+const ELDERS: ViewRecord = {
+  id: "0b1f4c4e-6f0a-4d0e-9a57-3f0c1c2d4e5f",
+  surface: "staff",
+  name: "Elders",
+  payload: {
+    sorting: [{ id: "name", desc: true }],
+    // A view holds every column it hides: the table's own three, and one more.
+    columnVisibility: {
+      phone: false,
+      summary: false,
+      photo: false,
+      createdAt: false,
+    },
+    pageSize: 50,
+    entries: [{ kind: "filter", key: "role", op: "is", value: "elder" }],
+  },
+  createdAt: "2026-10-17T18:00:00.000Z",
+  updatedAt: "2026-10-18T09:30:00.000Z",
+};
+
+/**
+ * The staff page over the admin's API listing the members given, and
+ * holding the views given as whoever is signed in has saved them.
+ */
+const mountStaff = async (items: StaffRecord[], saved: ViewRecord[] = []) => {
+  const fetch = vi.fn(async (path: string, _request?: object) =>
+    path.startsWith("/api/views/") ? saved : { items, total: items.length },
+  );
   vi.stubGlobal("$fetch", fetch);
   const { wrapper, error } = await mountSuspended(Index);
   expect(error).toBeUndefined();
   return { wrapper, fetch };
 };
+
+type Mounted = Awaited<ReturnType<typeof mountStaff>>["wrapper"];
+
+/** The page's own dialog, the new member's: the views have theirs too. */
+const adding = (wrapper: Mounted) =>
+  wrapper
+    .findAllComponents(Dialog)
+    .find((dialog) => dialog.props("title") === "New member")!;
 
 describe("staff page", () => {
   it("heads the staff table with the way to a new member, its first page fetched on load", async () => {
@@ -40,10 +74,11 @@ describe("staff page", () => {
     expect(wrapper.find("a.page-header-action").exists()).toBe(false);
     const table = wrapper.findComponent(Table);
     expect(table.props("service").id).toBe("staff");
-    expect(fetch).toHaveBeenCalledTimes(1);
-    expect(fetch).toHaveBeenCalledWith("/api/staff", {
-      query: { page: 1, size: 25 },
-    });
+    // The views load first, so the table's one fetch reads the open one.
+    expect(fetch.mock.calls).toEqual([
+      ["/api/views/staff", {}],
+      ["/api/staff", { query: { page: 1, size: 25 } }],
+    ]);
     expect(table.props("service").data).toEqual([STAFF]);
     expect(head()).toEqual({ title: "Staff" });
   });
@@ -160,6 +195,165 @@ describe("staff page", () => {
   });
 });
 
+describe("staff views", () => {
+  const services = (wrapper: Mounted) => ({
+    views: wrapper.findComponent(Views).props("service"),
+    table: wrapper.findComponent(Table).props("service"),
+  });
+
+  const ids = (views: { views: { id: string }[] }) =>
+    views.views.map((view) => view.id);
+
+  it("opens on the admin's own view, the table as it starts, with nothing edited", async () => {
+    const { wrapper } = await mountStaff([STAFF]);
+    const { views, table } = services(wrapper);
+    expect(views.id).toBe("staff");
+    expect(views.initialized).toBe(true);
+    expect(views.views).toMatchObject([
+      { id: "all", name: "admin.staff.allView", origin: "system" },
+    ]);
+    expect(views.active).toBe("all");
+    expect(views.current.payload).toEqual(table.snapshot());
+    expect(views.drifted).toBe(false);
+    expect(views.editable).toBe(false);
+    expect(wrapper.find(".f-views").classes()).not.toContain("f-views-drifted");
+    expect(wrapper.findAll(".f-views-tabs .f-tabs-trigger")).toHaveLength(1);
+  });
+
+  it("lists the views whoever is signed in has saved after it, each their own, a tab apiece", async () => {
+    const { wrapper } = await mountStaff([STAFF], [ELDERS]);
+    const { views } = services(wrapper);
+    expect(views.views).toMatchObject([
+      { id: "all", origin: "system" },
+      { id: ELDERS.id, name: "Elders", origin: "user" },
+    ]);
+    expect(views.stale).toEqual([]);
+    expect(wrapper.findAll(".f-views-tabs .f-tabs-trigger")).toHaveLength(2);
+    expect(wrapper.find(".f-views-tabs").text()).toContain("Elders");
+  });
+
+  it("puts a view picked in place, and lists the staff afresh as it arranges them", async () => {
+    const { wrapper, fetch } = await mountStaff([STAFF], [ELDERS]);
+    const { views, table } = services(wrapper);
+    fetch.mockClear();
+    expect(await views.select(ELDERS.id)).toBe(true);
+    await flushPromises();
+    expect(fetch.mock.calls).toEqual([
+      [
+        "/api/staff",
+        {
+          query: {
+            page: 1,
+            size: 50,
+            roleIs: "elder",
+            sort: "name",
+            direction: "desc",
+          },
+        },
+      ],
+    ]);
+    expect(views.active).toBe(ELDERS.id);
+    expect(views.editable).toBe(true);
+    expect(views.drifted).toBe(false);
+    expect(
+      table.table
+        .getVisibleLeafColumns()
+        .map((column: { id: string }) => column.id),
+    ).toEqual(["name", "role", "email", "updatedAt"]);
+  });
+
+  it("marks the open view as edited once the table moves off it, and holds a view picked over the edit", async () => {
+    const { wrapper } = await mountStaff([STAFF], [ELDERS]);
+    const { views, table } = services(wrapper);
+    table.table.setSorting([{ id: "email", desc: false }]);
+    await flushPromises();
+    expect(views.drifted).toBe(true);
+    expect(wrapper.find(".f-views").classes()).toContain("f-views-drifted");
+    expect(wrapper.find(".f-views-badge").exists()).toBe(true);
+    expect(await views.select(ELDERS.id)).toBe(false);
+    expect(views.pending).toEqual({ kind: "select", id: ELDERS.id });
+    await views.resolve("cancel");
+    expect(views.active).toBe("all");
+    table.table.setSorting([]);
+    await flushPromises();
+    expect(views.drifted).toBe(false);
+  });
+
+  it("saves the table as it stands as a view of the user's own, through the API", async () => {
+    const { wrapper, fetch } = await mountStaff([STAFF]);
+    const { views, table } = services(wrapper);
+    table.table.setSorting([{ id: "email", desc: true }]);
+    await flushPromises();
+    fetch.mockClear();
+    const view = await views.saveAs("By email");
+    expect(view.id).toMatch(/^[0-9a-f-]{36}$/);
+    expect(fetch.mock.calls).toEqual([
+      [
+        `/api/views/staff/${view.id}`,
+        {
+          method: "PUT",
+          body: {
+            name: "By email",
+            payload: {
+              ...views.views[0].payload,
+              sorting: [{ id: "email", desc: true }],
+            },
+          },
+        },
+      ],
+    ]);
+    expect(views.active).toBe(view.id);
+    expect(views.editable).toBe(true);
+    expect(views.drifted).toBe(false);
+  });
+
+  it("saves over a view of the user's own, and removes it, through the API", async () => {
+    const { wrapper, fetch } = await mountStaff([STAFF], [ELDERS]);
+    const { views, table } = services(wrapper);
+    await views.select(ELDERS.id);
+    table.table.setPageSize(10);
+    await flushPromises();
+    expect(views.drifted).toBe(true);
+    fetch.mockClear();
+    await views.save();
+    expect(fetch.mock.calls).toEqual([
+      [
+        `/api/views/staff/${ELDERS.id}`,
+        {
+          method: "PUT",
+          body: {
+            name: "Elders",
+            payload: expect.objectContaining({ pageSize: 10 }),
+          },
+        },
+      ],
+    ]);
+    expect(views.drifted).toBe(false);
+
+    fetch.mockClear();
+    await views.remove(ELDERS.id, { force: true });
+    await flushPromises();
+    expect(fetch.mock.calls[0]).toEqual([
+      `/api/views/staff/${ELDERS.id}`,
+      { method: "DELETE" },
+    ]);
+    expect(ids(views)).toEqual(["all"]);
+    expect(views.active).toBe("all");
+  });
+
+  it("sets a view its schema no longer accepts aside, and never applies it", async () => {
+    const stale = {
+      ...ELDERS,
+      payload: { sorting: [{ id: "bio", desc: false }] },
+    };
+    const { wrapper } = await mountStaff([STAFF], [stale]);
+    const { views } = services(wrapper);
+    expect(ids(views)).toEqual(["all"]);
+    expect(views.stale).toMatchObject([{ id: ELDERS.id, name: "Elders" }]);
+    expect(views.drifted).toBe(false);
+  });
+});
+
 describe("new member dialog", () => {
   const open = async () => {
     const mounted = await mountStaff([STAFF]);
@@ -170,14 +364,14 @@ describe("new member dialog", () => {
 
   it("stays shut until a new member is asked for", async () => {
     const { wrapper } = await mountStaff([STAFF]);
-    expect(wrapper.findComponent(Dialog).props("open")).toBe(false);
+    expect(adding(wrapper).props("open")).toBe(false);
     expect(wrapper.findComponent(StaffEditor).exists()).toBe(false);
     expect(document.body.querySelector(".f-dialog-content")).toBeNull();
   });
 
   it("opens the editor on no record, over the list, named and described", async () => {
     const { wrapper } = await open();
-    const dialog = wrapper.findComponent(Dialog);
+    const dialog = adding(wrapper);
     expect(dialog.props()).toMatchObject({
       open: true,
       title: "New member",
@@ -196,7 +390,7 @@ describe("new member dialog", () => {
 
   it("shuts from its corner, and opens blank the next time", async () => {
     const { wrapper } = await open();
-    const editor = wrapper.findComponent(Dialog).findComponent(StaffEditor);
+    const editor = adding(wrapper).findComponent(StaffEditor);
     await editor.find("#staff-name").setValue("John Roe");
     // The dialog is drawn on the body, outside the page's own element.
     const close = document.body.querySelector<HTMLButtonElement>(
@@ -205,7 +399,7 @@ describe("new member dialog", () => {
     expect(close.getAttribute("aria-label")).toBe("Cancel");
     close.click();
     await flushPromises();
-    expect(wrapper.findComponent(Dialog).props("open")).toBe(false);
+    expect(adding(wrapper).props("open")).toBe(false);
     expect(wrapper.findComponent(StaffEditor).exists()).toBe(false);
     await wrapper.find("button.page-header-action").trigger("click");
     await flushPromises();
@@ -217,7 +411,7 @@ describe("new member dialog", () => {
     const { wrapper } = await open();
     const fetch = vi.fn(async () => STAFF);
     vi.stubGlobal("$fetch", fetch);
-    const editor = wrapper.findComponent(Dialog).findComponent(StaffEditor);
+    const editor = adding(wrapper).findComponent(StaffEditor);
     await editor.find("#staff-name").setValue("John Roe");
     editor
       .findComponent(Select)

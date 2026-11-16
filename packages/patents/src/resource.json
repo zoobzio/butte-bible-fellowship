@@ -13,7 +13,9 @@
     "staff:read",
     "staff:write",
     "users:read",
-    "users:write"
+    "users:write",
+    "views:read",
+    "views:write"
   ],
   "bearer_methods_supported": ["header"]
 }

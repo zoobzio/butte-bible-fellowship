@@ -18,7 +18,10 @@ church, each in a `staff_role` — pastor, elder, staff — which is also the
 order the site lists them in; `events`, each held on a date, and every
 week on that date's day of the week when it is `recurring`, with the page
 written about it; and `sermons`, each preached on a day, with the page
-written about it and its recording on the church's YouTube channel. Beside them, `users` is who may sign in to the admin app.
+written about it and its recording on the church's YouTube channel. Beside them, `users` is who may sign in to the admin app,
+and `views` is the arrangements of the admin's lists each of them has saved:
+one table for every list, each row a user's own, named for the list it is
+over by its `surface`, with the arrangement itself as `payload`.
 A sermon carries a `content_status` — draft, published, archived — and
 only the published reaches the site; the staff and the events carry none,
 and whoever is on the staff, and whatever event or page is written, is on
@@ -36,7 +39,7 @@ would not have offered.
 
 ```
 bezoar.config.ts   the kit config: the output directory, the defaults for the rest
-src/migrations/    the schema, forward only: staff, events, sermons, users, staff search, like escape, search cost, staff status, events search, events trim, content, pages, folders, connect
+src/migrations/    the schema, forward only: staff, events, sermons, users, staff search, like escape, search cost, staff status, events search, events trim, content, pages, folders, connect, views
 src/seeds/         the staff, the events and the first admin user, each safe to run again
 src/queries/web/   what the site reads: home, about, connect, content, staff, events, sermons
 src/queries/admin/ what the admin app will read and write: the same, in full
@@ -177,6 +180,18 @@ that holds nothing and leaves one that holds anything, which is how the
 two tell a caller apart from a folder that is not there: a `fetch` first.
 A name is a folder's own among the folders beside it.
 
+`admin.views` has `list`, `save` and `delete`, each of one user's views of
+one list: the user named by `sub`, as their session names them, and the
+list by `surface`. A view's `id` is a UUID its maker gives it before it is
+stored, so `save` is the one write: it writes a new view, or gives the
+user's own of that list its new `name` and `payload`, and returns the row
+either way. Given the id of a view of another user's, or of another list,
+it changes nothing and returns none, as it does for a `sub` no user is
+bound to; `delete` removes none then either. The `payload` is `jsonb`, and
+the database holds it to no shape: each list's arrangement is its own, and
+the admin's API checks it against the surface's schema of `@bbf/schema`
+before it is saved. A user removed takes their views along.
+
 `admin.users` has the same, and two more for signing in. A user is added
 by their email and a `user_role` — `admin` or `editor`, the roles of
 `@bbf/patents` — and is bound to Google's subject (`sub`) the first time
@@ -213,10 +228,10 @@ so the contract carries, by role, the queries the role may run.
 
 `web` has `SELECT` on `home`, `about`, `connect`, `content`, `staff`, `events` and `sermons`, and nothing else.
 It may run every read of them, the admin app's plain reads among them, and
-no write; it may not read `users` at all, nor `folders`, which the site has no use for yet. `admin` has `SELECT`, `INSERT`,
-`UPDATE` and `DELETE` on `content`, `folders`, `staff`, `events`, `sermons` and `users`, and `SELECT` and `UPDATE` alone on
+no write; it may not read `users` at all, nor `folders` or `views`, which the site has no use for yet. `admin` has `SELECT`, `INSERT`,
+`UPDATE` and `DELETE` on `content`, `folders`, `staff`, `events`, `sermons`, `users` and `views`, and `SELECT` and `UPDATE` alone on
 `home`, `about` and `connect`, whose one row is neither added nor removed, and may run every query. Each `id` is an identity column, which
-Postgres fills without a privilege on its sequence, so the tables are the
+Postgres fills without a privilege on its sequence, or for a view a UUID it is handed, so the tables are the
 whole of each grant.
 
 Each app scopes its service to its role, `bezoar: { role: "web" }` in

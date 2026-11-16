@@ -1,0 +1,162 @@
+/*
+ * Foundation's saved views, over a data table or a data browser: the
+ * views as tabs along a rule, a mark on the one with changes not yet
+ * saved, the menu of the open view's actions at the rule's end, and the
+ * forms of the two dialogs, the one that confirms what would lose
+ * something and the one that names a view. The menu is the dropdown and
+ * the dialogs the dialog of components.css.
+ */
+.f-views {
+  display: flex;
+  /* The tabs stand on the rule, whatever the height of what is beside them. */
+  align-items: flex-end;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+  border-bottom: 1px var(--stroke-solid) var(--rule);
+}
+
+.f-views-tabs {
+  flex: 1;
+  min-width: 0;
+}
+
+/* The tabs, as a page's are: a row that wraps, the open one lit. */
+.f-views-tabs .f-tabs-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.f-views-tabs .f-tabs-trigger {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: -1px;
+  padding: var(--space-2) var(--space-3);
+  border: 0;
+  border-bottom: 2px var(--stroke-solid) transparent;
+  background: transparent;
+  color: var(--on-surface-muted);
+  font: var(--type-label);
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--type-label-letter-spacing);
+  cursor: pointer;
+  transition:
+    color var(--transition-fast),
+    border-color var(--transition-fast);
+}
+
+.f-views-tabs .f-tabs-trigger:hover {
+  color: var(--on-surface-high-contrast);
+}
+
+.f-views-tabs .f-tabs-trigger[data-state="active"] {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+}
+
+/* A view has no panel of its own: the table under the tabs is it. */
+.f-views-tabs .f-tabs-content {
+  display: none;
+}
+
+/* The mark of a view with changes not yet saved. */
+.f-views-badge {
+  flex: none;
+  width: var(--space-2);
+  height: var(--space-2);
+  border-radius: var(--shape-full);
+  background: var(--primary);
+}
+
+/* The way into the open view's actions, and the buttons of the dialogs. */
+.f-views > .f-button,
+.f-views-buttons .f-button {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border: 1px var(--stroke-solid) var(--rule);
+  border-radius: var(--shape-sm);
+  background: transparent;
+  color: var(--on-surface);
+  font: var(--type-label);
+  cursor: pointer;
+  transition:
+    color var(--transition-fast),
+    border-color var(--transition-fast),
+    background-color var(--transition-fast);
+}
+
+.f-views > .f-button {
+  margin-bottom: var(--space-2);
+}
+
+.f-views > .f-button svg {
+  width: var(--space-4);
+  height: var(--space-4);
+}
+
+.f-views > .f-button:hover,
+.f-views > .f-button[data-state="open"],
+.f-views-buttons .f-button:hover:not(:disabled) {
+  color: var(--on-surface-high-contrast);
+  border-color: color-mix(in oklab, var(--primary) 65%, transparent);
+  background: color-mix(in oklab, var(--primary-container) 30%, transparent);
+}
+
+/* A dialog's form: the name it asks for, over its buttons at the end. */
+.f-views-confirm,
+.f-views-naming {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.f-views-confirm .f-label,
+.f-views-naming .f-label {
+  color: var(--on-surface-muted);
+  font: var(--type-label);
+}
+
+.f-views-name {
+  padding: var(--space-2) var(--space-3);
+  border: 1px var(--stroke-solid) var(--rule);
+  border-radius: var(--shape-sm);
+  background: var(--surface);
+  color: var(--on-surface);
+  font: var(--type-body);
+}
+
+.f-views-name:focus-visible {
+  outline: 0;
+  border-color: var(--primary);
+}
+
+.f-views-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+}
+
+/* The one that keeps the changes: filled where the others are outlined. */
+.f-views-buttons .f-views-save {
+  border-color: transparent;
+  background: var(--primary);
+  color: var(--on-primary);
+}
+
+.f-views-buttons .f-views-save:hover:not(:disabled) {
+  border-color: transparent;
+  background: var(--primary);
+  color: var(--on-primary);
+}
+
+.f-views-buttons .f-button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}

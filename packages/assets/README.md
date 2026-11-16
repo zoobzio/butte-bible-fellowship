@@ -17,6 +17,7 @@ src/css/components.css the call to action, toggle button and Foundation's parts
 src/css/search.css     the search of Foundation's data table and data browser
 src/css/table.css      Foundation's data table: toolbar, card, pagination
 src/css/browser.css    Foundation's data browser: toolbar, trail, card of folders and files
+src/css/views.css      Foundation's saved views: the tabs over a table, the menu of a view's actions, the dialogs' forms
 src/css/fonts.css      the font stacks, where @nuxt/fonts can see them
 ```
 

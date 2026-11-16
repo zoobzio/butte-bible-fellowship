@@ -16,6 +16,8 @@ export const GRANTS: Record<Role, readonly Scope[]> = {
     "staff:write",
     "users:read",
     "users:write",
+    "views:read",
+    "views:write",
   ],
   editor: [
     "content:read",
@@ -28,5 +30,7 @@ export const GRANTS: Record<Role, readonly Scope[]> = {
     "site:write",
     "staff:read",
     "staff:write",
+    "views:read",
+    "views:write",
   ],
 };

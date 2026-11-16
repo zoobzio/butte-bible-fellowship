@@ -1,11 +1,13 @@
 <script lang="ts">
-import { Dialog, Icon, Table } from "#components";
+import { Dialog, Icon, Table, Views } from "#components";
 import { definePageMeta, ref, useHead, useNuxtApp } from "#imports";
 
 import PageHeader from "~/components/PageHeader.vue";
 import StaffEditor from "~/components/StaffEditor.vue";
 import { useTableRequest } from "~/composables/listing";
 import { useStaffTable } from "~/composables/staff/table";
+import { useStaffViews } from "~/composables/staff/views";
+import { useViewsRequest } from "~/composables/views";
 </script>
 
 <script setup lang="ts">
@@ -13,6 +15,12 @@ definePageMeta({ middleware: "auth", auth: { scopes: ["staff:read"] } });
 
 const { $t } = useNuxtApp();
 const table = useStaffTable();
+
+/*
+ * The saved views sit over the table: its arrangement under a name, the
+ * admin's own first and then whoever is signed in's, each a tab.
+ */
+const views = useStaffViews(table);
 
 useHead(() => ({ title: $t.admin.staff.title() }));
 
@@ -23,6 +31,7 @@ useHead(() => ({ title: $t.admin.staff.title() }));
  */
 const adding = ref(false);
 
+await useViewsRequest(views);
 await useTableRequest(table);
 </script>
 
@@ -33,6 +42,7 @@ await useTableRequest(table);
     :action="$t.admin.staff.new()"
     @action="adding = true"
   />
+  <Views :service="views" />
   <Table :service="table" />
   <Dialog
     v-model:open="adding"

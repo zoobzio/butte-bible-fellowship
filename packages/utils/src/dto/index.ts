@@ -8,3 +8,4 @@ export * from "./hast";
 export * from "./home";
 export * from "./sermon";
 export * from "./staff";
+export * from "./view";

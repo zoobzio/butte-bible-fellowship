@@ -19,6 +19,8 @@ export default defineConfig({
       "staff:write": "Create, edit and remove staff",
       "users:read": "View who may sign in to the admin",
       "users:write": "Add, change and remove who may sign in to the admin",
+      "views:read": "View your own saved views of the admin's lists",
+      "views:write": "Save, rename and remove your own saved views",
     },
     roles: {
       admin: "Full control of the admin",

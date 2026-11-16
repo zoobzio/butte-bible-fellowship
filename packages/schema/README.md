@@ -32,6 +32,7 @@ src/models/      what the API answers with: one file per kind of thing
   sermon.ts      a sermon preached at the church, and the list of them
   page.ts        a page's front matter: its title, description and image
   slug.ts        what names a thing in an address
+  view.ts        a saved view of one of the admin's lists as the admin reads it, and the lists that have them
 src/input/       what a request carries, one file per group of endpoints
   about.ts       About Us: the metadata and the body of a write
   connect.ts     the connect page: the metadata and the body of a write
@@ -41,6 +42,7 @@ src/input/       what a request carries, one file per group of endpoints
   event.ts       the events: the path of one, the query of the list, the body of a write
   staff.ts       the staff: the id of one, the body of a write
   sermon.ts      the sermons: the path of one, the query of the list, the body of a write
+  view.ts        the saved views: the list one is of and its id, the payload each list's views are held to, and the body of a save
 src/index.ts     every schema, models and inputs
 src/types.ts     the type each schema infers, and nothing else
 tests/models/    what each model accepts and rejects
@@ -108,6 +110,22 @@ older number still reads. A sermon's body also carries what the site never
 shows: the `status` that decides whether it reaches the site, a draft
 until the body says otherwise. A member and an event carry none: whoever
 is on the staff, and whatever event is written, is on the site.
+
+A saved view is a named arrangement of one of the admin's lists, and every
+list's are stored in one table, the arrangement as JSON, so the schema is
+what holds each to its shape. `VIEW_SURFACES` names the lists that have
+views, `staff` the first, and `VIEW_PAYLOADS` and `VIEW_BODIES` carry, by
+that name, the schema of the list's payload and of a save of it:
+`staffView` and `staffViewBody`. `tableView` builds the payload of a view
+over a table — its sort, its columns' order, visibility and widths, its
+page's size and its search — from the columns the list's API sorts by and
+filters by, so a view saved never asks the API for what it would refuse,
+and a page stays within `LISTING_MAX_SIZE`. A save is checked against it;
+`viewRecord` carries the payload back as it was stored, unchecked, so a
+view saved before its list changed still reads, and the admin, which reads
+each through the same schema, sets it aside rather than failing the list.
+A list gains its views by a name in `VIEW_SURFACES` and a schema in each
+of the two records, which the types hold to every name.
 
 A sermon is what the church preached, not what YouTube lists: its `date` is
 the day it was preached, its `speaker` who preached it, and its `video`

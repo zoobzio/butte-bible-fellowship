@@ -37,11 +37,13 @@ describe("useListingFetch", () => {
 });
 
 describe("useTableRequest", () => {
-  it("fetches the table's page on every load", async () => {
+  it("fetches the table's page on every load, the first through its init", async () => {
     const fetch = vi.fn(async () => ({ data: [STAFF], rowCount: 1 }));
     const useTable = createTable("listing-request", { ...STAFF_TABLE, fetch });
     const table = withSetup(() => useTable()).result;
+    expect(table.initialized).toBe(false);
     await useTableRequest(table);
+    expect(table.initialized).toBe(true);
     expect(table.data).toEqual([STAFF]);
     expect(fetch).toHaveBeenCalledTimes(1);
     await useTableRequest(withSetup(() => useTable()).result);

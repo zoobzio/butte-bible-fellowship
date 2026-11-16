@@ -12,6 +12,7 @@ export { createBrowser } from "@zoobzio/nuxt/factories/browser";
 export { createEditor } from "@zoobzio/nuxt/factories/editor";
 export { createForm } from "@zoobzio/nuxt/factories/form";
 export { createTable } from "@zoobzio/nuxt/factories/table";
+export { createViews } from "@zoobzio/nuxt/factories/views";
 
 const logger = {
   level: ref("info"),
