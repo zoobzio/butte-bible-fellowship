@@ -11,7 +11,9 @@ The tables are the site's kinds of data: `home`, `about` and `connect`,
 the three pages with a layout of their own, each a table of one row that
 holds whatever its layout shows; `content`, the pages written in the admin, each named by
 its slug with a title, a description and what is written on it, which the
-admin keeps as its content, each filed in one of the `folders` or at the top;
+admin keeps as its content, each filed in one of the `folders` or at the top,
+and each a document of the kind its `mime` says, its media type, an article
+being the site's own, with a `size` in bytes;
 `folders`, the content's folders, each named and inside another or at the
 top, however whoever writes it sorts them; `staff`, who serve the
 church, each in a `staff_role` — pastor, elder, staff — which is also the
@@ -39,7 +41,7 @@ would not have offered.
 
 ```
 bezoar.config.ts   the kit config: the output directory, the defaults for the rest
-src/migrations/    the schema, forward only: staff, events, sermons, users, staff search, like escape, search cost, staff status, events search, events trim, content, pages, folders, connect, views
+src/migrations/    the schema, forward only: staff, events, sermons, users, staff search, like escape, search cost, staff status, events search, events trim, content, pages, folders, connect, views, documents
 src/seeds/         the staff, the events and the first admin user, each safe to run again
 src/queries/web/   what the site reads: home, about, connect, content, staff, events, sermons
 src/queries/admin/ what the admin app will read and write: the same, in full
@@ -161,18 +163,41 @@ every one. `admin.content` has `list`, `fetch`, `create`, `update` and
 description — and leave the body alone, and `create` takes the `folder_id`
 the page is filed in from the start; `folder` files a page in another
 folder afterwards, on its own, null for the top, and leaves when it was
-changed as it was. Its `list` is not a page of a search, as the others'
+changed as it was. What kind of document a row is, is its `mime`, its media type as it would
+be served, lowercase: the content is to hold the site's static assets as
+well as its pages, so no list of kinds is kept, and a type is whatever one
+is. A page is made an article, `application/vnd.bbf.article+json`, the
+site's own type for the tree the admin's editor writes, which the
+documents migration gives every page and a row is given when nothing names
+another. Its `size` is written with what it holds: `body` sets it to the
+bytes of the body as text, zero for none, and whatever writes a document
+of another type writes its size. Its `list` is not a page of a search, as the others'
 are: it is every page filed in the folder `folder_id` names, or at the top
-when it is null, and `sort` names `title`, `slug`, `created_at` or
-`updated_at`, the pages by title after any sort. The `search` column the
+when it is null, and `sort` names `title`, `slug`, `mime`, `size`,
+`created_at` or `updated_at`, the pages by title after any sort; `mime` is
+filtered as the title and the slug are, so `mime_starts_with` of `image/`
+is every image. The `search` column the
 content migration keeps is still there, and no query reads it. No seed
 writes a page: the content is empty until the admin writes one.
 
 `admin.folders` has `list`, `fetch`, `create`, `update` and `delete`, by
 `id`, and `parent`, where the folder is, on its own. `list` is the folders
 inside the one `parent_id` names, or at the top when it is null, by name,
-and each row carries `count`, how many folders and pages the folder holds
-itself. `create` takes a name and the folder it is made in; `update`
+or by the `name`, `size`, `created_at` or `updated_at` its `sort` names in
+`direction`, and each row carries `count`, how many folders and pages the
+folder holds itself. Its `size` and `updated_at` are of all that is under
+it, however deep: the bytes of every document, and when it, or anything
+under it, was last changed. All three are columns of its row, which the
+documents migration adds and fills in once, so `list` and `fetch` read a
+folder's row and nothing under it, however much that is. They are kept in
+step by triggers, `content_carried` on the content and `folders_made` and
+`folders_placed` on the folders: a document written, filed elsewhere or
+removed, and a folder made, renamed, moved or removed, is carried by
+`folders_carry` to the folder it is in and every folder above that, one
+row to a level. So a write costs the depth it is made at, and takes the
+rows above it for as long as it runs; a document moved leaves its own
+`updated_at` as it was and changes both folders. A write of `content` or
+`folders` that goes around the queries is carried the same way. `create` takes a name and the folder it is made in; `update`
 renames one where it stands; `parent` moves one into another folder, or to
 the top, and changes nothing when that folder is the folder itself or one
 under it, so no folder is cut loose from the top. `delete` removes a folder

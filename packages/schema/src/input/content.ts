@@ -25,6 +25,8 @@ export const contentId = z.object({
 export const CONTENT_SORT_KEYS = [
   "title",
   "slug",
+  "mime",
+  "size",
   "createdAt",
   "updatedAt",
 ] as const;
@@ -53,6 +55,7 @@ export const contentQuery = z.object({
   ...sorting(contentSort),
   ...textColumn("title", "title"),
   ...textColumn("slug", "slug"),
+  ...textColumn("mime", "media type"),
   ...dayColumn("updatedAt", "The day the pages listed were last changed"),
 });
 

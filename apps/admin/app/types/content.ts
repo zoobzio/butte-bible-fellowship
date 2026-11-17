@@ -15,8 +15,13 @@ export type BrowserFetchParams = Parameters<BrowserFetch<unknown>>[0];
 
 export type BrowserFetchResult<T> = Awaited<ReturnType<BrowserFetch<T>>>;
 
-/** A folder as the browser lists it: its id as its key, its name as its label. */
-export type BrowserFolder = BrowserFetchResult<unknown>["folders"][number];
+/**
+ * A folder as the browser lists it: its id as its key, its name as its
+ * label, and what it shows under the columns of the files it is listed
+ * over, `T`.
+ */
+export type BrowserFolder<T = unknown> =
+  BrowserFetchResult<T>["folders"][number];
 
 /**
  * What is being moved: a document or a folder, picked up where it was, to be

@@ -33,7 +33,7 @@ afterAll(() => db.close());
 const HEADING = "Discover God’s **Love, Grace & Truth**";
 
 describe("the build", () => {
-  it("carries the staff, events, sermons, users, staff search, like escape, search cost, staff status, events search, events trim, content, pages, folders, connect and views migrations in order", () => {
+  it("carries the staff, events, sermons, users, staff search, like escape, search cost, staff status, events search, events trim, content, pages, folders, connect, views and documents migrations in order", () => {
     expect(migrations.map((migration) => migration.name)).toEqual([
       "staff",
       "events",
@@ -50,6 +50,7 @@ describe("the build", () => {
       "folders",
       "connect",
       "views",
+      "documents",
     ]);
   });
 
@@ -768,17 +769,24 @@ describe("admin.content", () => {
     const id = created!.id;
 
     // A page is created with its metadata alone: its body is set on its own.
+    // It is an article, and holds nothing yet.
     expect(await db.admin.content.fetch.first({ id })).toMatchObject({
+      mime: "application/vnd.bbf.article+json",
       slug: "membership",
       description: null,
       body: null,
+      size: 0,
     });
     expect((await db.web.content.list()).map((row) => row.slug)).toContain(
       "membership",
     );
 
+    // Its size is written with its body: the bytes of the body as text.
     const written = await db.admin.content.body.first({ id, body: article });
     expect(written?.updated_at).toBeInstanceOf(Date);
+    expect(written?.size).toBeGreaterThan(
+      "Membership at the fellowship.".length,
+    );
     expect(
       await db.admin.content.body.first({ id: 0, body: article }),
     ).toBeNull();
@@ -795,6 +803,7 @@ describe("admin.content", () => {
       title: "Belonging – Butte Bible Fellowship",
       description: "How to join the fellowship.",
       body: article,
+      size: written!.size,
     });
     expect(await db.web.content.fetch.first({ slug: "membership" })).toEqual({
       slug: "membership",
@@ -806,12 +815,36 @@ describe("admin.content", () => {
     await db.admin.content.body({ id, body: null });
     expect(await db.admin.content.fetch.first({ id })).toMatchObject({
       body: null,
+      size: 0,
     });
 
     expect(await db.admin.content.delete({ id })).toBe(1);
     expect(await db.admin.content.fetch.first({ id })).toBeNull();
     expect(await db.admin.content.delete({ id })).toBe(0);
     expect(await db.web.content.fetch.first({ slug: "membership" })).toBeNull();
+  });
+
+  it("is a document of whatever media type it is given, written as one is served", async () => {
+    const made = await db.build
+      .insertInto("content")
+      .values({ slug: "bulletin", title: "Bulletin", mime: "application/pdf" })
+      .returning(["id", "mime"])
+      .executeTakeFirstOrThrow();
+    expect(made.mime).toBe("application/pdf");
+    expect(await slugs({ mime_is: "application/pdf" })).toEqual(["bulletin"]);
+    expect(await slugs({ mime_starts_with: "application/vnd.bbf" })).toEqual(
+      WRITTEN,
+    );
+    await db.admin.content.delete({ id: made.id });
+    for (const mime of ["", "pdf", "Image/PNG", "image/", "image/png; q=1"]) {
+      await expect(
+        db.build
+          .insertInto("content")
+          .values({ slug: "refused", title: "Refused", mime })
+          .execute(),
+        mime,
+      ).rejects.toThrow(/content_mime_check/);
+    }
   });
 
   it("refuses a slug already taken", async () => {
@@ -843,6 +876,17 @@ describe("admin.content", () => {
       WRITTEN,
     );
     expect(await slugs({ sort: "updated_at" })).toEqual([...WRITTEN].reverse());
+    // By size, the shorter body first; by media type, where every page
+    // is an article, the admin's own order.
+    expect(listed.map((row) => row.size)).toEqual([
+      listed[0]!.size,
+      listed[0]!.size + 17,
+    ]);
+    expect(await slugs({ sort: "size" })).toEqual(WRITTEN);
+    expect(await slugs({ sort: "size", direction: "desc" })).toEqual(
+      [...WRITTEN].reverse(),
+    );
+    expect(await slugs({ sort: "mime", direction: "desc" })).toEqual(WRITTEN);
 
     // A folder no page is filed in lists none.
     expect(await slugs({ folder_id: 0 })).toEqual([]);
@@ -869,7 +913,7 @@ describe("admin.content", () => {
     expect(await slugs({ q: "welcome", folder_id: 0 })).toEqual([]);
   });
 
-  it("filters a folder's pages on the title, the slug and the day last changed", async () => {
+  it("filters a folder's pages on the title, the slug, the media type and the day last changed", async () => {
     expect(await slugs({ title_contains: "BELIEFS" })).toEqual([
       "core-beliefs",
     ]);
@@ -893,6 +937,19 @@ describe("admin.content", () => {
     expect(await slugs({ slug_is: "present" })).toEqual(WRITTEN);
     // What is typed is the text itself, never a wildcard.
     expect(await slugs({ title_contains: "%" })).toEqual([]);
+
+    // Every page is an article, by its media type, filtered as text is.
+    expect(
+      await slugs({ mime_is: "application/vnd.bbf.article+json" }),
+    ).toEqual(WRITTEN);
+    expect(
+      await slugs({ mime_not: "application/vnd.bbf.article+json" }),
+    ).toEqual([]);
+    expect(await slugs({ mime_starts_with: "application/" })).toEqual(WRITTEN);
+    expect(await slugs({ mime_starts_with: "image/" })).toEqual([]);
+    expect(await slugs({ mime_ends_with: "+JSON" })).toEqual(WRITTEN);
+    expect(await slugs({ mime_contains: "article" })).toEqual(WRITTEN);
+    expect(await slugs({ mime_not_contains: "article" })).toEqual([]);
 
     const today = new Intl.DateTimeFormat("en-CA", {
       timeZone: top.tz,
@@ -957,8 +1014,28 @@ describe("admin.content", () => {
 });
 
 describe("admin.folders", () => {
-  const names = async (parent_id?: number) =>
-    (await db.admin.folders.list({ parent_id })).map((row) => row.name);
+  /* A level in its own order, by name. */
+  const level = { direction: "asc" };
+
+  const names = async (
+    parent_id?: number,
+    order: Partial<Parameters<typeof db.admin.folders.list>[0]> = {},
+  ) =>
+    (await db.admin.folders.list({ ...level, parent_id, ...order })).map(
+      (row) => row.name,
+    );
+
+  const paragraph = (value: string) => ({
+    type: "root",
+    children: [
+      {
+        type: "element",
+        tagName: "p",
+        properties: {},
+        children: [{ type: "text", value }],
+      },
+    ],
+  });
 
   it("nests folders, lists each level by name, and counts what each holds", async () => {
     expect(await names()).toEqual([]);
@@ -986,7 +1063,9 @@ describe("admin.folders", () => {
     // Searched, a level lists the folders its text names, whatever the
     // case, a misspelling forgiven, and no folder of another level.
     const found = async (q: string, parent_id?: number) =>
-      (await db.admin.folders.list({ q, parent_id })).map((row) => row.name);
+      (await db.admin.folders.list({ ...level, q, parent_id })).map(
+        (row) => row.name,
+      );
     expect(await found("SERM")).toEqual(["Sermons"]);
     expect(await found("s")).toEqual(["News", "Sermons"]);
     expect(await found("sermosn")).toEqual(["Sermons"]);
@@ -998,7 +1077,7 @@ describe("admin.folders", () => {
 
     // A folder counts the folders and the pages it holds itself, and none
     // of what those hold.
-    const listed = await db.admin.folders.list({});
+    const listed = await db.admin.folders.list(level);
     expect(listed.map((row) => [row.name, row.count])).toEqual([
       ["News", 0],
       ["Sermons", 2],
@@ -1007,6 +1086,83 @@ describe("admin.folders", () => {
       await db.admin.folders.fetch.first({ id: series!.id }),
     ).toMatchObject({ name: "Romans", parent_id: sermons!.id, count: 1 });
     expect(await db.admin.folders.fetch.first({ id: 0 })).toBeNull();
+
+    // A folder is as big as every document under it, however deep, and
+    // was changed when the last of them, or of its folders, was.
+    const size = async (id: number) =>
+      (await db.admin.folders.fetch.first({ id }))!.size;
+    const changed = async (id: number) =>
+      (await db.admin.folders.fetch.first({ id }))!.updated_at;
+    expect(await size(sermons!.id)).toBe(0);
+    const made = await changed(news!.id);
+    expect(made).toBeInstanceOf(Date);
+    const verse = await db.admin.content.create.first({
+      slug: "more-than-conquerors",
+      title: "More Than Conquerors",
+      folder_id: deep!.id,
+    });
+    const shallow = await db.admin.content.body.first({
+      id: document!.id,
+      body: paragraph("There is therefore now no condemnation."),
+    });
+    const buried = await db.admin.content.body.first({
+      id: verse!.id,
+      body: paragraph("In all these things."),
+    });
+    expect(await size(deep!.id)).toBe(buried!.size);
+    expect(await size(series!.id)).toBe(buried!.size);
+    expect(await size(sermons!.id)).toBe(shallow!.size + buried!.size);
+    expect(await size(news!.id)).toBe(0);
+    expect(await changed(sermons!.id)).toEqual(buried!.updated_at);
+    expect(await changed(deep!.id)).toEqual(buried!.updated_at);
+    expect(await changed(news!.id)).toEqual(made);
+    // The list reads the same of each folder of its level.
+    expect(
+      (await db.admin.folders.list(level)).map((row) => [
+        row.name,
+        row.size,
+        row.updated_at,
+      ]),
+    ).toEqual([
+      ["News", 0, made],
+      ["Sermons", shallow!.size + buried!.size, buried!.updated_at],
+    ]);
+
+    // A level sorts by what its folders show under a column, either way,
+    // and by name after it.
+    expect(await names(undefined, { sort: "name", direction: "desc" })).toEqual(
+      ["Sermons", "News"],
+    );
+    expect(await names(undefined, { sort: "size" })).toEqual([
+      "News",
+      "Sermons",
+    ]);
+    expect(await names(undefined, { sort: "size", direction: "desc" })).toEqual(
+      ["Sermons", "News"],
+    );
+    expect(
+      await names(undefined, { sort: "updated_at", direction: "desc" }),
+    ).toEqual(["Sermons", "News"]);
+    expect(await names(undefined, { sort: "updated_at" })).toEqual([
+      "News",
+      "Sermons",
+    ]);
+    // By when each was made, which two made at once share: by name then.
+    const made_at = (name: string) =>
+      listed.find((row) => row.name === name)!.created_at.getTime();
+    const oldest = ["News", "Sermons"].sort(
+      (a, b) => made_at(a) - made_at(b) || a.localeCompare(b),
+    );
+    const newest = ["News", "Sermons"].sort(
+      (a, b) => made_at(b) - made_at(a) || a.localeCompare(b),
+    );
+    expect(await names(undefined, { sort: "created_at" })).toEqual(oldest);
+    expect(
+      await names(undefined, { sort: "created_at", direction: "desc" }),
+    ).toEqual(newest);
+    await db.admin.content.delete({ id: verse!.id });
+    // What is taken out of a folder is no longer counted in it.
+    expect(await size(sermons!.id)).toBe(shallow!.size);
 
     // A name is a folder's own among those beside it, the top's too.
     expect(await refusal(db.admin.folders.create({ name: "News" }))).toMatch(
@@ -1328,6 +1484,226 @@ describe("the pages migration", () => {
     expect((await moved.web.content.list()).map((row) => row.slug)).toEqual([
       "membership",
     ]);
+  });
+});
+
+describe("a folder's totals", () => {
+  const body = (value: string) => ({
+    type: "root",
+    children: [{ type: "text", value }],
+  });
+
+  /* What a folder's row keeps of all that is under it. */
+  const kept = async (id: number) => {
+    const row = (await db.admin.folders.fetch.first({ id }))!;
+    return { size: row.size, count: row.count, at: row.updated_at.getTime() };
+  };
+
+  /* Puts folders' dates back, so that a change after it shows as one. */
+  const LONG_AGO = new Date("2026-01-01T00:00:00Z");
+  const age = (...ids: number[]) =>
+    db.build
+      .updateTable("folders")
+      .set({ updated_at: LONG_AGO })
+      .where("id", "in", ids)
+      .execute();
+
+  it("keeps each folder's size, count and date in step with every write under it, however deep", async () => {
+    const a = (await db.admin.folders.create.first({ name: "Kept A" }))!.id;
+    const b = (await db.admin.folders.create.first({ name: "Kept B" }))!.id;
+    const inner = (await db.admin.folders.create.first({
+      name: "Inner",
+      parent_id: a,
+    }))!.id;
+    expect(await kept(a)).toMatchObject({ size: 0, count: 1 });
+    expect(await kept(b)).toMatchObject({ size: 0, count: 0 });
+    await age(a, b, inner);
+
+    // A document written in a folder under it: counted where it is filed,
+    // and its bytes in every folder above.
+    const page = (await db.admin.content.create.first({
+      slug: "kept-page",
+      title: "Kept page",
+      folder_id: inner,
+    }))!.id;
+    expect(await kept(inner)).toMatchObject({ size: 0, count: 1 });
+    expect(await kept(a)).toMatchObject({ size: 0, count: 1 });
+    const written = (await db.admin.content.body.first({
+      id: page,
+      body: body("Kept in step."),
+    }))!;
+    expect(written.size).toBeGreaterThan(0);
+    expect(await kept(inner)).toEqual({
+      size: written.size,
+      count: 1,
+      at: written.updated_at.getTime(),
+    });
+    expect(await kept(a)).toEqual({
+      size: written.size,
+      count: 1,
+      at: written.updated_at.getTime(),
+    });
+    // A folder beside them is as it was.
+    expect(await kept(b)).toEqual({
+      size: 0,
+      count: 0,
+      at: LONG_AGO.getTime(),
+    });
+
+    // Written again, longer and then shorter: the difference alone.
+    const longer = (await db.admin.content.body.first({
+      id: page,
+      body: body("Kept in step, and at more length."),
+    }))!;
+    expect((await kept(a)).size).toBe(longer.size);
+    const metadata = await db.admin.content.update.first({
+      id: page,
+      slug: "kept-page",
+      title: "Kept page, retitled",
+    });
+    expect(await kept(a)).toEqual({
+      size: longer.size,
+      count: 1,
+      at: metadata!.updated_at.getTime(),
+    });
+
+    // Filed elsewhere, the page keeps its own date, and both folders are
+    // changed by it: one gives up what the other takes on.
+    await age(a, b, inner);
+    await db.admin.content.folder({ id: page, folder_id: b });
+    expect(await kept(inner)).toMatchObject({ size: 0, count: 0 });
+    expect(await kept(a)).toMatchObject({ size: 0, count: 1 });
+    expect(await kept(b)).toMatchObject({ size: longer.size, count: 1 });
+    for (const id of [a, b, inner]) {
+      expect((await kept(id)).at, String(id)).toBeGreaterThan(
+        LONG_AGO.getTime(),
+      );
+    }
+    expect(
+      (await db.admin.content.fetch.first({ id: page }))!.updated_at,
+    ).toEqual(metadata!.updated_at);
+
+    // To the top, and back under a folder: the top keeps no total.
+    await db.admin.content.folder({ id: page });
+    expect(await kept(b)).toMatchObject({ size: 0, count: 0 });
+    await db.admin.content.folder({ id: page, folder_id: inner });
+    expect(await kept(a)).toMatchObject({ size: longer.size, count: 1 });
+
+    // A folder moved takes all it holds with it.
+    await db.admin.folders.parent({ id: inner, parent_id: b });
+    expect(await kept(a)).toMatchObject({ size: 0, count: 0 });
+    expect(await kept(b)).toMatchObject({ size: longer.size, count: 1 });
+    expect(await kept(inner)).toMatchObject({ size: longer.size, count: 1 });
+    // One refused, into itself, moves nothing.
+    await db.admin.folders.parent({ id: b, parent_id: inner });
+    expect(await kept(b)).toMatchObject({ size: longer.size, count: 1 });
+
+    // Renamed, a folder changes the one it is inside, and no size.
+    const renamed = await db.admin.folders.update.first({
+      id: inner,
+      name: "Innermost",
+    });
+    expect(await kept(b)).toEqual({
+      size: longer.size,
+      count: 1,
+      at: renamed!.updated_at.getTime(),
+    });
+
+    // The list reads the same rows.
+    expect(
+      (await db.admin.folders.list({ direction: "desc", sort: "size" }))
+        .filter((row) => [a, b].includes(row.id))
+        .map((row) => [row.id, row.size, row.count]),
+    ).toEqual([
+      [b, longer.size, 1],
+      [a, 0, 0],
+    ]);
+
+    // Removed, a document is no longer in what was above it, which is
+    // changed by its going; and so a folder.
+    await age(b);
+    await db.admin.content.delete({ id: page });
+    expect(await kept(inner)).toMatchObject({ size: 0, count: 0 });
+    expect(await kept(b)).toMatchObject({ size: 0, count: 1 });
+    expect((await kept(b)).at).toBeGreaterThan(LONG_AGO.getTime());
+    expect(await db.admin.folders.delete({ id: inner })).toBe(1);
+    expect(await kept(b)).toMatchObject({ size: 0, count: 0 });
+    expect(await db.admin.folders.delete({ id: a })).toBe(1);
+    expect(await db.admin.folders.delete({ id: b })).toBe(1);
+  });
+});
+
+describe("the documents migration", () => {
+  /*
+   * A database with pages written before a document had a kind or a size:
+   * one with a body, one with none.
+   */
+  const index = migrations.findIndex(({ name }) => name === "documents");
+  const body = '{"type":"root","children":[{"type":"text","value":"Ours."}]}';
+  const written = {
+    version: "0015a",
+    name: "written",
+    checksum: "written",
+    sql: `
+      INSERT INTO content (slug, title, body) VALUES
+        ('membership', 'Membership', '${body}'::jsonb),
+        ('untouched', 'Untouched', NULL);
+      INSERT INTO folders (name, updated_at) VALUES
+        ('Outer', '2026-01-01T00:00:00Z'), ('Empty', '2026-01-02T00:00:00Z');
+      INSERT INTO folders (name, parent_id, updated_at)
+        SELECT 'Inner', id, '2026-01-03T00:00:00Z'
+        FROM folders WHERE name = 'Outer';
+      INSERT INTO content (slug, title, body, folder_id, updated_at)
+        SELECT 'buried', 'Buried', '${body}'::jsonb, id, '2026-02-01T00:00:00Z'
+        FROM folders WHERE name = 'Inner';
+      INSERT INTO content (slug, title, folder_id, updated_at)
+        SELECT 'shallow', 'Shallow', id, '2026-01-15T00:00:00Z'
+        FROM folders WHERE name = 'Outer';
+    `,
+  };
+
+  it("makes every page an article, of the size of what is written on it", async () => {
+    await using moved = await makeTestBezoar(contract, {
+      queries,
+      migrations: [
+        ...migrations.slice(0, index),
+        written,
+        ...migrations.slice(index),
+      ],
+      database: { extensions: { fuzzystrmatch, pg_trgm } },
+    });
+    const listed = await moved.admin.content.list({
+      direction: "asc",
+      tz: "America/Los_Angeles",
+    });
+    expect(listed.map((row) => [row.slug, row.mime])).toEqual([
+      ["membership", "application/vnd.bbf.article+json"],
+      ["untouched", "application/vnd.bbf.article+json"],
+    ]);
+    // The bytes of the body as the database writes it out as text.
+    expect(listed[0]!.size).toBeGreaterThanOrEqual(body.length);
+    expect(listed[1]!.size).toBe(0);
+
+    // Each folder is given what all that is under it comes to, as it
+    // stood: its size, how many it holds itself, and its latest change.
+    const size = listed[0]!.size;
+    const top = await moved.admin.folders.list({ direction: "asc" });
+    expect(
+      top.map((row) => [
+        row.name,
+        row.size,
+        row.count,
+        row.updated_at.toISOString(),
+      ]),
+    ).toEqual([
+      ["Empty", 0, 0, "2026-01-02T00:00:00.000Z"],
+      ["Outer", size, 2, "2026-02-01T00:00:00.000Z"],
+    ]);
+    const [inner] = await moved.admin.folders.list({
+      direction: "asc",
+      parent_id: top[1]!.id,
+    });
+    expect([inner!.size, inner!.count]).toEqual([size, 1]);
   });
 });
 
@@ -2202,6 +2578,24 @@ describe("roles", () => {
     expect(await web.web.home.fetch()).toHaveLength(1);
     expect(await web.web.about.fetch()).toHaveLength(1);
     expect(await web.web.connect.fetch()).toHaveLength(1);
+  });
+
+  it("keeps a folder's totals as admin writes under it", async () => {
+    const folder = await admin.admin.folders.create.first({ name: "Granted" });
+    const page = await admin.admin.content.create.first({
+      slug: "granted",
+      title: "Granted",
+      folder_id: folder!.id,
+    });
+    const written = await admin.admin.content.body.first({
+      id: page!.id,
+      body: { type: "root", children: [{ type: "text", value: "Kept." }] },
+    });
+    expect(
+      await admin.admin.folders.fetch.first({ id: folder!.id }),
+    ).toMatchObject({ size: written!.size, count: 1 });
+    await admin.admin.content.delete({ id: page!.id });
+    expect(await admin.admin.folders.delete({ id: folder!.id })).toBe(1);
   });
 
   it("refuses a write as web, by name and in the database", async () => {

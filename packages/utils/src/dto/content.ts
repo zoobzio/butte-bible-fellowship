@@ -10,10 +10,12 @@ import { toDocument } from "./document";
 export const toContentRecord = (row: ContentRecordRow): ContentRecord => ({
   id: row.id,
   folder: row.folder_id ?? undefined,
+  mime: row.mime,
   slug: row.slug,
   title: row.title,
   description: row.description ?? undefined,
   body: row.body === null ? undefined : hast.parse(row.body),
+  size: row.size,
   createdAt: row.created_at.toISOString(),
   updatedAt: row.updated_at.toISOString(),
 });

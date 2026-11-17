@@ -61,18 +61,22 @@ export const DINNER: EventRecord = {
 
 export const HOME: ContentRecord = {
   id: 5,
+  mime: "application/vnd.bbf.article+json",
   slug: "index",
   title: "Butte Bible Fellowship",
   description: "A local church in Chico.",
   body: BIO,
+  size: 2048,
   createdAt: "2026-10-17T18:00:00.000Z",
   updatedAt: "2026-10-18T09:30:00.000Z",
 };
 
 export const ABOUT: ContentRecord = {
   id: 6,
+  mime: "application/vnd.bbf.article+json",
   slug: "about-us",
   title: "About Us",
+  size: 0,
   createdAt: "2026-10-17T18:00:00.000Z",
   updatedAt: "2026-10-17T18:00:00.000Z",
 };
@@ -82,8 +86,9 @@ export const NOTES: FolderRecord = {
   id: 2,
   name: "Sermon notes",
   count: 1,
+  size: 4096,
   createdAt: "2026-10-17T18:00:00.000Z",
-  updatedAt: "2026-10-17T18:00:00.000Z",
+  updatedAt: "2026-10-18T09:30:00.000Z",
 };
 
 /** A folder inside it, which holds nothing. */
@@ -92,6 +97,7 @@ export const ROMANS: FolderRecord = {
   parent: 2,
   name: "Romans",
   count: 0,
+  size: 0,
   createdAt: "2026-10-17T18:00:00.000Z",
   updatedAt: "2026-10-17T18:00:00.000Z",
 };

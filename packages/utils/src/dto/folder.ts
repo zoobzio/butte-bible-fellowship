@@ -7,6 +7,7 @@ export const toFolderRecord = (row: FolderRecordRow): FolderRecord => ({
   parent: row.parent_id ?? undefined,
   name: row.name,
   count: row.count,
+  size: row.size,
   createdAt: row.created_at.toISOString(),
   updatedAt: row.updated_at.toISOString(),
 });

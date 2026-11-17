@@ -363,6 +363,7 @@ describe("the components", () => {
       "HomeHero",
       "HomePage",
       "HomeRecord",
+      "Mime",
       "Page",
       "Sermon",
       "SermonBody",

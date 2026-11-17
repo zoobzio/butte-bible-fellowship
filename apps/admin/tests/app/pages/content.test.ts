@@ -101,7 +101,12 @@ describe("content page", () => {
     expect(fetch).toHaveBeenCalledWith("/api/content", { query: {} });
     expect(browser.props("service").files).toEqual([HOME, ABOUT]);
     expect(browser.props("service").folders).toEqual([
-      { key: "2", label: "Sermon notes", count: 1 },
+      {
+        key: "2",
+        label: "Sermon notes",
+        count: 1,
+        values: { size: 4096, updatedAt: "2026-10-18T09:30:00.000Z" },
+      },
     ]);
     expect(head()).toEqual({ title: "Content" });
   });
@@ -130,7 +135,25 @@ describe("content page", () => {
     ).toEqual([
       "Butte Bible Fellowship",
       "index",
+      "application/vnd.bbf.article+json",
+      "2 kB",
       expect.stringContaining("2026"),
+    ]);
+  });
+
+  it("shows of a folder, under the documents' columns, how much all that is under it holds and when the last of it was changed", async () => {
+    const { wrapper } = await mountContent({ folders: [NOTES] });
+    const cells = wrapper
+      .findAll(`${FOLDER} .f-td:not(.f-data-browser-actions)`)
+      .map((cell) => cell.text());
+    // Its name and its count, nothing under the slug or the type, then
+    // its size and the day.
+    expect(cells).toEqual([
+      "Sermon notes1",
+      "",
+      "",
+      "4 kB",
+      expect.stringContaining("Oct 18, 2026"),
     ]);
   });
 
@@ -196,7 +219,7 @@ describe("content page", () => {
     );
   });
 
-  it("offers a search of the open folder: its text, and the title, the slug and the day last changed, each by the operators the API answers", async () => {
+  it("offers a search of the open folder: its text, and the title, the slug, the media type and the day last changed, each by the operators the API answers", async () => {
     const { wrapper } = await mountContent({ documents: [HOME] });
     expect(
       wrapper.find(".f-data-browser-search .f-autocomplete-input").exists(),
@@ -205,8 +228,14 @@ describe("content page", () => {
     expect(query.literals).toEqual({
       text: { label: "Search", open: '"', close: '"' },
     });
-    expect(Object.keys(query.fields)).toEqual(["title", "slug", "updatedAt"]);
-    for (const key of ["title", "slug"]) {
+    // The size is sorted by, and filtered by nothing.
+    expect(Object.keys(query.fields)).toEqual([
+      "title",
+      "slug",
+      "mime",
+      "updatedAt",
+    ]);
+    for (const key of ["title", "slug", "mime"]) {
       expect(query.fields[key].operators, key).toEqual([
         "contains",
         "not contains",
@@ -297,7 +326,7 @@ describe("content page", () => {
     const browser = wrapper.findComponent(Browser).props("service");
     expect(
       browser.sortableColumns.map((column: { key: string }) => column.key),
-    ).toEqual(["title", "slug", "updatedAt"]);
+    ).toEqual(["title", "slug", "mime", "size", "updatedAt"]);
     const trigger = wrapper.find(".f-data-browser-toolbar button");
     await trigger.trigger("pointerdown", { button: 0, ctrlKey: false });
     await trigger.trigger("click");
@@ -310,6 +339,38 @@ describe("content page", () => {
     await flushPromises();
     expect(fetch).toHaveBeenLastCalledWith("/api/content", {
       query: { sort: "slug", direction: "desc" },
+    });
+    // A folder has no slug to be sorted by: the folders stay by name.
+    expect(fetch).toHaveBeenCalledWith("/api/content/folders", { query: {} });
+  });
+
+  it("sorts the folders with the documents where a folder shows something under the column, by its name under the title", async () => {
+    const { wrapper, fetch } = await mountContent({
+      folders: [NOTES],
+      documents: [HOME],
+    });
+    const browser = wrapper.findComponent(Browser).props("service");
+    browser.sortBy("size");
+    await flushPromises();
+    expect(fetch).toHaveBeenCalledWith("/api/content", {
+      query: { sort: "size", direction: "asc" },
+    });
+    expect(fetch).toHaveBeenCalledWith("/api/content/folders", {
+      query: { sort: "size", direction: "asc" },
+    });
+    browser.sortBy("updatedAt");
+    await flushPromises();
+    expect(fetch).toHaveBeenCalledWith("/api/content/folders", {
+      query: { sort: "updatedAt", direction: "asc" },
+    });
+    browser.sortBy("title");
+    browser.sortBy("title");
+    await flushPromises();
+    expect(fetch).toHaveBeenLastCalledWith("/api/content", {
+      query: { sort: "title", direction: "desc" },
+    });
+    expect(fetch).toHaveBeenCalledWith("/api/content/folders", {
+      query: { sort: "name", direction: "desc" },
     });
   });
 
@@ -496,6 +557,7 @@ describe("folders", () => {
       key: "2",
       label: "Sermon notes",
       count: 1,
+      values: { size: 4096, updatedAt: "2026-10-18T09:30:00.000Z" },
     });
     const name = editor.find("#folder-name");
     expect((name.element as HTMLInputElement).value).toBe("Sermon notes");

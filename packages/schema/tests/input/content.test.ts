@@ -128,6 +128,18 @@ describe("contentQuery", () => {
     expect(contentQuery.parse({ createdAtOn: "2026-10-01" })).toEqual({});
   });
 
+  it("filters on the media type as on any text: every image, by what it starts with", () => {
+    expect(contentQuery.parse({ mimeStartsWith: "image/" })).toEqual({
+      mimeStartsWith: "image/",
+    });
+    expect(
+      contentQuery.parse({ mimeIs: "application/pdf", mimeNotContains: "vnd" }),
+    ).toEqual({ mimeIs: "application/pdf", mimeNotContains: "vnd" });
+    expect(contentQuery.safeParse({ mimeIs: "" }).success).toBe(false);
+    // A size is sorted by, and filtered by nothing.
+    expect(contentQuery.parse({ sizeIs: "0" })).toEqual({});
+  });
+
   it("sorts by a column of the record, either way", () => {
     for (const sort of CONTENT_SORT_KEYS) {
       expect(contentQuery.parse({ sort })).toMatchObject({ sort });
@@ -135,6 +147,8 @@ describe("contentQuery", () => {
     expect(CONTENT_SORT_KEYS).toEqual([
       "title",
       "slug",
+      "mime",
+      "size",
       "createdAt",
       "updatedAt",
     ]);

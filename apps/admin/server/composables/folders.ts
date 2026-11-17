@@ -4,6 +4,7 @@ import type {
   FolderPlacement,
   FolderRecord,
   FolderRecords,
+  FolderSort,
   FoldersQuery,
 } from "@bbf/schema/types";
 
@@ -29,17 +30,31 @@ export type FolderRefusal = "missing" | "refused";
 export type FolderConflict =
   (typeof FOLDER_REFUSALS)[keyof typeof FOLDER_REFUSALS];
 
+/**
+ * The column of the row each sort key names.
+ */
+const SORT_COLUMNS: Record<FolderSort, string> = {
+  name: "name",
+  size: "size",
+  createdAt: "created_at",
+  updatedAt: "updated_at",
+};
+
 export const useFolders = () => {
   const db = useDatabase();
 
   /**
    * The folders inside one, or at the top when the query names none: all
-   * of them, or the ones the text searched for names.
+   * of them, or the ones the text searched for names, by the column the
+   * query sorts by, ascending unless told otherwise, and by name without
+   * one.
    */
   const list = async (query: FoldersQuery): Promise<FolderRecords> => {
     const rows = await db.admin.folders.list({
       parent_id: query.parent ?? null,
       q: query.q === undefined || query.q === "" ? null : query.q,
+      sort: query.sort === undefined ? null : SORT_COLUMNS[query.sort],
+      direction: query.direction ?? "asc",
     });
     return rows.map(toFolderRecord);
   };

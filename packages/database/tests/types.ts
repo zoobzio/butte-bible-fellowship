@@ -87,6 +87,10 @@ export type Checks = [
     >
   >,
   Assert<Equal<Row<Contract, "admin.content.fetch">["updated_at"], Date>>,
+  Assert<Equal<Row<Contract, "admin.content.fetch">["mime"], string>>,
+  Assert<Equal<Row<Contract, "admin.content.fetch">["size"], number>>,
+  Assert<Equal<Row<Contract, "admin.folders.fetch">["size"], number>>,
+  Assert<Equal<Row<Contract, "admin.folders.list">["updated_at"], Date>>,
   Assert<Equal<Arguments<Contract, "admin.content.body">["body"], unknown>>,
   Assert<
     Equal<

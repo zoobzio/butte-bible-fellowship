@@ -60,7 +60,7 @@ that directory's `index.ts`, and a type beside it in `types.ts`.
 A model is the response: `churchEvent`, `staffMember`, `sermon`,
 `page`, with `churchEvents`, `staffMembers` and `sermons`, the lists the
 API answers with, and the primitives they are built from — `eventDay`,
-`eventTime`, `slug`, `contentStatus`, `staffRole`, and `hast`, rich text
+`eventTime`, `slug`, `contentStatus`, `staffRole`, `mime`, and `hast`, rich text
 as an HTML syntax tree. A column written as Markdown — a sermon's `body` —
 goes over the wire as `hast`: the tree the site's pages are built to,
 which the app renders with its own components, so the wire never carries
@@ -84,7 +84,12 @@ written on its own too: `contentPlacement` is the folder it is moved to,
 none for the top, and `contentDraft` is the one write that carries both,
 a new page's metadata and the folder it is made in. A folder of the content
 follows: `folderBody` is its name, `folderPlacement` the folder it is
-inside, and `folderDraft` a new one's name and where it is made. The three pages with a table of
+inside, and `folderDraft` a new one's name and where it is made. A page is a document
+of the kind its `mime` says, a media type, since the content is to hold
+the site's static assets beside its pages: no write names it yet, and one
+is made an article, `ARTICLE_MIME`, the site's own type. Its `size`, in bytes, is the database's to write, with what
+the document holds, and a folder's `size` and `updatedAt` are of all that
+is under it. The three pages with a table of
 their own are written the same way, without an id or a slug: `aboutBody`,
 a title and a description, and `aboutArticle`; `homeBody`, with the words
 of the hero the page opens with — `heroHeading` is one line of text, its
@@ -142,7 +147,7 @@ Every schema is documented where it is declared. A model or a body is
 `components.schemas` and refers to it from every operation that uses it:
 `ChurchEvent`, `StaffMember`, `Sermon`, `Page`, `EventBody`,
 `StaffBody`, `StaffBio`, `SermonBody`. A primitive used by both — `EventDay`, `EventTime`,
-`ContentStatus`, `StaffRole` — is one component too, and so is `Hast`, with
+`ContentStatus`, `StaffRole`, `Mime` — is one component too, and so is `Hast`, with
 `HastElement` and `HastText`, which refer to each other as a tree does; rendered the same in a request and a response. A field is
 `.meta({ description, examples })`, and its format comes from its zod type:
 `z.iso.date()` is `date`, `z.iso.datetime()` is `date-time`, `z.url()` is
@@ -187,7 +192,7 @@ what it renders: the components, their references, the parameters.
   alone. `@bbf/schema/models/event` and the like reach one file.
 - `@bbf/schema/types`: the type each schema infers, under its `PascalCase`
   name — `ChurchEvent`, `ChurchEvents`, `EventDay`, `EventTime`, `Hast`, `HastElement`,
-  `HastText`, `ContentStatus`, `StaffRole`, `StaffMember`, `StaffMembers`,
+  `HastText`, `ContentStatus`, `StaffRole`, `Mime`, `StaffMember`, `StaffMembers`,
   `Page`, `Sermon`, `Sermons`, `Slug`, `EventPath`, `EventsQuery`,
   `EventBody`, `ContentRecord`, `ContentRecords`, `ContentBody`, `ContentForm`,
   `ContentArticle`, `ContentPlacement`, `ContentDraft`, `FolderRecord`,

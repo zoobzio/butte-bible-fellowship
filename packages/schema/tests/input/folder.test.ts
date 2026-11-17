@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  FOLDER_SORT_KEYS,
   folderBody,
   folderDraft,
   folderId,
@@ -29,6 +30,24 @@ describe("foldersQuery", () => {
       q: "romans",
     });
     expect(foldersQuery.parse({ q: "" })).toEqual({ q: "" });
+  });
+
+  it("sorts by the name, or by what a folder shows under a column, either way", () => {
+    for (const sort of FOLDER_SORT_KEYS) {
+      expect(foldersQuery.parse({ sort })).toEqual({ sort });
+    }
+    expect(FOLDER_SORT_KEYS).toEqual([
+      "name",
+      "size",
+      "createdAt",
+      "updatedAt",
+    ]);
+    expect(foldersQuery.parse({ sort: "size", direction: "desc" })).toEqual({
+      sort: "size",
+      direction: "desc",
+    });
+    expect(foldersQuery.safeParse({ sort: "count" }).success).toBe(false);
+    expect(foldersQuery.safeParse({ direction: "up" }).success).toBe(false);
   });
 });
 

@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { documentSize } from "./content";
+
 export const folderRecord = z
   .object({
     id: z
@@ -27,19 +29,24 @@ export const folderRecord = z
           "How many folders and pages it holds itself, what those hold not counted.",
         examples: [3],
       }),
+    size: documentSize.meta({
+      description:
+        "How much all that is under it holds, in bytes: every document filed in it or in a folder under it, however deep.",
+    }),
     createdAt: z.iso.datetime().meta({
       description: "When its row was written.",
       examples: ["2026-10-17T18:00:00.000Z"],
     }),
     updatedAt: z.iso.datetime().meta({
-      description: "When its row was last changed.",
+      description:
+        "When it, or anything under it, was last changed: a document or a folder written, moved in or out, or removed, however deep.",
       examples: ["2026-10-17T18:00:00.000Z"],
     }),
   })
   .meta({
     id: "FolderRecord",
     description:
-      "A folder of the content, as the admin reads it: every column of its row, and how much it holds.",
+      "A folder of the content, as the admin reads it: its row, how many folders and pages it holds itself, and what all that is under it comes to.",
   });
 
 export const folderRecords = z.array(folderRecord).meta({

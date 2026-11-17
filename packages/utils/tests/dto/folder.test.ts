@@ -8,6 +8,7 @@ const ROW = {
   parent_id: 1,
   name: "Romans",
   count: 3,
+  size: 4096,
   created_at: new Date("2026-10-17T18:00:00.000Z"),
   updated_at: new Date("2026-10-18T09:30:00.000Z"),
 };
@@ -20,6 +21,7 @@ describe("toFolderRecord", () => {
       parent: 1,
       name: "Romans",
       count: 3,
+      size: 4096,
       createdAt: "2026-10-17T18:00:00.000Z",
       updatedAt: "2026-10-18T09:30:00.000Z",
     });

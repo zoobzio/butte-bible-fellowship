@@ -23,6 +23,14 @@
     "defaultMessage": "Document",
     "description": "The tab of a document's own page in the admin that holds its metadata and what is written on it."
   },
+  "type": {
+    "defaultMessage": "Type",
+    "description": "The heading of the column of the content's browser for a document's media type (its MIME type), such as image/png, which is what kind of document it is."
+  },
+  "size": {
+    "defaultMessage": "Size",
+    "description": "The heading of the column of the content's browser for how much a document holds, and for a folder how much everything under it holds, shown as a file size."
+  },
   "newFolder": {
     "defaultMessage": "New folder",
     "description": "The button that opens the form of a new folder, and the title of that form's dialog."

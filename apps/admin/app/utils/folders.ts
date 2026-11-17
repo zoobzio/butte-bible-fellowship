@@ -1,14 +1,23 @@
-import type { FolderRecord } from "@bbf/schema/types";
+import type { ContentRecord, FolderRecord } from "@bbf/schema/types";
 
 import type { BrowserFetchParams, BrowserFolder } from "~/types/content";
 
+import { FOLDER_SORTS } from "~/constants/content";
 import { toFilterQuery } from "~/utils/listing";
 
-/** A folder as the browser lists it: named by its id, with what it holds. */
-export const toBrowserFolder = (record: FolderRecord): BrowserFolder => ({
+/**
+ * A folder as the browser lists it: named by its id, with how many
+ * folders and documents it holds itself, and under the documents' columns
+ * what all that is under it comes to: how much it holds, and when the last
+ * of it was changed.
+ */
+export const toBrowserFolder = (
+  record: FolderRecord,
+): BrowserFolder<ContentRecord> => ({
   key: String(record.id),
   label: record.name,
   count: record.count,
+  values: { size: record.size, updatedAt: record.updatedAt },
 });
 
 /** The id of a folder the browser lists, read back from its key. */
@@ -28,14 +37,22 @@ export const folderOf = (path: readonly string[]): number | undefined => {
  * The folders inside the open one, as the API is asked for them: all of
  * them, or the ones the free text names. A folder has its name alone to be
  * found by, so the column filters, which are the documents', narrow none.
+ * The sort reaches them where a folder has something to be sorted by under
+ * the column: its name under the title, and its own size and dates.
  */
 export const toFoldersQuery = (
-  params: Pick<BrowserFetchParams, "path" | "query">,
+  params: Pick<
+    BrowserFetchParams,
+    "path" | "query" | "sortField" | "sortDirection"
+  >,
 ): Record<string, number | string> => {
   const parent = folderOf(params.path);
+  const sort =
+    params.sortField === null ? undefined : FOLDER_SORTS[params.sortField];
   return {
     ...(parent === undefined ? {} : { parent }),
     ...(params.query === "" ? {} : { q: params.query }),
+    ...(sort === undefined ? {} : { sort, direction: params.sortDirection }),
   };
 };
 

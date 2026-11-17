@@ -3,6 +3,7 @@ import { migrations } from "@bbf/database/migrations";
 import { queries } from "@bbf/database/queries";
 import { seeds } from "@bbf/database/seeds";
 import {
+  ARTICLE_MIME,
   aboutBody,
   aboutRecord,
   churchEvent,
@@ -183,8 +184,10 @@ describe("content", () => {
       (await db.admin.content.fetch.first({ id }))!,
     );
     expect(contentRecord.parse(record)).toEqual(record);
+    // The type the database makes a page as is the schema's article.
     expect(record).toMatchObject({
       id,
+      mime: ARTICLE_MIME,
       slug: "membership",
       description: "How to join.",
     });

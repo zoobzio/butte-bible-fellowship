@@ -16,15 +16,26 @@ const UNSEARCHED = { query: "", filters: [] };
 
 describe("toBrowserFolder", () => {
   it("names a folder by its id, as text, with its name and what it holds", () => {
-    expect(toBrowserFolder(NOTES)).toEqual({
+    expect(toBrowserFolder(NOTES)).toMatchObject({
       key: "2",
       label: "Sermon notes",
       count: 1,
     });
-    expect(toBrowserFolder(ROMANS)).toEqual({
+    expect(toBrowserFolder(ROMANS)).toMatchObject({
       key: "3",
       label: "Romans",
       count: 0,
+    });
+  });
+
+  it("shows, under the documents' columns, what all that is under it comes to: its size and when the last of it was changed", () => {
+    expect(toBrowserFolder(NOTES).values).toEqual({
+      size: 4096,
+      updatedAt: "2026-10-18T09:30:00.000Z",
+    });
+    expect(toBrowserFolder(ROMANS).values).toEqual({
+      size: 0,
+      updatedAt: "2026-10-17T18:00:00.000Z",
     });
   });
 });
@@ -45,20 +56,45 @@ describe("folderOf", () => {
 
 describe("toFoldersQuery", () => {
   it("asks for the folders inside the open one, or the top's with nothing", () => {
-    expect(toFoldersQuery({ path: [], query: "" })).toEqual({});
-    expect(toFoldersQuery({ path: ["2", "3"], query: "" })).toEqual({
+    expect(toFoldersQuery({ path: [], query: "", ...UNSORTED })).toEqual({});
+    expect(
+      toFoldersQuery({ path: ["2", "3"], query: "", ...UNSORTED }),
+    ).toEqual({
       parent: 3,
     });
   });
 
   it("carries the free text as q, for the folders it names", () => {
-    expect(toFoldersQuery({ path: [], query: "romans" })).toEqual({
+    expect(toFoldersQuery({ path: [], query: "romans", ...UNSORTED })).toEqual({
       q: "romans",
     });
-    expect(toFoldersQuery({ path: ["2"], query: "romans" })).toEqual({
+    expect(
+      toFoldersQuery({ path: ["2"], query: "romans", ...UNSORTED }),
+    ).toEqual({
       parent: 2,
       q: "romans",
     });
+  });
+
+  it("carries the sort where a folder has something to be sorted by: its name under the title, and its own size and dates", () => {
+    const sorted = (sortField: string, sortDirection: "asc" | "desc" = "asc") =>
+      toFoldersQuery({ path: [], query: "", sortField, sortDirection });
+    expect(sorted("title", "desc")).toEqual({
+      sort: "name",
+      direction: "desc",
+    });
+    expect(sorted("size")).toEqual({ sort: "size", direction: "asc" });
+    expect(sorted("updatedAt", "desc")).toEqual({
+      sort: "updatedAt",
+      direction: "desc",
+    });
+    expect(sorted("createdAt")).toEqual({
+      sort: "createdAt",
+      direction: "asc",
+    });
+    // Under any other column the folders stay in their own order.
+    expect(sorted("slug", "desc")).toEqual({});
+    expect(sorted("mime")).toEqual({});
   });
 });
 

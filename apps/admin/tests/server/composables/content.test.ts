@@ -17,19 +17,23 @@ const BODY = {
 
 const ROW = {
   id: 3,
+  mime: "application/vnd.bbf.article+json",
   slug: "about-us",
   title: "About Us",
   folder_id: null as number | null,
   description: null as string | null,
   body: null as unknown,
+  size: 0,
   created_at: new Date("2026-10-17T18:00:00Z"),
   updated_at: new Date("2026-10-18T09:30:00Z"),
 };
 
 const RECORD = {
   id: 3,
+  mime: "application/vnd.bbf.article+json",
   slug: "about-us",
   title: "About Us",
+  size: 0,
   createdAt: "2026-10-17T18:00:00.000Z",
   updatedAt: "2026-10-18T09:30:00.000Z",
 };
@@ -79,7 +83,7 @@ const NONE: Record<string, string | null> = {
   q: null,
   tz: "America/Los_Angeles",
   ...Object.fromEntries([
-    ...["title", "slug"].flatMap((column) =>
+    ...["title", "slug", "mime"].flatMap((column) =>
       TEXT_OPERATORS.map((operator) => [`${column}_${operator}`, null]),
     ),
     ...DAY_OPERATORS.map((operator) => [`updated_${operator}`, null]),
@@ -169,6 +173,7 @@ describe("useContent", () => {
       titleContains: "about",
       titleNot: "Welcome",
       slugStartsWith: "about",
+      mimeStartsWith: "image/",
       updatedAtOnOrAfter: "2026-10-01",
       updatedAtBefore: "2026-11-01",
     });
@@ -179,6 +184,7 @@ describe("useContent", () => {
       title_contains: "about",
       title_not: "Welcome",
       slug_starts_with: "about",
+      mime_starts_with: "image/",
       updated_on_or_after: "2026-10-01",
       updated_before: "2026-11-01",
       ...ORDER,
@@ -218,6 +224,14 @@ describe("useContent", () => {
     await useContent().list({ sort: "createdAt" });
     expect(list).toHaveBeenLastCalledWith(
       expect.objectContaining({ sort: "created_at" }),
+    );
+    await useContent().list({ sort: "mime" });
+    expect(list).toHaveBeenLastCalledWith(
+      expect.objectContaining({ sort: "mime" }),
+    );
+    await useContent().list({ sort: "size" });
+    expect(list).toHaveBeenLastCalledWith(
+      expect.objectContaining({ sort: "size" }),
     );
   });
 

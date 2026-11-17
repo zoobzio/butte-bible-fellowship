@@ -41,6 +41,8 @@ const BARE = {
 const STAMPS = {
   id: 4,
   folder_id: null,
+  mime: "application/vnd.bbf.article+json",
+  size: 512,
   created_at: new Date("2026-10-17T18:00:00.000Z"),
   updated_at: new Date("2026-10-18T09:30:00.000Z"),
 };
@@ -50,10 +52,12 @@ describe("toContentRecord", () => {
     const record = toContentRecord({ ...HOME, ...STAMPS });
     expect(record).toEqual({
       id: 4,
+      mime: "application/vnd.bbf.article+json",
       slug: "index",
       title: "Butte Bible Fellowship",
       description: "A local church.",
       body: BODY,
+      size: 512,
       createdAt: "2026-10-17T18:00:00.000Z",
       updatedAt: "2026-10-18T09:30:00.000Z",
     });

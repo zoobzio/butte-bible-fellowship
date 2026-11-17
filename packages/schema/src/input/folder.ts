@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { listingQuery } from "./listing";
+import { listingQuery, sorting } from "./listing";
 
 export const folderId = z.object({
   id: z.coerce
@@ -11,6 +11,19 @@ export const folderId = z.object({
       description: "What names it to the admin: its row's number.",
       examples: [1],
     }),
+});
+
+export const FOLDER_SORT_KEYS = [
+  "name",
+  "size",
+  "createdAt",
+  "updatedAt",
+] as const;
+
+export const folderSort = z.enum(FOLDER_SORT_KEYS).meta({
+  description:
+    "What a level's folders may be sorted by: the name, or what a folder shows under a column of the documents.",
+  examples: ["name"],
 });
 
 export const foldersQuery = z.object({
@@ -29,6 +42,7 @@ export const foldersQuery = z.object({
       "Free text the folders' names are searched for, without regard to case. Left out or empty, every folder of the level.",
     examples: ["sermons"],
   }),
+  ...sorting(folderSort),
 });
 
 export const folderBody = z

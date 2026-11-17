@@ -28,6 +28,7 @@ import type {
   folderDraft,
   folderId,
   folderPlacement,
+  folderSort,
   foldersQuery,
 } from "./input/folder";
 import type { homeArticle, homeBody, homeForm, homeImage } from "./input/home";
@@ -54,7 +55,7 @@ import type {
 } from "./input/view";
 import type { aboutRecord } from "./models/about";
 import type { connectPage, connectRecord } from "./models/connect";
-import type { contentRecord, contentRecords } from "./models/content";
+import type { contentRecord, contentRecords, mime } from "./models/content";
 import type {
   churchEvent,
   churchEvents,
@@ -152,6 +153,8 @@ export type ConnectForm = z.infer<typeof connectForm>;
 
 export type ConnectArticle = z.infer<typeof connectArticle>;
 
+export type Mime = z.infer<typeof mime>;
+
 export type ContentRecord = z.infer<typeof contentRecord>;
 
 export type ContentRecords = z.infer<typeof contentRecords>;
@@ -179,6 +182,8 @@ export type FolderRecord = z.infer<typeof folderRecord>;
 export type FolderRecords = z.infer<typeof folderRecords>;
 
 export type FolderId = z.infer<typeof folderId>;
+
+export type FolderSort = z.infer<typeof folderSort>;
 
 export type FoldersQuery = z.infer<typeof foldersQuery>;
 

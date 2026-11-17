@@ -8,6 +8,7 @@ const ROW = {
   parent_id: null as number | null,
   name: "Sermon notes",
   count: 1,
+  size: 4096,
   created_at: new Date("2026-10-17T18:00:00Z"),
   updated_at: new Date("2026-10-18T09:30:00Z"),
 };
@@ -16,9 +17,13 @@ const RECORD = {
   id: 3,
   name: "Sermon notes",
   count: 1,
+  size: 4096,
   createdAt: "2026-10-17T18:00:00.000Z",
   updatedAt: "2026-10-18T09:30:00.000Z",
 };
+
+/* A level in its own order, by name. */
+const ORDER = { sort: null as string | null, direction: "asc" };
 
 /* Folder 3 at the top, folder 4 inside it, and the new one, 5. */
 const NESTED = { ...ROW, id: 4, parent_id: 3, name: "Romans", count: 0 };
@@ -74,18 +79,59 @@ afterEach(() => {
 describe("useFolders", () => {
   it("lists the folders at the top, or those inside the folder the query names", async () => {
     expect(await useFolders().list({})).toEqual([RECORD]);
-    expect(list).toHaveBeenLastCalledWith({ parent_id: null, q: null });
+    expect(list).toHaveBeenLastCalledWith({
+      parent_id: null,
+      q: null,
+      ...ORDER,
+    });
     expect(await useFolders().list({ parent: 3 })).toEqual([
       { ...RECORD, id: 4, parent: 3, name: "Romans", count: 0 },
     ]);
-    expect(list).toHaveBeenLastCalledWith({ parent_id: 3, q: null });
+    expect(list).toHaveBeenLastCalledWith({ parent_id: 3, q: null, ...ORDER });
   });
 
   it("searches a level's names for the text the query carries, and for nothing when none is typed", async () => {
     await useFolders().list({ parent: 3, q: "romans" });
-    expect(list).toHaveBeenLastCalledWith({ parent_id: 3, q: "romans" });
+    expect(list).toHaveBeenLastCalledWith({
+      parent_id: 3,
+      q: "romans",
+      ...ORDER,
+    });
     await useFolders().list({ q: "" });
-    expect(list).toHaveBeenLastCalledWith({ parent_id: null, q: null });
+    expect(list).toHaveBeenLastCalledWith({
+      parent_id: null,
+      q: null,
+      ...ORDER,
+    });
+  });
+
+  it("asks for the sort the query names, by the row's column, ascending unless told", async () => {
+    await useFolders().list({ sort: "name" });
+    expect(list).toHaveBeenLastCalledWith({
+      parent_id: null,
+      q: null,
+      sort: "name",
+      direction: "asc",
+    });
+    await useFolders().list({
+      parent: 3,
+      sort: "updatedAt",
+      direction: "desc",
+    });
+    expect(list).toHaveBeenLastCalledWith({
+      parent_id: 3,
+      q: null,
+      sort: "updated_at",
+      direction: "desc",
+    });
+    await useFolders().list({ sort: "createdAt" });
+    expect(list).toHaveBeenLastCalledWith(
+      expect.objectContaining({ sort: "created_at" }),
+    );
+    await useFolders().list({ sort: "size" });
+    expect(list).toHaveBeenLastCalledWith(
+      expect.objectContaining({ sort: "size" }),
+    );
   });
 
   it("fetches one folder by id, or nothing", async () => {

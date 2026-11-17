@@ -7,6 +7,8 @@ import { toContentBody, toContentForm } from "../../src/vm/content";
 
 const STAMPS = {
   id: 7,
+  mime: "application/vnd.bbf.article+json",
+  size: 0,
   createdAt: "2026-10-17T18:00:00.000Z",
   updatedAt: "2026-10-18T09:30:00.000Z",
 };

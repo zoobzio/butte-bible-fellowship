@@ -29,7 +29,7 @@ export type ContentRefusal =
   (typeof CONTENT_REFUSALS)[keyof typeof CONTENT_REFUSALS];
 
 /** The text columns of a page, each filtered by the text operators. */
-const TEXT_COLUMNS = ["title", "slug"] as const;
+const TEXT_COLUMNS = ["title", "slug", "mime"] as const;
 
 /** The day columns of a page, by the name the list query gives each. */
 const DAY_COLUMNS = { updated: "updatedAt" } as const;
@@ -51,6 +51,8 @@ const toSearch = (query: ContentQuery) => ({
 const SORT_COLUMNS: Record<ContentSort, string> = {
   title: "title",
   slug: "slug",
+  mime: "mime",
+  size: "size",
   createdAt: "created_at",
   updatedAt: "updated_at",
 };
