@@ -36,11 +36,22 @@ export interface Held {
 }
 
 /**
+ * What is selected in the browser, by the keys of its rows: the documents
+ * and the folders apart, as a folder's key and a document's may be the same.
+ */
+export interface Selected {
+  documents: string[];
+  folders: string[];
+}
+
+/**
  * What the browser's rows have asked for, which the content page carries
- * out: a folder to rename, a folder to remove, and what is held to move.
+ * out: a folder to rename, a folder to remove, the documents and folders
+ * selected to remove together, and what is held to move.
  */
 export interface ContentTasks {
   renaming: BrowserFolder | null;
   removing: BrowserFolder | null;
+  removingSelected: Selected | null;
   held: Held | null;
 }

@@ -39,7 +39,9 @@ export const useFolderFetch = (): BrowserFetch<ContentRecord> => {
  * The content browser: the config of the constants over the admin's API. A
  * document's edit is the way to its editor. Its move, and a folder's rename,
  * move and delete, are left as requests for the content page to carry out,
- * each of a move with the folder it was picked up in. The layer's factory
+ * each of a move with the folder it was picked up in. The rows select,
+ * folders and documents alike, and the removal of the ones selected is
+ * left as a request too. The layer's factory
  * names the columns, the actions and the root from the prose as the
  * browser is built in setup, in the visitor's locale.
  */
@@ -88,6 +90,17 @@ export const useContentBrowser = createBrowser<ContentRecord>("content", {
       icon: "remove",
       action: (asked) => {
         useContentRequests().value.removing = asked;
+      },
+    },
+  },
+  bulkActions: {
+    remove: {
+      label: "admin.editor.delete",
+      action: (selected, folders) => {
+        useContentRequests().value.removingSelected = {
+          documents: [...selected],
+          folders: [...folders],
+        };
       },
     },
   },

@@ -5,8 +5,13 @@ import type { ContentTasks } from "~/types/content";
 
 import { computed, ref, useNuxtApp, useState, watch } from "#imports";
 import { useApi } from "~/composables/api";
-import { folder, parent, placement } from "~/composables/content/routes";
-import { failure } from "~/utils/errors";
+import {
+  endpoint,
+  folder,
+  parent,
+  placement,
+} from "~/composables/content/routes";
+import { failure, isNotFound } from "~/utils/errors";
 import { folderId, folderOf } from "~/utils/folders";
 
 /**
@@ -19,6 +24,7 @@ export const useContentRequests = (): Ref<ContentTasks> =>
   useState<ContentTasks>("content:tasks", () => ({
     renaming: null,
     removing: null,
+    removingSelected: null,
     held: null,
   }));
 
@@ -29,9 +35,14 @@ export const useContentRequests = (): Ref<ContentTasks> =>
  * `renamed` ends it. `held` is what a move picked up: `drop` puts it down
  * in the open folder, `release` lets it go where it was, and `droppable`
  * says whether here is somewhere else to put it. A folder asked to be
- * removed is asked about by name first, then removed. Each lists the
- * folder afresh once done; what fails reports through `error`, which the
- * next try clears, and `busy` holds while one is under way.
+ * removed is asked about by name first, then removed. The documents and
+ * folders selected, asked to be removed together, are asked about by their
+ * count first, then removed, each on its own, so one that fails keeps none
+ * of the rest: one already gone counts as removed, and only the ones that
+ * could not be removed stay selected, as the folder listed afresh still
+ * holds them. Each lists the folder afresh once done; what fails reports
+ * through `error`, which the next try clears, and `busy` holds while one
+ * is under way.
  */
 export const useContentTasks = (
   browser: ReturnType<UseBrowser<ContentRecord>>,
@@ -108,6 +119,35 @@ export const useContentTasks = (
       }
       run(async () => {
         await api(folder(folderId(asked)), { method: "DELETE" });
+      });
+    },
+    { immediate: true },
+  );
+
+  watch(
+    () => requests.value.removingSelected,
+    (asked) => {
+      if (asked === null) return;
+      requests.value.removingSelected = null;
+      const count = asked.documents.length + asked.folders.length;
+      if (count === 0) return;
+      if (!globalThis.confirm($t.admin.content.confirmMany({ count }))) return;
+      run(async () => {
+        const results = await Promise.allSettled([
+          ...asked.documents.map((id) =>
+            api(endpoint(Number(id)), { method: "DELETE" }),
+          ),
+          ...asked.folders.map((id) =>
+            api(folder(Number(id)), { method: "DELETE" }),
+          ),
+        ]);
+        const failed = results.find(
+          (result) =>
+            result.status === "rejected" && !isNotFound(result.reason),
+        );
+        if (failed?.status === "rejected") {
+          error.value = failure(failed.reason) ?? $t.admin.editor.failed();
+        }
       });
     },
     { immediate: true },

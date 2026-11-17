@@ -23,8 +23,9 @@ useHead(() => ({ title: $t.admin.content.title() }));
 
 /*
  * What the rows ask for, carried out on the folder that is open: a folder
- * renamed or removed, and a document or a folder moved, picked up on its row
- * and put down in whichever folder is opened next.
+ * renamed or removed, a document or a folder moved, picked up on its row
+ * and put down in whichever folder is opened next, and the documents and
+ * folders selected removed together, once asked about.
  */
 const {
   here,

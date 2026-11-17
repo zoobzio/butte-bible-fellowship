@@ -94,6 +94,7 @@ describe("bundles", () => {
       "admin.member.photoConfirm",
       "admin.event.imageConfirm",
       "admin.content.moving",
+      "admin.content.confirmMany",
       "admin.staff.confirmMany",
       "connect.map",
     ];
@@ -142,6 +143,14 @@ describe("bundles", () => {
     ).toEqual([
       "Delete 1 member? This cannot be undone.",
       "Delete 3 members? This cannot be undone.",
+    ]);
+    expect(
+      [1, 3].map((count) =>
+        prosary.format("admin.content.confirmMany", { count }),
+      ),
+    ).toEqual([
+      "Delete 1 item? This cannot be undone.",
+      "Delete 3 items? This cannot be undone.",
     ]);
     expect(
       prosary.format("admin.content.moving", { name: "Sermon notes" }),

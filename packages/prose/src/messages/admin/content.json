@@ -63,6 +63,10 @@
     "defaultMessage": "Moving {name}. Open the folder it belongs in.",
     "description": "What the page says over the folders while a document or a folder is picked up to be moved, and what to do next. `name` is the document's title or the folder's name."
   },
+  "confirmMany": {
+    "defaultMessage": "Delete {count, plural, one {# item} other {# items}}? This cannot be undone.",
+    "description": "The question asked before the documents and folders selected in the content's browser are deleted together. `count` is how many are selected, documents and folders alike."
+  },
   "moveHere": {
     "defaultMessage": "Move here",
     "description": "The button that puts what was picked up down in the folder that is open."

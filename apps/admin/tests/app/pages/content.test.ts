@@ -130,7 +130,9 @@ describe("content page", () => {
     ]);
     expect(
       wrapper
-        .findAll(`${POST}:first-child .f-td:not(.f-data-browser-actions)`)
+        .findAll(
+          `${POST}:first-child .f-td:not(.f-data-browser-select, .f-data-browser-actions)`,
+        )
         .map((cell) => cell.text()),
     ).toEqual([
       "Butte Bible Fellowship",
@@ -144,7 +146,9 @@ describe("content page", () => {
   it("shows of a folder, under the documents' columns, how much all that is under it holds and when the last of it was changed", async () => {
     const { wrapper } = await mountContent({ folders: [NOTES] });
     const cells = wrapper
-      .findAll(`${FOLDER} .f-td:not(.f-data-browser-actions)`)
+      .findAll(
+        `${FOLDER} .f-td:not(.f-data-browser-select, .f-data-browser-actions)`,
+      )
       .map((cell) => cell.text());
     // Its name and its count, nothing under the slug or the type, then
     // its size and the day.
@@ -768,6 +772,132 @@ describe("moving", () => {
     );
     expect(wrapper.find(".content-error").text()).toBe("The folder is gone");
     expect(wrapper.find(".content-move").exists()).toBe(true);
+  });
+});
+
+describe("selection", () => {
+  type Mounted = Awaited<ReturnType<typeof mountContent>>["wrapper"];
+
+  const BAR = ".f-data-browser-bulk-actions";
+  const COUNT = ".f-data-browser-bulk-actions-count";
+
+  /** Ticks each row given, folders first, by the box its row leads with. */
+  const select = async (wrapper: Mounted, ...rows: number[]) => {
+    const boxes = wrapper.findAll(
+      ".f-tbody .f-data-browser-select [role=checkbox]",
+    );
+    for (const row of rows) await boxes[row]!.trigger("click");
+  };
+
+  /** Presses a button of the bar over the selection, by its label. */
+  const press = (wrapper: Mounted, label: string) =>
+    wrapper
+      .findAll(`${BAR} button`)
+      .find((button) => button.text() === label)!
+      .trigger("click");
+
+  it("offers nothing over the rows until one is selected, then how many are, and their removal", async () => {
+    const { wrapper } = await mountContent({
+      folders: [NOTES],
+      documents: [HOME, ABOUT],
+    });
+    expect(wrapper.find(BAR).exists()).toBe(false);
+    await select(wrapper, 0, 1);
+    expect(wrapper.find(COUNT).text()).toBe("2 selected");
+    expect(
+      wrapper.findAll(`${BAR} button`).map((button) => button.text()),
+    ).toEqual(["Delete", "Clear"]);
+  });
+
+  it("removes the documents and folders selected, once asked by their count, and lists the folder afresh with none selected", async () => {
+    const confirm = vi.fn(() => true);
+    vi.stubGlobal("confirm", confirm);
+    const { wrapper, fetch } = await mountContent({
+      folders: [NOTES],
+      documents: [HOME, ABOUT],
+    });
+    const listing = fetch.getMockImplementation()!;
+    await select(wrapper, 0, 1, 2);
+    // What was removed is gone from what the folder lists next.
+    fetch.mockImplementation(async (path, request) =>
+      request?.method === undefined &&
+      ["/api/content", "/api/content/folders"].includes(path)
+        ? []
+        : listing(path, request),
+    );
+    await press(wrapper, "Delete");
+    await flushPromises();
+    expect(confirm).toHaveBeenCalledWith(
+      "Delete 3 items? This cannot be undone.",
+    );
+    expect(writes(fetch)).toEqual([
+      ["/api/content/5", { method: "DELETE" }],
+      ["/api/content/6", { method: "DELETE" }],
+      ["/api/content/folders/2", { method: "DELETE" }],
+    ]);
+    expect(fetch).toHaveBeenLastCalledWith("/api/content", { query: {} });
+    expect(wrapper.find(BAR).exists()).toBe(false);
+    expect(wrapper.find(".content-error").exists()).toBe(false);
+  });
+
+  it("asks about one as one, and keeps it when the question is declined", async () => {
+    const confirm = vi.fn(() => false);
+    vi.stubGlobal("confirm", confirm);
+    const { wrapper, fetch } = await mountContent({ documents: [HOME, ABOUT] });
+    await select(wrapper, 1);
+    await press(wrapper, "Delete");
+    await flushPromises();
+    expect(confirm).toHaveBeenCalledWith(
+      "Delete 1 item? This cannot be undone.",
+    );
+    expect(writes(fetch)).toEqual([]);
+    expect(wrapper.find(COUNT).text()).toBe("1 selected");
+  });
+
+  it("says why one was not removed and keeps it selected, the rest removed", async () => {
+    vi.stubGlobal("confirm", () => true);
+    const { wrapper, fetch } = await mountContent({
+      folders: [NOTES],
+      documents: [HOME],
+    });
+    const listing = fetch.getMockImplementation()!;
+    await select(wrapper, 0, 1);
+    fetch.mockImplementation(async (path, request) => {
+      if (path === "/api/content/folders/2") {
+        throw { data: { message: "The folder is not empty" } };
+      }
+      // The document went; the folder that was refused is still listed.
+      if (path === "/api/content" && request?.method === undefined) return [];
+      return listing(path, request);
+    });
+    await press(wrapper, "Delete");
+    await flushPromises();
+    expect(writes(fetch)).toHaveLength(2);
+    expect(wrapper.find(".content-error").text()).toBe(
+      "The folder is not empty",
+    );
+    expect(wrapper.find(COUNT).text()).toBe("1 selected");
+    expect(
+      wrapper.findAll(".f-tbody .f-tr.f-data-browser-selected"),
+    ).toHaveLength(1);
+    expect(wrapper.find(`${FOLDER}.f-data-browser-selected`).exists()).toBe(
+      true,
+    );
+  });
+
+  it("counts one already gone as removed", async () => {
+    vi.stubGlobal("confirm", () => true);
+    const { wrapper, fetch } = await mountContent({ documents: [HOME] });
+    await select(wrapper, 0);
+    fetch.mockImplementation(async (path, request) => {
+      if (request?.method !== undefined) throw { status: 404 };
+      return [];
+    });
+    await press(wrapper, "Delete");
+    await flushPromises();
+    expect(writes(fetch)).toEqual([["/api/content/5", { method: "DELETE" }]]);
+    expect(wrapper.find(".content-error").exists()).toBe(false);
+    expect(wrapper.find(BAR).exists()).toBe(false);
   });
 });
 

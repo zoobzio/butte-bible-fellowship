@@ -147,8 +147,41 @@
   color: var(--on-surface-high-contrast);
 }
 
-/* The controls: the sort, the refresh and each row's actions, outlined. */
+/*
+ * The bar over the selection: a box of its own between the toolbar and the
+ * card, bordered as the card is and filled as the card's head is, so what
+ * is done to the rows selected stands apart from the rows.
+ */
+.f-data-browser-bulk-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-2) var(--space-2) var(--space-4);
+  border: 1px var(--stroke-solid) var(--rule);
+  border-radius: var(--shape-md);
+  background: var(--surface-container);
+  color: var(--on-surface-muted);
+  font-size: var(--label-size);
+}
+
+.f-data-browser-bulk-actions-count {
+  margin-right: auto;
+}
+
+/* What is done to the selection is worded, so it pads as a label does. */
+.f-data-browser-bulk-actions > .f-button {
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  font: var(--type-label);
+}
+
+/*
+ * The controls: the sort, the refresh, each row's actions and what is done
+ * to the selection, outlined.
+ */
 .f-data-browser-toolbar > .f-button,
+.f-data-browser-bulk-actions > .f-button,
 .f-data-browser-actions .f-button {
   display: inline-flex;
   align-items: center;
@@ -166,6 +199,7 @@
 }
 
 .f-data-browser-toolbar > .f-button:hover,
+.f-data-browser-bulk-actions > .f-button:hover,
 .f-data-browser-actions .f-button:hover {
   color: var(--on-surface-high-contrast);
   border-color: color-mix(in oklab, var(--primary) 65%, transparent);
@@ -206,6 +240,11 @@
   .f-tr:not(.f-data-browser-no-files):hover
   .f-td {
   background: color-mix(in oklab, var(--primary-container) 25%, transparent);
+}
+
+/* A row that is selected stays lit, a shade deeper. */
+.f-data-browser .f-tbody .f-tr.f-data-browser-selected .f-td {
+  background: color-mix(in oklab, var(--primary-container) 40%, transparent);
 }
 
 .f-data-browser .f-tbody:last-child .f-tr:last-child .f-td:first-child {
@@ -279,6 +318,11 @@
   padding: var(--space-6) var(--space-3);
   color: var(--on-surface-muted);
   text-align: center;
+}
+
+/* The select column is as wide as its checkbox and the cell's padding. */
+.f-data-browser-select {
+  width: 1%;
 }
 
 .f-data-browser-actions {
