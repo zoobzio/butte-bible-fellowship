@@ -7,6 +7,10 @@
     "defaultMessage": "The documents written here, in folders of your own making: what each says, and what search engines show for it.",
     "description": "The line under the title of the page that browses the content: what it holds. The home page, About Us and the connect page are not among the documents: they are under Site."
   },
+  "allView": {
+    "defaultMessage": "All content",
+    "description": "The name of the view of the content's browser that the admin starts with: every folder and document of the folder that is open, in their own order, with nothing searched for. Shown as the first tab over the browser, beside the views a user has saved."
+  },
   "new": {
     "defaultMessage": "New document",
     "description": "The button that opens the form of a new document, and the title of that form's dialog."

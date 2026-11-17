@@ -1,5 +1,5 @@
 <script lang="ts">
-import { Browser, Dialog, Icon, NuxtLink } from "#components";
+import { Browser, Dialog, Icon, NuxtLink, Views } from "#components";
 import { computed, definePageMeta, ref, useHead, useNuxtApp } from "#imports";
 
 import ContentEditor from "~/components/ContentEditor.vue";
@@ -10,6 +10,8 @@ import {
   useContentBrowser,
 } from "~/composables/content/browser";
 import { useContentTasks } from "~/composables/content/tasks";
+import { useContentViews } from "~/composables/content/views";
+import { useViewsRequest } from "~/composables/views";
 import { link } from "~/constants/content";
 </script>
 
@@ -18,6 +20,13 @@ definePageMeta({ middleware: "auth", auth: { scopes: ["content:read"] } });
 
 const { $t } = useNuxtApp();
 const browser = useContentBrowser();
+
+/*
+ * The saved views sit over the browser: its sort and its search under a
+ * name, the admin's own first and then whoever is signed in's, each a tab.
+ * One picked is put in place in the folder that is open.
+ */
+const views = useContentViews(browser);
 
 useHead(() => ({ title: $t.admin.content.title() }));
 
@@ -70,6 +79,7 @@ const named = async () => {
   await renamed();
 };
 
+await useViewsRequest(views);
 await useBrowserRequest(browser);
 </script>
 
@@ -101,6 +111,7 @@ await useBrowserRequest(browser);
     </button>
   </div>
   <p v-if="error" class="content-error" role="alert">{{ error }}</p>
+  <Views :service="views" />
   <Browser :service="browser">
     <template #cell:title="{ row }">
       <NuxtLink :to="link(row)" class="f-anchor">{{ row.title }}</NuxtLink>

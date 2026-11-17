@@ -14,6 +14,7 @@ const VIEW = {
 describe("viewSurface", () => {
   it("names a list of the admin that has views, and no other", () => {
     expect(viewSurface.parse("staff")).toBe("staff");
+    expect(viewSurface.parse("content")).toBe("content");
     expect(viewSurface.safeParse("sermons").success).toBe(false);
   });
 });

@@ -48,6 +48,8 @@ import type {
   staffSort,
 } from "./input/staff";
 import type {
+  contentView,
+  contentViewBody,
   staffView,
   staffViewBody,
   viewList,
@@ -256,3 +258,7 @@ export interface ViewBody {
 export type StaffView = z.infer<typeof staffView>;
 
 export type StaffViewBody = z.infer<typeof staffViewBody>;
+
+export type ContentView = z.infer<typeof contentView>;
+
+export type ContentViewBody = z.infer<typeof contentViewBody>;

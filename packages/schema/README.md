@@ -119,13 +119,17 @@ is on the staff, and whatever event is written, is on the site.
 A saved view is a named arrangement of one of the admin's lists, and every
 list's are stored in one table, the arrangement as JSON, so the schema is
 what holds each to its shape. `VIEW_SURFACES` names the lists that have
-views, `staff` the first, and `VIEW_PAYLOADS` and `VIEW_BODIES` carry, by
+views, `staff` and `content`, and `VIEW_PAYLOADS` and `VIEW_BODIES` carry, by
 that name, the schema of the list's payload and of a save of it:
-`staffView` and `staffViewBody`. `tableView` builds the payload of a view
+`staffView` and `staffViewBody`, `contentView` and `contentViewBody`.
+`tableView` builds the payload of a view
 over a table — its sort, its columns' order, visibility and widths, its
 page's size and its search — from the columns the list's API sorts by and
 filters by, so a view saved never asks the API for what it would refuse,
-and a page stays within `LISTING_MAX_SIZE`. A save is checked against it;
+and a page stays within `LISTING_MAX_SIZE`. `browserView` builds the same
+over a browser, which the content is: its one sort and its search, and not
+the folder that is open, so a view is put in place wherever the browser
+stands. A save is checked against it;
 `viewRecord` carries the payload back as it was stored, unchecked, so a
 view saved before its list changed still reads, and the admin, which reads
 each through the same schema, sets it aside rather than failing the list.

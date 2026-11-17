@@ -1,9 +1,13 @@
-import type { ContentRecord, FolderRecord } from "@bbf/schema/types";
+import type {
+  ContentRecord,
+  FolderRecord,
+  ViewRecord,
+} from "@bbf/schema/types";
 
 import { describe, expect, it, vi } from "vitest";
 import { flushPromises, mount } from "@vue/test-utils";
 
-import { Browser, Dialog, Editor, NuxtPage } from "#components";
+import { Browser, Dialog, Editor, NuxtPage, Views } from "#components";
 import { setRoutePath, useRouter } from "#imports";
 import ContentBody from "~/components/ContentBody.vue";
 import ContentEditor from "~/components/ContentEditor.vue";
@@ -23,13 +27,36 @@ type Request = { method?: string; query?: Record<string, unknown> };
 /** What one folder holds: the folders inside it, and the documents filed in it. */
 type Held = { folders?: FolderRecord[]; documents?: ContentRecord[] };
 
+/** A view of the content someone saved: the images, the largest first. */
+const IMAGES: ViewRecord = {
+  id: "0b1f4c4e-6f0a-4d0e-9a57-3f0c1c2d4e5f",
+  surface: "content",
+  name: "Images",
+  payload: {
+    sortField: "size",
+    sortDirection: "desc",
+    entries: [
+      { kind: "filter", key: "mime", op: "starts with", value: "image/" },
+    ],
+  },
+  createdAt: "2026-10-17T18:00:00.000Z",
+  updatedAt: "2026-10-18T09:30:00.000Z",
+};
+
 /**
  * The admin's API over the content: the top holds `top`, and each folder what
- * `inside` gives under its id. Every write answers with `answer`.
+ * `inside` gives under its id. Every write answers with `answer`, and the
+ * views whoever is signed in has saved are `saved`.
  */
-const api = (top: Held, inside: Record<number, Held> = {}, answer?: unknown) =>
+const api = (
+  top: Held,
+  inside: Record<number, Held> = {},
+  answer?: unknown,
+  saved: ViewRecord[] = [],
+) =>
   vi.fn(async (path: string, request: Request = {}) => {
     if (request.method !== undefined) return answer;
+    if (path.startsWith("/api/views/")) return saved;
     if (path === "/api/content/folders") {
       const parent = request.query?.parent as number | undefined;
       return (parent === undefined ? top : inside[parent])?.folders ?? [];
@@ -43,13 +70,28 @@ const mountContent = async (
   top: Held,
   inside: Record<number, Held> = {},
   answer?: unknown,
+  saved: ViewRecord[] = [],
 ) => {
-  const fetch = api(top, inside, answer);
+  const fetch = api(top, inside, answer, saved);
   vi.stubGlobal("$fetch", fetch);
   const { wrapper, error } = await mountSuspended(Index);
   expect(error).toBeUndefined();
   return { wrapper, fetch };
 };
+
+type Mounted = Awaited<ReturnType<typeof mountContent>>["wrapper"];
+
+/** The titles of the page's own dialogs: the views have theirs too. */
+const DIALOGS = {
+  document: "New document",
+  folder: "New folder",
+};
+
+/** A dialog of the page's own, by its title. */
+const dialogOf = (wrapper: Mounted, title: string) =>
+  wrapper
+    .findAllComponents(Dialog)
+    .find((dialog) => dialog.props("title") === title)!;
 
 /** The writes the API was asked for, the reads left out. */
 const writes = (fetch: ReturnType<typeof api>) =>
@@ -96,7 +138,9 @@ describe("content page", () => {
     expect(wrapper.find("button.content-new-folder").text()).toBe("New folder");
     const browser = wrapper.findComponent(Browser);
     expect(browser.props("service").id).toBe("content");
-    expect(fetch).toHaveBeenCalledTimes(2);
+    // The views load first, so the browser's one listing reads the open one.
+    expect(fetch).toHaveBeenCalledTimes(3);
+    expect(fetch.mock.calls[0]).toEqual(["/api/views/content", {}]);
     expect(fetch).toHaveBeenCalledWith("/api/content/folders", { query: {} });
     expect(fetch).toHaveBeenCalledWith("/api/content", { query: {} });
     expect(browser.props("service").files).toEqual([HOME, ABOUT]);
@@ -397,6 +441,193 @@ describe("content page", () => {
   });
 });
 
+describe("content views", () => {
+  const services = (wrapper: Mounted) => ({
+    views: wrapper.findComponent(Views).props("service"),
+    browser: wrapper.findComponent(Browser).props("service"),
+  });
+
+  const ids = (views: { views: { id: string }[] }) =>
+    views.views.map((view) => view.id);
+
+  /** The reads of the content the API was asked for, the folders' left out. */
+  const listed = (fetch: ReturnType<typeof api>) =>
+    fetch.mock.calls.filter(([path]) => path === "/api/content");
+
+  it("opens on the admin's own view, the browser as it starts, with nothing edited", async () => {
+    const { wrapper } = await mountContent({ documents: [HOME] });
+    const { views, browser } = services(wrapper);
+    expect(views.id).toBe("content");
+    expect(views.initialized).toBe(true);
+    expect(views.views).toMatchObject([
+      { id: "all", name: "admin.content.allView", origin: "system" },
+    ]);
+    expect(views.active).toBe("all");
+    expect(views.current.payload).toEqual(browser.snapshot());
+    expect(views.drifted).toBe(false);
+    expect(views.editable).toBe(false);
+    expect(wrapper.find(".f-views").classes()).not.toContain("f-views-drifted");
+    expect(wrapper.findAll(".f-views-tabs .f-tabs-trigger")).toHaveLength(1);
+  });
+
+  it("lists the views whoever is signed in has saved after it, each their own, a tab apiece", async () => {
+    const { wrapper } = await mountContent({ documents: [HOME] }, {}, null, [
+      IMAGES,
+    ]);
+    const { views } = services(wrapper);
+    expect(views.views).toMatchObject([
+      { id: "all", origin: "system" },
+      { id: IMAGES.id, name: "Images", origin: "user" },
+    ]);
+    expect(views.stale).toEqual([]);
+    expect(wrapper.findAll(".f-views-tabs .f-tabs-trigger")).toHaveLength(2);
+    expect(wrapper.find(".f-views-tabs").text()).toContain("Images");
+  });
+
+  it("puts a view picked in place in the folder that is open, and lists it afresh as the view arranges it", async () => {
+    const { wrapper, fetch } = await mountContent(
+      { folders: [NOTES] },
+      { 2: { documents: [HOME] } },
+      null,
+      [IMAGES],
+    );
+    const { views, browser } = services(wrapper);
+    await wrapper.find(`${FOLDER} .f-data-browser-folder-btn`).trigger("click");
+    await flushPromises();
+    fetch.mockClear();
+    expect(await views.select(IMAGES.id)).toBe(true);
+    await flushPromises();
+    expect(listed(fetch)).toEqual([
+      [
+        "/api/content",
+        {
+          query: {
+            folder: 2,
+            mimeStartsWith: "image/",
+            sort: "size",
+            direction: "desc",
+          },
+        },
+      ],
+    ]);
+    expect(fetch).toHaveBeenCalledWith("/api/content/folders", {
+      query: { parent: 2, sort: "size", direction: "desc" },
+    });
+    expect(browser.pathKeys).toEqual(["2"]);
+    expect(views.active).toBe(IMAGES.id);
+    expect(views.editable).toBe(true);
+    expect(views.drifted).toBe(false);
+  });
+
+  it("marks the open view as edited once the browser moves off it, and holds a view picked over the edit", async () => {
+    const { wrapper } = await mountContent({ documents: [HOME] }, {}, null, [
+      IMAGES,
+    ]);
+    const { views, browser } = services(wrapper);
+    browser.query.add({ kind: "literal", key: "text", value: "fellowship" });
+    await flushPromises();
+    expect(views.drifted).toBe(true);
+    expect(wrapper.find(".f-views").classes()).toContain("f-views-drifted");
+    expect(wrapper.find(".f-views-badge").exists()).toBe(true);
+    expect(await views.select(IMAGES.id)).toBe(false);
+    expect(views.pending).toEqual({ kind: "select", id: IMAGES.id });
+    await views.resolve("cancel");
+    expect(views.active).toBe("all");
+    browser.query.clear();
+    await flushPromises();
+    expect(views.drifted).toBe(false);
+  });
+
+  it("saves the browser as it stands as a view of the user's own, through the API, the open folder no part of it", async () => {
+    const { wrapper, fetch } = await mountContent(
+      { folders: [NOTES] },
+      { 2: { documents: [HOME] } },
+    );
+    const { views, browser } = services(wrapper);
+    await wrapper.find(`${FOLDER} .f-data-browser-folder-btn`).trigger("click");
+    await flushPromises();
+    browser.query.add({ kind: "literal", key: "text", value: "fellowship" });
+    await flushPromises();
+    fetch.mockClear();
+    const view = await views.saveAs("Fellowship");
+    expect(view.id).toMatch(/^[0-9a-f-]{36}$/);
+    expect(fetch.mock.calls).toEqual([
+      [
+        `/api/views/content/${view.id}`,
+        {
+          method: "PUT",
+          body: {
+            name: "Fellowship",
+            payload: {
+              sortField: null,
+              sortDirection: "asc",
+              entries: [{ kind: "literal", key: "text", value: "fellowship" }],
+            },
+          },
+        },
+      ],
+    ]);
+    expect(views.active).toBe(view.id);
+    expect(views.editable).toBe(true);
+    expect(views.drifted).toBe(false);
+  });
+
+  it("saves over a view of the user's own, and removes it, through the API", async () => {
+    const { wrapper, fetch } = await mountContent(
+      { documents: [HOME] },
+      {},
+      null,
+      [IMAGES],
+    );
+    const { views, browser } = services(wrapper);
+    await views.select(IMAGES.id);
+    browser.query.add({ kind: "literal", key: "text", value: "easter" });
+    await flushPromises();
+    expect(views.drifted).toBe(true);
+    fetch.mockClear();
+    await views.save();
+    expect(fetch.mock.calls).toEqual([
+      [
+        `/api/views/content/${IMAGES.id}`,
+        {
+          method: "PUT",
+          body: {
+            name: "Images",
+            payload: expect.objectContaining({
+              sortField: "size",
+              entries: expect.arrayContaining([
+                { kind: "literal", key: "text", value: "easter" },
+              ]),
+            }),
+          },
+        },
+      ],
+    ]);
+    expect(views.drifted).toBe(false);
+
+    fetch.mockClear();
+    await views.remove(IMAGES.id, { force: true });
+    await flushPromises();
+    expect(fetch.mock.calls[0]).toEqual([
+      `/api/views/content/${IMAGES.id}`,
+      { method: "DELETE" },
+    ]);
+    expect(ids(views)).toEqual(["all"]);
+    expect(views.active).toBe("all");
+  });
+
+  it("sets a view its schema no longer accepts aside, and never applies it", async () => {
+    const stale = { ...IMAGES, payload: { sortField: "description" } };
+    const { wrapper } = await mountContent({ documents: [HOME] }, {}, null, [
+      stale,
+    ]);
+    const { views } = services(wrapper);
+    expect(ids(views)).toEqual(["all"]);
+    expect(views.stale).toMatchObject([{ id: IMAGES.id, name: "Images" }]);
+    expect(views.drifted).toBe(false);
+  });
+});
+
 describe("new document dialog", () => {
   const open = async (top: Held = { documents: [HOME] }) => {
     const mounted = await mountContent(top, { 2: {} }, ABOUT);
@@ -407,9 +638,8 @@ describe("new document dialog", () => {
 
   it("stays shut until a new document is asked for", async () => {
     const { wrapper } = await mountContent({ documents: [HOME] });
-    expect(
-      wrapper.findAllComponents(Dialog).map((dialog) => dialog.props("open")),
-    ).toEqual([false, false]);
+    expect(dialogOf(wrapper, DIALOGS.document).props("open")).toBe(false);
+    expect(dialogOf(wrapper, DIALOGS.folder).props("open")).toBe(false);
     expect(wrapper.findComponent(ContentEditor).exists()).toBe(false);
     expect(wrapper.findComponent(FolderEditor).exists()).toBe(false);
     expect(document.body.querySelector(".f-dialog-content")).toBeNull();
@@ -417,7 +647,7 @@ describe("new document dialog", () => {
 
   it("opens the editor on no record, over the browser, named and described", async () => {
     const { wrapper } = await open();
-    const dialog = wrapper.findAllComponents(Dialog)[0]!;
+    const dialog = dialogOf(wrapper, DIALOGS.document);
     expect(dialog.props()).toMatchObject({
       open: true,
       title: "New document",
@@ -445,7 +675,7 @@ describe("new document dialog", () => {
     expect(close.getAttribute("aria-label")).toBe("Cancel");
     close.click();
     await flushPromises();
-    expect(wrapper.findAllComponents(Dialog)[0]!.props("open")).toBe(false);
+    expect(dialogOf(wrapper, DIALOGS.document).props("open")).toBe(false);
     expect(wrapper.findComponent(ContentEditor).exists()).toBe(false);
     await wrapper.find("button.page-header-action").trigger("click");
     await flushPromises();
@@ -502,7 +732,7 @@ describe("folders", () => {
     const { wrapper, fetch } = await mountContent({ documents: [HOME] });
     await wrapper.find("button.content-new-folder").trigger("click");
     await flushPromises();
-    const dialog = wrapper.findAllComponents(Dialog)[1]!;
+    const dialog = dialogOf(wrapper, DIALOGS.folder);
     expect(dialog.props()).toMatchObject({
       open: true,
       title: "New folder",
@@ -550,7 +780,7 @@ describe("folders", () => {
   it("renames a folder from its row's actions, its name in the form to start from", async () => {
     const { wrapper, fetch } = await mountContent({ folders: [NOTES] });
     await act(wrapper, FOLDER, "Rename");
-    const dialog = wrapper.findAllComponents(Dialog)[1]!;
+    const dialog = dialogOf(wrapper, "Rename folder");
     expect(dialog.props()).toMatchObject({
       open: true,
       title: "Rename folder",
@@ -776,8 +1006,6 @@ describe("moving", () => {
 });
 
 describe("selection", () => {
-  type Mounted = Awaited<ReturnType<typeof mountContent>>["wrapper"];
-
   const BAR = ".f-data-browser-bulk-actions";
   const COUNT = ".f-data-browser-bulk-actions-count";
 

@@ -2,7 +2,12 @@ import { keys, within } from "objectively";
 import { z } from "zod";
 
 import { viewSurface } from "../models/view";
-import { LISTING_DEFAULT_SIZE, LISTING_MAX_SIZE } from "./listing";
+import { CONTENT_SORT_KEYS } from "./content";
+import {
+  LISTING_DEFAULT_SIZE,
+  LISTING_MAX_SIZE,
+  SORT_DIRECTIONS,
+} from "./listing";
 import { DATE_OPERATORS, MATCH_OPERATORS, TEXT_OPERATORS } from "./operators";
 import { STAFF_SORT_KEYS } from "./staff";
 
@@ -27,6 +32,34 @@ const among = (values: readonly string[], what: string) =>
   z.string().refine((value) => within(values, value), {
     error: `Not ${what} of the list.`,
   });
+
+/**
+ * The search a view holds, over the columns its list's API filters by: the
+ * text looked for, and a filter for each column and operator narrowed by.
+ */
+const entries = (columns: readonly string[]) =>
+  z
+    .array(
+      z.discriminatedUnion("kind", [
+        z.object({
+          kind: z.literal("literal"),
+          key: z.string().min(1),
+          value: z.string(),
+        }),
+        z.object({
+          kind: z.literal("filter"),
+          key: among(columns, "a column to filter by"),
+          op: among(OPERATORS, "an operator").optional(),
+          value: z.string(),
+        }),
+      ]),
+    )
+    .max(VIEW_ENTRIES_SIZE)
+    .default([])
+    .meta({
+      description:
+        "The search: the text looked for, and a filter for each column and operator narrowed by.",
+    });
 
 /**
  * The schema of a view over one of the admin's tables: the table's
@@ -81,28 +114,7 @@ export const tableView = ({
         description: "How many rows to a page.",
         examples: [25],
       }),
-    entries: z
-      .array(
-        z.discriminatedUnion("kind", [
-          z.object({
-            kind: z.literal("literal"),
-            key: z.string().min(1),
-            value: z.string(),
-          }),
-          z.object({
-            kind: z.literal("filter"),
-            key: among(columns, "a column to filter by"),
-            op: among(OPERATORS, "an operator").optional(),
-            value: z.string(),
-          }),
-        ]),
-      )
-      .max(VIEW_ENTRIES_SIZE)
-      .default([])
-      .meta({
-        description:
-          "The search: the text looked for, and a filter for each column and operator narrowed by.",
-      }),
+    entries: entries(columns),
   });
 
 /** The columns of the staff a view may filter by: the list's own filters. */
@@ -127,12 +139,66 @@ export const staffView = tableView({
 });
 
 /**
+ * The schema of a view over one of the admin's browsers: the browser's
+ * arrangement as it is saved, and as it is put back. A browser sorts by
+ * one column at a time, and has neither columns to arrange nor pages, so
+ * its view is the sort and the search alone: `sorts` names the columns the
+ * list's API sorts by and `columns` the ones it filters by, as a table's
+ * do. The folder that is open is no part of it: a view is put in place in
+ * whichever folder the browser stands in. Every member has a default, so a
+ * view saved before a member existed still reads.
+ *
+ * What it yields is the browser's snapshot, member for member.
+ */
+export const browserView = ({
+  sorts,
+  columns,
+}: {
+  sorts: readonly string[];
+  columns: readonly string[];
+}) =>
+  z.object({
+    sortField: among(sorts, "a column to sort by")
+      .nullable()
+      .default(null)
+      .meta({
+        description:
+          "The column the list is sorted by. None, the list's own order.",
+      }),
+    sortDirection: z.enum(SORT_DIRECTIONS).default("asc").meta({
+      description: "Which way the list is sorted.",
+    }),
+    entries: entries(columns),
+  });
+
+/**
+ * The columns of the content a view may filter by: the documents' own
+ * filters.
+ */
+export const CONTENT_VIEW_COLUMNS = [
+  "title",
+  "slug",
+  "mime",
+  "updatedAt",
+] as const;
+
+export const contentView = browserView({
+  sorts: CONTENT_SORT_KEYS,
+  columns: CONTENT_VIEW_COLUMNS,
+}).meta({
+  id: "ContentView",
+  description:
+    "A view of the content: the browser's sort and its search, put in place in whichever folder is open.",
+});
+
+/**
  * The schema each list's views are held to, by the list's name: what a
  * view's payload is checked against before it is saved, and what the admin
  * reads a stored one through.
  */
 export const VIEW_PAYLOADS = {
   staff: staffView,
+  content: contentView,
 } satisfies Record<z.infer<typeof viewSurface>, z.ZodType>;
 
 export const viewList = z.object({
@@ -171,7 +237,14 @@ export const staffViewBody = viewBody(staffView).meta({
     "A view of the staff as it is saved: what a save writes, or replaces.",
 });
 
+export const contentViewBody = viewBody(contentView).meta({
+  id: "ContentViewBody",
+  description:
+    "A view of the content as it is saved: what a save writes, or replaces.",
+});
+
 /** What a save of a view carries, by the list the view is of. */
 export const VIEW_BODIES = {
   staff: staffViewBody,
+  content: contentViewBody,
 } satisfies Record<z.infer<typeof viewSurface>, z.ZodType>;

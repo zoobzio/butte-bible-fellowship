@@ -1,8 +1,10 @@
-import type { ContentRecord, FolderSort } from "@bbf/schema/types";
+import type { ContentRecord, ContentView, FolderSort } from "@bbf/schema/types";
+import type { AppProsaryMessage } from "#imports";
 
 import type { BrowserConfig } from "~/types/content";
 import type { RecordLink } from "~/types/listing";
 
+import { contentView } from "@bbf/schema";
 import { TIME_ZONE } from "#layers/bbf/shared/constants/time";
 import { dated, textual } from "~/constants/listing";
 
@@ -84,3 +86,22 @@ export const FOLDER_SORTS: Partial<Record<string, FolderSort>> = {
   createdAt: "createdAt",
   updatedAt: "updatedAt",
 };
+
+/**
+ * The views of the content the admin itself has, before any a user saves:
+ * the browser as it starts, nothing sorted and nothing searched for, which
+ * is what its tab goes back to. Its payload is the schema's own defaults,
+ * as the browser starts from none of its own. Its name is a message of the
+ * prose, which the tabs resolve.
+ */
+export const CONTENT_VIEWS: {
+  id: string;
+  name: Extract<AppProsaryMessage, string>;
+  payload: ContentView;
+}[] = [
+  {
+    id: "all",
+    name: "admin.content.allView",
+    payload: contentView.parse({}),
+  },
+];

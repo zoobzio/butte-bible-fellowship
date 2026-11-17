@@ -1,11 +1,15 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  CONTENT_VIEW_COLUMNS,
   STAFF_VIEW_COLUMNS,
   VIEW_BODIES,
   VIEW_ENTRIES_SIZE,
   VIEW_NAME_LENGTH,
   VIEW_PAYLOADS,
+  browserView,
+  contentView,
+  contentViewBody,
   staffView,
   staffViewBody,
   tableView,
@@ -130,18 +134,105 @@ describe("staffView", () => {
   });
 });
 
+/** A browser as it starts: nothing sorted or searched. */
+const UNSORTED = { sortField: null, sortDirection: "asc", entries: [] };
+
+const IMAGES = {
+  sortField: "size",
+  sortDirection: "desc",
+  entries: [
+    { kind: "literal", key: "text", value: "easter" },
+    { kind: "filter", key: "mime", op: "starts with", value: "image/" },
+  ],
+};
+
+describe("browserView", () => {
+  const view = browserView({ sorts: ["title"], columns: ["title", "slug"] });
+
+  it("fills in whatever a view leaves out, so one saved before a member existed reads", () => {
+    expect(view.parse({})).toEqual(UNSORTED);
+  });
+
+  it("sorts by a column named to sort by, or by none, and filters by the ones named to filter by", () => {
+    expect(view.safeParse({ sortField: "title" }).success).toBe(true);
+    expect(view.safeParse({ sortField: null }).success).toBe(true);
+    expect(view.safeParse({ sortField: "slug" }).success).toBe(false);
+    expect(
+      view.safeParse({
+        entries: [{ kind: "filter", key: "slug", value: "welcome" }],
+      }).success,
+    ).toBe(true);
+    expect(
+      view.safeParse({
+        entries: [{ kind: "filter", key: "body", value: "welcome" }],
+      }).success,
+    ).toBe(false);
+  });
+});
+
+describe("contentView", () => {
+  it("accepts the content browser's arrangement, and hands it back as it came", () => {
+    expect(contentView.parse(IMAGES)).toEqual(IMAGES);
+    expect(contentView.parse({})).toEqual(UNSORTED);
+  });
+
+  it("drops what is no part of an arrangement, the folder that is open with it", () => {
+    expect(contentView.parse({ ...IMAGES, path: ["2"] })).toEqual(IMAGES);
+  });
+
+  it("sorts by a column the API sorts the content by, one way or the other, and no other", () => {
+    const sorted = (sortField: string) =>
+      contentView.safeParse({ sortField }).success;
+    expect(sorted("size")).toBe(true);
+    expect(sorted("createdAt")).toBe(true);
+    expect(sorted("description")).toBe(false);
+    expect(contentView.safeParse({ sortDirection: "desc" }).success).toBe(true);
+    expect(contentView.safeParse({ sortDirection: "down" }).success).toBe(
+      false,
+    );
+  });
+
+  it("filters by a column the API filters the content by, under an operator the schema names", () => {
+    const filtered = (filter: Record<string, string>) =>
+      contentView.safeParse({ entries: [{ kind: "filter", ...filter }] })
+        .success;
+    for (const key of CONTENT_VIEW_COLUMNS) {
+      expect(filtered({ key, value: "x" }), key).toBe(true);
+    }
+    expect(filtered({ key: "size", value: "x" })).toBe(false);
+    expect(filtered({ key: "mime", op: "starts with", value: "x" })).toBe(true);
+    expect(filtered({ key: "mime", op: "sounds like", value: "x" })).toBe(
+      false,
+    );
+  });
+
+  it("holds the search to a size", () => {
+    const entry = { kind: "literal", key: "text", value: "x" };
+    expect(
+      contentView.safeParse({
+        entries: Array.from({ length: VIEW_ENTRIES_SIZE + 1 }, () => entry),
+      }).success,
+    ).toBe(false);
+  });
+});
+
 describe("VIEW_PAYLOADS and VIEW_BODIES", () => {
   it("have a schema for every list that has views", () => {
     expect(Object.keys(VIEW_PAYLOADS)).toEqual([...VIEW_SURFACES]);
     expect(Object.keys(VIEW_BODIES)).toEqual([...VIEW_SURFACES]);
     expect(VIEW_PAYLOADS.staff).toBe(staffView);
     expect(VIEW_BODIES.staff).toBe(staffViewBody);
+    expect(VIEW_PAYLOADS.content).toBe(contentView);
+    expect(VIEW_BODIES.content).toBe(contentViewBody);
   });
 });
 
 describe("viewList and viewPath", () => {
   it("name a list that has views, and a view of it by its UUID", () => {
     expect(viewList.parse({ surface: "staff" })).toEqual({ surface: "staff" });
+    expect(viewList.parse({ surface: "content" })).toEqual({
+      surface: "content",
+    });
     expect(viewList.safeParse({ surface: "sermons" }).success).toBe(false);
     expect(viewPath.parse({ surface: "staff", id: ID })).toEqual({
       surface: "staff",
@@ -183,6 +274,32 @@ describe("staffViewBody", () => {
       staffViewBody.safeParse({
         name: "Elders",
         payload: { sorting: [{ id: "bio", desc: false }] },
+      }).success,
+    ).toBe(false);
+  });
+});
+
+describe("contentViewBody", () => {
+  it("is a view's name, trimmed, and its payload through the content's schema", () => {
+    expect(contentViewBody.parse({ name: " Images ", payload: {} })).toEqual({
+      name: "Images",
+      payload: UNSORTED,
+    });
+    expect(contentViewBody.parse({ name: "Images", payload: IMAGES })).toEqual({
+      name: "Images",
+      payload: IMAGES,
+    });
+  });
+
+  it("needs a name, and a payload the content's schema accepts", () => {
+    expect(contentViewBody.safeParse({ name: "  ", payload: {} }).success).toBe(
+      false,
+    );
+    expect(contentViewBody.safeParse({ name: "Images" }).success).toBe(false);
+    expect(
+      contentViewBody.safeParse({
+        name: "Images",
+        payload: { sortField: "description" },
       }).success,
     ).toBe(false);
   });

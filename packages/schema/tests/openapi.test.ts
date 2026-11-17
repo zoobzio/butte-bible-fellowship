@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { z } from "zod";
 import { createDocument } from "zod-openapi";
 
 import {
@@ -19,6 +20,7 @@ import {
   contentQuery,
   contentRecord,
   contentRecords,
+  contentViewBody,
   eventBody,
   eventId,
   eventListing,
@@ -214,7 +216,11 @@ const document = createDocument(
         put: {
           requestParams: { path: viewPath },
           requestBody: {
-            content: { "application/json": { schema: staffViewBody } },
+            content: {
+              "application/json": {
+                schema: z.union([staffViewBody, contentViewBody]),
+              },
+            },
           },
           responses: { 200: json(viewRecord) },
         },
@@ -345,6 +351,8 @@ describe("the components", () => {
       "ContentRecord",
       "ContentRecords",
       "ContentStatus",
+      "ContentView",
+      "ContentViewBody",
       "EventBody",
       "EventDay",
       "EventListing",
