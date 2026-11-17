@@ -1,4 +1,4 @@
-import type { BrowserOptions } from "#imports";
+import type { BrowserOptions, UseBrowser } from "#imports";
 
 /**
  * A browser as the app configures it: the descriptors alone. The fetch,
@@ -22,6 +22,12 @@ export type BrowserFetchResult<T> = Awaited<ReturnType<BrowserFetch<T>>>;
  */
 export type BrowserFolder<T = unknown> =
   BrowserFetchResult<T>["folders"][number];
+
+/**
+ * A step of the browser's trail: a folder that was opened, by its key and
+ * its name, with the link its crumb is drawn as.
+ */
+export type BrowserCrumb = ReturnType<UseBrowser<unknown>>["path"][number];
 
 /**
  * What is being moved: a document or a folder, picked up where it was, to be

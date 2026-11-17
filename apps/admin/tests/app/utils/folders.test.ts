@@ -4,7 +4,9 @@ import { NOTES, ROMANS } from "#test/support/records";
 import {
   folderId,
   folderOf,
+  folderParam,
   toBrowserFolder,
+  toCrumb,
   toContentQuery,
   toFoldersQuery,
 } from "~/utils/folders";
@@ -37,6 +39,38 @@ describe("toBrowserFolder", () => {
       size: 0,
       updatedAt: "2026-10-17T18:00:00.000Z",
     });
+  });
+});
+
+describe("toBrowserFolder's link", () => {
+  it("links a folder to where it is browsed, for its crumb to carry", () => {
+    expect(toBrowserFolder(ROMANS).link).toEqual({ to: "/content?folder=3" });
+  });
+});
+
+describe("toCrumb", () => {
+  it("names a folder as the trail does: its key, its name and its link", () => {
+    expect(toCrumb(ROMANS)).toEqual({
+      key: "3",
+      label: "Romans",
+      link: { to: "/content?folder=3" },
+    });
+  });
+});
+
+describe("folderParam", () => {
+  it("reads the folder an address asks for, by its id", () => {
+    expect(folderParam("3")).toBe(3);
+    expect(folderParam(["3", "4"])).toBe(3);
+  });
+
+  it("is none where the address names none, or what it names is no id", () => {
+    expect(folderParam(undefined)).toBeUndefined();
+    expect(folderParam(null)).toBeUndefined();
+    expect(folderParam("")).toBeUndefined();
+    expect(folderParam("notes")).toBeUndefined();
+    expect(folderParam("0")).toBeUndefined();
+    expect(folderParam("1.5")).toBeUndefined();
   });
 });
 

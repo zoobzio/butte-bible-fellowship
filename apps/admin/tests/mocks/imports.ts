@@ -8,6 +8,7 @@ import {
 export * from "@bbf/nuxt/testing/imports";
 
 export { defineTabs } from "@zoobzio/vue/definitions/tabs";
+export { accessBrowser } from "@zoobzio/nuxt/stores/browser";
 export { createBrowser } from "@zoobzio/nuxt/factories/browser";
 export { createEditor } from "@zoobzio/nuxt/factories/editor";
 export { createForm } from "@zoobzio/nuxt/factories/form";

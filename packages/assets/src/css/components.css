@@ -454,7 +454,11 @@
     border-color var(--transition-fast);
 }
 
-.f-checkbox-root[data-state="checked"] {
+/*
+ * Checked, the check; over some of what it stands for, as a select-all
+ * over some of the rows, the dash the layer draws in its place.
+ */
+.f-checkbox-root:is([data-state="checked"], [data-state="indeterminate"]) {
   background: var(--primary);
   border-color: var(--primary);
 }
@@ -468,6 +472,6 @@
   height: var(--space-3);
 }
 
-.f-checkbox-root:not([data-state="checked"]) svg {
+.f-checkbox-root:not([data-state="checked"], [data-state="indeterminate"]) svg {
   opacity: 0;
 }

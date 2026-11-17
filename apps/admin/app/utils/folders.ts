@@ -1,15 +1,20 @@
 import type { ContentRecord, FolderRecord } from "@bbf/schema/types";
 
-import type { BrowserFetchParams, BrowserFolder } from "~/types/content";
+import type {
+  BrowserCrumb,
+  BrowserFetchParams,
+  BrowserFolder,
+} from "~/types/content";
 
-import { FOLDER_SORTS } from "~/constants/content";
+import { FOLDER_SORTS, browse } from "~/constants/content";
 import { toFilterQuery } from "~/utils/listing";
 
 /**
  * A folder as the browser lists it: named by its id, with how many
  * folders and documents it holds itself, and under the documents' columns
  * what all that is under it comes to: how much it holds, and when the last
- * of it was changed.
+ * of it was changed. Its link is where it is browsed, which its crumb
+ * carries once it is opened.
  */
 export const toBrowserFolder = (
   record: FolderRecord,
@@ -18,7 +23,26 @@ export const toBrowserFolder = (
   label: record.name,
   count: record.count,
   values: { size: record.size, updatedAt: record.updatedAt },
+  link: { to: browse(record.id) },
 });
+
+/**
+ * A folder as the trail names it: what the browser keeps of one it has
+ * opened.
+ */
+export const toCrumb = (record: FolderRecord): BrowserCrumb => {
+  const { key, label, link } = toBrowserFolder(record);
+  return { key, label, link };
+};
+
+/**
+ * The folder an address asks for under its `folder`, by its id. None where
+ * it names none, or what it names is no id.
+ */
+export const folderParam = (value: unknown): number | undefined => {
+  const id = Number(Array.isArray(value) ? value[0] : value);
+  return Number.isInteger(id) && id > 0 ? id : undefined;
+};
 
 /** The id of a folder the browser lists, read back from its key. */
 export const folderId = (folder: Pick<BrowserFolder, "key">): number =>

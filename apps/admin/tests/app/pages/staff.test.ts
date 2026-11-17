@@ -1,4 +1,5 @@
 import type { StaffRecord, ViewRecord } from "@bbf/schema/types";
+import type { DOMWrapper } from "@vue/test-utils";
 
 import { describe, expect, it, vi } from "vitest";
 import { flushPromises, mount } from "@vue/test-utils";
@@ -34,7 +35,7 @@ const ELDERS: ViewRecord = {
       createdAt: false,
     },
     pageSize: 50,
-    entries: [{ kind: "filter", key: "role", op: "is", value: "elder" }],
+    clauses: [{ kind: "filter", key: "role", op: "is", value: "elder" }],
   },
   createdAt: "2026-10-17T18:00:00.000Z",
   updatedAt: "2026-10-18T09:30:00.000Z",
@@ -61,6 +62,15 @@ const adding = (wrapper: Mounted) =>
   wrapper
     .findAllComponents(Dialog)
     .find((dialog) => dialog.props("title") === "New member")!;
+
+/**
+ * What a heading is named: its label alone, the button the column is
+ * pinned from left out. The select and actions headings have none.
+ */
+const named = (th: { find: (selector: string) => DOMWrapper<Element> }) => {
+  const label = th.find(".f-data-table-header, .f-data-table-header-btn");
+  return label.exists() ? label.text() : "";
+};
 
 describe("staff page", () => {
   it("heads the staff table with the way to a new member, its first page fetched on load", async () => {
@@ -92,7 +102,7 @@ describe("staff page", () => {
     expect(
       wrapper
         .findAll(".f-th:not(.f-data-table-select, .f-data-table-actions)")
-        .map((th) => th.text()),
+        .map(named),
     ).toEqual(["Name", "Role", "Email", "Phone", "Updated"]);
     expect(wrapper.find(".f-th.f-data-table-select").exists()).toBe(true);
     expect(wrapper.find(".f-th.f-data-table-actions").exists()).toBe(true);
@@ -102,7 +112,7 @@ describe("staff page", () => {
     const { wrapper } = await mountStaff([STAFF]);
     const heading = wrapper
       .findAll(".f-th")
-      .find((th) => th.text() === "Email")!;
+      .find((th) => named(th) === "Email")!;
     expect(heading.classes()).toContain("f-data-table-sortable");
     expect(heading.classes()).not.toContain("f-data-table-sorted");
     expect(heading.attributes("aria-sort")).toBeUndefined();
@@ -112,6 +122,45 @@ describe("staff page", () => {
     expect(heading.attributes("aria-sort")).toBe("ascending");
   });
 
+  it("pins a column from its heading, to hold its side of the table, as a view then saves it", async () => {
+    const { wrapper } = await mountStaff([STAFF]);
+    const service = wrapper.findComponent(Table).props("service");
+    const heading = () =>
+      wrapper.findAll(".f-th").find((th) => named(th) === "Role")!;
+    // Every column offers it, and none is pinned to start with: the row's
+    // actions alone hold the end.
+    expect(heading().find(".f-data-table-pin").exists()).toBe(true);
+    expect(heading().classes()).not.toContain("f-data-table-pinned");
+    expect(service.snapshot().columnPinning).toEqual({ start: [], end: [] });
+    expect(wrapper.find(".f-th.f-data-table-actions").classes()).toContain(
+      "f-data-table-pinned-end",
+    );
+
+    service.table.getColumn("role").pin("start");
+    await flushPromises();
+    // Pinned, it leads the columns, and the select column holds the start
+    // with it.
+    expect(
+      wrapper
+        .findAll(".f-th:not(.f-data-table-select, .f-data-table-actions)")
+        .map(named),
+    ).toEqual(["Role", "Name", "Email", "Phone", "Updated"]);
+    expect(heading().classes()).toEqual(
+      expect.arrayContaining([
+        "f-data-table-pinned",
+        "f-data-table-pinned-start",
+        "f-data-table-pinned-edge",
+      ]),
+    );
+    expect(wrapper.find(".f-th.f-data-table-select").classes()).toContain(
+      "f-data-table-pinned-start",
+    );
+    expect(service.snapshot().columnPinning).toEqual({
+      start: ["role"],
+      end: [],
+    });
+  });
+
   it("leaves a column the API does not sort by as plain text, and the name out of what can be hidden", async () => {
     const { wrapper } = await mountStaff([STAFF]);
     const service = wrapper.findComponent(Table).props("service");
@@ -119,12 +168,12 @@ describe("staff page", () => {
     await flushPromises();
     const heading = wrapper
       .findAll(".f-th")
-      .find((th) => th.text() === "Summary")!;
+      .find((th) => named(th) === "Summary")!;
     expect(heading.classes()).not.toContain("f-data-table-sortable");
-    expect(heading.find("button").exists()).toBe(false);
+    expect(heading.find(".f-data-table-header-btn").exists()).toBe(false);
     service.table.getColumn("name").toggleVisibility(false);
     await flushPromises();
-    expect(wrapper.findAll(".f-th").some((th) => th.text() === "Name")).toBe(
+    expect(wrapper.findAll(".f-th").some((th) => named(th) === "Name")).toBe(
       true,
     );
   });

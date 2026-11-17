@@ -22,7 +22,8 @@ export const link: RecordLink<StaffRecord> = (record) =>
  * cell can show, the bio aside. The name, the way to the member's editor,
  * the role and the contact details are shown at first; the summary, the
  * photo and the day added wait in the column manager, and the name is
- * never hidden. A column sorts unless the API does not sort by it, and by
+ * never hidden. Any column pins to a side of the table from its heading,
+ * to hold it while the rest scroll, which a saved view keeps. A column sorts unless the API does not sort by it, and by
  * one column at a time, as the API does. The free text searches the name,
  * the email, the phone, the summary and the bio; beside it, each text column filters on
  * the text it holds, carries, starts or ends with, an optional one on

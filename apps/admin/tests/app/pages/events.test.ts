@@ -1,4 +1,5 @@
 import type { EventRecord } from "@bbf/schema/types";
+import type { DOMWrapper } from "@vue/test-utils";
 
 import { describe, expect, it, vi } from "vitest";
 import { flushPromises, mount } from "@vue/test-utils";
@@ -27,6 +28,15 @@ const mountEvents = async (items: EventRecord[]) => {
   return { wrapper, fetch };
 };
 
+/**
+ * What a heading is named: its label alone, the button the column is
+ * pinned from left out. The select and actions headings have none.
+ */
+const named = (th: { find: (selector: string) => DOMWrapper<Element> }) => {
+  const label = th.find(".f-data-table-header, .f-data-table-header-btn");
+  return label.exists() ? label.text() : "";
+};
+
 describe("events page", () => {
   it("heads the events table with the way to a new event, its first page fetched on load", async () => {
     const { wrapper, fetch } = await mountEvents([WORSHIP, DINNER]);
@@ -51,9 +61,7 @@ describe("events page", () => {
     const { wrapper } = await mountEvents([WORSHIP]);
     expect(wrapper.find(".f-data-table table").exists()).toBe(true);
     expect(
-      wrapper
-        .findAll(".f-th:not(.f-data-table-actions)")
-        .map((th) => th.text()),
+      wrapper.findAll(".f-th:not(.f-data-table-actions)").map(named),
     ).toEqual(["Title", "Day", "Date", "Repeats weekly", "Start", "Updated"]);
     expect(wrapper.find(".f-th.f-data-table-actions").exists()).toBe(true);
   });
@@ -62,7 +70,7 @@ describe("events page", () => {
     const { wrapper } = await mountEvents([WORSHIP]);
     const heading = wrapper
       .findAll(".f-th")
-      .find((th) => th.text() === "Start")!;
+      .find((th) => named(th) === "Start")!;
     expect(heading.classes()).toContain("f-data-table-sortable");
     expect(heading.classes()).not.toContain("f-data-table-sorted");
     await heading.find("button").trigger("click");

@@ -13,8 +13,16 @@ export const link: RecordLink<ContentRecord> = (record) =>
   `/content/${record.id}/page`;
 
 /**
+ * Where the content is browsed: the page itself at the top, and under its
+ * `folder` the folder that is open, by its id. It is what a crumb of the
+ * trail links to, and what the page's address follows the browser to.
+ */
+export const browse = (folder?: number): string =>
+  folder === undefined ? "/content" : `/content?folder=${folder}`;
+
+/**
  * The content as the admin browses it: folders, each opened in turn from the
- * top, which the trail names after the content itself, and the documents
+ * top, which the trail names after the content itself and links to the page, and the documents
  * filed in the one that is open. A document shows its title, the way to its
  * editor, its slug, its media type, which is what kind of document it is, how much it holds and when
  * it was last changed, in the church's time zone. A folder shows, under the
@@ -32,6 +40,7 @@ export const CONTENT_BROWSER: BrowserConfig<ContentRecord> = {
   fileKey: "id",
   timeZone: TIME_ZONE,
   rootLabel: "admin.content.title",
+  rootLink: { to: browse() },
   columns: [
     {
       key: "title",

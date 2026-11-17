@@ -8,7 +8,7 @@ import { describe, expect, it, vi } from "vitest";
 import { flushPromises, mount } from "@vue/test-utils";
 
 import { Browser, Dialog, Editor, NuxtPage, Views } from "#components";
-import { setRoutePath, useRouter } from "#imports";
+import { navigateTo, setRoutePath, useRouter } from "#imports";
 import ContentBody from "~/components/ContentBody.vue";
 import ContentEditor from "~/components/ContentEditor.vue";
 import ContentMenu from "~/components/ContentMenu.vue";
@@ -35,7 +35,7 @@ const IMAGES: ViewRecord = {
   payload: {
     sortField: "size",
     sortDirection: "desc",
-    entries: [
+    clauses: [
       { kind: "filter", key: "mime", op: "starts with", value: "image/" },
     ],
   },
@@ -45,7 +45,8 @@ const IMAGES: ViewRecord = {
 
 /**
  * The admin's API over the content: the top holds `top`, and each folder what
- * `inside` gives under its id. Every write answers with `answer`, and the
+ * `inside` gives under its id. A folder asked for by its id is one of the
+ * ones held, and not found otherwise. Every write answers with `answer`, and the
  * views whoever is signed in has saved are `saved`.
  */
 const api = (
@@ -57,6 +58,16 @@ const api = (
   vi.fn(async (path: string, request: Request = {}) => {
     if (request.method !== undefined) return answer;
     if (path.startsWith("/api/views/")) return saved;
+    if (path.startsWith("/api/content/folders/")) {
+      const id = Number(path.split("/").at(-1));
+      const held = [top, ...Object.values(inside)]
+        .flatMap((holds) => holds.folders ?? [])
+        .find((folder) => folder.id === id);
+      if (held === undefined) {
+        throw Object.assign(new Error("Folder not found"), { status: 404 });
+      }
+      return held;
+    }
     if (path === "/api/content/folders") {
       const parent = request.query?.parent as number | undefined;
       return (parent === undefined ? top : inside[parent])?.folders ?? [];
@@ -150,6 +161,7 @@ describe("content page", () => {
         label: "Sermon notes",
         count: 1,
         values: { size: 4096, updatedAt: "2026-10-18T09:30:00.000Z" },
+        link: { to: "/content?folder=2" },
       },
     ]);
     expect(head()).toEqual({ title: "Content" });
@@ -249,12 +261,134 @@ describe("content page", () => {
     ]);
 
     // The trail's first crumb leads back to the top.
-    await wrapper.find(".f-data-browser-breadcrumb button").trigger("click");
+    await wrapper.find(".f-data-browser-breadcrumb a").trigger("click");
     await flushPromises();
     expect(fetch).toHaveBeenLastCalledWith("/api/content", { query: {} });
     expect(
       wrapper.findAll(`${POST} a.f-anchor`).map((link) => link.text()),
     ).toEqual(["Butte Bible Fellowship"]);
+  });
+
+  it("draws each folder above the open one as a link to where it is browsed", async () => {
+    const { wrapper } = await mountContent(
+      { folders: [NOTES] },
+      { 2: { folders: [ROMANS] }, 3: {} },
+    );
+    await wrapper.find(`${FOLDER} .f-data-browser-folder-btn`).trigger("click");
+    await flushPromises();
+    await wrapper.find(`${FOLDER} .f-data-browser-folder-btn`).trigger("click");
+    await flushPromises();
+    const links = wrapper.findAll(".f-data-browser-breadcrumb .f-li > a");
+    expect(links.map((link) => [link.text(), link.attributes("href")])).toEqual(
+      [
+        ["Content", "/content"],
+        ["Sermon notes", "/content?folder=2"],
+      ],
+    );
+    // The open folder is where the trail ends, and leads nowhere.
+    expect(
+      wrapper.find(".f-data-browser-breadcrumb .f-li:last-child > a").exists(),
+    ).toBe(false);
+  });
+
+  it("moves the page's address with the browser: to a folder opened, and back to the top", async () => {
+    setRoutePath("/content");
+    const { wrapper } = await mountContent(
+      { folders: [NOTES] },
+      { 2: { folders: [ROMANS] } },
+    );
+    // At the top, as the address says: there is nothing to put right.
+    expect(navigateTo).not.toHaveBeenCalled();
+    await wrapper.find(`${FOLDER} .f-data-browser-folder-btn`).trigger("click");
+    await flushPromises();
+    expect(navigateTo).toHaveBeenLastCalledWith("/content?folder=2");
+    setRoutePath("/content", {}, { folder: "2" });
+    await wrapper.find(".f-data-browser-breadcrumb a").trigger("click");
+    await flushPromises();
+    expect(navigateTo).toHaveBeenLastCalledWith("/content");
+  });
+
+  it("opens on the folder the address names, its trail asked of the API, in one listing", async () => {
+    setRoutePath("/content", {}, { folder: "3" });
+    const { wrapper, fetch } = await mountContent(
+      { folders: [NOTES], documents: [HOME] },
+      { 2: { folders: [ROMANS] }, 3: { documents: [ABOUT] } },
+    );
+    const browser = wrapper.findComponent(Browser).props("service");
+    expect(browser.pathKeys).toEqual(["2", "3"]);
+    expect(
+      wrapper
+        .findAll(".f-data-browser-breadcrumb .f-li")
+        .map((crumb) => crumb.text()),
+    ).toEqual(["Content", "Sermon notes", "Romans"]);
+    // The folder, then the one it is inside; then what it holds, once.
+    expect(fetch).toHaveBeenCalledWith("/api/content/folders/3", {});
+    expect(fetch).toHaveBeenCalledWith("/api/content/folders/2", {});
+    expect(
+      fetch.mock.calls.filter(([path]) => path === "/api/content"),
+    ).toEqual([["/api/content", { query: { folder: 3 } }]]);
+    expect(
+      wrapper.findAll(`${POST} a.f-anchor`).map((link) => link.text()),
+    ).toEqual(["About Us"]);
+    expect(navigateTo).not.toHaveBeenCalled();
+  });
+
+  it("stays where it is for a folder that is gone, and puts the address right", async () => {
+    setRoutePath("/content", {}, { folder: "9" });
+    const { wrapper, fetch } = await mountContent({ documents: [HOME] });
+    expect(wrapper.findComponent(Browser).props("service").pathKeys).toEqual(
+      [],
+    );
+    expect(fetch).toHaveBeenCalledWith("/api/content", { query: {} });
+    expect(navigateTo).toHaveBeenCalledWith("/content", { replace: true });
+  });
+
+  it("puts the address right where it names no folder and the browser was left in one", async () => {
+    const first = await mountContent({ folders: [NOTES] }, { 2: {} });
+    await first.wrapper
+      .find(`${FOLDER} .f-data-browser-folder-btn`)
+      .trigger("click");
+    await flushPromises();
+    first.wrapper.unmount();
+
+    setRoutePath("/content");
+    const { wrapper } = await mountContent({ folders: [NOTES] }, { 2: {} });
+    expect(wrapper.findComponent(Browser).props("service").pathKeys).toEqual([
+      "2",
+    ]);
+    expect(navigateTo).toHaveBeenCalledWith("/content?folder=2", {
+      replace: true,
+    });
+  });
+
+  it("follows the address as it moves, by the way back or forward: up the trail, and into a folder off it", async () => {
+    setRoutePath("/content", {}, { folder: "3" });
+    const { wrapper, fetch } = await mountContent(
+      { folders: [NOTES], documents: [HOME] },
+      { 2: { folders: [ROMANS] }, 3: { documents: [ABOUT] } },
+    );
+    const browser = wrapper.findComponent(Browser).props("service");
+
+    setRoutePath("/content", {}, { folder: "2" });
+    await flushPromises();
+    expect(browser.pathKeys).toEqual(["2"]);
+
+    setRoutePath("/content");
+    await flushPromises();
+    expect(browser.pathKeys).toEqual([]);
+    expect(fetch).toHaveBeenLastCalledWith("/api/content", { query: {} });
+
+    setRoutePath("/content", {}, { folder: "3" });
+    await flushPromises();
+    expect(browser.pathKeys).toEqual(["2", "3"]);
+    expect(fetch).toHaveBeenLastCalledWith("/api/content", {
+      query: { folder: 3 },
+    });
+
+    // Another page's address is none of the browser's: it stays put.
+    setRoutePath("/staff");
+    await flushPromises();
+    expect(browser.pathKeys).toEqual(["2", "3"]);
   });
 
   it("counts what the open folder lists beside the trail", async () => {
@@ -363,7 +497,7 @@ describe("content page", () => {
     expect(wrapper.find("tbody.f-data-browser-empty .f-td").text()).toBe(
       "No matches",
     );
-    await wrapper.find(".f-data-browser-breadcrumb button").trigger("click");
+    await wrapper.find(".f-data-browser-breadcrumb a").trigger("click");
     await flushPromises();
     expect(browser.isFiltered).toBe(false);
     expect(fetch).toHaveBeenLastCalledWith("/api/content", { query: {} });
@@ -561,7 +695,7 @@ describe("content views", () => {
             payload: {
               sortField: null,
               sortDirection: "asc",
-              entries: [{ kind: "literal", key: "text", value: "fellowship" }],
+              clauses: [{ kind: "literal", key: "text", value: "fellowship" }],
             },
           },
         },
@@ -595,7 +729,7 @@ describe("content views", () => {
             name: "Images",
             payload: expect.objectContaining({
               sortField: "size",
-              entries: expect.arrayContaining([
+              clauses: expect.arrayContaining([
                 { kind: "literal", key: "text", value: "easter" },
               ]),
             }),
@@ -792,6 +926,7 @@ describe("folders", () => {
       label: "Sermon notes",
       count: 1,
       values: { size: 4096, updatedAt: "2026-10-18T09:30:00.000Z" },
+      link: { to: "/content?folder=2" },
     });
     const name = editor.find("#folder-name");
     expect((name.element as HTMLInputElement).value).toBe("Sermon notes");
@@ -938,7 +1073,7 @@ describe("moving", () => {
     );
     await enter(wrapper);
     await act(wrapper, POST, "Move");
-    await wrapper.find(".f-data-browser-breadcrumb button").trigger("click");
+    await wrapper.find(".f-data-browser-breadcrumb a").trigger("click");
     await flushPromises();
     await wrapper.find("button.content-move-drop").trigger("click");
     await vi.waitFor(() => expect(writes(fetch)).toHaveLength(1));
@@ -965,7 +1100,7 @@ describe("moving", () => {
     // Inside itself is nowhere to put it.
     await enter(wrapper);
     expect(drop.attributes("disabled")).toBeDefined();
-    await wrapper.find(".f-data-browser-breadcrumb button").trigger("click");
+    await wrapper.find(".f-data-browser-breadcrumb a").trigger("click");
     await flushPromises();
 
     await wrapper

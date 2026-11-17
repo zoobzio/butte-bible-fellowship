@@ -82,8 +82,9 @@
 }
 
 /*
- * The trail: each folder above the open one a button back to it, a slash
- * between two, and the open one named in full after them.
+ * The trail: each folder above the open one a link back to it, a button
+ * where it has no address of its own, a slash between two, and the open
+ * one named in full after them.
  */
 .f-data-browser-breadcrumb .f-ol {
   display: flex;
@@ -117,6 +118,7 @@
 }
 
 /* A crumb's icon, the open folder at the top of the trail, leads its name. */
+.f-data-browser-breadcrumb .f-li > .f-anchor,
 .f-data-browser-breadcrumb .f-li > .f-button,
 .f-data-browser-breadcrumb .f-li > .f-span {
   display: inline-flex;
@@ -130,14 +132,17 @@
   font-weight: var(--weight-medium);
 }
 
+.f-data-browser-breadcrumb .f-li > .f-anchor,
 .f-data-browser-breadcrumb .f-li > .f-button {
   color: var(--on-surface-muted);
+  text-decoration: none;
   cursor: pointer;
   transition:
     color var(--transition-fast),
     background var(--transition-fast);
 }
 
+.f-data-browser-breadcrumb .f-li > .f-anchor:hover,
 .f-data-browser-breadcrumb .f-li > .f-button:hover {
   color: var(--on-surface-high-contrast);
   background: color-mix(in oklab, var(--primary-container) 30%, transparent);

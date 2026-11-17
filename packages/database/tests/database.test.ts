@@ -2401,7 +2401,7 @@ describe("admin.views", () => {
     sorting: [{ id: "name", desc: true }],
     columnVisibility: { email: false },
     pageSize: 50,
-    entries: [{ kind: "filter", key: "role", op: "is", value: "elder" }],
+    clauses: [{ kind: "filter", key: "role", op: "is", value: "elder" }],
   };
   const users: number[] = [];
 

@@ -4,7 +4,7 @@ import {
   CONTENT_VIEW_COLUMNS,
   STAFF_VIEW_COLUMNS,
   VIEW_BODIES,
-  VIEW_ENTRIES_SIZE,
+  VIEW_CLAUSES_SIZE,
   VIEW_NAME_LENGTH,
   VIEW_PAYLOADS,
   browserView,
@@ -20,23 +20,25 @@ import { VIEW_SURFACES } from "../../src/models/view";
 
 const ID = "0b1f4c4e-6f0a-4d0e-9a57-3f0c1c2d4e5f";
 
-/** A table as it starts: nothing sorted, moved, hidden, sized or searched. */
+/** A table as it starts: nothing sorted, moved, pinned, hidden, sized or searched. */
 const BLANK = {
   sorting: [],
   columnOrder: [],
+  columnPinning: { start: [], end: [] },
   columnVisibility: {},
   columnSizing: {},
   pageSize: 25,
-  entries: [],
+  clauses: [],
 };
 
 const ELDERS = {
   sorting: [{ id: "name", desc: true }],
   columnOrder: ["role", "name"],
+  columnPinning: { start: ["name"], end: [] },
   columnVisibility: { email: false },
   columnSizing: { name: 320 },
   pageSize: 50,
-  entries: [
+  clauses: [
     { kind: "literal", key: "text", value: "smith" },
     { kind: "filter", key: "role", op: "is", value: "elder" },
     {
@@ -64,12 +66,12 @@ describe("tableView", () => {
     ).toBe(false);
     expect(
       view.safeParse({
-        entries: [{ kind: "filter", key: "slug", value: "welcome" }],
+        clauses: [{ kind: "filter", key: "slug", value: "welcome" }],
       }).success,
     ).toBe(true);
     expect(
       view.safeParse({
-        entries: [{ kind: "filter", key: "body", value: "welcome" }],
+        clauses: [{ kind: "filter", key: "body", value: "welcome" }],
       }).success,
     ).toBe(false);
   });
@@ -95,7 +97,7 @@ describe("staffView", () => {
 
   it("filters by a column of the staff, under an operator the schema names", () => {
     const filtered = (filter: Record<string, string>) =>
-      staffView.safeParse({ entries: [{ kind: "filter", ...filter }] }).success;
+      staffView.safeParse({ clauses: [{ kind: "filter", ...filter }] }).success;
     for (const key of STAFF_VIEW_COLUMNS) {
       expect(filtered({ key, value: "x" }), key).toBe(true);
     }
@@ -123,24 +125,24 @@ describe("staffView", () => {
       staffView.safeParse({ columnSizing: { name: "wide" } }).success,
     ).toBe(false);
     expect(
-      staffView.safeParse({ entries: [{ kind: "sort", key: "name" }] }).success,
+      staffView.safeParse({ clauses: [{ kind: "sort", key: "name" }] }).success,
     ).toBe(false);
-    const entry = { kind: "literal", key: "text", value: "x" };
+    const clause = { kind: "literal", key: "text", value: "x" };
     expect(
       staffView.safeParse({
-        entries: Array.from({ length: VIEW_ENTRIES_SIZE + 1 }, () => entry),
+        clauses: Array.from({ length: VIEW_CLAUSES_SIZE + 1 }, () => clause),
       }).success,
     ).toBe(false);
   });
 });
 
 /** A browser as it starts: nothing sorted or searched. */
-const UNSORTED = { sortField: null, sortDirection: "asc", entries: [] };
+const UNSORTED = { sortField: null, sortDirection: "asc", clauses: [] };
 
 const IMAGES = {
   sortField: "size",
   sortDirection: "desc",
-  entries: [
+  clauses: [
     { kind: "literal", key: "text", value: "easter" },
     { kind: "filter", key: "mime", op: "starts with", value: "image/" },
   ],
@@ -159,12 +161,12 @@ describe("browserView", () => {
     expect(view.safeParse({ sortField: "slug" }).success).toBe(false);
     expect(
       view.safeParse({
-        entries: [{ kind: "filter", key: "slug", value: "welcome" }],
+        clauses: [{ kind: "filter", key: "slug", value: "welcome" }],
       }).success,
     ).toBe(true);
     expect(
       view.safeParse({
-        entries: [{ kind: "filter", key: "body", value: "welcome" }],
+        clauses: [{ kind: "filter", key: "body", value: "welcome" }],
       }).success,
     ).toBe(false);
   });
@@ -194,7 +196,7 @@ describe("contentView", () => {
 
   it("filters by a column the API filters the content by, under an operator the schema names", () => {
     const filtered = (filter: Record<string, string>) =>
-      contentView.safeParse({ entries: [{ kind: "filter", ...filter }] })
+      contentView.safeParse({ clauses: [{ kind: "filter", ...filter }] })
         .success;
     for (const key of CONTENT_VIEW_COLUMNS) {
       expect(filtered({ key, value: "x" }), key).toBe(true);
@@ -207,10 +209,10 @@ describe("contentView", () => {
   });
 
   it("holds the search to a size", () => {
-    const entry = { kind: "literal", key: "text", value: "x" };
+    const clause = { kind: "literal", key: "text", value: "x" };
     expect(
       contentView.safeParse({
-        entries: Array.from({ length: VIEW_ENTRIES_SIZE + 1 }, () => entry),
+        clauses: Array.from({ length: VIEW_CLAUSES_SIZE + 1 }, () => clause),
       }).success,
     ).toBe(false);
   });

@@ -123,7 +123,7 @@ views, `staff` and `content`, and `VIEW_PAYLOADS` and `VIEW_BODIES` carry, by
 that name, the schema of the list's payload and of a save of it:
 `staffView` and `staffViewBody`, `contentView` and `contentViewBody`.
 `tableView` builds the payload of a view
-over a table — its sort, its columns' order, visibility and widths, its
+over a table — its sort, its columns' order, pinning, visibility and widths, its
 page's size and its search — from the columns the list's API sorts by and
 filters by, so a view saved never asks the API for what it would refuse,
 and a page stays within `LISTING_MAX_SIZE`. `browserView` builds the same

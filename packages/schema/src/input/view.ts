@@ -14,10 +14,10 @@ import { STAFF_SORT_KEYS } from "./staff";
 /** How long a view's name may be. */
 export const VIEW_NAME_LENGTH = 80;
 
-/** How many entries, a search's text and its filters, a view may hold. */
-export const VIEW_ENTRIES_SIZE = 50;
+/** How many clauses, a search's text and its filters, a view may hold. */
+export const VIEW_CLAUSES_SIZE = 50;
 
-/** How many columns a view may put in order. */
+/** How many columns a view may put in order, or pin to a side. */
 export const VIEW_COLUMNS_SIZE = 100;
 
 /** Every operator a filter may name, whatever the kind of column. */
@@ -37,7 +37,7 @@ const among = (values: readonly string[], what: string) =>
  * The search a view holds, over the columns its list's API filters by: the
  * text looked for, and a filter for each column and operator narrowed by.
  */
-const entries = (columns: readonly string[]) =>
+const clauses = (columns: readonly string[]) =>
   z
     .array(
       z.discriminatedUnion("kind", [
@@ -54,7 +54,7 @@ const entries = (columns: readonly string[]) =>
         }),
       ]),
     )
-    .max(VIEW_ENTRIES_SIZE)
+    .max(VIEW_CLAUSES_SIZE)
     .default([])
     .meta({
       description:
@@ -66,8 +66,8 @@ const entries = (columns: readonly string[]) =>
  * arrangement as it is saved, and as it is put back. `sorts` names the
  * columns the list's API sorts by and `columns` the ones it filters by, so
  * a view never asks the API for what it would refuse. The columns put in
- * order, shown or hidden, and sized are the table's own to name, and are
- * left as they come. Every member has a default, so a view saved before a
+ * order, pinned to a side, shown or hidden, and sized are the table's own
+ * to name, and are left as they come. Every member has a default, so a view saved before a
  * member existed still reads.
  *
  * What it yields is the table's snapshot, member for member: the keys
@@ -98,6 +98,16 @@ export const tableView = ({
     columnOrder: z.array(z.string()).max(VIEW_COLUMNS_SIZE).default([]).meta({
       description: "The columns in the order they stand. Empty, their own.",
     }),
+    columnPinning: z
+      .object({
+        start: z.array(z.string()).max(VIEW_COLUMNS_SIZE).default([]),
+        end: z.array(z.string()).max(VIEW_COLUMNS_SIZE).default([]),
+      })
+      .default({ start: [], end: [] })
+      .meta({
+        description:
+          "The columns pinned to the start of the table and to its end, each side in the order they stand. One left out scrolls with the rest.",
+      }),
     columnVisibility: z.record(z.string(), z.boolean()).default({}).meta({
       description: "Whether each column named is shown. One left out is shown.",
     }),
@@ -114,7 +124,7 @@ export const tableView = ({
         description: "How many rows to a page.",
         examples: [25],
       }),
-    entries: entries(columns),
+    clauses: clauses(columns),
   });
 
 /** The columns of the staff a view may filter by: the list's own filters. */
@@ -168,7 +178,7 @@ export const browserView = ({
     sortDirection: z.enum(SORT_DIRECTIONS).default("asc").meta({
       description: "Which way the list is sorted.",
     }),
-    entries: entries(columns),
+    clauses: clauses(columns),
   });
 
 /**
