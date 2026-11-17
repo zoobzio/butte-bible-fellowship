@@ -332,11 +332,20 @@
   text-align: right;
 }
 
+/*
+ * The bar over the selection: a box of its own between the toolbar and the
+ * card, bordered as the card is and filled as the card's head is, so what
+ * is done to the rows selected stands apart from the rows.
+ */
 .f-data-table-bulk-actions {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: var(--space-2);
+  padding: var(--space-2) var(--space-2) var(--space-2) var(--space-4);
+  border: 1px var(--stroke-solid) var(--rule);
+  border-radius: var(--shape-md);
+  background: var(--surface-container);
   color: var(--on-surface-muted);
   font-size: var(--label-size);
 }

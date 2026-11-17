@@ -4,13 +4,16 @@ import { staffListing } from "@bbf/schema";
 import { createTable, navigateTo } from "#imports";
 import { useListingFetch } from "~/composables/listing";
 import { ROUTE } from "~/composables/staff/routes";
+import { useStaffRequests } from "~/composables/staff/tasks";
 import { STAFF_TABLE, link } from "~/constants/staff";
 
 /**
  * The staff table: the config of the constants over the admin's API, each
- * row's edit the way to the member's editor. The layer's factory names the
- * columns, the action and the search's text literal from the prose as the
- * table is built in setup, in the visitor's locale.
+ * row's edit the way to the member's editor. The rows select, and the
+ * removal of the ones selected is left as a request for the staff page to
+ * carry out. The layer's factory names the columns, the actions and the
+ * search's text literal from the prose as the table is built in setup, in
+ * the visitor's locale.
  */
 export const useStaffTable = createTable<StaffRecord>("staff", {
   ...STAFF_TABLE,
@@ -20,6 +23,14 @@ export const useStaffTable = createTable<StaffRecord>("staff", {
       label: "admin.editor.edit",
       action: (record) => {
         navigateTo(link(record));
+      },
+    },
+  },
+  bulkActions: {
+    remove: {
+      label: "admin.editor.delete",
+      action: (selected) => {
+        useStaffRequests().value.removing = selected;
       },
     },
   },

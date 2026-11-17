@@ -91,9 +91,10 @@ describe("staff page", () => {
     );
     expect(
       wrapper
-        .findAll(".f-th:not(.f-data-table-actions)")
+        .findAll(".f-th:not(.f-data-table-select, .f-data-table-actions)")
         .map((th) => th.text()),
     ).toEqual(["Name", "Role", "Email", "Phone", "Updated"]);
+    expect(wrapper.find(".f-th.f-data-table-select").exists()).toBe(true);
     expect(wrapper.find(".f-th.f-data-table-actions").exists()).toBe(true);
   });
 
@@ -192,6 +193,153 @@ describe("staff page", () => {
     const { wrapper } = await mountStaff([]);
     expect(wrapper.find(".f-data-table-empty").exists()).toBe(true);
     expect(wrapper.find(".f-td > a.f-anchor").exists()).toBe(false);
+  });
+});
+
+describe("staff selection", () => {
+  const JOHN: StaffRecord = { ...STAFF, id: 2, name: "John Roe" };
+
+  /** The API's writes: every call that is not a read. */
+  const writes = (fetch: Awaited<ReturnType<typeof mountStaff>>["fetch"]) =>
+    fetch.mock.calls.filter(
+      ([, request]) => request !== undefined && "method" in request,
+    );
+
+  /** Ticks the row of each member given, by the box its row leads with. */
+  const select = async (wrapper: Mounted, ...rows: number[]) => {
+    const boxes = wrapper.findAll(
+      ".f-tbody .f-data-table-select [role=checkbox]",
+    );
+    for (const row of rows) await boxes[row]!.trigger("click");
+  };
+
+  /** Presses a button of the bar over the selection, by its label. */
+  const press = (wrapper: Mounted, label: string) =>
+    wrapper
+      .findAll(".f-data-table-bulk-actions button")
+      .find((button) => button.text() === label)!
+      .trigger("click");
+
+  it("offers nothing over the rows until one is selected, then how many are, and their removal", async () => {
+    const { wrapper } = await mountStaff([STAFF, JOHN]);
+    expect(wrapper.find(".f-data-table-bulk-actions").exists()).toBe(false);
+    await select(wrapper, 0, 1);
+    expect(wrapper.find(".f-data-table-bulk-actions-count").text()).toBe(
+      "2 selected",
+    );
+    expect(
+      wrapper
+        .findAll(".f-data-table-bulk-actions button")
+        .map((button) => button.text()),
+    ).toEqual(["Delete", "Clear"]);
+  });
+
+  it("removes the members selected, once asked by their count, and lists the staff afresh with none selected", async () => {
+    const confirm = vi.fn(() => true);
+    vi.stubGlobal("confirm", confirm);
+    const { wrapper, fetch } = await mountStaff([STAFF, JOHN]);
+    await select(wrapper, 0, 1);
+    await press(wrapper, "Delete");
+    await flushPromises();
+    expect(confirm).toHaveBeenCalledWith(
+      "Delete 2 members? This cannot be undone.",
+    );
+    expect(writes(fetch)).toEqual([
+      ["/api/staff/1", { method: "DELETE" }],
+      ["/api/staff/2", { method: "DELETE" }],
+    ]);
+    expect(fetch).toHaveBeenLastCalledWith("/api/staff", {
+      query: { page: 1, size: 25 },
+    });
+    expect(wrapper.find(".f-data-table-bulk-actions").exists()).toBe(false);
+    expect(wrapper.find(".staff-error").exists()).toBe(false);
+  });
+
+  it("asks about one member as one, and keeps them when the question is declined", async () => {
+    const confirm = vi.fn(() => false);
+    vi.stubGlobal("confirm", confirm);
+    const { wrapper, fetch } = await mountStaff([STAFF, JOHN]);
+    await select(wrapper, 1);
+    await press(wrapper, "Delete");
+    await flushPromises();
+    expect(confirm).toHaveBeenCalledWith(
+      "Delete 1 member? This cannot be undone.",
+    );
+    expect(writes(fetch)).toEqual([]);
+    expect(wrapper.find(".f-data-table-bulk-actions-count").text()).toBe(
+      "1 selected",
+    );
+  });
+
+  it("says why a member was not removed and keeps them selected, the rest removed, until the next try", async () => {
+    vi.stubGlobal("confirm", () => true);
+    const { wrapper, fetch } = await mountStaff([STAFF, JOHN]);
+    const listing = fetch.getMockImplementation()!;
+    fetch.mockImplementation(async (path, request) => {
+      if (path === "/api/staff/2") throw new Error("The server is away.");
+      return listing(path, request);
+    });
+    await select(wrapper, 0, 1);
+    await press(wrapper, "Delete");
+    await flushPromises();
+    expect(wrapper.find(".staff-error").text()).toBe("The server is away.");
+    expect(wrapper.find(".staff-error").attributes("role")).toBe("alert");
+    expect(wrapper.find(".f-data-table-bulk-actions-count").text()).toBe(
+      "1 selected",
+    );
+    expect(
+      wrapper.findAll(".f-tbody .f-tr.f-data-table-selected"),
+    ).toHaveLength(1);
+    expect(fetch).toHaveBeenLastCalledWith("/api/staff", {
+      query: { page: 1, size: 25 },
+    });
+
+    fetch.mockImplementation(listing);
+    await press(wrapper, "Delete");
+    await flushPromises();
+    expect(writes(fetch).at(-1)).toEqual([
+      "/api/staff/2",
+      { method: "DELETE" },
+    ]);
+    expect(wrapper.find(".staff-error").exists()).toBe(false);
+    expect(wrapper.find(".f-data-table-bulk-actions").exists()).toBe(false);
+  });
+
+  it("counts a member already gone as removed", async () => {
+    vi.stubGlobal("confirm", () => true);
+    const { wrapper, fetch } = await mountStaff([STAFF]);
+    const listing = fetch.getMockImplementation()!;
+    fetch.mockImplementation(async (path, request) => {
+      if (path === "/api/staff/1") throw { status: 404 };
+      return listing(path, request);
+    });
+    await select(wrapper, 0);
+    await press(wrapper, "Delete");
+    await flushPromises();
+    expect(wrapper.find(".staff-error").exists()).toBe(false);
+    expect(wrapper.find(".f-data-table-bulk-actions").exists()).toBe(false);
+  });
+
+  it("goes back to the last page there is when the one it was on is removed whole", async () => {
+    vi.stubGlobal("confirm", () => true);
+    const { wrapper, fetch } = await mountStaff([STAFF]);
+    const { table } = wrapper.findComponent(Table).props("service");
+    // The second page of twenty-six holds the one member; then they go.
+    fetch.mockImplementation(async () => ({ items: [STAFF], total: 26 }));
+    table.setPageIndex(1);
+    await flushPromises();
+    await select(wrapper, 0);
+    fetch.mockImplementation(async (_path, request) =>
+      (request as { query?: { page: number } })?.query?.page === 2
+        ? { items: [], total: 25 }
+        : { items: [JOHN], total: 25 },
+    );
+    await press(wrapper, "Delete");
+    await flushPromises();
+    expect(fetch).toHaveBeenLastCalledWith("/api/staff", {
+      query: { page: 1, size: 25 },
+    });
+    expect(wrapper.findAll(".f-tbody .f-tr")).toHaveLength(1);
   });
 });
 

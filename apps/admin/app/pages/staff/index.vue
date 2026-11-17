@@ -6,6 +6,7 @@ import PageHeader from "~/components/PageHeader.vue";
 import StaffEditor from "~/components/StaffEditor.vue";
 import { useTableRequest } from "~/composables/listing";
 import { useStaffTable } from "~/composables/staff/table";
+import { useStaffTasks } from "~/composables/staff/tasks";
 import { useStaffViews } from "~/composables/staff/views";
 import { useViewsRequest } from "~/composables/views";
 </script>
@@ -21,6 +22,12 @@ const table = useStaffTable();
  * admin's own first and then whoever is signed in's, each a tab.
  */
 const views = useStaffViews(table);
+
+/*
+ * What the selection asks for, carried out here: the members selected
+ * removed, once asked about, and the table listed afresh.
+ */
+const { error } = useStaffTasks(table);
 
 useHead(() => ({ title: $t.admin.staff.title() }));
 
@@ -43,6 +50,7 @@ await useTableRequest(table);
     @action="adding = true"
   />
   <Views :service="views" />
+  <p v-if="error" class="staff-error" role="alert">{{ error }}</p>
   <Table :service="table" />
   <Dialog
     v-model:open="adding"
@@ -62,6 +70,14 @@ await useTableRequest(table);
 </template>
 
 <style>
+.staff-error {
+  margin: 0 0 var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--shape-sm);
+  background: var(--error-container);
+  color: var(--on-error-container);
+}
+
 /* The way out of the dialog, in its corner, level with its title. */
 .staff-new-close {
   position: absolute;

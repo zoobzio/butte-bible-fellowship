@@ -23,6 +23,10 @@
     "defaultMessage": "All staff",
     "description": "The name of the view of the staff list that the admin starts with: every member, in the list's own order, with its usual columns. Shown as the first tab over the list, beside the views a user has saved."
   },
+  "confirmMany": {
+    "defaultMessage": "Delete {count, plural, one {# member} other {# members}}? This cannot be undone.",
+    "description": "The question asked before the staff members selected in the list are deleted together. `count` is how many are selected."
+  },
   "profile": {
     "defaultMessage": "Profile",
     "description": "The tab of a staff member's page that holds their details, their photo and their bio."

@@ -94,6 +94,7 @@ describe("bundles", () => {
       "admin.member.photoConfirm",
       "admin.event.imageConfirm",
       "admin.content.moving",
+      "admin.staff.confirmMany",
       "connect.map",
     ];
     for (const [key, message] of Object.entries(source)) {
@@ -134,6 +135,14 @@ describe("bundles", () => {
     expect(
       prosary.format("admin.editor.confirm", { name: "Harvest Dinner" }),
     ).toBe("Delete Harvest Dinner? This cannot be undone.");
+    expect(
+      [1, 3].map((count) =>
+        prosary.format("admin.staff.confirmMany", { count }),
+      ),
+    ).toEqual([
+      "Delete 1 member? This cannot be undone.",
+      "Delete 3 members? This cannot be undone.",
+    ]);
     expect(
       prosary.format("admin.content.moving", { name: "Sermon notes" }),
     ).toBe("Moving Sermon notes. Open the folder it belongs in.");

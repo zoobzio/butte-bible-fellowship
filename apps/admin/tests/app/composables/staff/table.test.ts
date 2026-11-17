@@ -5,6 +5,7 @@ import { navigateTo } from "#imports";
 import { STAFF } from "#test/support/records";
 import { withSetup } from "@bbf/nuxt/testing/mount";
 import { useStaffTable } from "~/composables/staff/table";
+import { useStaffRequests } from "~/composables/staff/tasks";
 import { TIME_ZONE } from "#layers/bbf/shared/constants/time";
 
 /** The day it is at the church, as the search offers it. */
@@ -314,5 +315,15 @@ describe("useStaffTable", () => {
     expect(edit?.label).toBe("Edit");
     edit?.action(STAFF);
     expect(navigateTo).toHaveBeenCalledWith("/staff/1/profile");
+  });
+
+  it("lets its rows select, and leaves the removal of the ones selected for the staff page", () => {
+    const table = withSetup(() => useStaffTable()).result;
+    expect(table.table.options.enableRowSelection).toBe(true);
+    const [remove] = table.bulkActions;
+    expect(remove?.label).toBe("Delete");
+    expect(useStaffRequests().value.removing).toBeNull();
+    remove?.action(["1", "2"]);
+    expect(useStaffRequests().value.removing).toEqual(["1", "2"]);
   });
 });
