@@ -2,14 +2,19 @@ import { describe, expect, it } from "vitest";
 
 import {
   CONTENT_VIEW_COLUMNS,
+  EVENT_CALENDAR_VIEWS,
+  EVENT_VIEW_COLUMNS,
   STAFF_VIEW_COLUMNS,
   VIEW_BODIES,
   VIEW_CLAUSES_SIZE,
   VIEW_NAME_LENGTH,
   VIEW_PAYLOADS,
   browserView,
+  calendarView,
   contentView,
   contentViewBody,
+  eventView,
+  eventViewBody,
   staffView,
   staffViewBody,
   tableView,
@@ -169,6 +174,78 @@ describe("browserView", () => {
         clauses: [{ kind: "filter", key: "body", value: "welcome" }],
       }).success,
     ).toBe(false);
+  });
+});
+
+describe("calendarView", () => {
+  const view = calendarView({
+    views: ["week", "month"],
+    columns: ["title", "slug"],
+  });
+
+  it("fills in whatever a view leaves out, the first of the calendar's views with it", () => {
+    expect(view.parse({})).toEqual({ view: "week", clauses: [] });
+  });
+
+  it("shows a view the calendar offers, and filters by the columns named to filter by", () => {
+    expect(view.safeParse({ view: "month" }).success).toBe(true);
+    expect(view.safeParse({ view: "day" }).success).toBe(false);
+    expect(
+      view.safeParse({
+        clauses: [{ kind: "filter", key: "slug", value: "welcome" }],
+      }).success,
+    ).toBe(true);
+    expect(
+      view.safeParse({
+        clauses: [{ kind: "filter", key: "body", value: "welcome" }],
+      }).success,
+    ).toBe(false);
+  });
+});
+
+describe("eventView", () => {
+  const WEEKLY = {
+    view: "week",
+    clauses: [
+      { kind: "literal", key: "text", value: "study" },
+      { kind: "filter", key: "recurring", op: "is", value: "true" },
+    ],
+  };
+
+  it("accepts the events calendar's arrangement, and hands it back as it came", () => {
+    expect(eventView.parse(WEEKLY)).toEqual(WEEKLY);
+    expect(eventView.parse({})).toEqual({ view: "month", clauses: [] });
+  });
+
+  it("drops what is no part of an arrangement, the day the calendar stands on with it", () => {
+    expect(eventView.parse({ ...WEEKLY, date: "2026-10-17" })).toEqual(WEEKLY);
+  });
+
+  it("shows a month, a week or the agenda, and not a day", () => {
+    for (const view of EVENT_CALENDAR_VIEWS) {
+      expect(eventView.safeParse({ view }).success, view).toBe(true);
+    }
+    expect(eventView.safeParse({ view: "day" }).success).toBe(false);
+  });
+
+  it("filters by a column the API filters the events by, and not by the date they are held", () => {
+    const filtered = (filter: Record<string, string>) =>
+      eventView.safeParse({ clauses: [{ kind: "filter", ...filter }] }).success;
+    for (const key of EVENT_VIEW_COLUMNS) {
+      expect(filtered({ key, value: "x" }), key).toBe(true);
+    }
+    expect(filtered({ key: "date", value: "2026-10-17" })).toBe(false);
+    expect(filtered({ key: "day", op: "sounds like", value: "x" })).toBe(false);
+  });
+
+  it("is saved under a name", () => {
+    expect(eventViewBody.parse({ name: " Weekly ", payload: WEEKLY })).toEqual({
+      name: "Weekly",
+      payload: WEEKLY,
+    });
+    expect(eventViewBody.safeParse({ name: "", payload: {} }).success).toBe(
+      false,
+    );
   });
 });
 

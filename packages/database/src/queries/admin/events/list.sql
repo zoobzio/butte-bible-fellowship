@@ -22,6 +22,11 @@ SELECT id, slug, title, summary, body, image, date, recurring, weeks, start_time
 FROM events, typed
 WHERE (typed.pattern IS NULL
     OR id IN (SELECT id FROM hits UNION ALL SELECT id FROM near))
+  -- The days an event is held within, for a calendar: a one-off whose date
+  -- is among them, and a recurring event that has begun by the last, which
+  -- is held from its date on. Left out, any.
+  AND (:held_from::date IS NULL OR recurring OR date >= :held_from::date)
+  AND (:held_to::date IS NULL OR date <= :held_to::date)
   AND (:recurring_is::boolean IS NULL OR recurring = :recurring_is::boolean)
   AND (:recurring_not::boolean IS NULL OR recurring <> :recurring_not::boolean)
   -- The day of the week an event is held on is its date's own.

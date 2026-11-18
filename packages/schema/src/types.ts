@@ -21,6 +21,7 @@ import type {
   eventPath,
   eventQuery,
   eventSort,
+  eventWindow,
   eventsQuery,
 } from "./input/event";
 import type {
@@ -50,6 +51,8 @@ import type {
 import type {
   contentView,
   contentViewBody,
+  eventView,
+  eventViewBody,
   staffView,
   staffViewBody,
   viewList,
@@ -64,6 +67,7 @@ import type {
   eventDay,
   eventListing,
   eventRecord,
+  eventRecords,
   eventTime,
 } from "./models/event";
 import type { folderRecord, folderRecords } from "./models/folder";
@@ -96,6 +100,8 @@ export type ChurchEvents = z.infer<typeof churchEvents>;
 export type EventRecord = z.infer<typeof eventRecord>;
 
 export type EventListing = z.infer<typeof eventListing>;
+
+export type EventRecords = z.infer<typeof eventRecords>;
 
 export type Hast = z.infer<typeof hast>;
 
@@ -221,6 +227,8 @@ export type EventSort = z.infer<typeof eventSort>;
 
 export type EventQuery = z.infer<typeof eventQuery>;
 
+export type EventWindow = z.infer<typeof eventWindow>;
+
 export type StaffId = z.infer<typeof staffId>;
 
 export type StaffSort = z.infer<typeof staffSort>;
@@ -262,3 +270,7 @@ export type StaffViewBody = z.infer<typeof staffViewBody>;
 export type ContentView = z.infer<typeof contentView>;
 
 export type ContentViewBody = z.infer<typeof contentViewBody>;
+
+export type EventView = z.infer<typeof eventView>;
+
+export type EventViewBody = z.infer<typeof eventViewBody>;

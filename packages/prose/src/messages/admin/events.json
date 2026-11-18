@@ -22,5 +22,9 @@
   "details": {
     "defaultMessage": "Details",
     "description": "The tab of an event's page that holds its details, its picture and what is written about it."
+  },
+  "allView": {
+    "defaultMessage": "All events",
+    "description": "The name of the view of the events calendar that the admin starts with: every event, a month at a time. Shown as the first tab over the calendar, beside the views a user has saved."
   }
 }

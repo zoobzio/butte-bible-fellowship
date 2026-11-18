@@ -10,6 +10,7 @@ export * from "@bbf/nuxt/testing/imports";
 export { defineTabs } from "@zoobzio/vue/definitions/tabs";
 export { accessBrowser } from "@zoobzio/nuxt/stores/browser";
 export { createBrowser } from "@zoobzio/nuxt/factories/browser";
+export { createCalendar } from "@zoobzio/nuxt/factories/calendar";
 export { createEditor } from "@zoobzio/nuxt/factories/editor";
 export { createForm } from "@zoobzio/nuxt/factories/form";
 export { createTable } from "@zoobzio/nuxt/factories/table";

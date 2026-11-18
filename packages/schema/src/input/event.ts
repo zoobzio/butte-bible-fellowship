@@ -72,6 +72,31 @@ export const eventQuery = listingQuery.extend({
   ...dayColumn("createdAt", "The day the events listed were added"),
 });
 
+/** A day of the span a calendar shows, as its query names it. */
+const held = (what: string) =>
+  z.iso.date().meta({
+    description: `The ${what} day of the span, as YYYY-MM-DD, in the church's own time.`,
+    examples: ["2026-10-01"],
+  });
+
+export const eventWindow = eventQuery
+  .omit({ page: true, size: true, sort: true, direction: true })
+  .extend({ from: held("first"), to: held("last") })
+  .check((ctx) => {
+    if (ctx.value.to < ctx.value.from) {
+      ctx.issues.push({
+        code: "custom",
+        input: ctx.value,
+        message: "a span ends on or after the day it starts",
+        path: ["to"],
+      });
+    }
+  })
+  .meta({
+    description:
+      "The events a calendar asks for: the ones held within a span of days, searched and filtered as the list is. A one-off is held on its date, and a recurring event from its date on. Neither paged nor sorted: every event of the span comes back, in the admin's own order.",
+  });
+
 /**
  * What the timing rules read of an event as it is written, whichever way
  * its weeks are held.

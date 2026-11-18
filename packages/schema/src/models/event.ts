@@ -155,3 +155,9 @@ export const eventListing = listing(eventRecord).meta({
   description:
     "A page of the events, as the admin lists them: the recurring ones Sunday first, then the one-offs by date.",
 });
+
+export const eventRecords = z.array(eventRecord).meta({
+  id: "EventRecords",
+  description:
+    "The events held within a span of days, as the admin's calendar reads them: the recurring ones Sunday first, then the one-offs by date. A recurring event is one record, whichever of the days it is held on.",
+});

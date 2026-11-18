@@ -202,6 +202,78 @@ export const contentView = browserView({
 });
 
 /**
+ * How much of time a calendar may show at once: a month, a week, a day, or
+ * the days to come as a list.
+ */
+export const CALENDAR_SPANS = ["month", "week", "day", "agenda"] as const;
+
+type CalendarSpan = (typeof CALENDAR_SPANS)[number];
+
+/**
+ * The schema of a view over one of the admin's calendars: the calendar's
+ * arrangement as it is saved, and as it is put back. A calendar has
+ * neither a sort nor columns nor pages, so its view is how much of time it
+ * shows at once and the search alone: `views` names the ones the calendar
+ * offers, the first the one a view left without takes, and `columns` the
+ * ones the list's API filters by, as a table's do. The day the calendar
+ * stands on is no part of it: a view is put in place on whichever day that
+ * is. Every member has a default, so a view saved before a member existed
+ * still reads.
+ *
+ * What it yields is the calendar's snapshot, member for member: the view
+ * stays any a calendar may show, checked and not narrowed, so the calendar
+ * reads and takes it as it is.
+ */
+export const calendarView = ({
+  views,
+  columns,
+}: {
+  views: readonly [CalendarSpan, ...CalendarSpan[]];
+  columns: readonly string[];
+}) =>
+  z.object({
+    view: z
+      .enum(CALENDAR_SPANS)
+      .refine((value) => within(views, value), {
+        error: "Not a view of the calendar.",
+      })
+      .default(views[0])
+      .meta({
+        description: "How much of time the calendar shows at once.",
+      }),
+    clauses: clauses(columns),
+  });
+
+/**
+ * How much of time the events' calendar shows at once: a month, a week, or
+ * the days to come as a list.
+ */
+export const EVENT_CALENDAR_VIEWS = ["month", "week", "agenda"] as const;
+
+/**
+ * The columns of the events a view may filter by: the calendar's own
+ * filters. The date an event is held is not among them: the days the
+ * calendar shows are its span.
+ */
+export const EVENT_VIEW_COLUMNS = [
+  "title",
+  "day",
+  "recurring",
+  "slug",
+  "summary",
+  "image",
+] as const;
+
+export const eventView = calendarView({
+  views: EVENT_CALENDAR_VIEWS,
+  columns: EVENT_VIEW_COLUMNS,
+}).meta({
+  id: "EventView",
+  description:
+    "A view of the events: how much of time the calendar shows at once and its search, put in place on whichever day the calendar stands on.",
+});
+
+/**
  * The schema each list's views are held to, by the list's name: what a
  * view's payload is checked against before it is saved, and what the admin
  * reads a stored one through.
@@ -209,6 +281,7 @@ export const contentView = browserView({
 export const VIEW_PAYLOADS = {
   staff: staffView,
   content: contentView,
+  events: eventView,
 } satisfies Record<z.infer<typeof viewSurface>, z.ZodType>;
 
 export const viewList = z.object({
@@ -253,8 +326,15 @@ export const contentViewBody = viewBody(contentView).meta({
     "A view of the content as it is saved: what a save writes, or replaces.",
 });
 
+export const eventViewBody = viewBody(eventView).meta({
+  id: "EventViewBody",
+  description:
+    "A view of the events as it is saved: what a save writes, or replaces.",
+});
+
 /** What a save of a view carries, by the list the view is of. */
 export const VIEW_BODIES = {
   staff: staffViewBody,
   content: contentViewBody,
+  events: eventViewBody,
 } satisfies Record<z.infer<typeof viewSurface>, z.ZodType>;

@@ -121,7 +121,9 @@ asked for; whether it recurs and the day of the week its date falls on,
 held or not, `recurring_is` and `day_not` and the like; the text filters
 on the `title`, `slug`, `summary` and `image`; and the day filters on the
 `date` it is held, as it is written, and on the days it was `updated` and
-`created`, read in `tz`. `sort` names a column, `title`, `slug`, `day`,
+`created`, read in `tz`; and for a calendar, the days it is held within,
+`held_from` and `held_to`: a one-off whose date is among them, and a
+recurring event that has begun by the last. `sort` names a column, `title`, `slug`, `day`,
 `date`, `recurring`, `start_time`, `created_at` or `updated_at`, and after
 any sort the admin's own order holds: the recurring events Sunday first,
 then the one-offs by date. An event's day of the week is never stored:

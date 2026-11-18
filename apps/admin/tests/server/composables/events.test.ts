@@ -380,6 +380,52 @@ describe("useEvents", () => {
     });
   });
 
+  it("asks the database for every event held within a span, searched as the list is, in the admin's own order", async () => {
+    const span = { from: "2026-10-01", to: "2026-10-31" };
+    expect(await useEvents().held(span)).toEqual([RECORD, ONCE]);
+    expect(list).toHaveBeenCalledTimes(1);
+    expect(list).toHaveBeenCalledWith({
+      ...NONE,
+      ...ORDER,
+      held_from: "2026-10-01",
+      held_to: "2026-10-31",
+      size: 100,
+      offset: 0,
+    });
+    expect(
+      await useEvents().held({ ...span, q: "work", recurringIs: false }),
+    ).toEqual([ONCE]);
+    expect(list).toHaveBeenLastCalledWith({
+      ...NONE,
+      ...ORDER,
+      q: "work",
+      recurring_is: false,
+      held_from: "2026-10-01",
+      held_to: "2026-10-31",
+      size: 100,
+      offset: 0,
+    });
+  });
+
+  it("reads a span a page at a time until every event of it is read", async () => {
+    const span = { from: "2026-10-01", to: "2026-10-31" };
+    const rows = Array.from({ length: 150 }, (_, index) => ({
+      ...ROW,
+      id: index + 1,
+      total: 150,
+    }));
+    const page = async ({ size, offset }: { size: number; offset: number }) =>
+      rows.slice(offset, offset + size);
+    list.mockImplementationOnce(page).mockImplementationOnce(page);
+    const found = await useEvents().held(span);
+    expect(found.map((record) => record.id)).toEqual(rows.map((row) => row.id));
+    expect(list.mock.calls.map(([args]) => args.offset)).toEqual([0, 100]);
+
+    list.mockImplementationOnce(async () => []);
+    expect(await useEvents().held(span)).toEqual([]);
+    expect(list).toHaveBeenCalledTimes(3);
+  });
+
   it("fetches one event by id, or nothing", async () => {
     expect(await useEvents().fetch(3)).toEqual(RECORD);
     expect(await useEvents().fetch(9)).toBeNull();

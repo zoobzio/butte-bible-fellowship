@@ -1887,6 +1887,25 @@ describe("admin.events", () => {
     ).toEqual([9]);
     expect(await slugs({ size: 2, offset: 10 })).toEqual([]);
 
+    // The days a calendar shows: a one-off whose date is among them, and
+    // each recurring event that has begun by the last of them.
+    expect(
+      await slugs({ held_from: "2026-10-01", held_to: "2026-10-31" }),
+    ).toEqual([...WEEKLY, "harvest-supper"]);
+    expect(
+      await slugs({ held_from: "2026-11-01", held_to: "2026-11-30" }),
+    ).toEqual(WEEKLY);
+    expect(
+      await slugs({ held_from: "2025-12-01", held_to: "2025-12-31" }),
+    ).toEqual([]);
+    expect(
+      await slugs({
+        held_from: "2026-10-01",
+        held_to: "2026-10-31",
+        recurring_is: false,
+      }),
+    ).toEqual(["harvest-supper"]);
+
     // The free text is looked for in the title, the slug, the summary and
     // the text of the body, as typed.
     expect(await slugs({ q: "HARVEST SUPPER" })).toEqual(["harvest-supper"]);
@@ -2116,6 +2135,17 @@ describe("admin.events", () => {
     expect(
       (await db.web.events.list({ from: "2026-01-01" })).map((e) => e.slug),
     ).toEqual(ordered);
+
+    // A recurring event is held from its date on: a calendar's days before
+    // it leave it out.
+    const held = async (held_from: string, held_to: string) =>
+      (await db.admin.events.list({ ...all, held_from, held_to })).map(
+        (event) => event.slug,
+      );
+    expect(await held("2026-03-01", "2026-04-04")).toEqual(
+      ordered.filter((slug) => slug !== "choir"),
+    );
+    expect(await held("2026-05-31", "2026-07-04")).toEqual(ordered);
 
     expect(await db.admin.events.delete({ id: every!.id })).toBe(1);
     expect(await db.admin.events.delete({ id: some!.id })).toBe(1);

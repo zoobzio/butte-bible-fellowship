@@ -24,6 +24,9 @@ import {
   eventBody,
   eventId,
   eventListing,
+  eventRecords,
+  eventViewBody,
+  eventWindow,
   eventPath,
   eventQuery,
   eventRecord,
@@ -218,7 +221,11 @@ const document = createDocument(
           requestBody: {
             content: {
               "application/json": {
-                schema: z.union([staffViewBody, contentViewBody]),
+                schema: z.union([
+                  staffViewBody,
+                  contentViewBody,
+                  eventViewBody,
+                ]),
               },
             },
           },
@@ -297,6 +304,12 @@ const document = createDocument(
           responses: { 200: json(eventListing) },
         },
       },
+      "/admin/api/events/held": {
+        get: {
+          requestParams: { query: eventWindow },
+          responses: { 200: json(eventRecords) },
+        },
+      },
       "/admin/api/events/{id}": {
         get: {
           requestParams: { path: eventId },
@@ -357,7 +370,10 @@ describe("the components", () => {
       "EventDay",
       "EventListing",
       "EventRecord",
+      "EventRecords",
       "EventTime",
+      "EventView",
+      "EventViewBody",
       "FolderBody",
       "FolderDraft",
       "FolderPlacement",

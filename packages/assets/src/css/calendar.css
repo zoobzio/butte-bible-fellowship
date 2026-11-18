@@ -1,0 +1,321 @@
+/*
+ * Foundation's calendar, as the admin lays out its events: the search and
+ * the refresh over a card, headed by the toolbar that steps through time
+ * and picks how much of it is shown, and under it the days, a grid of
+ * weeks or the agenda's list, each holding what is held on it. The
+ * search's own dress is in `search.css`, the table's and the browser's
+ * too. Each rule is scoped to the calendar's own root so a Fab or a table
+ * elsewhere keeps its own dress. The layer's icons are bare `svg`
+ * elements, and its reset lays an `svg` out as a block: every part that
+ * holds one is a flex box here, so an icon sits in line with its label.
+ */
+
+.f-data-calendar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-4);
+}
+
+.f-data-calendar svg {
+  flex: none;
+  width: var(--space-4);
+  height: var(--space-4);
+}
+
+/*
+ * The controls: the search takes the width the refresh after it leaves,
+ * which stands as tall as it does on one line, at its top once its chips
+ * wrap. With no search it keeps to the card's trailing edge.
+ */
+.f-data-calendar-controls {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}
+
+.f-data-calendar-controls > .f-button {
+  min-height: calc(var(--space-6) + 2 * var(--space-1) + 2px);
+  min-width: calc(var(--space-6) + 2 * var(--space-1) + 2px);
+}
+
+/* The Fabs of the controls and the toolbar, outlined as a table's are. */
+.f-data-calendar-controls > .f-button,
+.f-data-calendar-tool {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border: 1px var(--stroke-solid) var(--rule);
+  border-radius: var(--shape-sm);
+  background: transparent;
+  color: var(--on-surface);
+  font: var(--type-label);
+  cursor: pointer;
+  transition:
+    color var(--transition-fast),
+    border-color var(--transition-fast),
+    background var(--transition-fast);
+}
+
+.f-data-calendar-controls > .f-button:has(> svg:only-child),
+.f-data-calendar-tool:has(> svg:only-child) {
+  padding: var(--space-2);
+}
+
+.f-data-calendar-controls > .f-button:hover:not(:disabled),
+.f-data-calendar-tool:hover:not(:disabled) {
+  color: var(--on-surface-high-contrast);
+  border-color: color-mix(in oklab, var(--primary) 65%, transparent);
+  background: color-mix(in oklab, var(--primary-container) 30%, transparent);
+}
+
+.f-data-calendar-tool:disabled {
+  color: var(--on-surface-muted);
+  cursor: default;
+}
+
+/* The view the calendar is in, lit as a table's open page is. */
+.f-data-calendar-tool[aria-pressed="true"] {
+  background: var(--primary-container);
+  border-color: transparent;
+  color: var(--on-primary-container);
+}
+
+/*
+ * The card: a border around the toolbar and the days, its corners rounded
+ * and what passes them clipped. A grid narrower than its seven days
+ * scrolls sideways within it rather than widening the page.
+ */
+.f-data-calendar-body {
+  overflow-x: auto;
+  border: 1px var(--stroke-solid) var(--rule);
+  border-radius: var(--shape-md);
+  background: var(--surface);
+}
+
+/*
+ * The toolbar, on a darker ground: today and the two steps, then what the
+ * days shown are, which takes the width the views, at the far end, leave.
+ * It wraps where the card is too narrow for one line.
+ */
+.f-data-calendar-toolbar {
+  position: sticky;
+  left: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border-bottom: 1px var(--stroke-solid) var(--rule);
+  background: var(--surface-container);
+}
+
+.f-data-calendar-heading {
+  flex: 1;
+  min-width: 0;
+  margin: 0 var(--space-2);
+  color: var(--on-surface-high-contrast);
+  font: var(--type-title);
+  letter-spacing: var(--type-title-letter-spacing);
+}
+
+/* The heading stands between the groups, so the rule between them goes. */
+.f-data-calendar-separator {
+  display: none;
+}
+
+/*
+ * The grid: seven days across, each column as wide as the next whatever
+ * its days hold, the cells drawing the rules between them themselves.
+ */
+.f-data-calendar-grid {
+  table-layout: fixed;
+  width: 100%;
+  min-width: calc(7 * var(--space-9));
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: var(--body-size);
+}
+
+.f-data-calendar-weekday {
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px var(--stroke-solid) var(--rule);
+  color: var(--on-surface-muted);
+  font: var(--type-label);
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--type-label-letter-spacing);
+  text-align: left;
+}
+
+.f-data-calendar-grid .f-data-calendar-day {
+  height: calc(var(--space-9) + var(--space-6));
+  padding: var(--space-2);
+  border-bottom: 1px var(--stroke-solid) var(--rule);
+  vertical-align: top;
+}
+
+.f-data-calendar-grid .f-data-calendar-day + .f-data-calendar-day {
+  border-left: 1px var(--stroke-solid) var(--rule);
+}
+
+.f-data-calendar-week:last-child .f-data-calendar-day {
+  border-bottom: 0;
+}
+
+/* A week is one row of days, tall enough to read down. */
+.f-data-calendar[data-view="week"] .f-data-calendar-grid .f-data-calendar-day {
+  height: calc(4 * var(--space-9));
+}
+
+/* A day of the month before or after the one shown, on a darker ground. */
+.f-data-calendar-day[data-outside] {
+  background: color-mix(in oklab, var(--surface-container) 50%, transparent);
+}
+
+/*
+ * A day's date: a round button at the head of its cell, lit when the day
+ * is today, which opens the day where the calendar offers one.
+ */
+.f-data-calendar-day-label {
+  display: inline-grid;
+  place-items: center;
+  min-width: var(--space-6);
+  height: var(--space-6);
+  padding: 0 var(--space-1);
+  border: 0;
+  border-radius: var(--shape-full);
+  background: transparent;
+  color: var(--on-surface);
+  font: var(--type-label);
+  cursor: pointer;
+  transition:
+    color var(--transition-fast),
+    background var(--transition-fast);
+}
+
+.f-data-calendar-day[data-outside] .f-data-calendar-day-label {
+  color: var(--on-surface-muted);
+}
+
+.f-data-calendar-day-label:hover {
+  background: color-mix(in oklab, var(--primary-container) 30%, transparent);
+  color: var(--on-surface-high-contrast);
+}
+
+.f-data-calendar-day[data-today] .f-data-calendar-day-label {
+  background: var(--primary);
+  color: var(--on-primary);
+  font-weight: var(--weight-medium);
+}
+
+/* What is held on a day: a list under its date, each on one line. */
+.f-data-calendar-occurrences {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-1);
+  margin: var(--space-1) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+/*
+ * One time an event is held: when it starts, then its title, which ends
+ * in an ellipsis where the day is too narrow for it.
+ */
+.f-data-calendar-occurrence {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  width: 100%;
+  padding: var(--space-1) var(--space-2);
+  border: 0;
+  border-radius: var(--shape-sm);
+  background: color-mix(in oklab, var(--primary-container) 30%, transparent);
+  color: var(--on-surface);
+  font: var(--type-label);
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    color var(--transition-fast),
+    background var(--transition-fast);
+}
+
+.f-data-calendar-occurrence:hover,
+.f-data-calendar-occurrence[data-selected] {
+  background: var(--primary-container);
+  color: var(--on-primary-container);
+}
+
+.f-data-calendar-occurrence-time {
+  flex: none;
+  color: var(--on-surface-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.f-data-calendar-occurrence:hover .f-data-calendar-occurrence-time,
+.f-data-calendar-occurrence[data-selected] .f-data-calendar-occurrence-time {
+  color: inherit;
+}
+
+.f-data-calendar-occurrence > .f-span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/*
+ * The agenda: the days to come that hold something, one under the next,
+ * each its date beside what is held on it.
+ */
+.f-data-calendar-agenda {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.f-data-calendar-agenda > .f-li {
+  display: grid;
+  grid-template-columns: calc(3 * var(--space-9)) minmax(0, 1fr);
+  align-items: start;
+  gap: var(--space-4);
+  padding: var(--space-3);
+}
+
+.f-data-calendar-agenda > .f-li + .f-li {
+  border-top: 1px var(--stroke-solid) var(--rule);
+}
+
+/* A day's date is written out here, so it is no round button. */
+.f-data-calendar-agenda .f-data-calendar-day-label {
+  justify-self: start;
+  padding: 0 var(--space-3);
+}
+
+.f-data-calendar-agenda .f-data-calendar-occurrences {
+  margin: 0;
+}
+
+/* Nothing in the days to come: one line, centered, in the card. */
+.f-data-calendar-agenda > .f-data-calendar-empty {
+  display: block;
+  padding: var(--space-6) var(--space-3);
+  color: var(--on-surface-muted);
+  text-align: center;
+}
+
+/* While the days are fetched, what they held last waits, dimmed. */
+.f-data-calendar[data-loading]
+  :is(.f-data-calendar-grid, .f-data-calendar-agenda) {
+  opacity: 0.6;
+}
+
+/* On a narrow page a day of the agenda stands over what is held on it. */
+@media (max-width: 44rem) {
+  .f-data-calendar-agenda > .f-li {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-2);
+  }
+}

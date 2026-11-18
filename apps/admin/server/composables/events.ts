@@ -4,9 +4,12 @@ import type {
   EventListing,
   EventQuery,
   EventRecord,
+  EventRecords,
   EventSort,
+  EventWindow,
 } from "@bbf/schema/types";
 
+import { LISTING_MAX_SIZE } from "@bbf/schema";
 import { toEventArguments, toEventRecord } from "@bbf/utils";
 import { TIME_ZONE } from "#layers/bbf/shared/constants/time";
 import { useDatabase } from "#layers/bbf/server/composables/database";
@@ -30,7 +33,7 @@ const DAY_COLUMNS = {
  * The search as the query takes it: null for each part left out, and the
  * church's time zone, which decides what day an event was changed on.
  */
-const toSearch = (query: EventQuery) => ({
+const toSearch = (query: Omit<EventWindow, "from" | "to">) => ({
   q: query.q === undefined || query.q === "" ? null : query.q,
   recurring_is: query.recurringIs ?? null,
   recurring_not: query.recurringNot ?? null,
@@ -78,6 +81,34 @@ export const useEvents = () => {
       (window) => db.admin.events.list({ ...search, ...window }),
       toEventRecord,
     );
+  };
+
+  /**
+   * Every event held within a span of days, searched as the list is, in
+   * the admin's own order: a one-off whose date is among the days, and a
+   * recurring event that has begun by the last of them, once, whichever of
+   * the days it is held on. A calendar lays out every one, so the search is
+   * read a page at a time until the count each row carries is reached.
+   */
+  const held = async (query: EventWindow): Promise<EventRecords> => {
+    const search = {
+      ...toSearch(query),
+      held_from: query.from,
+      held_to: query.to,
+      sort: null,
+      direction: "asc",
+      size: LISTING_MAX_SIZE,
+    };
+    const rows: Awaited<ReturnType<typeof db.admin.events.list>> = [];
+    for (;;) {
+      const page = await db.admin.events.list({
+        ...search,
+        offset: rows.length,
+      });
+      rows.push(...page);
+      if (page.length === 0 || rows.length >= page[0]!.total) break;
+    }
+    return rows.map(toEventRecord);
   };
 
   const fetch = async (id: number): Promise<EventRecord | null> => {
@@ -133,5 +164,5 @@ export const useEvents = () => {
     return deleted > 0;
   };
 
-  return { list, fetch, create, update, setImage, setBody, remove };
+  return { list, held, fetch, create, update, setImage, setBody, remove };
 };

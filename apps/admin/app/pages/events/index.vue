@@ -1,29 +1,39 @@
 <script lang="ts">
-import { Dialog, Icon, Table } from "#components";
+import { Calendar, Dialog, Icon, NuxtLink, Views } from "#components";
 import { definePageMeta, ref, useHead, useNuxtApp } from "#imports";
 
 import EventEditor from "~/components/EventEditor.vue";
 import PageHeader from "~/components/PageHeader.vue";
-import { useEventsTable } from "~/composables/events/table";
-import { useTableRequest } from "~/composables/listing";
+import { useCalendarRequest } from "~/composables/calendar";
+import { useEventsCalendar } from "~/composables/events/calendar";
+import { useEventViews } from "~/composables/events/views";
+import { useViewsRequest } from "~/composables/views";
+import { link } from "~/constants/events";
 </script>
 
 <script setup lang="ts">
 definePageMeta({ middleware: "auth", auth: { scopes: ["events:read"] } });
 
 const { $t } = useNuxtApp();
-const table = useEventsTable();
+const calendar = useEventsCalendar();
+
+/*
+ * The saved views sit over the calendar: its arrangement under a name, the
+ * admin's own first and then whoever is signed in's, each a tab.
+ */
+const views = useEventViews(calendar);
 
 useHead(() => ({ title: $t.admin.events.title() }));
 
 /*
- * A new event is written in a dialog over the list. Its form is drawn only
- * while it is open, so each opening starts blank; once saved, the form
- * itself leads on to the event's page.
+ * A new event is written in a dialog over the calendar. Its form is drawn
+ * only while it is open, so each opening starts blank; once saved, the
+ * form itself leads on to the event's page.
  */
 const adding = ref(false);
 
-await useTableRequest(table);
+await useViewsRequest(views);
+await useCalendarRequest(calendar);
 </script>
 
 <template>
@@ -33,7 +43,25 @@ await useTableRequest(table);
     :action="$t.admin.events.new()"
     @action="adding = true"
   />
-  <Table :service="table" />
+  <Views :service="views" />
+  <Calendar :service="calendar">
+    <!-- Each time an event is held is the way to the event's details. -->
+    <template #occurrence="{ occurrence, time }">
+      <NuxtLink
+        :to="link({ id: Number(occurrence.uid) })"
+        class="f-anchor f-data-calendar-occurrence"
+        :data-key="occurrence.key"
+      >
+        <time
+          class="f-time f-data-calendar-occurrence-time"
+          :datetime="occurrence.start"
+        >
+          {{ time(occurrence) }}
+        </time>
+        <span class="f-span">{{ occurrence.entry.title }}</span>
+      </NuxtLink>
+    </template>
+  </Calendar>
   <Dialog
     v-model:open="adding"
     :title="$t.admin.events.new()"

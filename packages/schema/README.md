@@ -103,7 +103,10 @@ page — `connectArticle` what is written on it, and `connectPage` its front
 matter as the site reads it. An input is one part of a request, named for the
 group and the part: `eventPath` is the path parameters of one event,
 `eventsQuery` the query of the events list, `eventBody` what a write
-carries. An event is written with the date it is held and whether it is
+carries. `eventWindow` is what the admin's calendar asks for, the events
+held within a span of days, `from` its first to `to` its last, searched
+and filtered as the admin's list is, and `eventRecords` what it is
+answered with: every event of the span, unpaged. An event is written with the date it is held and whether it is
 `recurring`: a recurring event is held every week on that date's day of
 the week, which a record names as its `day` and the site's `churchEvent`
 carries in place of the date. A body says what a model cannot: only a
@@ -119,9 +122,10 @@ is on the staff, and whatever event is written, is on the site.
 A saved view is a named arrangement of one of the admin's lists, and every
 list's are stored in one table, the arrangement as JSON, so the schema is
 what holds each to its shape. `VIEW_SURFACES` names the lists that have
-views, `staff` and `content`, and `VIEW_PAYLOADS` and `VIEW_BODIES` carry, by
+views, `staff`, `content` and `events`, and `VIEW_PAYLOADS` and `VIEW_BODIES` carry, by
 that name, the schema of the list's payload and of a save of it:
-`staffView` and `staffViewBody`, `contentView` and `contentViewBody`.
+`staffView` and `staffViewBody`, `contentView` and `contentViewBody`,
+`eventView` and `eventViewBody`.
 `tableView` builds the payload of a view
 over a table — its sort, its columns' order, pinning, visibility and widths, its
 page's size and its search — from the columns the list's API sorts by and
@@ -129,7 +133,9 @@ filters by, so a view saved never asks the API for what it would refuse,
 and a page stays within `LISTING_MAX_SIZE`. `browserView` builds the same
 over a browser, which the content is: its one sort and its search, and not
 the folder that is open, so a view is put in place wherever the browser
-stands. A save is checked against it;
+stands. `calendarView` builds it over a calendar, which the events are:
+how much of time it shows at once, of the views the calendar offers, and
+its search, and not the day it stands on. A save is checked against it;
 `viewRecord` carries the payload back as it was stored, unchecked, so a
 view saved before its list changed still reads, and the admin, which reads
 each through the same schema, sets it aside rather than failing the list.

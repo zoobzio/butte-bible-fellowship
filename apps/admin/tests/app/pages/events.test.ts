@@ -1,10 +1,10 @@
-import type { EventRecord } from "@bbf/schema/types";
-import type { DOMWrapper } from "@vue/test-utils";
+import type { EventRecord, ViewRecord } from "@bbf/schema/types";
 
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { flushPromises, mount } from "@vue/test-utils";
 
-import { Dialog, Editor, NuxtPage, Table } from "#components";
+import { Calendar, Dialog, Editor, NuxtPage, Views } from "#components";
+import { eventViewBody } from "@bbf/schema";
 import { setRoutePath, useRouter } from "#imports";
 import EventBody from "~/components/EventBody.vue";
 import EventEditor from "~/components/EventEditor.vue";
@@ -19,26 +19,67 @@ import { DINNER, WORSHIP } from "#test/support/records";
 import { head } from "#test/support/head";
 import { mountSuspended } from "@bbf/nuxt/testing/mount";
 
-/** The events page over the admin's API listing the events given. */
-const mountEvents = async (items: EventRecord[]) => {
-  const fetch = vi.fn(async () => ({ items, total: items.length }));
+const ID = "0b1f4c4e-6f0a-4d0e-9a57-3f0c1c2d4e5f";
+
+/** A view whoever is signed in has saved: the recurring events, a week at a time. */
+const WEEKLY: ViewRecord = {
+  id: ID,
+  surface: "events",
+  name: "Weekly",
+  payload: {
+    view: "week",
+    clauses: [{ kind: "filter", key: "recurring", op: "is", value: "true" }],
+  },
+  createdAt: "2026-10-17T18:00:00.000Z",
+  updatedAt: "2026-10-18T09:30:00.000Z",
+};
+
+/* A Thursday of October 2026, mid-morning in the church's own time. */
+beforeEach(() => {
+  vi.useFakeTimers({ toFake: ["Date"], now: new Date("2026-10-15T17:00:00Z") });
+});
+
+afterEach(() => {
+  vi.useRealTimers();
+});
+
+/**
+ * The events page over the admin's API answering with the events given,
+ * and holding the views given as whoever is signed in has saved them.
+ */
+const mountEvents = async (items: EventRecord[], saved: ViewRecord[] = []) => {
+  const fetch = vi.fn(async (path: string, _request?: object) =>
+    path.startsWith("/api/views/") ? saved : items,
+  );
   vi.stubGlobal("$fetch", fetch);
   const { wrapper, error } = await mountSuspended(Index);
   expect(error).toBeUndefined();
   return { wrapper, fetch };
 };
 
+type Mounted = Awaited<ReturnType<typeof mountEvents>>["wrapper"];
+
+/** The page's own dialog, the new event's: the views have theirs too. */
+const adding = (wrapper: Mounted) =>
+  wrapper
+    .findAllComponents(Dialog)
+    .find((dialog) => dialog.props("title") === "New event")!;
+
 /**
- * What a heading is named: its label alone, the button the column is
- * pinned from left out. The select and actions headings have none.
+ * What a day holds: the address each time an event is held leads to, when
+ * it starts and what it is called.
  */
-const named = (th: { find: (selector: string) => DOMWrapper<Element> }) => {
-  const label = th.find(".f-data-table-header, .f-data-table-header-btn");
-  return label.exists() ? label.text() : "";
-};
+const held = (wrapper: Mounted, date: string) =>
+  wrapper
+    .findAll(`.f-data-calendar-day[data-date="${date}"] a`)
+    .map((link) => [
+      link.attributes("href"),
+      link.find("time").text(),
+      link.find(".f-span").text(),
+    ]);
 
 describe("events page", () => {
-  it("heads the events table with the way to a new event, its first page fetched on load", async () => {
+  it("heads the events calendar with the way to a new event, the days it shows fetched on load, after its views", async () => {
     const { wrapper, fetch } = await mountEvents([WORSHIP, DINNER]);
     expect(wrapper.findComponent(PageHeader).props()).toEqual({
       title: "Events",
@@ -47,61 +88,190 @@ describe("events page", () => {
       action: "New event",
     });
     expect(wrapper.find("a.page-header-action").exists()).toBe(false);
-    const table = wrapper.findComponent(Table);
-    expect(table.props("service").id).toBe("events");
-    expect(fetch).toHaveBeenCalledTimes(1);
-    expect(fetch).toHaveBeenCalledWith("/api/events", {
-      query: { page: 1, size: 25 },
-    });
-    expect(table.props("service").data).toEqual([WORSHIP, DINNER]);
+    const calendar = wrapper.findComponent(Calendar);
+    expect(calendar.props("service").id).toBe("events");
+    // The views load first, so the calendar's one fetch reads the open one.
+    expect(fetch.mock.calls).toEqual([
+      ["/api/views/events", {}],
+      ["/api/events/held", { query: { from: "2026-09-27", to: "2026-10-31" } }],
+    ]);
+    expect(calendar.props("service").initialized).toBe(true);
     expect(head()).toEqual({ title: "Events" });
   });
 
-  it("lists the events under the columns shown at first, the row's actions after them", async () => {
+  it("lays the month out in weeks from Sunday, today marked, under what the month is", async () => {
     const { wrapper } = await mountEvents([WORSHIP]);
-    expect(wrapper.find(".f-data-table table").exists()).toBe(true);
+    expect(wrapper.find(".f-data-calendar").attributes("data-view")).toBe(
+      "month",
+    );
+    expect(wrapper.find(".f-data-calendar-heading").text()).toBe(
+      "October 2026",
+    );
     expect(
-      wrapper.findAll(".f-th:not(.f-data-table-actions)").map(named),
-    ).toEqual(["Title", "Day", "Date", "Repeats weekly", "Start", "Updated"]);
-    expect(wrapper.find(".f-th.f-data-table-actions").exists()).toBe(true);
+      wrapper.findAll(".f-data-calendar-weekday").map((day) => day.text()),
+    ).toEqual(["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]);
+    expect(wrapper.findAll(".f-data-calendar-week")).toHaveLength(5);
+    expect(
+      wrapper
+        .findAll(".f-data-calendar-day[data-today]")
+        .map((day) => day.attributes("data-date")),
+    ).toEqual(["2026-10-15"]);
   });
 
-  it("sorts by a heading when it is clicked, and marks the sorted one", async () => {
+  it("offers today, a step each way, and a month, a week or the agenda, and no single day", async () => {
     const { wrapper } = await mountEvents([WORSHIP]);
-    const heading = wrapper
-      .findAll(".f-th")
-      .find((th) => named(th) === "Start")!;
-    expect(heading.classes()).toContain("f-data-table-sortable");
-    expect(heading.classes()).not.toContain("f-data-table-sorted");
-    await heading.find("button").trigger("click");
+    expect(
+      wrapper
+        .findAll(".f-data-calendar-tool")
+        .map((tool) => tool.attributes("data-tool")),
+    ).toEqual(["today", "prev", "next", "month", "week", "agenda"]);
+    expect(
+      wrapper
+        .find('.f-data-calendar-tool[data-tool="month"]')
+        .attributes("aria-pressed"),
+    ).toBe("true");
+  });
+
+  it("makes each time an event is held the way to the event's details", async () => {
+    const { wrapper } = await mountEvents([WORSHIP, DINNER]);
+    // The first and third Sundays of the month, and the one Saturday.
+    expect(held(wrapper, "2026-10-04")).toEqual([
+      ["/events/3/details", "10:00 AM", "Worship Service"],
+    ]);
+    expect(held(wrapper, "2026-10-11")).toEqual([]);
+    expect(held(wrapper, "2026-10-18")).toEqual([
+      ["/events/3/details", "10:00 AM", "Worship Service"],
+    ]);
+    expect(held(wrapper, "2026-10-24")).toEqual([
+      ["/events/4/details", "5:30 PM", "Harvest Dinner"],
+    ]);
+    expect(wrapper.findAll(".f-data-calendar-occurrence")).toHaveLength(3);
+    expect(wrapper.find("button.f-data-calendar-occurrence").exists()).toBe(
+      false,
+    );
+  });
+
+  it("steps to the next month, and asks for the days it then shows", async () => {
+    const { wrapper, fetch } = await mountEvents([WORSHIP, DINNER]);
+    await wrapper
+      .find('.f-data-calendar-tool[data-tool="next"]')
+      .trigger("click");
     await flushPromises();
-    expect(heading.classes()).toContain("f-data-table-sorted");
+    expect(fetch).toHaveBeenLastCalledWith("/api/events/held", {
+      query: { from: "2026-11-01", to: "2026-12-05" },
+    });
+    expect(wrapper.find(".f-data-calendar-heading").text()).toBe(
+      "November 2026",
+    );
+    expect(held(wrapper, "2026-11-15")).toEqual([
+      ["/events/3/details", "10:00 AM", "Worship Service"],
+    ]);
   });
 
-  it("searches: the table carries a search box", async () => {
+  it("lists the days to come as an agenda, and says when they hold nothing", async () => {
+    const { wrapper } = await mountEvents([DINNER]);
+    const agenda = wrapper.find('.f-data-calendar-tool[data-tool="agenda"]');
+    await agenda.trigger("click");
+    await flushPromises();
+    expect(wrapper.find(".f-data-calendar-grid").exists()).toBe(false);
+    expect(held(wrapper, "2026-10-24")).toEqual([
+      ["/events/4/details", "5:30 PM", "Harvest Dinner"],
+    ]);
+    expect(wrapper.find(".f-data-calendar-empty").exists()).toBe(false);
+
+    const empty = await mountEvents([]);
+    expect(empty.wrapper.find(".f-data-calendar-agenda").exists()).toBe(true);
+    expect(empty.wrapper.find(".f-data-calendar-empty").exists()).toBe(true);
+    expect(empty.wrapper.find(".f-data-calendar-occurrence").exists()).toBe(
+      false,
+    );
+  });
+
+  it("searches: the calendar carries a search box", async () => {
     const { wrapper } = await mountEvents([WORSHIP]);
     expect(
-      wrapper.find(".f-data-table-search .f-autocomplete-input").exists(),
+      wrapper.find(".f-data-calendar-search .f-autocomplete-input").exists(),
+    ).toBe(true);
+  });
+});
+
+describe("events views", () => {
+  const services = (wrapper: Mounted) => ({
+    views: wrapper.findComponent(Views).props("service"),
+    calendar: wrapper.findComponent(Calendar).props("service"),
+  });
+
+  it("opens on the admin's own view, the calendar as it starts, with nothing edited", async () => {
+    const { wrapper } = await mountEvents([WORSHIP]);
+    const { views, calendar } = services(wrapper);
+    expect(views.id).toBe("events");
+    expect(views.initialized).toBe(true);
+    expect(views.views).toMatchObject([
+      { id: "all", name: "admin.events.allView", origin: "system" },
+    ]);
+    expect(views.active).toBe("all");
+    expect(views.current.payload).toEqual(calendar.snapshot());
+    expect(views.drifted).toBe(false);
+    expect(wrapper.findAll(".f-views-tabs .f-tabs-trigger")).toHaveLength(1);
+  });
+
+  it("lists the views whoever is signed in has saved after it, and puts one picked in place on the day the calendar stands on", async () => {
+    const { wrapper, fetch } = await mountEvents([WORSHIP], [WEEKLY]);
+    const { views, calendar } = services(wrapper);
+    expect(views.views).toMatchObject([
+      { id: "all", origin: "system" },
+      { id: ID, name: "Weekly", origin: "user" },
+    ]);
+    expect(views.stale).toEqual([]);
+    expect(wrapper.find(".f-views-tabs").text()).toContain("Weekly");
+
+    expect(await views.select(ID)).toBe(true);
+    await flushPromises();
+    expect(views.active).toBe(ID);
+    expect(calendar.view).toBe("week");
+    expect(calendar.date).toBe("2026-10-15");
+    expect(calendar.snapshot()).toEqual(WEEKLY.payload);
+    expect(fetch).toHaveBeenLastCalledWith("/api/events/held", {
+      query: { from: "2026-10-11", to: "2026-10-17", recurringIs: "true" },
+    });
+    expect(views.drifted).toBe(false);
+  });
+
+  it("marks the open view as edited once the calendar shows another view or is searched, and not when it steps through time", async () => {
+    const { wrapper } = await mountEvents([WORSHIP]);
+    const { views, calendar } = services(wrapper);
+    calendar.next();
+    await flushPromises();
+    expect(views.drifted).toBe(false);
+    calendar.show("agenda");
+    await flushPromises();
+    expect(views.drifted).toBe(true);
+    expect(wrapper.find(".f-views").classes()).toContain("f-views-drifted");
+  });
+
+  it("saves a view under the events' own name, as the API takes it", async () => {
+    const { wrapper, fetch } = await mountEvents([WORSHIP]);
+    const { views, calendar } = services(wrapper);
+    calendar.show("week");
+    await flushPromises();
+    const view = await views.saveAs("This week");
+    const [path, request] = fetch.mock.calls.at(-1)!;
+    expect(path).toBe(`/api/views/events/${view.id}`);
+    expect(request).toEqual({
+      method: "PUT",
+      body: { name: "This week", payload: { view: "week", clauses: [] } },
+    });
+    expect(
+      eventViewBody.safeParse((request as { body: unknown }).body).success,
     ).toBe(true);
   });
 
-  it("makes the title of each row the way to the event's details", async () => {
-    const { wrapper } = await mountEvents([WORSHIP, DINNER]);
-    const links = wrapper.findAll(".f-td > a.f-anchor");
-    expect(links.map((link) => link.attributes("href"))).toEqual([
-      "/events/3/details",
-      "/events/4/details",
-    ]);
-    expect(links.map((link) => link.text())).toEqual([
-      "Worship Service",
-      "Harvest Dinner",
-    ]);
-  });
-
-  it("says when there is nothing to list", async () => {
-    const { wrapper } = await mountEvents([]);
-    expect(wrapper.find(".f-data-table-empty").exists()).toBe(true);
-    expect(wrapper.find(".f-td > a.f-anchor").exists()).toBe(false);
+  it("sets aside a saved view the events' schema would refuse", async () => {
+    const stale = { ...WEEKLY, payload: { view: "day", clauses: [] } };
+    const { wrapper } = await mountEvents([WORSHIP], [stale]);
+    const { views } = services(wrapper);
+    expect(views.views.map((view: { id: string }) => view.id)).toEqual(["all"]);
+    expect(views.stale).toHaveLength(1);
   });
 });
 
@@ -115,14 +285,14 @@ describe("new event dialog", () => {
 
   it("stays shut until a new event is asked for", async () => {
     const { wrapper } = await mountEvents([WORSHIP]);
-    expect(wrapper.findComponent(Dialog).props("open")).toBe(false);
+    expect(adding(wrapper).props("open")).toBe(false);
     expect(wrapper.findComponent(EventEditor).exists()).toBe(false);
     expect(document.body.querySelector(".f-dialog-content")).toBeNull();
   });
 
   it("opens the editor on no record, over the list, named and described", async () => {
     const { wrapper } = await open();
-    const dialog = wrapper.findComponent(Dialog);
+    const dialog = adding(wrapper);
     expect(dialog.props()).toMatchObject({
       open: true,
       title: "New event",
@@ -135,13 +305,13 @@ describe("new event dialog", () => {
       "New event",
     );
     expect(dialog.findComponent(EventEditor).props("record")).toBeNull();
-    expect(wrapper.findComponent(Table).exists()).toBe(true);
+    expect(wrapper.findComponent(Calendar).exists()).toBe(true);
     expect(head()).toEqual({ title: "Events" });
   });
 
   it("shuts from its corner, and opens blank the next time", async () => {
     const { wrapper } = await open();
-    const editor = wrapper.findComponent(Dialog).findComponent(EventEditor);
+    const editor = adding(wrapper).findComponent(EventEditor);
     await editor.find("#event-title").setValue("Harvest Dinner");
     // The dialog is drawn on the body, outside the page's own element.
     const close = document.body.querySelector<HTMLButtonElement>(
@@ -150,7 +320,7 @@ describe("new event dialog", () => {
     expect(close.getAttribute("aria-label")).toBe("Cancel");
     close.click();
     await flushPromises();
-    expect(wrapper.findComponent(Dialog).props("open")).toBe(false);
+    expect(adding(wrapper).props("open")).toBe(false);
     expect(wrapper.findComponent(EventEditor).exists()).toBe(false);
     await wrapper.find("button.page-header-action").trigger("click");
     await flushPromises();
@@ -162,7 +332,7 @@ describe("new event dialog", () => {
     const { wrapper } = await open();
     const fetch = vi.fn(async () => DINNER);
     vi.stubGlobal("$fetch", fetch);
-    const editor = wrapper.findComponent(Dialog).findComponent(EventEditor);
+    const editor = adding(wrapper).findComponent(EventEditor);
     await editor.find("#event-title").setValue("Harvest Dinner");
     await editor.find("#event-slug").setValue("harvest-dinner");
     await editor.find("#event-date").setValue("2026-10-24");

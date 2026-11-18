@@ -12,6 +12,7 @@ import {
   eventImage,
   eventPath,
   eventQuery,
+  eventWindow,
   eventsQuery,
 } from "../../src/input/event";
 
@@ -333,5 +334,46 @@ describe("eventImage", () => {
     expect(
       eventImage.safeParse(image("image/png", EVENT_IMAGE_SIZE + 1)).success,
     ).toBe(false);
+  });
+});
+
+describe("eventWindow", () => {
+  const span = { from: "2026-10-01", to: "2026-10-31" };
+
+  it("takes the first and the last day of a span, and both", () => {
+    expect(eventWindow.parse(span)).toEqual(span);
+    expect(eventWindow.parse({ from: "2026-10-17", to: "2026-10-17" })).toEqual(
+      { from: "2026-10-17", to: "2026-10-17" },
+    );
+    expect(eventWindow.safeParse({ from: "2026-10-01" }).success).toBe(false);
+    expect(eventWindow.safeParse({ to: "2026-10-31" }).success).toBe(false);
+    expect(eventWindow.safeParse({ ...span, to: "10/31/2026" }).success).toBe(
+      false,
+    );
+  });
+
+  it("refuses a span that ends before it starts", () => {
+    const backwards = eventWindow.safeParse({
+      from: "2026-10-31",
+      to: "2026-10-01",
+    });
+    expect(backwards.success).toBe(false);
+    expect(backwards.error?.issues[0]?.path).toEqual(["to"]);
+  });
+
+  it("is searched and filtered as the list is, and neither paged nor sorted", () => {
+    const search = {
+      ...span,
+      q: "study",
+      titleContains: "bible",
+      updatedAtOnOrAfter: "2026-01-01",
+    };
+    expect(eventWindow.parse(search)).toEqual(search);
+    expect(
+      eventWindow.parse({ ...span, recurringIs: "true", dayNot: "sunday" }),
+    ).toEqual({ ...span, recurringIs: true, dayNot: "sunday" });
+    expect(
+      eventWindow.parse({ ...span, page: "2", size: "50", sort: "title" }),
+    ).toEqual(span);
   });
 });

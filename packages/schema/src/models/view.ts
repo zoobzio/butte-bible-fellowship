@@ -5,7 +5,7 @@ import { z } from "zod";
  * views are kept under. A list has its views once it is named here and
  * its payload's schema is among `VIEW_PAYLOADS`.
  */
-export const VIEW_SURFACES = ["staff", "content"] as const;
+export const VIEW_SURFACES = ["staff", "content", "events"] as const;
 
 export const viewSurface = z.enum(VIEW_SURFACES).meta({
   id: "ViewSurface",
