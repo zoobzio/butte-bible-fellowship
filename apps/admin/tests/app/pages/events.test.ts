@@ -8,7 +8,6 @@ import { eventViewBody } from "@bbf/schema";
 import { setRoutePath, useRouter } from "#imports";
 import EventBody from "~/components/EventBody.vue";
 import EventEditor from "~/components/EventEditor.vue";
-import EventImage from "~/components/EventImage.vue";
 import EventMenu from "~/components/EventMenu.vue";
 import PageHeader from "~/components/PageHeader.vue";
 import SaveBar from "~/components/SaveBar.vue";
@@ -447,7 +446,7 @@ describe("event page", () => {
 });
 
 describe("details page", () => {
-  it("lays the event out in two panels: its picture over its details, then what is written about it", () => {
+  it("lays the event out in two panels: its details, its picture among them, then what is written about it", () => {
     const wrapper = mount(Details, { props: { record: WORSHIP } });
     const panels = wrapper.find(".event-page").element.children;
     expect([...panels].map((panel) => panel.className)).toEqual([
@@ -457,10 +456,9 @@ describe("details page", () => {
     ]);
     const side = wrapper.find(".event-page-side");
     expect([...side.element.children].map((child) => child.className)).toEqual([
-      "event-image",
       "event-editor",
     ]);
-    expect(side.findComponent(EventImage).props("record")).toEqual(WORSHIP);
+    expect(side.find(".event-editor .image-field").exists()).toBe(true);
     expect(side.findComponent(EventEditor).props("record")).toEqual(WORSHIP);
     expect(side.findComponent(EventBody).exists()).toBe(false);
     expect(wrapper.findComponent(EventBody).props("record")).toEqual(WORSHIP);

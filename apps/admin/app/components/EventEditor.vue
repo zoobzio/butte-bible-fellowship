@@ -3,6 +3,7 @@ import type { EventRecord } from "@bbf/schema/types";
 
 import { Form } from "#components";
 import { useNuxtApp } from "#imports";
+import ImageField from "~/components/ImageField.vue";
 import { useDraft } from "~/composables/drafts";
 import { useEventEditor } from "~/composables/events/editor";
 </script>
@@ -16,7 +17,7 @@ const emit = defineEmits<{ saved: [record: EventRecord] }>();
 
 const { $t } = useNuxtApp();
 
-const { form, error, dirty, saving, save, reset } = useEventEditor(
+const { form, picture, error, dirty, saving, save, reset } = useEventEditor(
   record,
   (saved) => emit("saved", saved),
 );
@@ -37,6 +38,9 @@ const pt = { form: { novalidate: true } };
 <template>
   <div class="event-editor">
     <Form :service="form" :pt="pt">
+      <template #imageInput="{ settings }">
+        <ImageField :control="settings.imageInput" :labels="picture" />
+      </template>
       <template #footer="{ settings }">
         <template v-if="!held">
           <p v-if="error" class="event-editor-error" role="alert">

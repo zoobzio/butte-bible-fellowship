@@ -45,7 +45,7 @@ const BODY = {
   ],
 };
 
-/** What a record's details are: what a body writes of it. */
+/** What a record's details are: what a form holds of it. */
 const details = (record: EventRecord) => {
   const {
     id: _id,
@@ -53,7 +53,6 @@ const details = (record: EventRecord) => {
     updatedAt: _u,
     day: _d,
     body: _b,
-    image: _i,
     ...written
   } = record;
   return written;
@@ -70,14 +69,12 @@ describe("toEventForm", () => {
     });
   });
 
-  it("carries the details the record has, and neither its picture nor what is written about it", () => {
-    expect(
-      toEventForm({
-        ...ONCE,
-        body: BODY,
-        image: "https://cdn.example.com/events/work-day.jpg",
-      }),
-    ).toEqual(details(ONCE));
+  it("carries the details the record has and its picture, and not what is written about it", () => {
+    const pictured = {
+      ...ONCE,
+      image: "https://cdn.example.com/events/work-day.jpg",
+    };
+    expect(toEventForm({ ...pictured, body: BODY })).toEqual(details(pictured));
   });
 
   it("leaves the record's id, its timestamps and the day its date falls on behind", () => {

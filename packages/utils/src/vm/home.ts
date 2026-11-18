@@ -6,8 +6,8 @@ const written = (value: string | undefined): string | undefined => {
 };
 
 /**
- * The record's metadata as the form holds it. The picture and what is
- * written on the page are no part of the form.
+ * The record's metadata as the form holds it, the hero's picture with it.
+ * What is written on the page is no part of the form.
  */
 export const toHomeForm = (record: HomeRecord): HomeForm => ({
   title: record.title,
@@ -16,7 +16,13 @@ export const toHomeForm = (record: HomeRecord): HomeForm => ({
   heroDescription: record.heroDescription,
   heroAction: record.heroAction,
   heroLink: record.heroLink,
+  heroImage: record.heroImage,
 });
+
+/**
+ * The metadata a form holds as a body writes it. The picture is no part of
+ * the body: it is written on its own.
+ */
 
 export const toHomeBody = (form: HomeForm): HomeBody => ({
   title: form.title.trim(),

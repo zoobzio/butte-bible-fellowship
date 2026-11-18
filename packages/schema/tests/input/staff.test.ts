@@ -272,6 +272,35 @@ describe("staffForm", () => {
     expect(staffForm.shape.phone.safeParse(undefined).success).toBe(true);
     expect(staffForm.shape.role.safeParse(undefined).success).toBe(false);
   });
+
+  it("holds their photo: the URL of the one kept, an image picked in its place, or none", () => {
+    const picked = new File([new Uint8Array(8)], "picked.png", {
+      type: "image/png",
+    });
+    const url = "https://cdn.example.com/kept.jpg";
+    expect(staffForm.parse({ ...MEMBER, photo: url }).photo).toBe(url);
+    expect(staffForm.parse({ ...MEMBER, photo: picked }).photo).toBe(picked);
+    expect(staffForm.parse(MEMBER).photo).toBeUndefined();
+    expect(staffForm.shape.photo.safeParse(undefined).success).toBe(true);
+  });
+
+  it("refuses a file that cannot be their photo, and says what can", () => {
+    const pdf = new File(["x"], "notes.pdf", { type: "application/pdf" });
+    const heavy = new File(
+      [new Uint8Array(STAFF_AVATAR_SIZE + 1)],
+      "heavy.png",
+      {
+        type: "image/png",
+      },
+    );
+    for (const file of [pdf, heavy]) {
+      const checked = staffForm.shape.photo.safeParse(file);
+      expect(checked.success).toBe(false);
+      expect(checked.error?.issues.map((issue) => issue.message)).toEqual([
+        "That file can’t be used. Choose a JPEG, PNG or WebP image of 4 MB or less.",
+      ]);
+    }
+  });
 });
 
 describe("staffBio", () => {

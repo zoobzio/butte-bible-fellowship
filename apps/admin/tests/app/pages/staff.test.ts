@@ -9,7 +9,6 @@ import { setRoutePath, useRouter } from "#imports";
 import Select from "@zoobzio/vue/components/select.vue";
 import PageHeader from "~/components/PageHeader.vue";
 import SaveBar from "~/components/SaveBar.vue";
-import StaffAvatar from "~/components/StaffAvatar.vue";
 import StaffBio from "~/components/StaffBio.vue";
 import StaffEditor from "~/components/StaffEditor.vue";
 import StaffMenu from "~/components/StaffMenu.vue";
@@ -709,7 +708,7 @@ describe("member page", () => {
 });
 
 describe("profile page", () => {
-  it("lays the member out in two panels: their photo over their details, then their bio", () => {
+  it("lays the member out in two panels: their details, their photo among them, then their bio", () => {
     const wrapper = mount(Profile, { props: { record: STAFF } });
     const panels = wrapper.find(".staff-page").element.children;
     expect([...panels].map((panel) => panel.className)).toEqual([
@@ -719,10 +718,9 @@ describe("profile page", () => {
     ]);
     const side = wrapper.find(".staff-page-side");
     expect([...side.element.children].map((child) => child.className)).toEqual([
-      "staff-avatar",
       "staff-editor",
     ]);
-    expect(side.findComponent(StaffAvatar).props("record")).toEqual(STAFF);
+    expect(side.find(".staff-editor .image-field").exists()).toBe(true);
     expect(side.findComponent(StaffEditor).props("record")).toEqual(STAFF);
     expect(side.findComponent(StaffBio).exists()).toBe(false);
     expect(wrapper.findComponent(StaffBio).props("record")).toEqual(STAFF);

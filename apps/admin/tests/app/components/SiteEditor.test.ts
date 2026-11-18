@@ -51,17 +51,35 @@ describe("SiteEditor", () => {
   it("is one column of the home page's metadata: what is shown for it, then its hero", () => {
     const { wrapper } = mountHome();
     expect(
-      wrapper.findAll(".f-data-form-field label").map((label) => label.text()),
+      wrapper.findAll(".f-data-form-field-label").map((label) => label.text()),
     ).toEqual([
       "Title",
       "Description",
+      "Hero image",
       "Hero heading",
       "Hero text",
       "Button label",
       "Button link",
     ]);
     expect(wrapper.find("#home-slug").exists()).toBe(false);
-    expect(wrapper.find("#home-heroImage").exists()).toBe(false);
+  });
+
+  it("draws the hero's picture among the fields: a frame with its badges, saying what the page's editor has them say", () => {
+    const { wrapper } = mountHome();
+    const input = wrapper.find("input#home-heroImage");
+    expect(input.attributes()).toMatchObject({
+      type: "file",
+      accept: "image/jpeg,image/png,image/webp",
+    });
+    const field = wrapper.find(".image-field");
+    expect(
+      field.find(".f-image-input-placeholder").attributes("aria-label"),
+    ).toBe("No hero image");
+    expect(field.find("label.image-field-pick").attributes()).toMatchObject({
+      for: "home-heroImage",
+      title: "Upload hero image",
+    });
+    expect(field.find(".image-field-remove").exists()).toBe(false);
   });
 
   it("writes the heading in a plain text field, its highlight between asterisks", () => {
@@ -111,8 +129,9 @@ describe("SiteEditor", () => {
 
   it("labels every control, with no hint under any", () => {
     const { wrapper } = mountHome();
+    // The picture has two: its field's, and the badge that picks one.
     const labels = wrapper.findAll("label");
-    expect(labels.length).toBe(6);
+    expect(labels.length).toBe(8);
     for (const label of labels) {
       const id = label.attributes("for");
       expect(id).toBeDefined();

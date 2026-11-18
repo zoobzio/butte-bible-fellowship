@@ -24,9 +24,13 @@ const HOME: HomeRecord = {
 };
 
 describe("toHomeForm", () => {
-  it("is the record's metadata as the form holds it, and neither its picture nor what is written on it", () => {
+  it("is the record's metadata and its picture as the form holds them, and not what is written on it", () => {
     const form = toHomeForm(HOME);
-    expect(form).toEqual({ ...WORDS, heroHeading: HEADING });
+    expect(form).toEqual({
+      ...WORDS,
+      heroHeading: HEADING,
+      heroImage: "https://cdn.example.com/home/1.jpg",
+    });
     expect(homeForm.safeParse(form).success).toBe(true);
   });
 
@@ -37,7 +41,7 @@ describe("toHomeForm", () => {
 });
 
 describe("toHomeBody", () => {
-  it("is the form as a body writes it: the record's metadata, back again", () => {
+  it("is the form as a body writes it: the record's metadata, back again, without the picture", () => {
     const body = toHomeBody(toHomeForm(HOME));
     expect(body).toEqual({ ...WORDS, heroHeading: HEADING });
     expect(homeBody.parse(body)).toEqual(body);

@@ -3,6 +3,7 @@ import type { Metadata } from "~/types/editor";
 
 import { Form } from "#components";
 import { useId, useNuxtApp } from "#imports";
+import ImageField from "~/components/ImageField.vue";
 import { useDraft } from "~/composables/drafts";
 </script>
 
@@ -22,7 +23,7 @@ const { $t } = useNuxtApp();
  * The page is saved as a whole, from the bar at its foot: the form hands
  * itself in and keeps no button of its own.
  */
-const { form, error, dirty, saving, save, reset } = editor;
+const { form, picture, error, dirty, saving, save, reset } = editor;
 useDraft({ dirty, open: dirty, saving, error, save, reset });
 
 const title = useId();
@@ -40,6 +41,10 @@ const pt = { form: { novalidate: true, "aria-labelledby": title } };
       {{ $t.admin.page.metadata() }}
     </h2>
     <Form :service="form" :pt="pt">
+      <!-- Only a page with a picture has a field that draws one. -->
+      <template v-if="picture" #imageInput="{ settings }">
+        <ImageField :control="settings.imageInput" :labels="picture" />
+      </template>
       <template #footer>
         <!-- An empty slot would draw the form's own buttons in its place. -->
         <span hidden />

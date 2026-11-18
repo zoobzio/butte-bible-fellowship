@@ -37,6 +37,29 @@ export const homeBody = z
       "The home page's metadata as it is written: what the browser and search engines show for it, and the words of the hero it opens with. Its picture and what is written on the page are each written on their own.",
   });
 
+/** The kinds of image the hero's picture may be, by media type. */
+export const HOME_IMAGE_TYPES = [
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+] as const;
+
+/** The most the hero's picture may weigh, in bytes: 4 MB. */
+export const HOME_IMAGE_SIZE = 4 * 1024 * 1024;
+
+/** What is said of a file that cannot be the hero's picture. */
+const HOME_IMAGE_ERROR =
+  "That file can’t be used. Choose a JPEG, PNG or WebP image of 4 MB or less.";
+
+export const homeImage = z
+  .file()
+  .max(HOME_IMAGE_SIZE, { error: HOME_IMAGE_ERROR })
+  .mime([...HOME_IMAGE_TYPES], { error: HOME_IMAGE_ERROR })
+  .meta({
+    description:
+      "The picture of the home page's hero as it is uploaded: a JPEG, PNG or WebP image of 4 MB at most.",
+  });
+
 /** A line of the page that must say something, as a form holds it. */
 const typed = z.string().trim().min(1);
 
@@ -48,10 +71,11 @@ export const homeForm = z
     heroDescription: typed,
     heroAction: typed,
     heroLink: z.string().trim().pipe(link),
+    heroImage: z.union([z.string(), homeImage]).optional(),
   })
   .meta({
     description:
-      "The home page's metadata as the admin's form holds it: the body, with each line trimmed.",
+      "The home page's metadata as the admin's form holds it: the body, with each line trimmed, and the hero's picture, the URL of the one it has or an image picked to be uploaded in its place, which is written on its own.",
   });
 
 export const homeArticle = z
@@ -65,23 +89,4 @@ export const homeArticle = z
     id: "HomeArticle",
     description:
       "What is written on the home page, on its own: what replaces what it has.",
-  });
-
-/** The kinds of image the hero's picture may be, by media type. */
-export const HOME_IMAGE_TYPES = [
-  "image/jpeg",
-  "image/png",
-  "image/webp",
-] as const;
-
-/** The most the hero's picture may weigh, in bytes: 4 MB. */
-export const HOME_IMAGE_SIZE = 4 * 1024 * 1024;
-
-export const homeImage = z
-  .file()
-  .max(HOME_IMAGE_SIZE)
-  .mime([...HOME_IMAGE_TYPES])
-  .meta({
-    description:
-      "The picture of the home page's hero as it is uploaded: a JPEG, PNG or WebP image of 4 MB at most.",
   });

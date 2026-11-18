@@ -28,9 +28,6 @@ const { editor, record, address } = defineProps<{
   address: string;
 }>();
 
-/* What else a page keeps beside its metadata, over it: a picture, say. */
-defineSlots<{ default?: () => unknown }>();
-
 /*
  * The page is saved and reset as a whole, from one bar at the foot of the
  * screen: each panel hands in its own part of it.
@@ -47,7 +44,6 @@ const contents = ref<OutlineEntry[]>([]);
 <template>
   <div class="site-page">
     <div class="site-page-side">
-      <slot />
       <SiteEditor :editor="editor" />
       <TableOfContents :entries="contents" />
     </div>

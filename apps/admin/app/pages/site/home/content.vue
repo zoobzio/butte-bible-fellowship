@@ -1,7 +1,6 @@
 <script lang="ts">
 import { createError, definePageMeta, useNuxtApp } from "#imports";
 
-import HomeImage from "~/components/HomeImage.vue";
 import SitePage from "~/components/SitePage.vue";
 import { useHomeEditor } from "~/composables/site/home";
 import { useHomeRecord } from "~/composables/site/record";
@@ -32,7 +31,5 @@ const editor = useHomeEditor(record.value);
     :editor="editor"
     :record="record"
     :address="body(HOME)"
-  >
-    <HomeImage :record="record" />
-  </SitePage>
+  />
 </template>

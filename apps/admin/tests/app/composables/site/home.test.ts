@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { useRouter } from "#imports";
+import { toRaw, useRouter } from "#imports";
 import { HOME_PAGE } from "#test/support/records";
 import { useHomeEditor } from "~/composables/site/home";
 
@@ -17,6 +17,7 @@ describe("useHomeEditor", () => {
     ).toEqual([
       ["title", "text"],
       ["description", "textarea"],
+      ["heroImage", "image"],
       ["heroHeading", "text"],
       ["heroDescription", "textarea"],
       ["heroAction", "text"],
@@ -25,14 +26,14 @@ describe("useHomeEditor", () => {
     expect(editor.form.payload).toEqual(FILLED);
   });
 
-  it("is one column: no field is given a span, all but the description must be filled in, and neither the picture nor what is written on the page is one", () => {
+  it("is one column: no field is given a span, all but the description and the picture must be filled in, and what is written on the page is not one", () => {
     const { fields } = useHomeEditor(HOME_PAGE).form.config;
     expect(fields.every((field) => field.colspan === undefined)).toBe(true);
     expect(
       fields.filter((field) => !field.required).map((field) => field.key),
-    ).toEqual(["description"]);
+    ).toEqual(["description", "heroImage"]);
     const { payload } = useHomeEditor(HOME_PAGE).form;
-    for (const key of ["body", "slug", "id", "updatedAt", "heroImage"]) {
+    for (const key of ["body", "slug", "id", "updatedAt"]) {
       expect(payload).not.toHaveProperty(key);
     }
   });
@@ -42,12 +43,26 @@ describe("useHomeEditor", () => {
     expect(fields.map((field) => field.label)).toEqual([
       "Title",
       "Description",
+      "Hero image",
       "Hero heading",
       "Hero text",
       "Button label",
       "Button link",
     ]);
     expect(fields.every((field) => field.hint === undefined)).toBe(true);
+  });
+
+  it("takes the hero's picture of the kinds the schema takes, and says what its control does", () => {
+    const editor = useHomeEditor(HOME_PAGE);
+    expect(
+      editor.form.config.fields.find((field) => field.key === "heroImage"),
+    ).toMatchObject({ accept: "image/jpeg,image/png,image/webp" });
+    expect(editor.picture).toEqual({
+      upload: "Upload hero image",
+      change: "Change hero image",
+      remove: "Remove hero image",
+      none: "No hero image",
+    });
   });
 
   it("starts over from the record, whatever the last visit left", () => {
@@ -148,6 +163,103 @@ describe("useHomeEditor", () => {
     const editor = useHomeEditor(HOME_PAGE);
     await editor.save();
     expect(editor.error.value).toBe("Something went wrong.");
+  });
+
+  const PICTURE = "https://cdn.example.com/kept.jpg";
+  const PICTURED = { ...HOME_PAGE, heroImage: PICTURE };
+  const picked = () =>
+    new File([new Uint8Array(8)], "picked.png", { type: "image/png" });
+  /** What was asked of the server, in order: where, and how. */
+  const asked = (fetch: { mock: { calls: unknown[][] } }) =>
+    fetch.mock.calls.map(([path, request]) => [
+      path,
+      (request as { method: string }).method,
+    ]);
+
+  it("uploads an image picked for the hero's picture after the details, in a request of its own, and holds the one kept", async () => {
+    const fetch = vi.fn(async (path: string, _?: unknown) =>
+      path === "/api/site/home/image" ? PICTURED : HOME_PAGE,
+    );
+    vi.stubGlobal("$fetch", fetch);
+    const editor = useHomeEditor(HOME_PAGE);
+    const file = picked();
+    editor.form.set("heroImage", file);
+    expect(editor.dirty.value).toBe(true);
+    await editor.save();
+    expect(asked(fetch)).toEqual([
+      ["/api/site/home", "PUT"],
+      ["/api/site/home/image", "PATCH"],
+    ]);
+    const [details, upload] = fetch.mock.calls.map(
+      ([, request]) => (request as { body: unknown }).body,
+    );
+    expect(details).not.toHaveProperty("heroImage");
+    expect(upload).toBeInstanceOf(FormData);
+    expect(toRaw((upload as FormData).get("file"))).toBe(file);
+    expect(editor.form.payload.heroImage).toBe(PICTURE);
+    expect(editor.dirty.value).toBe(false);
+    expect(editor.error.value).toBeNull();
+  });
+
+  it("removes the hero's picture once the form holds none, and leaves the one kept alone otherwise", async () => {
+    const fetch = vi.fn(async (path: string, _?: unknown) =>
+      path === "/api/site/home/image" ? HOME_PAGE : PICTURED,
+    );
+    vi.stubGlobal("$fetch", fetch);
+    const editor = useHomeEditor(PICTURED);
+    expect(editor.form.payload.heroImage).toBe(PICTURE);
+    await editor.save();
+    expect(asked(fetch)).toEqual([["/api/site/home", "PUT"]]);
+    expect(editor.form.payload.heroImage).toBe(PICTURE);
+
+    fetch.mockClear();
+    editor.form.set("heroImage", undefined);
+    expect(editor.dirty.value).toBe(true);
+    await editor.save();
+    expect(asked(fetch)).toEqual([
+      ["/api/site/home", "PUT"],
+      ["/api/site/home/image", "DELETE"],
+    ]);
+    expect(editor.form.payload.heroImage).toBeUndefined();
+    expect(editor.dirty.value).toBe(false);
+  });
+
+  it("refuses a file that cannot be the hero's picture at its field, and sends nothing", async () => {
+    const fetch = vi.fn(async () => HOME_PAGE);
+    vi.stubGlobal("$fetch", fetch);
+    const editor = useHomeEditor(HOME_PAGE);
+    editor.form.set(
+      "heroImage",
+      new File(["x"], "notes.pdf", { type: "application/pdf" }),
+    );
+    await editor.save();
+    expect(fetch).not.toHaveBeenCalled();
+    expect(editor.form.field("heroImage").error).toBe(
+      "That file can’t be used. Choose a JPEG, PNG or WebP image of 4 MB or less.",
+    );
+    expect(editor.error.value).toBeNull();
+  });
+
+  it("keeps the image picked when its upload fails, the details saved, and puts the hero's picture back on a reset", async () => {
+    const changed = { ...HOME_PAGE, title: "Welcome" };
+    const fetch = vi.fn(async (path: string, _?: unknown) => {
+      if (path === "/api/site/home/image")
+        throw new Error("The store is away.");
+      return changed;
+    });
+    vi.stubGlobal("$fetch", fetch);
+    const editor = useHomeEditor(HOME_PAGE);
+    const file = picked();
+    editor.form.set("title", "Welcome");
+    editor.form.set("heroImage", file);
+    await editor.save();
+    expect(editor.error.value).toBe("The store is away.");
+    expect(toRaw(editor.form.payload.heroImage)).toBe(file);
+    expect(editor.dirty.value).toBe(true);
+    editor.reset();
+    expect(editor.form.payload.heroImage).toBeUndefined();
+    expect(editor.form.payload.title).toBe("Welcome");
+    expect(editor.error.value).toBeNull();
   });
 
   it("is clean on the record as it was saved, and dirty from the first change", () => {

@@ -92,6 +92,29 @@ export const staffBody = z
       "A staff member's details as they are written: what creating one takes, and what updating one replaces. Their photo and their bio are each written on their own.",
   });
 
+/** The kinds of image a member's photo may be, by media type. */
+export const STAFF_AVATAR_TYPES = [
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+] as const;
+
+/** The most a member's photo may weigh, in bytes: 4 MB. */
+export const STAFF_AVATAR_SIZE = 4 * 1024 * 1024;
+
+/** What is said of a file that cannot be a member's photo. */
+const STAFF_AVATAR_ERROR =
+  "That file can’t be used. Choose a JPEG, PNG or WebP image of 4 MB or less.";
+
+export const staffAvatar = z
+  .file()
+  .max(STAFF_AVATAR_SIZE, { error: STAFF_AVATAR_ERROR })
+  .mime([...STAFF_AVATAR_TYPES], { error: STAFF_AVATAR_ERROR })
+  .meta({
+    description:
+      "A staff member's photo as it is uploaded: a JPEG, PNG or WebP image of 4 MB at most.",
+  });
+
 export const staffForm = staffBody
   .extend({
     name: z
@@ -99,10 +122,14 @@ export const staffForm = staffBody
       .trim()
       .min(1)
       .meta({ examples: ["Jane Doe"] }),
+    photo: z.union([z.string(), staffAvatar]).optional().meta({
+      description:
+        "Their photo: the URL of the one they have, or an image picked to be uploaded in its place. Left out, they have none.",
+    }),
   })
   .meta({
     description:
-      "A staff member's details as the admin's form holds them: the body, with the name trimmed.",
+      "A staff member's details as the admin's form holds them: the body, with the name trimmed, and their photo, which is written on its own.",
   });
 
 export const staffBio = z
@@ -116,23 +143,4 @@ export const staffBio = z
     id: "StaffBio",
     description:
       "A staff member's bio as it is written, on its own: what replaces the one they have.",
-  });
-
-/** The kinds of image a member's photo may be, by media type. */
-export const STAFF_AVATAR_TYPES = [
-  "image/jpeg",
-  "image/png",
-  "image/webp",
-] as const;
-
-/** The most a member's photo may weigh, in bytes: 4 MB. */
-export const STAFF_AVATAR_SIZE = 4 * 1024 * 1024;
-
-export const staffAvatar = z
-  .file()
-  .max(STAFF_AVATAR_SIZE)
-  .mime([...STAFF_AVATAR_TYPES])
-  .meta({
-    description:
-      "A staff member's photo as it is uploaded: a JPEG, PNG or WebP image of 4 MB at most.",
   });

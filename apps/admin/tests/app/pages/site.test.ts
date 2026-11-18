@@ -4,7 +4,6 @@ import { mount } from "@vue/test-utils";
 import { NuxtPage } from "#components";
 import { setRoutePath } from "#imports";
 import ContentBody from "~/components/ContentBody.vue";
-import HomeImage from "~/components/HomeImage.vue";
 import PageHeader from "~/components/PageHeader.vue";
 import SiteEditor from "~/components/SiteEditor.vue";
 import SitePage from "~/components/SitePage.vue";
@@ -158,9 +157,8 @@ describe("home page's content tab", () => {
       (wrapper.find("#home-heroHeading").element as HTMLInputElement).value,
     ).toBe("Discover God’s **Love, Grace & Truth**");
     expect(
-      wrapper.find(".site-page-side > .home-image + .site-editor").exists(),
+      wrapper.find(".site-page-side > .site-editor .image-field").exists(),
     ).toBe(true);
-    expect(wrapper.findComponent(HomeImage).props("record")).toEqual(HOME_PAGE);
     expect(wrapper.find(".content-body").text()).toContain(
       "Has served since 2010.",
     );
@@ -196,7 +194,7 @@ describe("About Us's content tab", () => {
       (wrapper.find("#about-title").element as HTMLInputElement).value,
     ).toBe("About Us");
     expect(wrapper.find("#about-heroHeading").exists()).toBe(false);
-    expect(wrapper.findComponent(HomeImage).exists()).toBe(false);
+    expect(wrapper.find(".image-field").exists()).toBe(false);
   });
 
   it("throws a 404 should the page's row be missing", async () => {
@@ -230,7 +228,7 @@ describe("connect page's content tab", () => {
     expect(wrapper.findComponent(ContentBody).props("address")).toBe(
       "/api/site/connect/body",
     );
-    expect(wrapper.findComponent(HomeImage).exists()).toBe(false);
+    expect(wrapper.find(".image-field").exists()).toBe(false);
   });
 
   it("throws a 404 should the page's row be missing", async () => {

@@ -91,8 +91,6 @@ describe("bundles", () => {
       "events.monthly",
       "events.week",
       "admin.editor.confirm",
-      "admin.member.photoConfirm",
-      "admin.event.imageConfirm",
       "admin.content.moving",
       "admin.content.confirmMany",
       "admin.staff.confirmMany",
@@ -155,12 +153,6 @@ describe("bundles", () => {
     expect(
       prosary.format("admin.content.moving", { name: "Sermon notes" }),
     ).toBe("Moving Sermon notes. Open the folder it belongs in.");
-    expect(
-      prosary.format("admin.member.photoConfirm", { name: "Jane Doe" }),
-    ).toBe("Remove Jane Doe’s photo?");
-    expect(
-      prosary.format("admin.event.imageConfirm", { name: "Harvest Dinner" }),
-    ).toBe("Remove the picture of Harvest Dinner?");
   });
 });
 

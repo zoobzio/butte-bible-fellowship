@@ -42,11 +42,12 @@ describe("EventEditor", () => {
     expect(wrapper.text()).not.toContain("Delete");
   });
 
-  it("is one column of an event's details: a date, its times and whether it repeats, and no picture, body, status, note or location", () => {
+  it("is one column of an event's details: its picture, a date, its times and whether it repeats, and no body, status, note or location", () => {
     const wrapper = mount(EventEditor, { props: { record: DINNER } });
     expect(
-      wrapper.findAll(".f-data-form-field label").map((label) => label.text()),
+      wrapper.findAll(".f-data-form-field-label").map((label) => label.text()),
     ).toEqual([
+      "Picture",
       "Title",
       "Slug",
       "Date",
@@ -61,10 +62,66 @@ describe("EventEditor", () => {
     expect(type("event-start")).toBe("time");
     expect(type("event-end")).toBe("time");
     expect(wrapper.find("textarea#event-summary").exists()).toBe(true);
-    for (const key of ["body", "image", "status", "note", "location", "day"]) {
+    for (const key of ["body", "status", "note", "location", "day"]) {
       expect(wrapper.find(`#event-${key}`).exists(), key).toBe(false);
     }
     expect(wrapper.find(".f-data-editor").exists()).toBe(false);
+  });
+
+  it("draws the picture of an event that exists among its fields: a frame with its badges, under the field's label", () => {
+    const pictured = {
+      ...WORSHIP,
+      image: "https://cdn.example.com/events/worship.jpg",
+    };
+    const wrapper = mount(EventEditor, { props: { record: pictured } });
+    const field = wrapper.find(".f-data-form-field");
+    expect(field.find(".f-data-form-field-label").attributes("for")).toBe(
+      "event-image",
+    );
+    expect(field.find("input#event-image").attributes()).toMatchObject({
+      type: "file",
+      accept: "image/jpeg,image/png,image/webp",
+    });
+    expect(field.find(".image-field img").attributes("src")).toBe(
+      pictured.image,
+    );
+    expect(field.find(".image-field").attributes("data-round")).toBeUndefined();
+    expect(field.find("label.image-field-pick").attributes("title")).toBe(
+      "Change picture",
+    );
+    expect(
+      field.find("button.image-field-remove").attributes("aria-label"),
+    ).toBe("Remove picture");
+
+    const bare = mount(EventEditor, { props: { record: DINNER } });
+    const none = bare.find(".image-field .f-image-input-placeholder");
+    expect(none.attributes("aria-label")).toBe("No picture");
+    expect(bare.find("label.image-field-pick").attributes("title")).toBe(
+      "Upload picture",
+    );
+  });
+
+  it("holds a picture taken out as a change to save, with no word to the server", async () => {
+    const fetch = vi.fn(async () => WORSHIP);
+    vi.stubGlobal("$fetch", fetch);
+    const { wrapper, drafts } = mountHeld(EventEditor, {
+      ...WORSHIP,
+      image: "https://cdn.example.com/events/worship.jpg",
+    });
+    expect(drafts.dirty.value).toBe(false);
+    await wrapper.find("button.image-field-remove").trigger("click");
+    expect(wrapper.find(".image-field img").exists()).toBe(false);
+    expect(drafts.dirty.value).toBe(true);
+    expect(fetch).not.toHaveBeenCalled();
+    drafts.reset();
+    await wrapper.vm.$nextTick();
+    expect(wrapper.find(".image-field img").exists()).toBe(true);
+  });
+
+  it("draws no picture for a new event: there is nothing yet to write one to", () => {
+    const wrapper = mount(EventEditor, { props: { record: null } });
+    expect(wrapper.find(".image-field").exists()).toBe(false);
+    expect(wrapper.find("#event-image").exists()).toBe(false);
   });
 
   it("says under a field what it is for, and ties the hint to it", () => {

@@ -11,7 +11,13 @@ export const toStaffForm = (record: StaffRecord): StaffForm => ({
   summary: record.summary,
   email: record.email,
   phone: record.phone,
+  photo: record.photo,
 });
+
+/**
+ * The details a form holds as a body writes them. The photo is no part of
+ * the body: it is written on its own.
+ */
 
 export const toStaffBody = (form: StaffForm): StaffBody => ({
   name: form.name.trim(),

@@ -1,14 +1,18 @@
 import type { EventForm, EventRecord } from "@bbf/schema/types";
+import type { FormOptions } from "#imports";
 
-import { eventForm, eventRecord } from "@bbf/schema";
+import type { PictureLabels } from "~/types/editor";
+
+import { EVENT_IMAGE_TYPES, eventForm, eventRecord } from "@bbf/schema";
 import { toEventBody, toEventForm } from "@bbf/utils/vm";
 import { computed, createForm, ref, useNuxtApp, useRouter } from "#imports";
 import { useApi } from "~/composables/api";
-import { ROUTE, endpoint } from "~/composables/events/routes";
+import { ROUTE, endpoint, image } from "~/composables/events/routes";
 import { WEEK_OPTIONS } from "~/constants/editor";
 import { link } from "~/constants/events";
 import { toOptions } from "~/utils/editor";
 import { failure } from "~/utils/errors";
+import { toImageRequest } from "~/utils/image";
 
 /**
  * An optional field once cleared: the control writes an empty string, the
@@ -26,15 +30,21 @@ const picked = (weeks: EventForm["weeks"]): EventForm["weeks"] =>
 
 /**
  * The form of one event's details: a new event when there is no record.
- * It is one column of fields and holds neither the picture nor what is
- * written about the event, each of which is written on its own, beside it.
- * The form's store is shared under its id, so each visit starts over from
+ * It is one column of fields and does not hold what is written about the
+ * event, which is written on its own, beside it. The form's store is shared under its id, so each visit starts over from
  * the record. The form carries no title of its own: the page's header
  * names the event, and its menu is where the event is deleted.
  *
  * An event is held on its date, and every week on that date's day of the
  * week once it is marked as recurring. Only a recurring event picks its
  * weeks, so the weeks are cleared when the mark is taken off.
+ *
+ * An event that exists has its picture as the first of its fields: the
+ * one it keeps, an image picked to take its place, or none. The picture is
+ * written with the details, in a request of its own after theirs: an image
+ * picked is uploaded, and none where one was kept is removed. A new event
+ * has no such field: there is nothing yet to write a picture to. `picture`
+ * is what the picture's control says of what it does.
  *
  * A new event saved opens on its own page, where the picture and the
  * writing wait; one changed stays on the page, its fields showing what was
@@ -57,8 +67,28 @@ export const useEventEditor = (
   /* The record as it was last saved: what a reset puts back. */
   let kept = record;
 
+  const picture: FormOptions<EventForm>["fields"] =
+    record === null
+      ? []
+      : [
+          {
+            type: "image",
+            key: "image",
+            label: $t.admin.event.picture(),
+            accept: EVENT_IMAGE_TYPES.join(","),
+          },
+        ];
+
+  const labels: PictureLabels = {
+    upload: $t.admin.event.imageUpload(),
+    change: $t.admin.event.imageChange(),
+    remove: $t.admin.event.imageRemove(),
+    none: $t.admin.event.imageNone(),
+  };
+
   const useForm = createForm<EventForm>("event", {
     fields: [
+      ...picture,
       {
         type: "text",
         key: "title",
@@ -110,18 +140,22 @@ export const useEventEditor = (
     defaults: { recurring: false },
     middleware: { summary: blank, weeks: picked },
     submit: async (form) => {
-      const body = toEventBody(eventForm.parse(form.payload));
+      const payload = eventForm.parse(form.payload);
+      const body = toEventBody(payload);
       if (record === null) {
         const created = await api(ROUTE, { method: "POST", body });
         await router.push(link(eventRecord.parse(created)));
         return;
       }
-      const changed = eventRecord.parse(
+      kept = eventRecord.parse(
         await api(endpoint(record.id), { method: "PUT", body }),
       );
-      kept = changed;
-      form.update(toEventForm(changed));
-      saved(changed);
+      const request = toImageRequest(payload.image, kept.image);
+      if (request !== null) {
+        kept = eventRecord.parse(await api(image(record.id), request));
+      }
+      form.update(toEventForm(kept));
+      saved(kept);
     },
   });
 
@@ -171,5 +205,5 @@ export const useEventEditor = (
     fill();
   };
 
-  return { form, error, dirty, saving, save, reset };
+  return { form, picture: labels, error, dirty, saving, save, reset };
 };

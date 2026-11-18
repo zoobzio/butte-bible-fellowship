@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { useRouter } from "#imports";
+import { toRaw, useRouter } from "#imports";
 import { STAFF } from "#test/support/records";
 import { useStaffEditor } from "~/composables/staff/editor";
 
@@ -30,14 +30,30 @@ describe("useStaffEditor", () => {
     expect(editor.form.payload).toEqual(BODY);
   });
 
-  it("is one column of their details: no field is given a span, and neither the photo nor the bio is one", () => {
+  it("is one column of their details: no field is given a span, and the bio is not one", () => {
     const { fields } = useStaffEditor({
       ...STAFF,
       photo: "https://cdn.example.com/staff/jane-doe.jpg",
     }).form.config;
     expect(fields.every((field) => field.colspan === undefined)).toBe(true);
     expect(useStaffEditor(STAFF).form.payload).not.toHaveProperty("bio");
-    expect(useStaffEditor(STAFF).form.payload).not.toHaveProperty("photo");
+  });
+
+  it("has the photo of a member that exists as the first of their fields, of the kinds the schema takes, and none for a new one", () => {
+    const [first, second] = useStaffEditor(STAFF).form.config.fields;
+    expect(first).toMatchObject({
+      type: "image",
+      key: "photo",
+      label: "Photo",
+      accept: "image/jpeg,image/png,image/webp",
+    });
+    expect(first?.required).toBeUndefined();
+    expect(second?.key).toBe("name");
+    expect(
+      useStaffEditor(null).form.config.fields.some(
+        (field) => field.type === "image",
+      ),
+    ).toBe(false);
   });
 
   it("starts over from the record, whatever the last visit left", () => {
@@ -182,6 +198,102 @@ describe("useStaffEditor", () => {
 
     editor.form.set("email", "jane");
     await editor.form.submit();
+    expect(editor.error.value).toBeNull();
+  });
+
+  const PICTURE = "https://cdn.example.com/kept.jpg";
+  const PICTURED = { ...STAFF, photo: PICTURE };
+  const picked = () =>
+    new File([new Uint8Array(8)], "picked.png", { type: "image/png" });
+  /** What was asked of the server, in order: where, and how. */
+  const asked = (fetch: { mock: { calls: unknown[][] } }) =>
+    fetch.mock.calls.map(([path, request]) => [
+      path,
+      (request as { method: string }).method,
+    ]);
+
+  it("uploads an image picked for their photo after the details, in a request of its own, and holds the one kept", async () => {
+    const fetch = vi.fn(async (path: string, _?: unknown) =>
+      path === "/api/staff/1/avatar" ? PICTURED : STAFF,
+    );
+    vi.stubGlobal("$fetch", fetch);
+    const editor = useStaffEditor(STAFF);
+    const file = picked();
+    editor.form.set("photo", file);
+    expect(editor.dirty.value).toBe(true);
+    await editor.save();
+    expect(asked(fetch)).toEqual([
+      ["/api/staff/1", "PUT"],
+      ["/api/staff/1/avatar", "PATCH"],
+    ]);
+    const [details, upload] = fetch.mock.calls.map(
+      ([, request]) => (request as { body: unknown }).body,
+    );
+    expect(details).not.toHaveProperty("photo");
+    expect(upload).toBeInstanceOf(FormData);
+    expect(toRaw((upload as FormData).get("file"))).toBe(file);
+    expect(editor.form.payload.photo).toBe(PICTURE);
+    expect(editor.dirty.value).toBe(false);
+    expect(editor.error.value).toBeNull();
+  });
+
+  it("removes their photo once the form holds none, and leaves the one kept alone otherwise", async () => {
+    const fetch = vi.fn(async (path: string, _?: unknown) =>
+      path === "/api/staff/1/avatar" ? STAFF : PICTURED,
+    );
+    vi.stubGlobal("$fetch", fetch);
+    const editor = useStaffEditor(PICTURED);
+    expect(editor.form.payload.photo).toBe(PICTURE);
+    await editor.save();
+    expect(asked(fetch)).toEqual([["/api/staff/1", "PUT"]]);
+    expect(editor.form.payload.photo).toBe(PICTURE);
+
+    fetch.mockClear();
+    editor.form.set("photo", undefined);
+    expect(editor.dirty.value).toBe(true);
+    await editor.save();
+    expect(asked(fetch)).toEqual([
+      ["/api/staff/1", "PUT"],
+      ["/api/staff/1/avatar", "DELETE"],
+    ]);
+    expect(editor.form.payload.photo).toBeUndefined();
+    expect(editor.dirty.value).toBe(false);
+  });
+
+  it("refuses a file that cannot be their photo at its field, and sends nothing", async () => {
+    const fetch = vi.fn(async () => STAFF);
+    vi.stubGlobal("$fetch", fetch);
+    const editor = useStaffEditor(STAFF);
+    editor.form.set(
+      "photo",
+      new File(["x"], "notes.pdf", { type: "application/pdf" }),
+    );
+    await editor.save();
+    expect(fetch).not.toHaveBeenCalled();
+    expect(editor.form.field("photo").error).toBe(
+      "That file can’t be used. Choose a JPEG, PNG or WebP image of 4 MB or less.",
+    );
+    expect(editor.error.value).toBeNull();
+  });
+
+  it("keeps the image picked when its upload fails, the details saved, and puts their photo back on a reset", async () => {
+    const changed = { ...STAFF, name: "Jane Roe" };
+    const fetch = vi.fn(async (path: string, _?: unknown) => {
+      if (path === "/api/staff/1/avatar") throw new Error("The store is away.");
+      return changed;
+    });
+    vi.stubGlobal("$fetch", fetch);
+    const editor = useStaffEditor(STAFF);
+    const file = picked();
+    editor.form.set("name", "Jane Roe");
+    editor.form.set("photo", file);
+    await editor.save();
+    expect(editor.error.value).toBe("The store is away.");
+    expect(toRaw(editor.form.payload.photo)).toBe(file);
+    expect(editor.dirty.value).toBe(true);
+    editor.reset();
+    expect(editor.form.payload.photo).toBeUndefined();
+    expect(editor.form.payload.name).toBe("Jane Roe");
     expect(editor.error.value).toBeNull();
   });
 

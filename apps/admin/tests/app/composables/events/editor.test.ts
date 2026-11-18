@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { useRouter } from "#imports";
+import { toRaw, useRouter } from "#imports";
 import { DINNER, WORSHIP } from "#test/support/records";
 import { useEventEditor } from "~/composables/events/editor";
 
@@ -55,7 +55,7 @@ describe("useEventEditor", () => {
     expect(useEventEditor(DINNER).form.payload).toEqual(ONCE);
   });
 
-  it("is one column of its details: no field is given a span, and neither the picture nor the body is one", () => {
+  it("is one column of its details: no field is given a span, and the body is not one", () => {
     const { fields } = useEventEditor({
       ...WORSHIP,
       image: "https://cdn.example.com/events/worship.jpg",
@@ -65,9 +65,26 @@ describe("useEventEditor", () => {
       fields.filter((field) => field.required).map((field) => field.key),
     ).toEqual(["title", "slug", "date", "start"]);
     const { payload } = useEventEditor(WORSHIP).form;
-    for (const key of ["body", "image", "day", "status", "note", "location"]) {
+    for (const key of ["body", "day", "status", "note", "location"]) {
       expect(payload).not.toHaveProperty(key);
     }
+  });
+
+  it("has the picture of an event that exists as the first of its fields, of the kinds the schema takes, and none for a new one", () => {
+    const [first, second] = useEventEditor(WORSHIP).form.config.fields;
+    expect(first).toMatchObject({
+      type: "image",
+      key: "image",
+      label: "Picture",
+      accept: "image/jpeg,image/png,image/webp",
+    });
+    expect(first?.required).toBeUndefined();
+    expect(second?.key).toBe("title");
+    expect(
+      useEventEditor(null).form.config.fields.some(
+        (field) => field.type === "image",
+      ),
+    ).toBe(false);
   });
 
   it("starts over from the record, whatever the last visit left", () => {
@@ -225,6 +242,102 @@ describe("useEventEditor", () => {
 
     editor.form.set("end", "09:00");
     await editor.form.submit();
+    expect(editor.error.value).toBeNull();
+  });
+
+  const PICTURE = "https://cdn.example.com/kept.jpg";
+  const PICTURED = { ...WORSHIP, image: PICTURE };
+  const picked = () =>
+    new File([new Uint8Array(8)], "picked.png", { type: "image/png" });
+  /** What was asked of the server, in order: where, and how. */
+  const asked = (fetch: { mock: { calls: unknown[][] } }) =>
+    fetch.mock.calls.map(([path, request]) => [
+      path,
+      (request as { method: string }).method,
+    ]);
+
+  it("uploads an image picked for its picture after the details, in a request of its own, and holds the one kept", async () => {
+    const fetch = vi.fn(async (path: string, _?: unknown) =>
+      path === "/api/events/3/image" ? PICTURED : WORSHIP,
+    );
+    vi.stubGlobal("$fetch", fetch);
+    const editor = useEventEditor(WORSHIP);
+    const file = picked();
+    editor.form.set("image", file);
+    expect(editor.dirty.value).toBe(true);
+    await editor.save();
+    expect(asked(fetch)).toEqual([
+      ["/api/events/3", "PUT"],
+      ["/api/events/3/image", "PATCH"],
+    ]);
+    const [details, upload] = fetch.mock.calls.map(
+      ([, request]) => (request as { body: unknown }).body,
+    );
+    expect(details).not.toHaveProperty("image");
+    expect(upload).toBeInstanceOf(FormData);
+    expect(toRaw((upload as FormData).get("file"))).toBe(file);
+    expect(editor.form.payload.image).toBe(PICTURE);
+    expect(editor.dirty.value).toBe(false);
+    expect(editor.error.value).toBeNull();
+  });
+
+  it("removes its picture once the form holds none, and leaves the one kept alone otherwise", async () => {
+    const fetch = vi.fn(async (path: string, _?: unknown) =>
+      path === "/api/events/3/image" ? WORSHIP : PICTURED,
+    );
+    vi.stubGlobal("$fetch", fetch);
+    const editor = useEventEditor(PICTURED);
+    expect(editor.form.payload.image).toBe(PICTURE);
+    await editor.save();
+    expect(asked(fetch)).toEqual([["/api/events/3", "PUT"]]);
+    expect(editor.form.payload.image).toBe(PICTURE);
+
+    fetch.mockClear();
+    editor.form.set("image", undefined);
+    expect(editor.dirty.value).toBe(true);
+    await editor.save();
+    expect(asked(fetch)).toEqual([
+      ["/api/events/3", "PUT"],
+      ["/api/events/3/image", "DELETE"],
+    ]);
+    expect(editor.form.payload.image).toBeUndefined();
+    expect(editor.dirty.value).toBe(false);
+  });
+
+  it("refuses a file that cannot be its picture at its field, and sends nothing", async () => {
+    const fetch = vi.fn(async () => WORSHIP);
+    vi.stubGlobal("$fetch", fetch);
+    const editor = useEventEditor(WORSHIP);
+    editor.form.set(
+      "image",
+      new File(["x"], "notes.pdf", { type: "application/pdf" }),
+    );
+    await editor.save();
+    expect(fetch).not.toHaveBeenCalled();
+    expect(editor.form.field("image").error).toBe(
+      "That file can’t be used. Choose a JPEG, PNG or WebP image of 4 MB or less.",
+    );
+    expect(editor.error.value).toBeNull();
+  });
+
+  it("keeps the image picked when its upload fails, the details saved, and puts its picture back on a reset", async () => {
+    const changed = { ...WORSHIP, title: "Morning Worship" };
+    const fetch = vi.fn(async (path: string, _?: unknown) => {
+      if (path === "/api/events/3/image") throw new Error("The store is away.");
+      return changed;
+    });
+    vi.stubGlobal("$fetch", fetch);
+    const editor = useEventEditor(WORSHIP);
+    const file = picked();
+    editor.form.set("title", "Morning Worship");
+    editor.form.set("image", file);
+    await editor.save();
+    expect(editor.error.value).toBe("The store is away.");
+    expect(toRaw(editor.form.payload.image)).toBe(file);
+    expect(editor.dirty.value).toBe(true);
+    editor.reset();
+    expect(editor.form.payload.image).toBeUndefined();
+    expect(editor.form.payload.title).toBe("Morning Worship");
     expect(editor.error.value).toBeNull();
   });
 

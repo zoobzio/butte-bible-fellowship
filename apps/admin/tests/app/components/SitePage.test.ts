@@ -77,25 +77,6 @@ describe("SitePage", () => {
     expect(wrapper.findComponent(PageHeader).exists()).toBe(false);
   });
 
-  it("draws what else the tab hands it over the metadata: the home page's picture", () => {
-    const wrapper = mount(
-      defineComponent({
-        setup() {
-          const editor = useHomeEditor(HOME_PAGE);
-          return () =>
-            h(
-              SitePage as Component,
-              { editor, record: HOME_PAGE, address: ADDRESS },
-              { default: () => h("section", { class: "picture" }) },
-            );
-        },
-      }),
-    );
-    expect(
-      wrapper.find(".site-page-side > .picture + .site-editor").exists(),
-    ).toBe(true);
-  });
-
   it("lists the page's headings under its metadata, each linked to its own", async () => {
     const body = {
       type: "root" as const,

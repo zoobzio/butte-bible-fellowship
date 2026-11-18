@@ -37,8 +37,13 @@ export const toEventForm = (record: EventRecord): EventForm => ({
   weeks: toFormWeeks(record.weeks),
   start: record.start,
   end: record.end,
+  image: record.image,
 });
 
+/**
+ * The details a form holds as a body writes them. The picture is no part
+ * of the body: it is written on its own.
+ */
 export const toEventBody = (form: EventForm): EventBody => ({
   slug: form.slug.trim(),
   title: form.title.trim(),

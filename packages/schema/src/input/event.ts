@@ -172,6 +172,29 @@ export const eventBody = eventFields.check(timing).meta({
     "An event's details as they are written: what creating one takes, and what updating one replaces. It is held on its date, or every week on that date's day of the week when it recurs. Only a recurring event picks its weeks, and an end comes after its start. Its picture and what is written about it are each written on their own.",
 });
 
+/** The kinds of image an event's picture may be, by media type. */
+export const EVENT_IMAGE_TYPES = [
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+] as const;
+
+/** The most an event's picture may weigh, in bytes: 4 MB. */
+export const EVENT_IMAGE_SIZE = 4 * 1024 * 1024;
+
+/** What is said of a file that cannot be an event's picture. */
+const EVENT_IMAGE_ERROR =
+  "That file can’t be used. Choose a JPEG, PNG or WebP image of 4 MB or less.";
+
+export const eventImage = z
+  .file()
+  .max(EVENT_IMAGE_SIZE, { error: EVENT_IMAGE_ERROR })
+  .mime([...EVENT_IMAGE_TYPES], { error: EVENT_IMAGE_ERROR })
+  .meta({
+    description:
+      "An event's picture as it is uploaded: a JPEG, PNG or WebP image of 4 MB at most.",
+  });
+
 /** The weeks of the month a form offers, each as a select writes it. */
 export const EVENT_WEEKS = ["1", "2", "3", "4", "5"] as const;
 
@@ -190,11 +213,15 @@ export const eventForm = eventFields
           "Which of the month's weeks a recurring event is held in, each as the form's select writes it. Left out, every week.",
         examples: [["1", "3"]],
       }),
+    image: z.union([z.string(), eventImage]).optional().meta({
+      description:
+        "Its picture: the URL of the one it has, or an image picked to be uploaded in its place. Left out, it has none.",
+    }),
   })
   .check(timing)
   .meta({
     description:
-      "An event's details as the admin's form holds them: the body, with the title trimmed and each week as a select writes it.",
+      "An event's details as the admin's form holds them: the body, with the title trimmed and each week as a select writes it, and its picture, which is written on its own.",
   });
 
 export const eventArticle = z
@@ -208,23 +235,4 @@ export const eventArticle = z
     id: "EventArticle",
     description:
       "What is written about an event, on its own: what replaces what it has.",
-  });
-
-/** The kinds of image an event's picture may be, by media type. */
-export const EVENT_IMAGE_TYPES = [
-  "image/jpeg",
-  "image/png",
-  "image/webp",
-] as const;
-
-/** The most an event's picture may weigh, in bytes: 4 MB. */
-export const EVENT_IMAGE_SIZE = 4 * 1024 * 1024;
-
-export const eventImage = z
-  .file()
-  .max(EVENT_IMAGE_SIZE)
-  .mime([...EVENT_IMAGE_TYPES])
-  .meta({
-    description:
-      "An event's picture as it is uploaded: a JPEG, PNG or WebP image of 4 MB at most.",
   });

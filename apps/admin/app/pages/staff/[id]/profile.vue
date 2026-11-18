@@ -6,7 +6,6 @@ import { definePageMeta, ref } from "#imports";
 
 import TableOfContents from "#layers/bbf/app/components/TableOfContents.vue";
 import SaveBar from "~/components/SaveBar.vue";
-import StaffAvatar from "~/components/StaffAvatar.vue";
 import StaffBio from "~/components/StaffBio.vue";
 import StaffEditor from "~/components/StaffEditor.vue";
 import { useDrafts } from "~/composables/drafts";
@@ -39,7 +38,6 @@ const contents = ref<OutlineEntry[]>([]);
 <template>
   <div class="staff-page">
     <div class="staff-page-side">
-      <StaffAvatar :record="record" />
       <StaffEditor :record="record" @saved="emit('saved', $event)" />
       <TableOfContents :entries="contents" />
     </div>
@@ -57,8 +55,8 @@ const contents = ref<OutlineEntry[]>([]);
 
 <style>
 /*
- * Two panels: the member's photo over their details and their bio's table
- * of contents in a narrow column, and their bio in what is left. Narrow,
+ * Two panels: the member's details, their photo among them, and their bio's
+ * table of contents in a narrow column, and their bio in what is left. Narrow,
  * one follows the other.
  */
 .staff-page {

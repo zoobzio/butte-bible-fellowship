@@ -3,6 +3,7 @@ import type { StaffRecord } from "@bbf/schema/types";
 
 import { Form } from "#components";
 import { useNuxtApp } from "#imports";
+import ImageField from "~/components/ImageField.vue";
 import { useDraft } from "~/composables/drafts";
 import { useStaffEditor } from "~/composables/staff/editor";
 </script>
@@ -16,10 +17,8 @@ const emit = defineEmits<{ saved: [record: StaffRecord] }>();
 
 const { $t } = useNuxtApp();
 
-const { form, error, dirty, saving, save, reset } = useStaffEditor(
-  record,
-  (saved) => emit("saved", saved),
-);
+const { form, picture, fallback, error, dirty, saving, save, reset } =
+  useStaffEditor(record, (saved) => emit("saved", saved));
 
 /*
  * A record that exists is saved as a whole, from the bar of the page it is
@@ -37,6 +36,14 @@ const pt = { form: { novalidate: true } };
 <template>
   <div class="staff-editor">
     <Form :service="form" :pt="pt">
+      <template #imageInput="{ settings }">
+        <ImageField
+          :control="settings.imageInput"
+          :labels="picture"
+          :fallback="fallback"
+          round
+        />
+      </template>
       <template #footer="{ settings }">
         <template v-if="!held">
           <p v-if="error" class="staff-editor-error" role="alert">

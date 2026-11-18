@@ -49,14 +49,51 @@ describe("StaffEditor", () => {
     ]);
   });
 
-  it("is one column of a member's details: no photo's address, and no bio", () => {
+  it("is one column of a member's details, their photo first, and no bio", () => {
     const wrapper = mount(StaffEditor, { props: { record: STAFF } });
     expect(
-      wrapper.findAll(".f-data-form-field label").map((label) => label.text()),
-    ).toEqual(["Name", "Role", "Email", "Phone", "Summary"]);
-    expect(wrapper.find("#staff-photo").exists()).toBe(false);
+      wrapper.findAll(".f-data-form-field-label").map((label) => label.text()),
+    ).toEqual(["Photo", "Name", "Role", "Email", "Phone", "Summary"]);
     expect(wrapper.find("#staff-bio").exists()).toBe(false);
     expect(wrapper.find(".f-data-editor").exists()).toBe(false);
+  });
+
+  it("draws the photo of a member that exists among their fields: a round frame, their initials in it for none", async () => {
+    const wrapper = mount(StaffEditor, { props: { record: STAFF } });
+    const field = wrapper.find(".f-data-form-field");
+    expect(field.find(".f-data-form-field-label").attributes("for")).toBe(
+      "staff-photo",
+    );
+    expect(field.find("input#staff-photo").attributes()).toMatchObject({
+      type: "file",
+      accept: "image/jpeg,image/png,image/webp",
+    });
+    expect(field.find(".image-field").attributes("data-round")).toBe("true");
+    const none = field.find(".f-image-input-placeholder");
+    expect(none.text()).toBe("JD");
+    expect(none.attributes("role")).toBeUndefined();
+    expect(field.find("label.image-field-pick").attributes("title")).toBe(
+      "Upload photo",
+    );
+    expect(field.find(".image-field-remove").exists()).toBe(false);
+
+    const photo = "https://cdn.example.com/staff/jane-doe.jpg";
+    const pictured = mount(StaffEditor, {
+      props: { record: { ...STAFF, photo } },
+    });
+    expect(pictured.find(".image-field img").attributes("src")).toBe(photo);
+    expect(pictured.find("label.image-field-pick").attributes("title")).toBe(
+      "Change photo",
+    );
+    expect(
+      pictured.find("button.image-field-remove").attributes("aria-label"),
+    ).toBe("Remove photo");
+  });
+
+  it("draws no photo for a new member: there is nothing yet to write one to", () => {
+    const wrapper = mount(StaffEditor, { props: { record: null } });
+    expect(wrapper.find(".image-field").exists()).toBe(false);
+    expect(wrapper.find("#staff-photo").exists()).toBe(false);
   });
 
   it("labels every control", () => {

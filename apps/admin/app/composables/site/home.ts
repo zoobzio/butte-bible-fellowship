@@ -1,18 +1,19 @@
 import type { HomeForm, HomeRecord } from "@bbf/schema/types";
 
-import { homeForm, homeRecord } from "@bbf/schema";
+import { HOME_IMAGE_TYPES, homeForm, homeRecord } from "@bbf/schema";
 import { toHomeBody, toHomeForm } from "@bbf/utils/vm";
 import { useNuxtApp } from "#imports";
 import { blank, useSiteEditor } from "~/composables/site/editor";
-import { HOME } from "~/composables/site/routes";
+import { HOME, image } from "~/composables/site/routes";
 
 /**
  * The form of the home page's metadata: what the browser and search
  * engines show for it, and the words of the hero it opens with. The
  * heading is one line of text: what is written between asterisks in it
  * (**like this**) is what the site draws as the highlight. The hero's
- * picture and what is written under the hero are each written on their
- * own, beside the form.
+ * picture is one of the fields: the one the page keeps, an image picked to
+ * take its place, or none, for the site's own picture to stand in. What is
+ * written under the hero is written on its own, beside the form.
  */
 export const useHomeEditor = (record: HomeRecord) => {
   const { $t } = useNuxtApp();
@@ -31,6 +32,12 @@ export const useHomeEditor = (record: HomeRecord) => {
         key: "description",
         label: $t.admin.page.description(),
         rows: 3,
+      },
+      {
+        type: "image",
+        key: "heroImage",
+        label: $t.admin.home.image(),
+        accept: HOME_IMAGE_TYPES.join(","),
       },
       {
         type: "text",
@@ -64,5 +71,16 @@ export const useHomeEditor = (record: HomeRecord) => {
     record: homeRecord,
     toForm: toHomeForm,
     toBody: toHomeBody,
+    picture: {
+      endpoint: image(HOME),
+      held: (form) => form.heroImage,
+      kept: (saved) => saved.heroImage,
+      labels: {
+        upload: $t.admin.home.imageUpload(),
+        change: $t.admin.home.imageChange(),
+        remove: $t.admin.home.imageRemove(),
+        none: $t.admin.home.imageNone(),
+      },
+    },
   });
 };

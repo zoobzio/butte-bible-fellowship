@@ -1,14 +1,19 @@
 import type { StaffForm, StaffRecord } from "@bbf/schema/types";
+import type { FormOptions } from "#imports";
 
-import { staffForm, staffRecord } from "@bbf/schema";
+import type { PictureLabels } from "~/types/editor";
+
+import { STAFF_AVATAR_TYPES, staffForm, staffRecord } from "@bbf/schema";
 import { toStaffBody, toStaffForm } from "@bbf/utils/vm";
 import { computed, createForm, ref, useNuxtApp, useRouter } from "#imports";
 import { useApi } from "~/composables/api";
-import { ROUTE, endpoint } from "~/composables/staff/routes";
+import { ROUTE, avatar, endpoint } from "~/composables/staff/routes";
 import { ROLE_OPTIONS } from "~/constants/editor";
 import { link } from "~/constants/staff";
 import { toOptions } from "~/utils/editor";
 import { failure } from "~/utils/errors";
+import { toImageRequest } from "~/utils/image";
+import { initials } from "~/utils/staff";
 
 /**
  * An optional field once cleared: the control writes an empty string, the
@@ -19,11 +24,21 @@ const blank = (value: string | undefined): string | undefined =>
 
 /**
  * The form of one member's details: a new member when there is no record.
- * It is one column of fields and holds neither the photo nor the bio, each
- * of which is written on its own, beside it. The form's store is shared
- * under its id, so each visit starts over from the record. The form
- * carries no title of its own: the page's header names the member, and
- * its menu is where the member is deleted. A new member saved opens on
+ * It is one column of fields and does not hold the bio, which is written
+ * on its own, beside it. The form's store is shared under its id, so each
+ * visit starts over from the record. The form carries no title of its own:
+ * the page's header names the member, and its menu is where the member is
+ * deleted.
+ *
+ * A member that exists has their photo as the first of their fields: the
+ * one they keep, an image picked to take its place, or none. The photo is
+ * written with the details, in a request of its own after theirs: an image
+ * picked is uploaded, and none where one was kept is removed. A new member
+ * has no such field: there is nothing yet to write a photo to. `picture`
+ * is what the photo's control says of what it does, and `fallback` what
+ * stands in for no photo: the initials of the name as it is written.
+ *
+ * A new member saved opens on
  * their own page, where the photo and the bio wait; one changed stays on
  * the page, its fields showing what was kept, a phone number in the one
  * way it is written, and the record saved is handed to `saved`, for the
@@ -45,8 +60,27 @@ export const useStaffEditor = (
   /* The record as it was last saved: what a reset puts back. */
   let kept = record;
 
+  const photo: FormOptions<StaffForm>["fields"] =
+    record === null
+      ? []
+      : [
+          {
+            type: "image",
+            key: "photo",
+            label: $t.admin.member.picture(),
+            accept: STAFF_AVATAR_TYPES.join(","),
+          },
+        ];
+
+  const labels: PictureLabels = {
+    upload: $t.admin.member.photoUpload(),
+    change: $t.admin.member.photoChange(),
+    remove: $t.admin.member.photoRemove(),
+  };
+
   const useForm = createForm<StaffForm>("staff", {
     fields: [
+      ...photo,
       {
         type: "text",
         key: "name",
@@ -73,18 +107,22 @@ export const useStaffEditor = (
     schema: staffForm,
     middleware: { summary: blank, email: blank, phone: blank },
     submit: async (form) => {
-      const body = toStaffBody(staffForm.parse(form.payload));
+      const payload = staffForm.parse(form.payload);
+      const body = toStaffBody(payload);
       if (record === null) {
         const created = await api(ROUTE, { method: "POST", body });
         await router.push(link(staffRecord.parse(created)));
         return;
       }
-      const changed = staffRecord.parse(
+      kept = staffRecord.parse(
         await api(endpoint(record.id), { method: "PUT", body }),
       );
-      kept = changed;
-      form.update(toStaffForm(changed));
-      saved(changed);
+      const request = toImageRequest(payload.photo, kept.photo);
+      if (request !== null) {
+        kept = staffRecord.parse(await api(avatar(record.id), request));
+      }
+      form.update(toStaffForm(kept));
+      saved(kept);
     },
   });
 
@@ -114,6 +152,7 @@ export const useStaffEditor = (
   });
 
   const saving = computed(() => form.submitting);
+  const fallback = computed(() => initials(form.payload.name ?? ""));
 
   /* What fails reports through `error`: the rejection has no other use. */
   const save = async () => {
@@ -126,5 +165,14 @@ export const useStaffEditor = (
     fill();
   };
 
-  return { form, error, dirty, saving, save, reset };
+  return {
+    form,
+    picture: labels,
+    fallback,
+    error,
+    dirty,
+    saving,
+    save,
+    reset,
+  };
 };

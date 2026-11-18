@@ -262,6 +262,35 @@ describe("eventForm", () => {
     expect(eventForm.parse(ONCE)).toEqual(ONCE);
   });
 
+  it("holds its picture: the URL of the one kept, an image picked in its place, or none", () => {
+    const picked = new File([new Uint8Array(8)], "picked.png", {
+      type: "image/png",
+    });
+    const url = "https://cdn.example.com/kept.jpg";
+    expect(eventForm.parse({ ...ONCE, image: url }).image).toBe(url);
+    expect(eventForm.parse({ ...ONCE, image: picked }).image).toBe(picked);
+    expect(eventForm.parse(ONCE).image).toBeUndefined();
+    expect(eventForm.shape.image.safeParse(undefined).success).toBe(true);
+  });
+
+  it("refuses a file that cannot be its picture, and says what can", () => {
+    const pdf = new File(["x"], "notes.pdf", { type: "application/pdf" });
+    const heavy = new File(
+      [new Uint8Array(EVENT_IMAGE_SIZE + 1)],
+      "heavy.png",
+      {
+        type: "image/png",
+      },
+    );
+    for (const file of [pdf, heavy]) {
+      const checked = eventForm.shape.image.safeParse(file);
+      expect(checked.success).toBe(false);
+      expect(checked.error?.issues.map((issue) => issue.message)).toEqual([
+        "That file can’t be used. Choose a JPEG, PNG or WebP image of 4 MB or less.",
+      ]);
+    }
+  });
+
   it("takes only a week of the month, as a string", () => {
     expect(form({ ...WEEKLY, weeks: ["6"] })).toEqual(["weeks.0"]);
     expect(form({ ...WEEKLY, weeks: [1] })).toEqual(["weeks.0"]);

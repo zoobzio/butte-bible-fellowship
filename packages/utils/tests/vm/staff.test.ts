@@ -30,7 +30,7 @@ describe("toStaffForm", () => {
     expect(toStaffForm(RECORD)).toEqual({ name: "Jane Doe", role: "elder" });
   });
 
-  it("carries the details the record has, and neither its photo nor its bio", () => {
+  it("carries the details the record has, and its photo, and not its bio", () => {
     expect(
       toStaffForm({
         ...RECORD,
@@ -46,6 +46,7 @@ describe("toStaffForm", () => {
       summary: "Serving since 2010.",
       email: "j@x.org",
       phone: "530-555-0100",
+      photo: "https://cdn.example.com/staff/jane-doe.jpg",
     });
   });
 

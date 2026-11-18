@@ -7,7 +7,6 @@ import { definePageMeta, ref } from "#imports";
 import TableOfContents from "#layers/bbf/app/components/TableOfContents.vue";
 import EventBody from "~/components/EventBody.vue";
 import EventEditor from "~/components/EventEditor.vue";
-import EventImage from "~/components/EventImage.vue";
 import SaveBar from "~/components/SaveBar.vue";
 import { useDrafts } from "~/composables/drafts";
 </script>
@@ -39,7 +38,6 @@ const contents = ref<OutlineEntry[]>([]);
 <template>
   <div class="event-page">
     <div class="event-page-side">
-      <EventImage :record="record" />
       <EventEditor :record="record" @saved="emit('saved', $event)" />
       <TableOfContents :entries="contents" />
     </div>
@@ -57,8 +55,8 @@ const contents = ref<OutlineEntry[]>([]);
 
 <style>
 /*
- * Two panels: the event's picture over its details and its table of
- * contents in a narrow column, and what is written about it in what is
+ * Two panels: the event's details, its picture among them, and its table
+ * of contents in a narrow column, and what is written about it in what is
  * left. Narrow, one follows the other.
  */
 .event-page {
