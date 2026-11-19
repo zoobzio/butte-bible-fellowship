@@ -58,5 +58,29 @@
   "actions": {
     "defaultMessage": "Actions",
     "description": "The button in a page's header that opens the menu of what can be done to the record: delete it, for one."
+  },
+  "unsaved": {
+    "defaultMessage": "Unsaved changes",
+    "description": "What the mark beside a section of a menu says, to a reader and under the pointer, while the section holds changes that are not saved."
+  },
+  "leave": {
+    "defaultMessage": "Unsaved changes",
+    "description": "The title of the window that asks before a page is left while it holds changes that are not saved."
+  },
+  "leaveDescription": {
+    "defaultMessage": "If you leave now, the changes you have not saved will be lost.",
+    "description": "The line under the title of the window that asks before a page is left with changes not saved: what leaving does."
+  },
+  "leaveStay": {
+    "defaultMessage": "Keep editing",
+    "description": "The button of the window that asks before a page is left with changes not saved, which stays on the page."
+  },
+  "leaveDiscard": {
+    "defaultMessage": "Discard changes",
+    "description": "The button of the window that asks before a page is left with changes not saved, which leaves the page and loses them."
+  },
+  "invalid": {
+    "defaultMessage": "Needs fixing",
+    "description": "What the mark beside a section of a menu says, to a reader and under the pointer, when a save found something wrong in one of the section's fields."
   }
 }

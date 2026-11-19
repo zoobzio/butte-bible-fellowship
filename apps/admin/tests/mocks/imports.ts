@@ -78,6 +78,22 @@ export const clearRouter = () => {
 
 export const useRouter = () => router;
 
+type RouteGuard = () => unknown;
+
+// What a page asks before it is left: kept as it is registered, for a test
+// to ask in the router's place.
+const guards = { leave: [] as RouteGuard[] };
+
+export const routeGuards = () => guards;
+
+export const clearRouteGuards = () => {
+  guards.leave = [];
+};
+
+export const onBeforeRouteLeave = (guard: RouteGuard) => {
+  guards.leave.push(guard);
+};
+
 export const navigateTo = vi.fn(async () => {});
 
 export const useRequestFetch =

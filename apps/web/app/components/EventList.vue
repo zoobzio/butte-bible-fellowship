@@ -64,11 +64,6 @@ const listed = useEventListing(() => events);
 .event-list li {
   padding: var(--space-4) 0;
   border-top: 1px var(--stroke-solid) var(--rule);
-  line-height: inherit;
-}
-
-.event-list li::before {
-  content: none;
 }
 
 .event-list li:first-child {

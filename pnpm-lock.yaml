@@ -572,6 +572,9 @@ importers:
 
   packages/schema:
     dependencies:
+      '@bbf/theme':
+        specifier: workspace:*
+        version: link:../theme
       objectively:
         specifier: 'catalog:'
         version: 0.3.0
@@ -634,9 +637,15 @@ importers:
       '@bbf/schema':
         specifier: workspace:*
         version: link:../schema
+      '@bbf/theme':
+        specifier: workspace:*
+        version: link:../theme
       '@prosary/parse':
         specifier: 'catalog:'
         version: 0.0.11
+      '@untheme/aurora':
+        specifier: 'catalog:'
+        version: 0.6.0
       bezoar:
         specifier: 'catalog:'
         version: 0.0.6
@@ -671,6 +680,9 @@ importers:
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
+      untheme:
+        specifier: 'catalog:'
+        version: 0.6.0
       vitest:
         specifier: 'catalog:'
         version: 5.0.3(@opentelemetry/api@1.9.1)(@types/node@26.2.0)(@vitest/coverage-v8@5.0.3)(happy-dom@20.11.6)(vite@8.3.4(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(yaml@2.9.1))

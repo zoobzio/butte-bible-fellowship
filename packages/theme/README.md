@@ -14,7 +14,8 @@ consumes. The package is itself a preset: the app names it as
 
 ```
 untheme.config.ts      the kit config: the foundation theme as the source, our palette on top of its ramps
-scripts/generate.mjs   the seeds of the palette, and the script that writes src/bbf.json
+scripts/generate.mjs   the script that writes src/bbf.json from the seeds
+src/seeds.mjs          the seeds of the palette: one color for each ramp
 src/bbf.json           the site's palette: its name, its description and all eight ramps
 ```
 
@@ -55,8 +56,8 @@ foundation's, so applying it over any theme restores the site's colors.
 
 ## Changing a color
 
-The ramps are generated, not hand-written. `scripts/generate.mjs` holds one
-seed for each ramp and writes `src/bbf.json` with `palette` from
+The ramps are generated, not hand-written. `src/seeds.mjs` holds one
+seed for each ramp, and `scripts/generate.mjs` writes `src/bbf.json` from them with `palette` from
 `@untheme/aurora/ramp`, aurora's own generator. The seed gives hue and
 chroma, and every ramp shares aurora's lightness ladder, so every stop sits
 where aurora's does. To change a color, edit the seed and run:
@@ -64,6 +65,12 @@ where aurora's does. To change a color, edit the seed and run:
 ```sh
 pnpm generate && pnpm format
 ```
+
+These seeds are the site's defaults, and no more than that: the admin's
+appearance settings set a ramp to another color without a deployment, by
+the same generator, and the site reads what was set as overrides of the
+tokens here whenever this theme is the one applied. A ramp nobody has set
+keeps the seed it has here.
 
 ## Exports
 
@@ -81,6 +88,8 @@ pnpm generate && pnpm format
   config builds on them with `source: "npm:/@bbf/theme"`.
 - `@bbf/theme/src/*`: the palette, as DTCG JSON, which the resolver
   references.
+- `@bbf/theme/seeds`: the `seeds` of the palette, a hex color for each ramp,
+  and the `Ramp` type.
 - `@bbf/theme`: the `tokens` and `modifiers` lists, the `isToken` /
   `isModifier` guards, and the `Token`, `Modifier`, `Context` and `Mod`
   types.

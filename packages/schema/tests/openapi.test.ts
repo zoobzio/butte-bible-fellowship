@@ -6,6 +6,9 @@ import {
   aboutArticle,
   aboutBody,
   aboutRecord,
+  appearance,
+  appearanceBody,
+  appearanceRecord,
   churchEvent,
   churchEvents,
   connectArticle,
@@ -298,6 +301,18 @@ const document = createDocument(
           responses: { 200: json(connectRecord) },
         },
       },
+      "/api/appearance": {
+        get: { responses: { 200: json(appearance) } },
+      },
+      "/admin/api/settings/appearance": {
+        get: { responses: { 200: json(appearanceRecord) } },
+        put: {
+          requestBody: {
+            content: { "application/json": { schema: appearanceBody } },
+          },
+          responses: { 200: json(appearanceRecord) },
+        },
+      },
       "/admin/api/events": {
         get: {
           requestParams: { query: eventQuery },
@@ -352,6 +367,11 @@ describe("the components", () => {
       "AboutArticle",
       "AboutBody",
       "AboutRecord",
+      "Appearance",
+      "AppearanceBody",
+      "AppearanceInput",
+      "AppearanceRecord",
+      "AppearanceSeeds",
       "ChurchEvent",
       "ConnectArticle",
       "ConnectBody",

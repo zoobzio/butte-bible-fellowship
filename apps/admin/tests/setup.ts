@@ -6,6 +6,7 @@ import {
   clearLocale,
   clearNuxtApp,
   clearNuxtStateRegistry,
+  clearRouteGuards,
   clearRouter,
   clearUntheme,
   setRoutePath,
@@ -21,6 +22,7 @@ beforeEach(() => {
   clearUntheme();
   setRoutePath("/");
   clearRouter();
+  clearRouteGuards();
   useHead.mockClear();
 });
 

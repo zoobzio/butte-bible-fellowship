@@ -1,5 +1,6 @@
 import type {
   AboutRecord,
+  AppearanceRecord,
   ConnectRecord,
   ContentRecord,
   EventRecord,
@@ -136,4 +137,18 @@ export const CONNECT_PAGE: ConnectRecord = {
   hours: "Tuesday–Thursday: 9am–4pm\nFriday: 9am–noon",
   body: BIO,
   updatedAt: "2026-10-18T09:30:00.000Z",
+};
+
+/** How the site looks with nothing set over its theme: the row as it is made. */
+export const APPEARANCE: AppearanceRecord = {
+  seeds: {},
+  input: {},
+  updatedAt: "2026-11-19T18:00:00.000Z",
+};
+
+/** How the site looks with a color and two modifiers set over its theme. */
+export const APPEARANCE_SET: AppearanceRecord = {
+  seeds: { primary: "#7c3aed" },
+  input: { color: "dark", text: "lg" },
+  updatedAt: "2026-11-19T18:00:00.000Z",
 };

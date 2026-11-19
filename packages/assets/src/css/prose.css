@@ -102,13 +102,18 @@ ul {
   list-style: none;
 }
 
-li {
+/*
+ * The dash before a line of a list belongs to what is written: a page's
+ * prose, and the editor it is written in. A list anywhere else is a
+ * component's own, and draws what it likes.
+ */
+:where(.prose, .f-data-editor-content) li {
   position: relative;
   line-height: 1.75;
   padding-left: var(--space-4);
 }
 
-li::before {
+:where(.prose, .f-data-editor-content) li::before {
   content: "";
   position: absolute;
   left: 0;

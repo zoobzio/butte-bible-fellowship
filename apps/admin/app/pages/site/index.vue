@@ -47,15 +47,8 @@ const pages = Object.values(SITE_PAGES);
   list-style: none;
 }
 
-/* A card is no line of a list: it keeps neither the indent nor the mark of one. */
 .site-cards-item {
   display: grid;
-  padding: 0;
-  line-height: inherit;
-}
-
-.site-cards-item::before {
-  content: none;
 }
 
 /*

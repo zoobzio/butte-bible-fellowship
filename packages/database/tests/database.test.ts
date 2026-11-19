@@ -33,7 +33,7 @@ afterAll(() => db.close());
 const HEADING = "Discover God’s **Love, Grace & Truth**";
 
 describe("the build", () => {
-  it("carries the staff, events, sermons, users, staff search, like escape, search cost, staff status, events search, events trim, content, pages, folders, connect, views and documents migrations in order", () => {
+  it("carries the staff, events, sermons, users, staff search, like escape, search cost, staff status, events search, events trim, content, pages, folders, connect, views, documents and appearance migrations in order", () => {
     expect(migrations.map((migration) => migration.name)).toEqual([
       "staff",
       "events",
@@ -51,6 +51,7 @@ describe("the build", () => {
       "connect",
       "views",
       "documents",
+      "appearance",
     ]);
   });
 
@@ -94,6 +95,7 @@ describe("the build", () => {
     const names = Object.keys(contract.queries);
     expect(names.filter((name) => name.startsWith("web."))).toEqual([
       "web.about.fetch",
+      "web.appearance.fetch",
       "web.connect.fetch",
       "web.content.fetch",
       "web.content.list",
@@ -106,8 +108,8 @@ describe("the build", () => {
       "web.sermons.list",
       "web.staff.list",
     ]);
-    expect(names.filter((name) => name.startsWith("admin."))).toHaveLength(52);
-    expect(names).toHaveLength(64);
+    expect(names.filter((name) => name.startsWith("admin."))).toHaveLength(54);
+    expect(names).toHaveLength(67);
   });
 });
 
@@ -255,6 +257,14 @@ describe("web", () => {
       body: null,
     });
     expect(await db.web.connect.fetch()).toHaveLength(1);
+  });
+
+  it("reads how the site looks: nothing set over its theme yet", async () => {
+    expect(await db.web.appearance.fetch.first()).toEqual({
+      patch: {},
+      input: {},
+    });
+    expect(await db.web.appearance.fetch()).toHaveLength(1);
   });
 
   it("makes each page as rich text, the site's blocks among its elements", async () => {
@@ -1379,6 +1389,53 @@ describe("admin.about", () => {
     await expect(
       db.build.insertInto("about").values({ title: "Another" }).execute(),
     ).rejects.toThrow(/about_pkey/);
+  });
+});
+
+describe("admin.appearance", () => {
+  it("writes the seeds, the patch they come to and the modifiers together, and the web reads the patch and the modifiers alone", async () => {
+    const before = await db.admin.appearance.fetch.first();
+    expect(before).toEqual({
+      seeds: {},
+      input: {},
+      updated_at: expect.any(Date),
+    });
+    const seeds = { primary: "#7c3aed" };
+    const patch = {
+      tokens: {
+        "primary-500": {
+          colorSpace: "srgb",
+          components: [0.5451, 0.36078, 0.96471],
+          hex: "#8b5cf6",
+        },
+      },
+    };
+    const input = { color: "dark" };
+
+    const updated = await db.admin.appearance.update.first({
+      seeds,
+      patch,
+      input,
+    });
+    expect(updated?.updated_at).toBeInstanceOf(Date);
+    expect(await db.admin.appearance.fetch.first()).toMatchObject({
+      seeds,
+      input,
+    });
+    expect(await db.web.appearance.fetch.first()).toEqual({ patch, input });
+
+    // Put back, for the tests after this one.
+    await db.admin.appearance.update({ seeds: {}, patch: {}, input: {} });
+    expect(await db.web.appearance.fetch.first()).toEqual({
+      patch: {},
+      input: {},
+    });
+  });
+
+  it("is one row, and no more", async () => {
+    await expect(
+      db.build.insertInto("appearance").defaultValues().execute(),
+    ).rejects.toThrow(/appearance_pkey/);
   });
 });
 
@@ -2608,6 +2665,7 @@ describe("roles", () => {
     expect(await web.web.home.fetch()).toHaveLength(1);
     expect(await web.web.about.fetch()).toHaveLength(1);
     expect(await web.web.connect.fetch()).toHaveLength(1);
+    expect(await web.web.appearance.fetch()).toHaveLength(1);
   });
 
   it("keeps a folder's totals as admin writes under it", async () => {
@@ -2681,6 +2739,26 @@ describe("roles", () => {
     await expect(admin.build.deleteFrom("connect").execute()).rejects.toThrow(
       /permission denied for table connect/,
     );
+  });
+
+  it("lets admin change how the site looks, and web only read it", async () => {
+    await expect(
+      // @ts-expect-error: not a query of web.
+      web.query("admin.appearance.update", { seeds: {}, patch: {}, input: {} }),
+    ).rejects.toBeInstanceOf(ForbiddenQueryError);
+    await expect(
+      web.build.updateTable("appearance").set({ input: "{}" }).execute(),
+    ).rejects.toThrow(/permission denied for table appearance/);
+    expect(
+      await admin.admin.appearance.update.first({
+        seeds: {},
+        patch: {},
+        input: {},
+      }),
+    ).toMatchObject({ updated_at: expect.any(Date) });
+    await expect(
+      admin.build.deleteFrom("appearance").execute(),
+    ).rejects.toThrow(/permission denied for table appearance/);
   });
 
   it("keeps the users from web", async () => {

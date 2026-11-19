@@ -5,6 +5,9 @@ import { CONTENT, PREFIX } from "@prosary/nuxt/constant";
 
 export * from "@bbf/nuxt/testing/imports";
 
+/** A plugin as it is defined: what the app would run. */
+export const defineNuxtPlugin = <T>(plugin: T) => plugin;
+
 export const useRuntimeConfig = () => ({
   public: { youtube: { channel: "UCtest" } },
 });

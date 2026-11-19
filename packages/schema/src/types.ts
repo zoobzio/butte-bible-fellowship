@@ -1,6 +1,7 @@
 import type { z } from "zod";
 
 import type { aboutArticle, aboutBody, aboutForm } from "./input/about";
+import type { appearanceBody, appearanceForm } from "./input/appearance";
 import type { connectArticle, connectBody, connectForm } from "./input/connect";
 import type {
   contentArticle,
@@ -59,6 +60,12 @@ import type {
   viewPath,
 } from "./input/view";
 import type { aboutRecord } from "./models/about";
+import type {
+  appearance,
+  appearanceInput,
+  appearanceRecord,
+  appearanceSeeds,
+} from "./models/appearance";
 import type { connectPage, connectRecord } from "./models/connect";
 import type { contentRecord, contentRecords, mime } from "./models/content";
 import type {
@@ -150,6 +157,18 @@ export type AboutBody = z.infer<typeof aboutBody>;
 export type AboutForm = z.infer<typeof aboutForm>;
 
 export type AboutArticle = z.infer<typeof aboutArticle>;
+
+export type Appearance = z.infer<typeof appearance>;
+
+export type AppearanceSeeds = z.infer<typeof appearanceSeeds>;
+
+export type AppearanceInput = z.infer<typeof appearanceInput>;
+
+export type AppearanceRecord = z.infer<typeof appearanceRecord>;
+
+export type AppearanceBody = z.infer<typeof appearanceBody>;
+
+export type AppearanceForm = z.infer<typeof appearanceForm>;
 
 export type ConnectPage = z.infer<typeof connectPage>;
 

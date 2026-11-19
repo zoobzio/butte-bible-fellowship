@@ -15,6 +15,7 @@ import { toImageRequest } from "~/utils/image";
  * body the API takes. A page with a picture among its fields says so with
  * `picture`: where the picture is written, on its own; the picture as the
  * form holds it and as the record keeps it; and what its control says.
+ * `saved` is handed the record each save keeps, for a page that holds it.
  */
 export interface SiteForm<Form, Saved> extends Pick<
   FormOptions<Form>,
@@ -31,6 +32,7 @@ export interface SiteForm<Form, Saved> extends Pick<
     kept: (record: Saved) => string | undefined;
     labels: PictureLabels;
   };
+  saved?: (record: Saved) => void;
 }
 
 /**
@@ -67,6 +69,7 @@ export const useSiteEditor = <Form, Saved>(
     toForm,
     toBody,
     picture,
+    saved,
     ...options
   }: SiteForm<Form, Saved>,
 ): Metadata<Form> => {
@@ -92,6 +95,7 @@ export const useSiteEditor = <Form, Saved>(
         }
       }
       form.update(toForm(kept));
+      saved?.(kept);
     },
   });
 

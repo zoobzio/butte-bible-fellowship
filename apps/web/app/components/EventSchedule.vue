@@ -39,12 +39,7 @@ const listed = useEventListing(() => events);
 
 .event-schedule li {
   display: grid;
-  padding: 0;
   line-height: 1.6;
-}
-
-.event-schedule li::before {
-  content: none;
 }
 
 .event-schedule a {

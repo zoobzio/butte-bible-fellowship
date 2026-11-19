@@ -20,6 +20,10 @@
       "default": "./.output/layers.mjs"
     },
     "./layers/*": "./.output/layers/*",
+    "./seeds": {
+      "types": "./src/seeds.d.mts",
+      "default": "./src/seeds.mjs"
+    },
     "./preset.json": "./.output/preset.json",
     "./resolver.json": "./.output/resolver.json",
     "./src/*": "./src/*",

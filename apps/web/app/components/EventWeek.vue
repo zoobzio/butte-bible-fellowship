@@ -43,12 +43,7 @@ const listed = useEventWeek(() => days);
 }
 
 .event-week li {
-  padding: 0;
   line-height: 1.6;
-}
-
-.event-week li::before {
-  content: none;
 }
 
 .event-week > li {

@@ -89,11 +89,27 @@ export const useUntheme = () => {
   return untheme;
 };
 
+const cookies = {
+  input: ref<Container["input"] | null>(null),
+  key: ref<string | null>(null),
+};
+
+/**
+ * The state the service reads and the cookies a visitor's choices are kept
+ * in, as the module's plugin and composable share them.
+ */
+export const accessUntheme = () => {
+  useUntheme();
+  return { config: { value: container! }, cookies };
+};
+
 export const clearUntheme = () => {
   if (container) {
     container.input = { ...theme.input };
     container.patch = {};
   }
+  cookies.input.value = null;
+  cookies.key.value = null;
 };
 
 export const defineNuxtRouteMiddleware = <T>(middleware: T) => middleware;

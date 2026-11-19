@@ -161,15 +161,6 @@ const { period, weekdays, days, move, select, reset } = useEventCalendar(
   list-style: none;
 }
 
-.event-calendar li {
-  padding-left: 0;
-  line-height: inherit;
-}
-
-.event-calendar li::before {
-  content: none;
-}
-
 .event-calendar-grid {
   overflow: hidden;
   border: 1px var(--stroke-solid) var(--rule);

@@ -95,12 +95,19 @@ describe("bundles", () => {
       "admin.content.confirmMany",
       "admin.staff.confirmMany",
       "connect.map",
+      "admin.appearance.pick",
     ];
     for (const [key, message] of Object.entries(source)) {
       if (!taking.includes(key)) {
         expect(prosary.format(key as never), key).toBe(message);
       }
     }
+    expect(
+      prosary.format("admin.appearance.pick", {
+        name: "Primary",
+        hex: "#0a68ff",
+      }),
+    ).toBe("Primary: #0a68ff");
     expect(prosary.format("appearance.scheme", { mode: "dark" })).toBe(
       "Switch to dark mode",
     );

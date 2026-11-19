@@ -13,6 +13,10 @@ export type AboutRow = Row<Contract, "web.about.fetch">;
 
 export type AboutRecordRow = Row<Contract, "admin.about.fetch">;
 
+export type AppearanceRow = Row<Contract, "web.appearance.fetch">;
+
+export type AppearanceRecordRow = Row<Contract, "admin.appearance.fetch">;
+
 export type ConnectRow = Row<Contract, "web.connect.fetch">;
 
 export type ConnectRecordRow = Row<Contract, "admin.connect.fetch">;
@@ -48,6 +52,11 @@ export type ViewArguments = Arguments<Contract, "admin.views.save">;
 export type HomeArguments = Arguments<Contract, "admin.home.update">;
 
 export type AboutArguments = Arguments<Contract, "admin.about.update">;
+
+export type AppearanceArguments = Arguments<
+  Contract,
+  "admin.appearance.update"
+>;
 
 export type ConnectArguments = Arguments<Contract, "admin.connect.update">;
 

@@ -1,0 +1,66 @@
+{
+  "sections": {
+    "defaultMessage": "Appearance settings",
+    "description": "The accessible name of the menu beside the appearance settings, which lists their sections: the color palette, the modifiers."
+  },
+  "palette": {
+    "defaultMessage": "Color palette",
+    "description": "The section of the appearance settings that sets the site's colors: its name in the menu beside the settings, and the heading over its form."
+  },
+  "paletteHint": {
+    "defaultMessage": "Each color is drawn out into every shade the site uses. Pick one of the theme’s colors, or type a hex code.",
+    "description": "The line under the heading of the color palette of the appearance settings: how a color is set, and what setting it does."
+  },
+  "modifiers": {
+    "defaultMessage": "Modifiers",
+    "description": "The section of the appearance settings that sets what a visitor starts with, the color scheme, the contrast, the text size and the like: its name in the menu beside the settings, and the heading over its form."
+  },
+  "modifiersHint": {
+    "defaultMessage": "What a visitor starts with, until they choose their own.",
+    "description": "The line under the heading of the modifiers of the appearance settings: whom they apply to."
+  },
+  "primary": {
+    "defaultMessage": "Primary",
+    "description": "The label of the field for the site's primary color, and the name of that color among the theme's."
+  },
+  "secondary": {
+    "defaultMessage": "Secondary",
+    "description": "The label of the field for the site's secondary color, and the name of that color among the theme's."
+  },
+  "tertiary": {
+    "defaultMessage": "Tertiary",
+    "description": "The label of the field for the site's tertiary color, and the name of that color among the theme's."
+  },
+  "error": {
+    "defaultMessage": "Error",
+    "description": "The label of the field for the color the site says something went wrong in, and the name of that color among the theme's."
+  },
+  "success": {
+    "defaultMessage": "Success",
+    "description": "The label of the field for the color the site says something went well in, and the name of that color among the theme's."
+  },
+  "warning": {
+    "defaultMessage": "Warning",
+    "description": "The label of the field for the color the site warns in, and the name of that color among the theme's."
+  },
+  "neutral": {
+    "defaultMessage": "Neutral",
+    "description": "The label of the field for the grey of the site's surfaces and text, and the name of that color among the theme's."
+  },
+  "neutralVariant": {
+    "defaultMessage": "Neutral variant",
+    "description": "The label of the field for the grey of the site's outlines, and the name of that color among the theme's."
+  },
+  "themeColors": {
+    "defaultMessage": "Theme colors",
+    "description": "The accessible name of the row of the theme's own colors under a color field, any of which may be picked for it."
+  },
+  "pick": {
+    "defaultMessage": "{name}: {hex}",
+    "description": "The accessible name of one of the theme's own colors, a button that sets the field to it. `name` is the color's name among the theme's, and `hex` its hex code."
+  },
+  "notFound": {
+    "defaultMessage": "The appearance settings could not be found.",
+    "description": "What the appearance settings say when there is nothing stored to change."
+  }
+}

@@ -142,13 +142,8 @@ onBeforeUnmount(() => {
 }
 
 .toc-item {
-  padding-left: 0;
   font-size: var(--label-size);
   line-height: 1.4;
-}
-
-.toc-item::before {
-  content: none;
 }
 
 .toc-item[data-depth="1"] {

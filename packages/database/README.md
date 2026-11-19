@@ -20,7 +20,11 @@ church, each in a `staff_role` — pastor, elder, staff — which is also the
 order the site lists them in; `events`, each held on a date, and every
 week on that date's day of the week when it is `recurring`, with the page
 written about it; and `sermons`, each preached on a day, with the page
-written about it and its recording on the church's YouTube channel. Beside them, `users` is who may sign in to the admin app,
+written about it and its recording on the church's YouTube channel; and `appearance`, how the site looks over what its theme says, a table of
+one row as the three pages are: the color the admin set each ramp of the
+palette to as `seeds`, the overrides of the theme's tokens those come to as
+`patch`, which is what the site applies, and the context of each modifier a
+visitor starts with as `input`. Beside them, `users` is who may sign in to the admin app,
 and `views` is the arrangements of the admin's lists each of them has saved:
 one table for every list, each row a user's own, named for the list it is
 over by its `surface`, with the arrangement itself as `payload`.
@@ -41,9 +45,9 @@ would not have offered.
 
 ```
 bezoar.config.ts   the kit config: the output directory, the defaults for the rest
-src/migrations/    the schema, forward only: staff, events, sermons, users, staff search, like escape, search cost, staff status, events search, events trim, content, pages, folders, connect, views, documents
+src/migrations/    the schema, forward only: staff, events, sermons, users, staff search, like escape, search cost, staff status, events search, events trim, content, pages, folders, connect, views, documents, appearance
 src/seeds/         the staff, the events and the first admin user, each safe to run again
-src/queries/web/   what the site reads: home, about, connect, content, staff, events, sermons
+src/queries/web/   what the site reads: home, about, connect, content, staff, events, sermons, appearance
 src/queries/admin/ what the admin app will read and write: the same, in full
 src/roles/         what each app's role may do: web reads, admin reads and writes
 tests/             the build, run through @bezoar/testing
