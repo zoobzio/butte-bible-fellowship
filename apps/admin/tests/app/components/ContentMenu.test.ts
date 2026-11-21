@@ -7,8 +7,12 @@ import { useRouter } from "#imports";
 import { ABOUT } from "#test/support/records";
 import ContentMenu from "~/components/ContentMenu.vue";
 
+/* The page's menu, the page filed in a folder under the top. */
 const mountMenu = () =>
-  mount(ContentMenu, { props: { record: ABOUT }, attachTo: document.body });
+  mount(ContentMenu, {
+    props: { record: ABOUT, folder: ["Sermon notes"] },
+    attachTo: document.body,
+  });
 
 /** Opens the menu from its trigger, as the keyboard does. */
 const open = async (wrapper: ReturnType<typeof mountMenu>) => {
@@ -39,7 +43,7 @@ describe("ContentMenu", () => {
     ]);
   });
 
-  it("deletes the page from the menu, once asked", async () => {
+  it("deletes the page from the menu, at its path, once asked, and leaves for its folder", async () => {
     const fetch = vi.fn(async () => null);
     vi.stubGlobal("$fetch", fetch);
     const confirm = vi.fn(() => true);
@@ -52,8 +56,10 @@ describe("ContentMenu", () => {
     expect(confirm).toHaveBeenCalledWith(
       "Delete About Us? This cannot be undone.",
     );
-    expect(fetch).toHaveBeenCalledWith("/api/content/6", { method: "DELETE" });
-    expect(useRouter().push).toHaveBeenCalledWith("/content");
+    expect(fetch).toHaveBeenCalledWith("/api/content/Sermon%20notes/about-us", {
+      method: "DELETE",
+    });
+    expect(useRouter().push).toHaveBeenCalledWith("/content/Sermon%20notes");
   });
 
   it("says what went wrong when the deletion fails, where a reader is told", async () => {

@@ -1,4 +1,4 @@
-import type { ContentBody, ContentDraft } from "@bbf/schema/types";
+import type { ContentBody } from "@bbf/schema/types";
 
 import type { ContentArguments, ContentDraftArguments } from "../types";
 
@@ -12,8 +12,9 @@ export const toContentArguments = (
 
 /** A new page: its metadata, and the folder it is made in, null for none. */
 export const toContentDraftArguments = (
-  draft: ContentDraft,
+  body: ContentBody,
+  folder?: number,
 ): ContentDraftArguments => ({
-  ...toContentArguments(draft),
-  folder_id: draft.folder ?? null,
+  ...toContentArguments(body),
+  folder_id: folder ?? null,
 });

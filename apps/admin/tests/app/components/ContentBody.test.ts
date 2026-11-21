@@ -11,7 +11,7 @@ import ContentBody from "~/components/ContentBody.vue";
 const { body: _, ...BARE } = HOME;
 
 /** Where the body of the page the tests write is written. */
-const address = "/api/content/5/body";
+const address = "/api/content/index";
 
 const content = (wrapper: ReturnType<typeof mount>) =>
   wrapper.find(".f-data-editor-content");
@@ -147,7 +147,7 @@ describe("ContentBody", () => {
     expect(drafts.dirty.value).toBe(true);
     await drafts.save();
     await wrapper.vm.$nextTick();
-    expect(fetch).toHaveBeenCalledWith("/api/content/5/body", {
+    expect(fetch).toHaveBeenCalledWith("/api/content/index", {
       method: "PATCH",
       body: { body: written },
     });

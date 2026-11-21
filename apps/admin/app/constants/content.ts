@@ -1,29 +1,30 @@
-import type { ContentRecord, ContentView, FolderSort } from "@bbf/schema/types";
+import type { ContentRecord, ContentView } from "@bbf/schema/types";
 import type { AppProsaryMessage } from "#imports";
 
 import type { BrowserConfig } from "~/types/content";
-import type { RecordLink } from "~/types/listing";
 
 import { contentView } from "@bbf/schema";
 import { TIME_ZONE } from "#layers/bbf/shared/constants/time";
 import { dated, textual } from "~/constants/listing";
 
-/** The way to a document's editor: the page a row's title leads to. */
-export const link: RecordLink<ContentRecord> = (record) =>
-  `/content/${record.id}/page`;
+/** The page the content is browsed on, at its top. */
+export const CONTENT = "/content";
 
 /**
- * Where the content is browsed: the page itself at the top, and under its
- * `folder` the folder that is open, by its id. It is what a crumb of the
- * trail links to, and what the page's address follows the browser to.
+ * Where something of the content is, as an address: its path under the
+ * content's own page, each name encoded as a step of it. It is the page of
+ * a folder, which browses it, and of a document, which edits it; the top
+ * is the path of no steps. It is what a folder's row and a crumb of the
+ * trail link to.
  */
-export const browse = (folder?: number): string =>
-  folder === undefined ? "/content" : `/content?folder=${folder}`;
+export const browse = (path: readonly string[] = []): string =>
+  [CONTENT, ...path.map((step) => encodeURIComponent(step))].join("/");
 
 /**
  * The content as the admin browses it: folders, each opened in turn from the
  * top, which the trail names after the content itself and links to the page, and the documents
- * filed in the one that is open. A document shows its title, the way to its
+ * filed in the one that is open. A document is named by its slug, the last
+ * step of its path. It shows its title, the way to its
  * editor, its slug, its media type, which is what kind of document it is, how much it holds and when
  * it was last changed, in the church's time zone. A folder shows, under the
  * last two, what all that is under it comes to.
@@ -37,7 +38,7 @@ export const browse = (folder?: number): string =>
  * literal is the factory's own, named by the prose.
  */
 export const CONTENT_BROWSER: BrowserConfig<ContentRecord> = {
-  fileKey: "id",
+  fileKey: "slug",
   timeZone: TIME_ZONE,
   rootLabel: "admin.content.title",
   rootLink: { to: browse() },
@@ -81,19 +82,6 @@ export const CONTENT_BROWSER: BrowserConfig<ContentRecord> = {
       ...dated,
     },
   ],
-};
-
-/**
- * What the folders are sorted by under each column the documents sort by:
- * their name under the title, and what they show under a column of their
- * own. Under any other, a folder has nothing to be sorted by, and the
- * folders stay in their own order, by name.
- */
-export const FOLDER_SORTS: Partial<Record<string, FolderSort>> = {
-  title: "name",
-  size: "size",
-  createdAt: "createdAt",
-  updatedAt: "updatedAt",
 };
 
 /**

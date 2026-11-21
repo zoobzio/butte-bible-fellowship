@@ -1,101 +1,108 @@
-import type { ContentRecord, FolderRecord } from "@bbf/schema/types";
+import type {
+  ContentRecord,
+  ContentResource,
+  FolderRecord,
+} from "@bbf/schema/types";
 
 import type {
   BrowserCrumb,
   BrowserFetchParams,
+  BrowserFetchResult,
   BrowserFolder,
 } from "~/types/content";
 
-import { FOLDER_SORTS, browse } from "~/constants/content";
+import { browse } from "~/constants/content";
 import { toFilterQuery } from "~/utils/listing";
 
 /**
- * A folder as the browser lists it: named by its id, with how many
- * folders and documents it holds itself, and under the documents' columns
- * what all that is under it comes to: how much it holds, and when the last
- * of it was changed. Its link is where it is browsed, which its crumb
- * carries once it is opened.
+ * The path an address names, of what its route holds after the content's
+ * own page: the steps in order, as the router decoded them. None at the
+ * top, where it holds nothing.
+ */
+export const toPath = (param: unknown): string[] => {
+  const steps = Array.isArray(param) ? param : [param];
+  return steps.filter(
+    (step): step is string => typeof step === "string" && step !== "",
+  );
+};
+
+/** Whether two paths are one: the same steps, in the same order. */
+export const samePath = (
+  one: readonly string[],
+  other: readonly string[],
+): boolean =>
+  one.length === other.length &&
+  one.every((step, index) => step === other[index]);
+
+/** Whether a path is another, or is somewhere under it. */
+export const isUnder = (
+  path: readonly string[],
+  above: readonly string[],
+): boolean => samePath(path.slice(0, above.length), above);
+
+/** The folder a path's last step is in: the path above it. */
+export const parentOf = (path: readonly string[]): string[] =>
+  path.slice(0, -1);
+
+/**
+ * A folder as the browser lists it, in the folder at `path`: named by its
+ * name, which is its step of the path, with how many folders and documents
+ * it holds itself, and under the documents' columns what all that is under
+ * it comes to: how much it holds, and when the last of it was changed. Its
+ * link is its own page, where it is browsed.
  */
 export const toBrowserFolder = (
   record: FolderRecord,
+  path: readonly string[],
 ): BrowserFolder<ContentRecord> => ({
-  key: String(record.id),
+  key: record.name,
   label: record.name,
   count: record.count,
   values: { size: record.size, updatedAt: record.updatedAt },
-  link: { to: browse(record.id) },
+  link: { to: browse([...path, record.name]) },
 });
 
 /**
- * A folder as the trail names it: what the browser keeps of one it has
- * opened.
+ * The trail of a path: a crumb to each folder on the way down, named by
+ * its step, which is the folder's name, and linked to its own page. It is
+ * read off the path alone, with nothing asked of the API.
  */
-export const toCrumb = (record: FolderRecord): BrowserCrumb => {
-  const { key, label, link } = toBrowserFolder(record);
-  return { key, label, link };
-};
+export const toCrumbs = (path: readonly string[]): BrowserCrumb[] =>
+  path.map((step, index) => ({
+    key: step,
+    label: step,
+    link: { to: browse(path.slice(0, index + 1)) },
+  }));
 
 /**
- * The folder an address asks for under its `folder`, by its id. None where
- * it names none, or what it names is no id.
+ * What the browser lists of what a path names: a folder's folders and its
+ * documents, and of a document, which holds neither, nothing.
  */
-export const folderParam = (value: unknown): number | undefined => {
-  const id = Number(Array.isArray(value) ? value[0] : value);
-  return Number.isInteger(id) && id > 0 ? id : undefined;
-};
-
-/** The id of a folder the browser lists, read back from its key. */
-export const folderId = (folder: Pick<BrowserFolder, "key">): number =>
-  Number(folder.key);
+export const toListing = (
+  resource: ContentResource,
+  path: readonly string[],
+): BrowserFetchResult<ContentRecord> =>
+  resource.kind === "folder"
+    ? {
+        folders: resource.folders.map((folder) =>
+          toBrowserFolder(folder, path),
+        ),
+        files: resource.files,
+      }
+    : { folders: [], files: [] };
 
 /**
- * The folder a trail of keys ends in, by its id: the one that is open.
- * None at the top, where the trail is empty.
- */
-export const folderOf = (path: readonly string[]): number | undefined => {
-  const key = path.at(-1);
-  return key === undefined ? undefined : Number(key);
-};
-
-/**
- * The folders inside the open one, as the API is asked for them: all of
- * them, or the ones the free text names. A folder has its name alone to be
- * found by, so the column filters, which are the documents', narrow none.
- * The sort reaches them where a folder has something to be sorted by under
- * the column: its name under the title, and its own size and dates.
- */
-export const toFoldersQuery = (
-  params: Pick<
-    BrowserFetchParams,
-    "path" | "query" | "sortField" | "sortDirection"
-  >,
-): Record<string, number | string> => {
-  const parent = folderOf(params.path);
-  const sort =
-    params.sortField === null ? undefined : FOLDER_SORTS[params.sortField];
-  return {
-    ...(parent === undefined ? {} : { parent }),
-    ...(params.query === "" ? {} : { q: params.query }),
-    ...(sort === undefined ? {} : { sort, direction: params.sortDirection }),
-  };
-};
-
-/**
- * The documents filed in the open folder, as the API is asked for them: the
- * folder, the free text as `q`, one column filter per key, and the sort
- * when the browser holds one. The search is the open folder's alone: it
- * reaches into none of the folders inside it.
+ * What a folder is asked for, beside its path: the free text as `q`, one
+ * column filter per key, and the sort when the browser holds one. The
+ * search is the open folder's alone: it reaches into none of the folders
+ * inside it.
  */
 export const toContentQuery = (
-  params: BrowserFetchParams,
-): Record<string, number | string> => {
-  const folder = folderOf(params.path);
-  return {
-    ...toFilterQuery(params.filters),
-    ...(folder === undefined ? {} : { folder }),
-    ...(params.query === "" ? {} : { q: params.query }),
-    ...(params.sortField === null
-      ? {}
-      : { sort: params.sortField, direction: params.sortDirection }),
-  };
-};
+  params: Omit<BrowserFetchParams, "path">,
+): Record<string, number | string> => ({
+  ...toFilterQuery(params.filters),
+  ...(params.query === "" ? {} : { q: params.query }),
+  ...(params.sortField === null
+    ? {}
+    : { sort: params.sortField, direction: params.sortDirection }),
+});

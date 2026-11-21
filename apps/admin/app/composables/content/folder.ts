@@ -5,21 +5,21 @@ import type { BrowserFolder } from "~/types/content";
 import { folderBody } from "@bbf/schema";
 import { createForm, ref, useNuxtApp } from "#imports";
 import { useApi } from "~/composables/api";
-import { FOLDERS, folder as endpoint } from "~/composables/content/routes";
+import { endpoint } from "~/composables/content/routes";
 import { failure } from "~/utils/errors";
-import { folderId } from "~/utils/folders";
 
 /**
  * The form of one folder, which is its name: a new folder, made inside
- * `parent`, or at the top when there is none, when no folder is given; the
- * folder given, renamed where it stands, otherwise. The form's store is
+ * the folder at `parent`, the top's path being of no steps, when no folder
+ * is given; the folder given, which is inside it, renamed where it stands,
+ * otherwise. The form's store is
  * shared under its id, so each opening starts over from the folder. Once
  * saved, `saved` is told, for the page to list the folder afresh. A save
  * that fails reports through `error`, which the next submit clears.
  */
 export const useFolderEditor = (
   folder: BrowserFolder | null,
-  parent: number | undefined,
+  parent: readonly string[],
   saved: () => void = () => {},
 ) => {
   const api = useApi();
@@ -38,8 +38,11 @@ export const useFolderEditor = (
     submit: async (form) => {
       const body = folderBody.parse(form.payload);
       await (folder === null
-        ? api(FOLDERS, { method: "POST", body: { ...body, parent } })
-        : api(endpoint(folderId(folder)), { method: "PUT", body }));
+        ? api(endpoint(parent), {
+            method: "POST",
+            body: { kind: "folder", ...body },
+          })
+        : api(endpoint([...parent, folder.key]), { method: "PUT", body }));
       saved();
     },
   });

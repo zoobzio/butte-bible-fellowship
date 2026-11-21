@@ -93,6 +93,57 @@ describe("useDrafts", () => {
     expect(other.draft.save).not.toHaveBeenCalled();
   });
 
+  it("saves the parts marked last after the rest have settled", async () => {
+    const [details, body] = [part(), part()];
+    details.draft.last = true;
+    const order: string[] = [];
+    let settle!: () => void;
+    vi.mocked(body.draft.save).mockImplementation(
+      () =>
+        new Promise<void>((resolve) => {
+          order.push("body");
+          settle = resolve;
+        }),
+    );
+    vi.mocked(details.draft.save).mockImplementation(async () => {
+      order.push("details");
+    });
+    // Handed in first, and written last all the same.
+    const { whole } = mountPage([details.draft, body.draft]);
+    details.dirty.value = true;
+    body.dirty.value = true;
+    const saved = whole.save();
+    await Promise.resolve();
+    expect(order).toEqual(["body"]);
+    settle();
+    await saved;
+    expect(order).toEqual(["body", "details"]);
+  });
+
+  it("saves a part marked last on its own when it alone has a change", async () => {
+    const [details, body] = [part(), part()];
+    details.draft.last = true;
+    const { whole } = mountPage([details.draft, body.draft]);
+    details.dirty.value = true;
+    await whole.save();
+    expect(details.draft.save).toHaveBeenCalledTimes(1);
+    expect(body.draft.save).not.toHaveBeenCalled();
+  });
+
+  it("leaves the parts marked last unsaved when one of the rest failed", async () => {
+    const [details, body] = [part(), part()];
+    details.draft.last = true;
+    vi.mocked(body.draft.save).mockImplementation(async () => {
+      body.error.value = "The server is away.";
+    });
+    const { whole } = mountPage([details.draft, body.draft]);
+    details.dirty.value = true;
+    body.dirty.value = true;
+    await whole.save();
+    expect(body.draft.save).toHaveBeenCalledTimes(1);
+    expect(details.draft.save).not.toHaveBeenCalled();
+  });
+
   it("resets every part, changed or only open", () => {
     const [details, body] = [part(), part()];
     const { whole } = mountPage([details.draft, body.draft]);

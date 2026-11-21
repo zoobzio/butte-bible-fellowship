@@ -18,6 +18,14 @@ const refusal = (call: Promise<unknown>): Promise<string> =>
     (error: unknown) => String((error as { cause?: unknown }).cause),
   );
 
+/** The constraint a write was refused over, as the driver's error names it. */
+const constraint = (call: Promise<unknown>): Promise<string | undefined> =>
+  call.then(
+    () => "accepted",
+    (error: unknown) =>
+      (error as { cause?: { constraint?: string } }).cause?.constraint,
+  );
+
 beforeAll(async () => {
   db = await makeTestBezoar(contract, {
     queries,
@@ -33,7 +41,7 @@ afterAll(() => db.close());
 const HEADING = "Discover God’s **Love, Grace & Truth**";
 
 describe("the build", () => {
-  it("carries the staff, events, sermons, users, staff search, like escape, search cost, staff status, events search, events trim, content, pages, folders, connect, views, documents and appearance migrations in order", () => {
+  it("carries the staff, events, sermons, users, staff search, like escape, search cost, staff status, events search, events trim, content, pages, folders, connect, views, documents, appearance and paths migrations in order", () => {
     expect(migrations.map((migration) => migration.name)).toEqual([
       "staff",
       "events",
@@ -52,6 +60,7 @@ describe("the build", () => {
       "views",
       "documents",
       "appearance",
+      "paths",
     ]);
   });
 
@@ -108,8 +117,8 @@ describe("the build", () => {
       "web.sermons.list",
       "web.staff.list",
     ]);
-    expect(names.filter((name) => name.startsWith("admin."))).toHaveLength(54);
-    expect(names).toHaveLength(67);
+    expect(names.filter((name) => name.startsWith("admin."))).toHaveLength(56);
+    expect(names).toHaveLength(69);
   });
 });
 
@@ -1764,6 +1773,176 @@ describe("the documents migration", () => {
   });
 });
 
+describe("the content's paths", () => {
+  /* The folders a path's names find, the top's first, by how deep each is. */
+  const walk = (...path: string[]) =>
+    db.admin.folders.walk({ path: JSON.stringify(path) });
+
+  it("walks a path of names from the top, as far down as it holds", async () => {
+    const notes = await db.admin.folders.create.first({ name: "Sermon notes" });
+    const romans = await db.admin.folders.create.first({
+      name: "Romans",
+      parent_id: notes!.id,
+    });
+    // A name is its own among the folders beside it alone: another Romans,
+    // at the top, is another folder.
+    const other = await db.admin.folders.create.first({ name: "Romans" });
+
+    expect(await walk()).toEqual([]);
+    expect(await walk("Sermon notes")).toEqual([{ depth: 1, id: notes!.id }]);
+    expect(await walk("Sermon notes", "Romans")).toEqual([
+      { depth: 1, id: notes!.id },
+      { depth: 2, id: romans!.id },
+    ]);
+    expect(await walk("Romans")).toEqual([{ depth: 1, id: other!.id }]);
+
+    // The walk stops at the first name no folder there has, and goes no
+    // further: a folder under one that is not there is not found.
+    expect(await walk("Sermon notes", "Galatians")).toEqual([
+      { depth: 1, id: notes!.id },
+    ]);
+    expect(await walk("Galatians", "Romans")).toEqual([]);
+    // A name is matched as it is written, its case with it.
+    expect(await walk("sermon notes")).toEqual([]);
+
+    await db.admin.folders.delete({ id: romans!.id });
+    await db.admin.folders.delete({ id: other!.id });
+    await db.admin.folders.delete({ id: notes!.id });
+  });
+
+  it("finds the document a path ends in, in the folder it is filed in", async () => {
+    const folder = await db.admin.folders.create.first({ name: "Guides" });
+    const filed = await db.admin.content.create.first({
+      slug: "getting-started",
+      title: "Getting started",
+      folder_id: folder!.id,
+    });
+    const top = await db.admin.content.create.first({
+      slug: "at-the-top",
+      title: "At the top",
+    });
+
+    expect(
+      await db.admin.content.locate.first({
+        folder_id: folder!.id,
+        slug: "getting-started",
+      }),
+    ).toEqual({ id: filed!.id });
+    expect(await db.admin.content.locate.first({ slug: "at-the-top" })).toEqual(
+      { id: top!.id },
+    );
+    // A document is found where it is filed, and nowhere else.
+    expect(
+      await db.admin.content.locate.first({ slug: "getting-started" }),
+    ).toBeNull();
+    expect(
+      await db.admin.content.locate.first({
+        folder_id: folder!.id,
+        slug: "at-the-top",
+      }),
+    ).toBeNull();
+
+    await db.admin.content.delete({ id: filed!.id });
+    await db.admin.content.delete({ id: top!.id });
+    await db.admin.folders.delete({ id: folder!.id });
+  });
+
+  it("refuses a folder's name that is no step of a path", async () => {
+    for (const name of ["a/b", "/", "a\\b", "why?", "#1", "50%", ".", ".."]) {
+      expect(await refusal(db.admin.folders.create({ name })), name).toMatch(
+        /folders_name_step/,
+      );
+    }
+    // A dot is no more than a letter anywhere else in a name, and what an
+    // address reads as nothing else is free.
+    const dotted = await db.admin.folders.create.first({
+      name: "v1.2 ... one, two & more!",
+    });
+    expect(dotted).not.toBeNull();
+    expect(
+      await refusal(db.admin.folders.update({ id: dotted!.id, name: "a/b" })),
+    ).toMatch(/folders_name_step/);
+    await db.admin.folders.delete({ id: dotted!.id });
+  });
+
+  it("refuses a folder and a document beside one another the same name, whichever comes second", async () => {
+    const folder = await db.admin.folders.create.first({ name: "guides" });
+    const inside = await db.admin.folders.create.first({
+      name: "inside",
+      parent_id: folder!.id,
+    });
+    const document = await db.admin.content.create.first({
+      slug: "handbook",
+      title: "Handbook",
+    });
+
+    // A document written, or renamed, to where a folder answers.
+    expect(
+      await constraint(
+        db.admin.content.create({ slug: "guides", title: "Guides" }),
+      ),
+    ).toBe("content_path_taken");
+    expect(
+      await constraint(
+        db.admin.content.update({
+          id: document!.id,
+          slug: "guides",
+          title: "Handbook",
+        }),
+      ),
+    ).toBe("content_path_taken");
+
+    // A folder made, or renamed, to where a document answers.
+    expect(
+      await constraint(db.admin.folders.create({ name: "handbook" })),
+    ).toBe("folders_path_taken");
+    expect(
+      await constraint(
+        db.admin.folders.update({ id: inside!.id, name: "handbook" }),
+      ),
+    ).not.toBe("folders_path_taken");
+    expect(
+      await constraint(
+        db.admin.folders.update({ id: folder!.id, name: "handbook" }),
+      ),
+    ).toBe("folders_path_taken");
+
+    // Under another folder the name is free: it is another path.
+    await db.admin.folders.update({ id: inside!.id, name: "inside" });
+    const nested = await db.admin.content.create.first({
+      slug: "guides",
+      title: "Guides",
+      folder_id: folder!.id,
+    });
+    expect(nested).not.toBeNull();
+
+    // And neither is moved to where the other answers: the document out to
+    // the top, beside the folder of its name, nor a folder of the
+    // document's name in beside it.
+    expect(await constraint(db.admin.content.folder({ id: nested!.id }))).toBe(
+      "content_path_taken",
+    );
+    const twin = await db.admin.folders.create.first({
+      name: "handbook",
+      parent_id: folder!.id,
+    });
+    expect(await constraint(db.admin.folders.parent({ id: twin!.id }))).toBe(
+      "folders_path_taken",
+    );
+
+    // What is written on a document, which names nothing, is written still.
+    expect(
+      await db.admin.content.body.first({ id: nested!.id, body: null }),
+    ).not.toBeNull();
+
+    await db.admin.content.delete({ id: nested!.id });
+    await db.admin.content.delete({ id: document!.id });
+    await db.admin.folders.delete({ id: twin!.id });
+    await db.admin.folders.delete({ id: inside!.id });
+    await db.admin.folders.delete({ id: folder!.id });
+  });
+});
+
 describe("admin.events", () => {
   /* The whole list, in the admin's own order: one page big enough. */
   const all = {
@@ -2653,7 +2832,7 @@ describe("roles", () => {
           !name.startsWith("admin.users.") &&
           !name.startsWith("admin.folders.") &&
           !name.startsWith("admin.views.") &&
-          /\.(fetch|list|upcoming|weekly)$/.test(name),
+          /\.(fetch|list|locate|upcoming|weekly)$/.test(name),
       ),
     );
   });

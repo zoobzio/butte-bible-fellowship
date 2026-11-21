@@ -158,17 +158,16 @@ afterEach(() => {
 });
 
 describe("useContent", () => {
-  it("asks the database for the pages at the top, or those filed in the folder the query names", async () => {
-    expect(await useContent().list({})).toEqual([RECORD, HOME]);
+  it("asks the database for the pages at the top, or those filed in the folder named", async () => {
+    expect(await useContent().list(undefined, {})).toEqual([RECORD, HOME]);
     expect(list).toHaveBeenCalledTimes(1);
     expect(list).toHaveBeenCalledWith({ folder_id: null, ...NONE, ...ORDER });
-    expect(await useContent().list({ folder: 7 })).toEqual([]);
+    expect(await useContent().list(7, {})).toEqual([]);
     expect(list).toHaveBeenLastCalledWith({ folder_id: 7, ...NONE, ...ORDER });
   });
 
   it("searches the folder for the text and the filters the query carries, each as the list query names it, in the church's time", async () => {
-    await useContent().list({
-      folder: 7,
+    await useContent().list(7, {
       q: "vision",
       titleContains: "about",
       titleNot: "Welcome",
@@ -190,7 +189,7 @@ describe("useContent", () => {
       ...ORDER,
     });
     // Nothing typed is no search.
-    await useContent().list({ q: "" });
+    await useContent().list(undefined, { q: "" });
     expect(list).toHaveBeenLastCalledWith({
       folder_id: null,
       ...NONE,
@@ -199,37 +198,33 @@ describe("useContent", () => {
   });
 
   it("asks for the sort the query names, by the row's column, ascending unless told", async () => {
-    await useContent().list({ sort: "title" });
+    await useContent().list(undefined, { sort: "title" });
     expect(list).toHaveBeenLastCalledWith({
       folder_id: null,
       ...NONE,
       sort: "title",
       direction: "asc",
     });
-    await useContent().list({
-      folder: 7,
-      sort: "updatedAt",
-      direction: "desc",
-    });
+    await useContent().list(7, { sort: "updatedAt", direction: "desc" });
     expect(list).toHaveBeenLastCalledWith({
       folder_id: 7,
       ...NONE,
       sort: "updated_at",
       direction: "desc",
     });
-    await useContent().list({ sort: "slug" });
+    await useContent().list(undefined, { sort: "slug" });
     expect(list).toHaveBeenLastCalledWith(
       expect.objectContaining({ sort: "slug" }),
     );
-    await useContent().list({ sort: "createdAt" });
+    await useContent().list(undefined, { sort: "createdAt" });
     expect(list).toHaveBeenLastCalledWith(
       expect.objectContaining({ sort: "created_at" }),
     );
-    await useContent().list({ sort: "mime" });
+    await useContent().list(undefined, { sort: "mime" });
     expect(list).toHaveBeenLastCalledWith(
       expect.objectContaining({ sort: "mime" }),
     );
-    await useContent().list({ sort: "size" });
+    await useContent().list(undefined, { sort: "size" });
     expect(list).toHaveBeenLastCalledWith(
       expect.objectContaining({ sort: "size" }),
     );
@@ -256,8 +251,8 @@ describe("useContent", () => {
     expect(record).toMatchObject({ id: 5, slug: "new" });
   });
 
-  it("creates a page in the folder its draft names", async () => {
-    await useContent().create({ slug: "new", title: "New", folder: 7 });
+  it("creates a page in the folder named", async () => {
+    await useContent().create({ slug: "new", title: "New" }, 7);
     expect(created).toHaveBeenCalledWith(
       expect.objectContaining({ folder_id: 7 }),
     );
@@ -296,18 +291,18 @@ describe("useContent", () => {
     expect(await useContent().setBody(9, { body: BODY })).toBeNull();
   });
 
-  it("files a page in a folder on its own, or at the top when the placement names none", async () => {
-    expect(await useContent().setFolder(3, { folder: 7 })).toEqual({
+  it("files a page in a folder on its own, or at the top when none is named", async () => {
+    expect(await useContent().setFolder(3, 7)).toEqual({
       ...RECORD,
       folder: 7,
     });
     expect(filed).toHaveBeenLastCalledWith({ id: 3, folder_id: 7 });
-    expect(await useContent().setFolder(3, {})).toEqual(RECORD);
+    expect(await useContent().setFolder(3)).toEqual(RECORD);
     expect(filed).toHaveBeenLastCalledWith({ id: 3, folder_id: null });
   });
 
   it("files nothing when no page has the id", async () => {
-    expect(await useContent().setFolder(9, { folder: 7 })).toBeNull();
+    expect(await useContent().setFolder(9, 7)).toBeNull();
     expect(fetched).not.toHaveBeenCalled();
   });
 
@@ -317,15 +312,32 @@ describe("useContent", () => {
         cause: { constraint: "content_folder_id_fkey" },
       });
     created.mockRejectedValueOnce(refused());
-    expect(
-      await useContent().create({ slug: "new", title: "New", folder: 9 }),
-    ).toBe("gone");
-    filed.mockRejectedValueOnce(refused());
-    expect(await useContent().setFolder(3, { folder: 9 })).toBe("gone");
-    filed.mockRejectedValueOnce(new Error("down"));
-    await expect(useContent().setFolder(3, { folder: 9 })).rejects.toThrow(
-      "down",
+    expect(await useContent().create({ slug: "new", title: "New" }, 9)).toBe(
+      "gone",
     );
+    filed.mockRejectedValueOnce(refused());
+    expect(await useContent().setFolder(3, 9)).toBe("gone");
+    filed.mockRejectedValueOnce(new Error("down"));
+    await expect(useContent().setFolder(3, 9)).rejects.toThrow("down");
+  });
+
+  it("says a slug is taken, by a page anywhere or by a folder beside it, when the database refuses the write over it", async () => {
+    const refused = (constraint: string) =>
+      new Error("the query failed", { cause: { constraint } });
+    const body = { slug: "index", title: "Home" };
+    for (const constraint of ["content_slug_key", "content_path_taken"]) {
+      created.mockRejectedValueOnce(refused(constraint));
+      expect(await useContent().create(body), constraint).toBe("taken");
+      updated.mockRejectedValueOnce(refused(constraint));
+      expect(await useContent().update(3, body), constraint).toBe("taken");
+    }
+    // A page filed where a folder of its name already is.
+    filed.mockRejectedValueOnce(refused("content_path_taken"));
+    expect(await useContent().setFolder(3, 7)).toBe("taken");
+    expect(fetched).not.toHaveBeenCalled();
+    // Whatever else fails a write is thrown on.
+    updated.mockRejectedValueOnce(new Error("down"));
+    await expect(useContent().update(3, body)).rejects.toThrow("down");
   });
 
   it("removes a page, and says whether there was one", async () => {

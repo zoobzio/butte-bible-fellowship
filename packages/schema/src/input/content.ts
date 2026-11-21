@@ -1,7 +1,9 @@
 import { z } from "zod";
 
 import { hast } from "../models/hast";
+import { contentLocation } from "../models/path";
 import { slug } from "../models/slug";
+import { folderBody } from "./folder";
 import { dayColumn, listingQuery, sorting, textColumn } from "./listing";
 
 export const contentPath = z.object({
@@ -9,17 +11,6 @@ export const contentPath = z.object({
     description: "What the page is called in its address.",
     examples: ["about-us"],
   }),
-});
-
-export const contentId = z.object({
-  id: z.coerce
-    .number()
-    .int()
-    .positive()
-    .meta({
-      description: "What names it to the admin: its row's number.",
-      examples: [1],
-    }),
 });
 
 export const CONTENT_SORT_KEYS = [
@@ -37,19 +28,9 @@ export const contentSort = z.enum(CONTENT_SORT_KEYS).meta({
 });
 
 export const contentQuery = z.object({
-  folder: z.coerce
-    .number()
-    .int()
-    .positive()
-    .optional()
-    .meta({
-      description:
-        "The folder whose pages are listed, by its id. Left out, the pages at the top, in no folder.",
-      examples: [1],
-    }),
   q: listingQuery.shape.q.meta({
     description:
-      "Free text the folder's pages are searched for, in their title, slug, description and what is written on them, without regard to case. Left out or empty, every page of the folder.",
+      "Free text the folder is searched for: its pages in their title, slug, description and what is written on them, and the folders inside it in their name, without regard to case. Left out or empty, all the folder holds.",
     examples: ["beliefs"],
   }),
   ...sorting(contentSort),
@@ -78,29 +59,29 @@ export const contentBody = z
       "A page's metadata as it is written, what its front matter carried: what creating one takes, and what updating one replaces. What is written on the page is written on its own.",
   });
 
-export const contentPlacement = z
-  .object({
-    folder: z
-      .int()
-      .positive()
-      .optional()
-      .meta({
-        description:
-          "The folder the page is filed in, by its id. Left out, it is at the top, in no folder.",
-        examples: [1],
-      }),
-  })
+export const contentEntry = z
+  .discriminatedUnion("kind", [
+    contentBody.extend({ kind: z.literal("document") }),
+    folderBody.extend({ kind: z.literal("folder") }),
+  ])
   .meta({
-    id: "ContentPlacement",
+    id: "ContentEntry",
     description:
-      "Where a page is filed, on its own: what moving it to another folder takes.",
+      "What is made in a folder, the one the address names: a new document, by its metadata, or a new folder, by its name.",
   });
 
-export const contentDraft = contentBody.extend(contentPlacement.shape).meta({
-  id: "ContentDraft",
-  description:
-    "A new page as it is written: its metadata, and the folder it is made in.",
-});
+export const contentMove = z
+  .object({
+    parent: contentLocation.meta({
+      description:
+        "The folder it is moved into, by its path. Empty, it is moved to the top.",
+    }),
+  })
+  .meta({
+    id: "ContentMove",
+    description:
+      "Where a document or a folder is, on its own: what moving it into another folder takes.",
+  });
 
 export const contentForm = z
   .object({
@@ -132,4 +113,12 @@ export const contentArticle = z
     id: "ContentArticle",
     description:
       "What is written on a page, on its own: what replaces what it has.",
+  });
+
+export const contentPatch = z
+  .union([contentMove, contentArticle.strict()])
+  .meta({
+    id: "ContentPatch",
+    description:
+      "One part of what a path names, written on its own: where it is, a document's or a folder's, or what is written on a document.",
   });

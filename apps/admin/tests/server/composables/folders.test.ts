@@ -77,27 +77,27 @@ afterEach(() => {
 });
 
 describe("useFolders", () => {
-  it("lists the folders at the top, or those inside the folder the query names", async () => {
-    expect(await useFolders().list({})).toEqual([RECORD]);
+  it("lists the folders at the top, or those inside the folder named", async () => {
+    expect(await useFolders().list(undefined)).toEqual([RECORD]);
     expect(list).toHaveBeenLastCalledWith({
       parent_id: null,
       q: null,
       ...ORDER,
     });
-    expect(await useFolders().list({ parent: 3 })).toEqual([
+    expect(await useFolders().list(3, {})).toEqual([
       { ...RECORD, id: 4, parent: 3, name: "Romans", count: 0 },
     ]);
     expect(list).toHaveBeenLastCalledWith({ parent_id: 3, q: null, ...ORDER });
   });
 
   it("searches a level's names for the text the query carries, and for nothing when none is typed", async () => {
-    await useFolders().list({ parent: 3, q: "romans" });
+    await useFolders().list(3, { q: "romans" });
     expect(list).toHaveBeenLastCalledWith({
       parent_id: 3,
       q: "romans",
       ...ORDER,
     });
-    await useFolders().list({ q: "" });
+    await useFolders().list(undefined, { q: "" });
     expect(list).toHaveBeenLastCalledWith({
       parent_id: null,
       q: null,
@@ -105,33 +105,46 @@ describe("useFolders", () => {
     });
   });
 
-  it("asks for the sort the query names, by the row's column, ascending unless told", async () => {
-    await useFolders().list({ sort: "name" });
+  it("follows the sort of the pages where a folder has something to be sorted by, by the row's column, ascending unless told", async () => {
+    // The pages' title is the folders' name.
+    await useFolders().list(undefined, { sort: "title" });
     expect(list).toHaveBeenLastCalledWith({
       parent_id: null,
       q: null,
       sort: "name",
       direction: "asc",
     });
-    await useFolders().list({
-      parent: 3,
-      sort: "updatedAt",
-      direction: "desc",
-    });
+    await useFolders().list(3, { sort: "updatedAt", direction: "desc" });
     expect(list).toHaveBeenLastCalledWith({
       parent_id: 3,
       q: null,
       sort: "updated_at",
       direction: "desc",
     });
-    await useFolders().list({ sort: "createdAt" });
+    await useFolders().list(undefined, { sort: "createdAt" });
     expect(list).toHaveBeenLastCalledWith(
       expect.objectContaining({ sort: "created_at" }),
     );
-    await useFolders().list({ sort: "size" });
+    await useFolders().list(undefined, { sort: "size" });
     expect(list).toHaveBeenLastCalledWith(
       expect.objectContaining({ sort: "size" }),
     );
+  });
+
+  it("sorts by nothing under a column a folder shows nothing under, and keeps the direction asked for", async () => {
+    await useFolders().list(undefined, { sort: "slug" });
+    expect(list).toHaveBeenLastCalledWith({
+      parent_id: null,
+      q: null,
+      ...ORDER,
+    });
+    await useFolders().list(3, { sort: "mime", direction: "desc" });
+    expect(list).toHaveBeenLastCalledWith({
+      parent_id: 3,
+      q: null,
+      sort: null,
+      direction: "desc",
+    });
   });
 
   it("fetches one folder by id, or nothing", async () => {
@@ -139,13 +152,13 @@ describe("useFolders", () => {
     expect(await useFolders().fetch(9)).toBeNull();
   });
 
-  it("creates a folder at the top, or inside the one its draft names, and hands back the record", async () => {
+  it("creates a folder at the top, or inside the one named, and hands back the record", async () => {
     expect(await useFolders().create({ name: "New" })).toMatchObject({
       id: 5,
       name: "New",
     });
     expect(created).toHaveBeenLastCalledWith({ name: "New", parent_id: null });
-    await useFolders().create({ name: "New", parent: 3 });
+    await useFolders().create({ name: "New" }, 3);
     expect(created).toHaveBeenLastCalledWith({ name: "New", parent_id: 3 });
   });
 
@@ -161,20 +174,18 @@ describe("useFolders", () => {
     expect(await useFolders().update(9, { name: "Notes" })).toBeNull();
   });
 
-  it("moves a folder into another, or to the top when the placement names none", async () => {
-    expect(await useFolders().setParent(4, {})).toMatchObject({ id: 4 });
+  it("moves a folder into another, or to the top when none is named", async () => {
+    expect(await useFolders().setParent(4)).toMatchObject({ id: 4 });
     expect(moved).toHaveBeenLastCalledWith({ id: 4, parent_id: null });
-    expect(await useFolders().setParent(4, { parent: 3 })).toMatchObject({
-      id: 4,
-    });
+    expect(await useFolders().setParent(4, 3)).toMatchObject({ id: 4 });
     expect(moved).toHaveBeenLastCalledWith({ id: 4, parent_id: 3 });
   });
 
   it("refuses to move a folder into itself or under a folder of its own, and misses one that is not there", async () => {
-    expect(await useFolders().setParent(3, { parent: 3 })).toBe("refused");
-    expect(await useFolders().setParent(3, { parent: 4 })).toBe("refused");
+    expect(await useFolders().setParent(3, 3)).toBe("refused");
+    expect(await useFolders().setParent(3, 4)).toBe("refused");
     moved.mockClear();
-    expect(await useFolders().setParent(9, { parent: 3 })).toBe("missing");
+    expect(await useFolders().setParent(9, 3)).toBe("missing");
     expect(moved).not.toHaveBeenCalled();
   });
 
@@ -184,13 +195,26 @@ describe("useFolders", () => {
     created.mockRejectedValueOnce(refused("folders_parent_id_name_key"));
     expect(await useFolders().create({ name: "Sermon notes" })).toBe("taken");
     created.mockRejectedValueOnce(refused("folders_parent_id_fkey"));
-    expect(await useFolders().create({ name: "New", parent: 9 })).toBe("gone");
+    expect(await useFolders().create({ name: "New" }, 9)).toBe("gone");
     updated.mockRejectedValueOnce(refused("folders_parent_id_name_key"));
     expect(await useFolders().update(3, { name: "Romans" })).toBe("taken");
     moved.mockRejectedValueOnce(refused("folders_parent_id_name_key"));
-    expect(await useFolders().setParent(4, {})).toBe("taken");
+    expect(await useFolders().setParent(4)).toBe("taken");
     moved.mockRejectedValueOnce(refused("folders_parent_id_fkey"));
-    expect(await useFolders().setParent(4, { parent: 9 })).toBe("gone");
+    expect(await useFolders().setParent(4, 9)).toBe("gone");
+  });
+
+  it("says a name is taken when a page beside the folder already answers to it", async () => {
+    const refused = () =>
+      new Error("the query failed", {
+        cause: { constraint: "folders_path_taken" },
+      });
+    created.mockRejectedValueOnce(refused());
+    expect(await useFolders().create({ name: "about-us" })).toBe("taken");
+    updated.mockRejectedValueOnce(refused());
+    expect(await useFolders().update(3, { name: "about-us" })).toBe("taken");
+    moved.mockRejectedValueOnce(refused());
+    expect(await useFolders().setParent(4)).toBe("taken");
   });
 
   it("throws on whatever else fails a write", async () => {

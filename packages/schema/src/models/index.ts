@@ -9,6 +9,8 @@ export * from "./home";
 export * from "./link";
 export * from "./listing";
 export * from "./page";
+export * from "./path";
+export * from "./resource";
 export * from "./sermon";
 export * from "./slug";
 export * from "./staff";

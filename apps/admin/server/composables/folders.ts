@@ -1,11 +1,10 @@
 import type {
+  ContentQuery,
+  ContentSort,
   FolderBody,
-  FolderDraft,
-  FolderPlacement,
   FolderRecord,
   FolderRecords,
   FolderSort,
-  FoldersQuery,
 } from "@bbf/schema/types";
 
 import { toFolderArguments, toFolderRecord } from "@bbf/utils";
@@ -23,9 +22,9 @@ import { orRefused } from "~~/server/utils/conflicts";
 export type FolderRefusal = "missing" | "refused";
 
 /**
- * What the database refuses a write of a folder over: `taken`, a folder
- * beside it already has the name; `gone`, the folder it was to be inside
- * is not there.
+ * What the database refuses a write of a folder over: `taken`, a folder or
+ * a page beside it already has the name; `gone`, the folder it was to be
+ * inside is not there.
  */
 export type FolderConflict =
   (typeof FOLDER_REFUSALS)[keyof typeof FOLDER_REFUSALS];
@@ -40,20 +39,42 @@ const SORT_COLUMNS: Record<FolderSort, string> = {
   updatedAt: "updated_at",
 };
 
+/**
+ * What the folders are sorted by under each column the pages sort by: their
+ * name under the title, and what they show under a column of their own.
+ * Under any other, a folder has nothing to be sorted by, and the folders
+ * stay in their own order, by name.
+ */
+const FOLDER_SORTS: Partial<Record<ContentSort, FolderSort>> = {
+  title: "name",
+  size: "size",
+  createdAt: "createdAt",
+  updatedAt: "updatedAt",
+};
+
+/** What of a folder's listing its folders are searched and sorted by. */
+export type FoldersQuery = Pick<ContentQuery, "q" | "sort" | "direction">;
+
 export const useFolders = () => {
   const db = useDatabase();
 
   /**
-   * The folders inside one, or at the top when the query names none: all
-   * of them, or the ones the text searched for names, by the column the
-   * query sorts by, ascending unless told otherwise, and by name without
-   * one.
+   * The folders inside one, or at the top when none is named: all of them,
+   * or the ones the text searched for names, a folder having its name
+   * alone to be found by. They follow the sort of the pages they are
+   * listed over where a folder has something to be sorted by under its
+   * column, ascending unless told otherwise, and are by name otherwise.
    */
-  const list = async (query: FoldersQuery): Promise<FolderRecords> => {
+  const list = async (
+    parent: number | undefined,
+    query: FoldersQuery = {},
+  ): Promise<FolderRecords> => {
+    const sort =
+      query.sort === undefined ? undefined : FOLDER_SORTS[query.sort];
     const rows = await db.admin.folders.list({
-      parent_id: query.parent ?? null,
+      parent_id: parent ?? null,
       q: query.q === undefined || query.q === "" ? null : query.q,
-      sort: query.sort === undefined ? null : SORT_COLUMNS[query.sort],
+      sort: sort === undefined ? null : SORT_COLUMNS[sort],
       direction: query.direction ?? "asc",
     });
     return rows.map(toFolderRecord);
@@ -64,13 +85,14 @@ export const useFolders = () => {
     return row === null ? null : toFolderRecord(row);
   };
 
-  /** A new folder, inside the one its draft names, or at the top. */
+  /** A new folder, inside the one named, or at the top. */
   const create = (
-    draft: FolderDraft,
+    body: FolderBody,
+    parent?: number,
   ): Promise<FolderRecord | FolderConflict | null> =>
     orRefused(FOLDER_REFUSALS, async () => {
       const written = await db.admin.folders.create.first(
-        toFolderArguments(draft),
+        toFolderArguments(body, parent),
       );
       return written === null ? null : fetch(written.id);
     });
@@ -89,19 +111,19 @@ export const useFolders = () => {
     });
 
   /**
-   * Where a folder is, on its own: inside the folder the placement names,
-   * or at the top when it names none. A folder is never moved into itself,
-   * nor under a folder of its own: that is refused.
+   * Where a folder is, on its own: inside the folder named, or at the top
+   * when none is. A folder is never moved into itself, nor under a folder
+   * of its own: that is refused.
    */
   const setParent = (
     id: number,
-    placement: FolderPlacement,
+    parent?: number,
   ): Promise<FolderRecord | FolderRefusal | FolderConflict> =>
     orRefused(FOLDER_REFUSALS, async () => {
       if ((await fetch(id)) === null) return "missing";
       const written = await db.admin.folders.parent.first({
         id,
-        parent_id: placement.parent ?? null,
+        parent_id: parent ?? null,
       });
       return written === null ? "refused" : ((await fetch(id)) ?? "missing");
     });

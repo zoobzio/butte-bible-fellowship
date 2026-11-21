@@ -5,19 +5,20 @@ import type {
 } from "@bbf/schema/types";
 
 import { describe, expect, it, vi } from "vitest";
-import { flushPromises, mount } from "@vue/test-utils";
+import { flushPromises } from "@vue/test-utils";
 
-import { Browser, Dialog, Editor, NuxtPage, Views } from "#components";
+import { Browser, Dialog, Editor, Views } from "#components";
 import { navigateTo, setRoutePath, useRouter } from "#imports";
 import ContentBody from "~/components/ContentBody.vue";
+import ContentDocument from "~/components/ContentDocument.vue";
 import ContentEditor from "~/components/ContentEditor.vue";
+import ContentFolder from "~/components/ContentFolder.vue";
 import ContentMenu from "~/components/ContentMenu.vue";
 import FolderEditor from "~/components/FolderEditor.vue";
 import PageHeader from "~/components/PageHeader.vue";
 import SaveBar from "~/components/SaveBar.vue";
-import Index from "~/pages/content/index.vue";
-import Content from "~/pages/content/[id].vue";
-import Page from "~/pages/content/[id]/page.vue";
+import Page from "~/pages/content/[...path].vue";
+import { browse } from "~/constants/content";
 import { HOME, ABOUT, NOTES, ROMANS } from "#test/support/records";
 import { head } from "#test/support/head";
 import { mountSuspended } from "@bbf/nuxt/testing/mount";
@@ -26,6 +27,9 @@ type Request = { method?: string; query?: Record<string, unknown> };
 
 /** What one folder holds: the folders inside it, and the documents filed in it. */
 type Held = { folders?: FolderRecord[]; documents?: ContentRecord[] };
+
+/** The folders under the top, each by its path as an address spells it. */
+type Inside = Record<string, Held>;
 
 /** A view of the content someone saved: the images, the largest first. */
 const IMAGES: ViewRecord = {
@@ -43,54 +47,94 @@ const IMAGES: ViewRecord = {
   updatedAt: "2026-10-18T09:30:00.000Z",
 };
 
+/** Where the notes are browsed, and read: their path, as an address has it. */
+const IN_NOTES = "/content/Sermon%20notes";
+const NOTES_API = "/api/content/Sermon%20notes";
+
+/** A folder as the API answers with it: what it holds. */
+const folder = (held: Held) => ({
+  kind: "folder" as const,
+  folders: held.folders ?? [],
+  files: held.documents ?? [],
+});
+
 /**
- * The admin's API over the content: the top holds `top`, and each folder what
- * `inside` gives under its id. A folder asked for by its id is one of the
- * ones held, and not found otherwise. Every write answers with `answer`, and the
- * views whoever is signed in has saved are `saved`.
+ * The admin's API over the content: the top holds `top`, and each folder
+ * under it what `inside` gives under its path, `Sermon notes/Romans` the
+ * folder of that name inside the notes. A path is answered with the folder
+ * it names, or the document of its last step filed in the folder above, and
+ * is not found otherwise. Every write answers with `answer`, and the views
+ * whoever is signed in has saved are `saved`.
  */
 const api = (
   top: Held,
-  inside: Record<number, Held> = {},
+  inside: Inside = {},
   answer?: unknown,
   saved: ViewRecord[] = [],
 ) =>
   vi.fn(async (path: string, request: Request = {}) => {
     if (request.method !== undefined) return answer;
     if (path.startsWith("/api/views/")) return saved;
-    if (path.startsWith("/api/content/folders/")) {
-      const id = Number(path.split("/").at(-1));
-      const held = [top, ...Object.values(inside)]
-        .flatMap((holds) => holds.folders ?? [])
-        .find((folder) => folder.id === id);
-      if (held === undefined) {
-        throw Object.assign(new Error("Folder not found"), { status: 404 });
-      }
-      return held;
+    const steps = path
+      .slice("/api/content".length)
+      .split("/")
+      .filter((step) => step !== "")
+      .map((step) => decodeURIComponent(step));
+    const held = (at: string[]) =>
+      at.length === 0 ? top : inside[at.join("/")];
+    const here = held(steps);
+    if (here !== undefined) return folder(here);
+    const record = held(steps.slice(0, -1))?.documents?.find(
+      (document) => document.slug === steps.at(-1),
+    );
+    if (record === undefined) {
+      throw Object.assign(new Error("Nothing is at that path"), {
+        status: 404,
+      });
     }
-    if (path === "/api/content/folders") {
-      const parent = request.query?.parent as number | undefined;
-      return (parent === undefined ? top : inside[parent])?.folders ?? [];
-    }
-    const folder = request.query?.folder as number | undefined;
-    return (folder === undefined ? top : inside[folder])?.documents ?? [];
+    return { kind: "document", record };
   });
 
-/** The content page over the admin's API holding what is given. */
+/** Puts the page's address at a path of the content: the top, with none. */
+const at = (...path: string[]) => setRoutePath(browse(path), { path } as never);
+
+/** The content's page, at the address it stands at, over whatever the API holds. */
+const visit = async () => {
+  const { wrapper, error } = await mountSuspended(Page);
+  return { wrapper, error };
+};
+
+/**
+ * The content page over the admin's API holding what is given, at the
+ * address it stands at: the top, unless `at` put it elsewhere.
+ */
 const mountContent = async (
   top: Held,
-  inside: Record<number, Held> = {},
+  inside: Inside = {},
   answer?: unknown,
   saved: ViewRecord[] = [],
 ) => {
   const fetch = api(top, inside, answer, saved);
   vi.stubGlobal("$fetch", fetch);
-  const { wrapper, error } = await mountSuspended(Index);
+  const { wrapper, error } = await visit();
   expect(error).toBeUndefined();
   return { wrapper, fetch };
 };
 
 type Mounted = Awaited<ReturnType<typeof mountContent>>["wrapper"];
+
+/**
+ * Moves to another page of the content, as a link followed does: the page
+ * that was drawn goes, and the one at the new address is drawn in its
+ * place, over the same API.
+ */
+const go = async (from: Mounted, ...path: string[]) => {
+  from.unmount();
+  at(...path);
+  const { wrapper, error } = await visit();
+  expect(error).toBeUndefined();
+  return wrapper;
+};
 
 /** The titles of the page's own dialogs: the views have theirs too. */
 const DIALOGS = {
@@ -108,6 +152,13 @@ const dialogOf = (wrapper: Mounted, title: string) =>
 const writes = (fetch: ReturnType<typeof api>) =>
   fetch.mock.calls.filter(([, request]) => request?.method !== undefined);
 
+/** The reads of the content the API was asked for, the views' left out. */
+const reads = (fetch: ReturnType<typeof api>) =>
+  fetch.mock.calls.filter(
+    ([path, request]) =>
+      request?.method === undefined && path.startsWith("/api/content"),
+  );
+
 /** Picks an action of the menu that is open, by its label. */
 const pick = async (label: string) => {
   const item = [
@@ -119,11 +170,7 @@ const pick = async (label: string) => {
 };
 
 /** Opens the actions of a row, and picks one. */
-const act = async (
-  wrapper: Awaited<ReturnType<typeof mountContent>>["wrapper"],
-  row: string,
-  label: string,
-) => {
+const act = async (wrapper: Mounted, row: string, label: string) => {
   const trigger = wrapper.find(`${row} .f-data-browser-actions button`);
   await trigger.trigger("pointerdown", { button: 0, ctrlKey: false });
   await trigger.trigger("click");
@@ -134,12 +181,17 @@ const act = async (
 const FOLDER = ".f-data-browser-folder";
 const POST = ".f-data-browser-files .f-tr";
 
+/** The browser the page draws. */
+const browserOf = (wrapper: Mounted) =>
+  wrapper.findComponent(Browser).props("service");
+
 describe("content page", () => {
-  it("heads the content browser with the ways to a new document and a new folder, the top fetched on load", async () => {
+  it("heads the content browser with the ways to a new document and a new folder, the top asked for in one request", async () => {
     const { wrapper, fetch } = await mountContent({
       folders: [NOTES],
       documents: [HOME, ABOUT],
     });
+    expect(wrapper.findComponent(ContentFolder).exists()).toBe(true);
     expect(wrapper.findComponent(PageHeader).props()).toEqual({
       title: "Content",
       description:
@@ -149,25 +201,27 @@ describe("content page", () => {
     expect(wrapper.find("button.content-new-folder").text()).toBe("New folder");
     const browser = wrapper.findComponent(Browser);
     expect(browser.props("service").id).toBe("content");
-    // The views load first, so the browser's one listing reads the open one.
-    expect(fetch).toHaveBeenCalledTimes(3);
-    expect(fetch.mock.calls[0]).toEqual(["/api/views/content", {}]);
-    expect(fetch).toHaveBeenCalledWith("/api/content/folders", { query: {} });
-    expect(fetch).toHaveBeenCalledWith("/api/content", { query: {} });
+    // The views load first, so the one request of the content reads the
+    // open one: the folders and the documents come back together.
+    expect(fetch.mock.calls).toEqual([
+      ["/api/views/content", {}],
+      ["/api/content", { query: {} }],
+    ]);
+    expect(browser.props("service").initialized).toBe(true);
     expect(browser.props("service").files).toEqual([HOME, ABOUT]);
     expect(browser.props("service").folders).toEqual([
       {
-        key: "2",
+        key: "Sermon notes",
         label: "Sermon notes",
         count: 1,
         values: { size: 4096, updatedAt: "2026-10-18T09:30:00.000Z" },
-        link: { to: "/content?folder=2" },
+        link: { to: IN_NOTES },
       },
     ]);
     expect(head()).toEqual({ title: "Content" });
   });
 
-  it("lists the folders first, each with what it holds, then the documents, each title the way to its editor", async () => {
+  it("lists the folders first, each with what it holds, then the documents, each title the way to its page", async () => {
     const { wrapper } = await mountContent({
       folders: [NOTES],
       documents: [HOME, ABOUT],
@@ -177,8 +231,8 @@ describe("content page", () => {
     expect(folders.map((folder) => folder.text())).toEqual(["Sermon notes1"]);
     const links = wrapper.findAll(`${POST} .f-td > a.f-anchor`);
     expect(links.map((link) => link.attributes("href"))).toEqual([
-      "/content/5/page",
-      "/content/6/page",
+      "/content/index",
+      "/content/about-us",
     ]);
     expect(links.map((link) => link.text())).toEqual([
       "Butte Bible Fellowship",
@@ -220,175 +274,145 @@ describe("content page", () => {
   it("names the top of the trail after the content", async () => {
     const { wrapper } = await mountContent({ documents: [HOME] });
     expect(wrapper.find(".f-data-browser-breadcrumb").text()).toBe("Content");
+    expect(browserOf(wrapper).pathKeys).toEqual([]);
   });
 
-  it("opens a folder when it is clicked: what it holds is fetched, and the trail leads back", async () => {
+  it("draws a folder's row as a link to the folder's own page, which is what opens it: nothing is asked for here", async () => {
     const { wrapper, fetch } = await mountContent(
       { folders: [NOTES], documents: [HOME] },
-      { 2: { folders: [ROMANS], documents: [ABOUT] } },
+      { "Sermon notes": { folders: [ROMANS] } },
     );
-    await wrapper.find(`${FOLDER} .f-data-browser-folder-btn`).trigger("click");
+    const row = wrapper.find(`${FOLDER} .f-data-browser-folder-btn`);
+    expect(row.element.tagName).toBe("A");
+    expect(row.attributes("href")).toBe(IN_NOTES);
+    expect(row.find("svg use").attributes("href")).toBe("#folder");
+    fetch.mockClear();
+    await row.trigger("click");
     await flushPromises();
-    expect(fetch).toHaveBeenLastCalledWith("/api/content", {
-      query: { folder: 2 },
-    });
-    expect(fetch).toHaveBeenCalledWith("/api/content/folders", {
-      query: { parent: 2 },
-    });
+    expect(fetch).not.toHaveBeenCalled();
+    expect(browserOf(wrapper).pathKeys).toEqual([]);
+    expect(navigateTo).not.toHaveBeenCalled();
+  });
+
+  it("opens on the folder the address names, in one request of the folder's own path, its trail read off the address", async () => {
+    at("Sermon notes", "Romans");
+    const { wrapper, fetch } = await mountContent(
+      { folders: [NOTES], documents: [HOME] },
+      {
+        "Sermon notes": { folders: [ROMANS] },
+        "Sermon notes/Romans": { documents: [ABOUT] },
+      },
+    );
+    expect(browserOf(wrapper).pathKeys).toEqual(["Sermon notes", "Romans"]);
     expect(
       wrapper
-        .findAll(`${FOLDER} .f-data-browser-folder-btn`)
-        .map((f) => f.text()),
-    ).toEqual(["Romans0"]);
+        .findAll(".f-data-browser-breadcrumb .f-li")
+        .map((crumb) => crumb.text()),
+    ).toEqual(["Content", "Sermon notes", "Romans"]);
+    // Nothing is asked of the API for the trail, nor for the folders above.
+    expect(reads(fetch)).toEqual([
+      ["/api/content/Sermon%20notes/Romans", { query: {} }],
+    ]);
     expect(
       wrapper.findAll(`${POST} a.f-anchor`).map((link) => link.text()),
     ).toEqual(["About Us"]);
-    const crumbs = wrapper.findAll(".f-data-browser-breadcrumb .f-li");
-    expect(crumbs.map((crumb) => crumb.text())).toEqual([
-      "Content",
-      "Sermon notes",
-    ]);
-
-    // A folder inside a folder opens the same way, a level deeper.
-    await wrapper.find(`${FOLDER} .f-data-browser-folder-btn`).trigger("click");
-    await flushPromises();
-    expect(fetch).toHaveBeenLastCalledWith("/api/content", {
-      query: { folder: 3 },
-    });
-    expect(wrapper.findComponent(Browser).props("service").pathKeys).toEqual([
-      "2",
-      "3",
-    ]);
-
-    // The trail's first crumb leads back to the top.
-    await wrapper.find(".f-data-browser-breadcrumb a").trigger("click");
-    await flushPromises();
-    expect(fetch).toHaveBeenLastCalledWith("/api/content", { query: {} });
-    expect(
-      wrapper.findAll(`${POST} a.f-anchor`).map((link) => link.text()),
-    ).toEqual(["Butte Bible Fellowship"]);
+    expect(navigateTo).not.toHaveBeenCalled();
   });
 
-  it("draws each folder above the open one as a link to where it is browsed", async () => {
+  it("lists what a folder holds under the folder's own path: a folder inside it, and a document filed in it", async () => {
+    at("Sermon notes");
     const { wrapper } = await mountContent(
       { folders: [NOTES] },
-      { 2: { folders: [ROMANS] }, 3: {} },
+      { "Sermon notes": { folders: [ROMANS], documents: [ABOUT] } },
     );
-    await wrapper.find(`${FOLDER} .f-data-browser-folder-btn`).trigger("click");
-    await flushPromises();
-    await wrapper.find(`${FOLDER} .f-data-browser-folder-btn`).trigger("click");
-    await flushPromises();
+    expect(
+      wrapper.find(`${FOLDER} .f-data-browser-folder-btn`).attributes("href"),
+    ).toBe("/content/Sermon%20notes/Romans");
+    expect(wrapper.find(`${POST} a.f-anchor`).attributes("href")).toBe(
+      "/content/Sermon%20notes/about-us",
+    );
+    expect(browserOf(wrapper).folders[0].link).toEqual({
+      to: "/content/Sermon%20notes/Romans",
+    });
+  });
+
+  it("draws each folder above the open one as a link to its own page, which is what leads back: a crumb picked asks for nothing here", async () => {
+    at("Sermon notes", "Romans");
+    const { wrapper, fetch } = await mountContent(
+      { folders: [NOTES] },
+      { "Sermon notes": { folders: [ROMANS] }, "Sermon notes/Romans": {} },
+    );
     const links = wrapper.findAll(".f-data-browser-breadcrumb .f-li > a");
     expect(links.map((link) => [link.text(), link.attributes("href")])).toEqual(
       [
         ["Content", "/content"],
-        ["Sermon notes", "/content?folder=2"],
+        ["Sermon notes", IN_NOTES],
       ],
     );
     // The open folder is where the trail ends, and leads nowhere.
     expect(
       wrapper.find(".f-data-browser-breadcrumb .f-li:last-child > a").exists(),
     ).toBe(false);
+    fetch.mockClear();
+    await links[0]!.trigger("click");
+    await links[1]!.trigger("click");
+    await flushPromises();
+    expect(fetch).not.toHaveBeenCalled();
+    expect(browserOf(wrapper).pathKeys).toEqual(["Sermon notes", "Romans"]);
   });
 
-  it("moves the page's address with the browser: to a folder opened, and back to the top", async () => {
-    setRoutePath("/content");
-    const { wrapper } = await mountContent(
-      { folders: [NOTES] },
-      { 2: { folders: [ROMANS] } },
-    );
-    // At the top, as the address says: there is nothing to put right.
-    expect(navigateTo).not.toHaveBeenCalled();
-    await wrapper.find(`${FOLDER} .f-data-browser-folder-btn`).trigger("click");
-    await flushPromises();
-    expect(navigateTo).toHaveBeenLastCalledWith("/content?folder=2");
-    setRoutePath("/content", {}, { folder: "2" });
-    await wrapper.find(".f-data-browser-breadcrumb a").trigger("click");
-    await flushPromises();
-    expect(navigateTo).toHaveBeenLastCalledWith("/content");
-  });
-
-  it("opens on the folder the address names, its trail asked of the API, in one listing", async () => {
-    setRoutePath("/content", {}, { folder: "3" });
-    const { wrapper, fetch } = await mountContent(
+  it("is the top at the content's own address, wherever the browser was left", async () => {
+    at("Sermon notes");
+    const first = await mountContent(
       { folders: [NOTES], documents: [HOME] },
-      { 2: { folders: [ROMANS] }, 3: { documents: [ABOUT] } },
+      { "Sermon notes": {} },
     );
-    const browser = wrapper.findComponent(Browser).props("service");
-    expect(browser.pathKeys).toEqual(["2", "3"]);
+    expect(browserOf(first.wrapper).pathKeys).toEqual(["Sermon notes"]);
+    const wrapper = await go(first.wrapper);
+    expect(browserOf(wrapper).pathKeys).toEqual([]);
+    expect(first.fetch).toHaveBeenLastCalledWith("/api/content", {
+      query: {},
+    });
+    expect(
+      wrapper.findAll(`${POST} a.f-anchor`).map((link) => link.text()),
+    ).toEqual(["Butte Bible Fellowship"]);
+    expect(navigateTo).not.toHaveBeenCalled();
+  });
+
+  it("throws a 404 where the path names nothing, and draws nothing", async () => {
+    at("Sermon notes", "Gone", "deeper");
+    const fetch = api({ folders: [NOTES] }, { "Sermon notes": {} });
+    vi.stubGlobal("$fetch", fetch);
+    const { wrapper, error } = await visit();
+    expect(error).toMatchObject({
+      statusCode: 404,
+      message: "Nothing is at this address",
+    });
+    expect(reads(fetch)).toEqual([
+      ["/api/content/Sermon%20notes/Gone/deeper", { query: {} }],
+    ]);
+    expect(wrapper.findComponent(Browser).exists()).toBe(false);
+    expect(wrapper.findComponent(PageHeader).exists()).toBe(false);
+  });
+
+  it("encodes each name of a path as one step of the address, whatever is in it", async () => {
+    const odd = { ...NOTES, name: "Q&A: one, two + three!" };
+    at("Q&A: one, two + three!");
+    const { wrapper, fetch } = await mountContent(
+      { folders: [odd] },
+      { "Q&A: one, two + three!": { documents: [ABOUT] } },
+    );
+    expect(reads(fetch)).toEqual([
+      ["/api/content/Q%26A%3A%20one%2C%20two%20%2B%20three!", { query: {} }],
+    ]);
+    expect(wrapper.find(`${POST} a.f-anchor`).attributes("href")).toBe(
+      "/content/Q%26A%3A%20one%2C%20two%20%2B%20three!/about-us",
+    );
     expect(
       wrapper
         .findAll(".f-data-browser-breadcrumb .f-li")
         .map((crumb) => crumb.text()),
-    ).toEqual(["Content", "Sermon notes", "Romans"]);
-    // The folder, then the one it is inside; then what it holds, once.
-    expect(fetch).toHaveBeenCalledWith("/api/content/folders/3", {});
-    expect(fetch).toHaveBeenCalledWith("/api/content/folders/2", {});
-    expect(
-      fetch.mock.calls.filter(([path]) => path === "/api/content"),
-    ).toEqual([["/api/content", { query: { folder: 3 } }]]);
-    expect(
-      wrapper.findAll(`${POST} a.f-anchor`).map((link) => link.text()),
-    ).toEqual(["About Us"]);
-    expect(navigateTo).not.toHaveBeenCalled();
-  });
-
-  it("stays where it is for a folder that is gone, and puts the address right", async () => {
-    setRoutePath("/content", {}, { folder: "9" });
-    const { wrapper, fetch } = await mountContent({ documents: [HOME] });
-    expect(wrapper.findComponent(Browser).props("service").pathKeys).toEqual(
-      [],
-    );
-    expect(fetch).toHaveBeenCalledWith("/api/content", { query: {} });
-    expect(navigateTo).toHaveBeenCalledWith("/content", { replace: true });
-  });
-
-  it("puts the address right where it names no folder and the browser was left in one", async () => {
-    const first = await mountContent({ folders: [NOTES] }, { 2: {} });
-    await first.wrapper
-      .find(`${FOLDER} .f-data-browser-folder-btn`)
-      .trigger("click");
-    await flushPromises();
-    first.wrapper.unmount();
-
-    setRoutePath("/content");
-    const { wrapper } = await mountContent({ folders: [NOTES] }, { 2: {} });
-    expect(wrapper.findComponent(Browser).props("service").pathKeys).toEqual([
-      "2",
-    ]);
-    expect(navigateTo).toHaveBeenCalledWith("/content?folder=2", {
-      replace: true,
-    });
-  });
-
-  it("follows the address as it moves, by the way back or forward: up the trail, and into a folder off it", async () => {
-    setRoutePath("/content", {}, { folder: "3" });
-    const { wrapper, fetch } = await mountContent(
-      { folders: [NOTES], documents: [HOME] },
-      { 2: { folders: [ROMANS] }, 3: { documents: [ABOUT] } },
-    );
-    const browser = wrapper.findComponent(Browser).props("service");
-
-    setRoutePath("/content", {}, { folder: "2" });
-    await flushPromises();
-    expect(browser.pathKeys).toEqual(["2"]);
-
-    setRoutePath("/content");
-    await flushPromises();
-    expect(browser.pathKeys).toEqual([]);
-    expect(fetch).toHaveBeenLastCalledWith("/api/content", { query: {} });
-
-    setRoutePath("/content", {}, { folder: "3" });
-    await flushPromises();
-    expect(browser.pathKeys).toEqual(["2", "3"]);
-    expect(fetch).toHaveBeenLastCalledWith("/api/content", {
-      query: { folder: 3 },
-    });
-
-    // Another page's address is none of the browser's: it stays put.
-    setRoutePath("/staff");
-    await flushPromises();
-    expect(browser.pathKeys).toEqual(["2", "3"]);
+    ).toEqual(["Content", "Q&A: one, two + three!"]);
   });
 
   it("counts what the open folder lists beside the trail", async () => {
@@ -406,7 +430,7 @@ describe("content page", () => {
     expect(
       wrapper.find(".f-data-browser-search .f-autocomplete-input").exists(),
     ).toBe(true);
-    const { query } = wrapper.findComponent(Browser).props("service");
+    const { query } = browserOf(wrapper);
     expect(query.literals).toEqual({
       text: { label: "Search", open: '"', close: '"' },
     });
@@ -445,22 +469,19 @@ describe("content page", () => {
     }
   });
 
-  it("searches the open folder by the text and the filters the search commits: its documents by both, its folders by the text", async () => {
+  it("searches the open folder by the text and the filters the search commits, in one request of its path", async () => {
+    at("Sermon notes");
     const { wrapper, fetch } = await mountContent(
       { folders: [NOTES] },
-      { 2: { documents: [HOME] } },
+      { "Sermon notes": { documents: [HOME] } },
     );
-    const { query } = wrapper.findComponent(Browser).props("service");
-    await wrapper.find(`${FOLDER} .f-data-browser-folder-btn`).trigger("click");
-    await flushPromises();
+    const { query } = browserOf(wrapper);
+    fetch.mockClear();
     query.add({ kind: "literal", key: "text", value: "fellowship" });
     await flushPromises();
-    expect(fetch).toHaveBeenLastCalledWith("/api/content", {
-      query: { folder: 2, q: "fellowship" },
-    });
-    expect(fetch).toHaveBeenCalledWith("/api/content/folders", {
-      query: { parent: 2, q: "fellowship" },
-    });
+    expect(fetch.mock.calls).toEqual([
+      [NOTES_API, { query: { q: "fellowship" } }],
+    ]);
     query.setDraft("Title: butte");
     query.submit();
     query.add({
@@ -470,42 +491,73 @@ describe("content page", () => {
       value: "2026-10-01",
     });
     await flushPromises();
-    expect(fetch).toHaveBeenLastCalledWith("/api/content", {
+    expect(fetch).toHaveBeenLastCalledWith(NOTES_API, {
       query: {
-        folder: 2,
         q: "fellowship",
         titleContains: "butte",
         updatedAtOnOrAfter: "2026-10-01",
       },
     });
-    expect(fetch).toHaveBeenCalledWith("/api/content/folders", {
-      query: { parent: 2, q: "fellowship" },
-    });
   });
 
-  it("drops the search on leaving the folder it was typed in, and says when one finds nothing", async () => {
+  it("drops the search and the selection on arriving at another folder, which is asked for with nothing searched for, and says when a search finds nothing", async () => {
+    at("Sermon notes");
     const { wrapper, fetch } = await mountContent(
       { folders: [NOTES] },
-      { 2: {} },
+      { "Sermon notes": { documents: [HOME] } },
     );
-    const browser = wrapper.findComponent(Browser).props("service");
-    await wrapper.find(`${FOLDER} .f-data-browser-folder-btn`).trigger("click");
-    await flushPromises();
+    const browser = browserOf(wrapper);
+    browser.toggleRow("index");
+    expect(browser.hasSelection).toBe(true);
+    // The search finds nothing: the folder comes back holding none.
+    fetch.mockImplementation(async () => folder({}));
     browser.query.add({ kind: "literal", key: "text", value: "nothing" });
     await flushPromises();
     expect(browser.isFiltered).toBe(true);
     expect(wrapper.find("tbody.f-data-browser-empty .f-td").text()).toBe(
       "No matches",
     );
-    await wrapper.find(".f-data-browser-breadcrumb a").trigger("click");
-    await flushPromises();
-    expect(browser.isFiltered).toBe(false);
-    expect(fetch).toHaveBeenLastCalledWith("/api/content", { query: {} });
+    fetch.mockClear();
+    const top = await go(wrapper);
+    expect(reads(fetch)).toEqual([["/api/content", { query: {} }]]);
+    expect(browserOf(top).isFiltered).toBe(false);
+    expect(browserOf(top).query.text).toBe("");
+    expect(browserOf(top).hasSelection).toBe(false);
   });
 
-  it("sorts the documents by a column the sort menu offers, and the other way on a second ask", async () => {
+  it("asks for a folder come back to as the browser was left: its search kept, and its sort kept wherever it goes", async () => {
+    at("Sermon notes");
+    const { wrapper, fetch } = await mountContent(
+      { folders: [NOTES] },
+      { "Sermon notes": { documents: [HOME] } },
+    );
+    const browser = browserOf(wrapper);
+    browser.sortBy("size");
+    browser.query.add({ kind: "literal", key: "text", value: "fellowship" });
+    await flushPromises();
+
+    // The same folder, loaded again: what was searched for still is.
+    fetch.mockClear();
+    const again = await go(wrapper, "Sermon notes");
+    expect(reads(fetch)).toEqual([
+      [
+        NOTES_API,
+        { query: { q: "fellowship", sort: "size", direction: "asc" } },
+      ],
+    ]);
+    expect(browserOf(again).isFiltered).toBe(true);
+
+    // Another folder: the sort goes with the browser, the search does not.
+    fetch.mockClear();
+    await go(again);
+    expect(reads(fetch)).toEqual([
+      ["/api/content", { query: { sort: "size", direction: "asc" } }],
+    ]);
+  });
+
+  it("sorts what the folder holds by a column the sort menu offers, and the other way on a second ask", async () => {
     const { wrapper, fetch } = await mountContent({ documents: [HOME, ABOUT] });
-    const browser = wrapper.findComponent(Browser).props("service");
+    const browser = browserOf(wrapper);
     expect(
       browser.sortableColumns.map((column: { key: string }) => column.key),
     ).toEqual(["title", "slug", "mime", "size", "updatedAt"]);
@@ -522,38 +574,6 @@ describe("content page", () => {
     expect(fetch).toHaveBeenLastCalledWith("/api/content", {
       query: { sort: "slug", direction: "desc" },
     });
-    // A folder has no slug to be sorted by: the folders stay by name.
-    expect(fetch).toHaveBeenCalledWith("/api/content/folders", { query: {} });
-  });
-
-  it("sorts the folders with the documents where a folder shows something under the column, by its name under the title", async () => {
-    const { wrapper, fetch } = await mountContent({
-      folders: [NOTES],
-      documents: [HOME],
-    });
-    const browser = wrapper.findComponent(Browser).props("service");
-    browser.sortBy("size");
-    await flushPromises();
-    expect(fetch).toHaveBeenCalledWith("/api/content", {
-      query: { sort: "size", direction: "asc" },
-    });
-    expect(fetch).toHaveBeenCalledWith("/api/content/folders", {
-      query: { sort: "size", direction: "asc" },
-    });
-    browser.sortBy("updatedAt");
-    await flushPromises();
-    expect(fetch).toHaveBeenCalledWith("/api/content/folders", {
-      query: { sort: "updatedAt", direction: "asc" },
-    });
-    browser.sortBy("title");
-    browser.sortBy("title");
-    await flushPromises();
-    expect(fetch).toHaveBeenLastCalledWith("/api/content", {
-      query: { sort: "title", direction: "desc" },
-    });
-    expect(fetch).toHaveBeenCalledWith("/api/content/folders", {
-      query: { sort: "name", direction: "desc" },
-    });
   });
 
   it("says when a folder holds nothing", async () => {
@@ -567,11 +587,18 @@ describe("content page", () => {
     expect(wrapper.find(POST).exists()).toBe(false);
   });
 
-  it("leads to a document's editor from its row's actions", async () => {
-    const { wrapper } = await mountContent({ documents: [HOME] });
+  it("leads to a document's page from its row's actions: its slug under the folder that is open", async () => {
+    const { wrapper } = await mountContent(
+      { documents: [HOME] },
+      { "Sermon notes": { documents: [ABOUT] } },
+    );
     await act(wrapper, POST, "Edit");
-    const { navigateTo } = await import("#imports");
-    expect(navigateTo).toHaveBeenCalledWith("/content/5/page");
+    expect(navigateTo).toHaveBeenCalledWith("/content/index");
+    const notes = await go(wrapper, "Sermon notes");
+    await act(notes, POST, "Edit");
+    expect(navigateTo).toHaveBeenLastCalledWith(
+      "/content/Sermon%20notes/about-us",
+    );
   });
 });
 
@@ -583,10 +610,6 @@ describe("content views", () => {
 
   const ids = (views: { views: { id: string }[] }) =>
     views.views.map((view) => view.id);
-
-  /** The reads of the content the API was asked for, the folders' left out. */
-  const listed = (fetch: ReturnType<typeof api>) =>
-    fetch.mock.calls.filter(([path]) => path === "/api/content");
 
   it("opens on the admin's own view, the browser as it starts, with nothing edited", async () => {
     const { wrapper } = await mountContent({ documents: [HOME] });
@@ -619,24 +642,22 @@ describe("content views", () => {
   });
 
   it("puts a view picked in place in the folder that is open, and lists it afresh as the view arranges it", async () => {
+    at("Sermon notes");
     const { wrapper, fetch } = await mountContent(
       { folders: [NOTES] },
-      { 2: { documents: [HOME] } },
+      { "Sermon notes": { documents: [HOME] } },
       null,
       [IMAGES],
     );
     const { views, browser } = services(wrapper);
-    await wrapper.find(`${FOLDER} .f-data-browser-folder-btn`).trigger("click");
-    await flushPromises();
     fetch.mockClear();
     expect(await views.select(IMAGES.id)).toBe(true);
     await flushPromises();
-    expect(listed(fetch)).toEqual([
+    expect(reads(fetch)).toEqual([
       [
-        "/api/content",
+        NOTES_API,
         {
           query: {
-            folder: 2,
             mimeStartsWith: "image/",
             sort: "size",
             direction: "desc",
@@ -644,10 +665,7 @@ describe("content views", () => {
         },
       ],
     ]);
-    expect(fetch).toHaveBeenCalledWith("/api/content/folders", {
-      query: { parent: 2, sort: "size", direction: "desc" },
-    });
-    expect(browser.pathKeys).toEqual(["2"]);
+    expect(browser.pathKeys).toEqual(["Sermon notes"]);
     expect(views.active).toBe(IMAGES.id);
     expect(views.editable).toBe(true);
     expect(views.drifted).toBe(false);
@@ -673,13 +691,12 @@ describe("content views", () => {
   });
 
   it("saves the browser as it stands as a view of the user's own, through the API, the open folder no part of it", async () => {
+    at("Sermon notes");
     const { wrapper, fetch } = await mountContent(
       { folders: [NOTES] },
-      { 2: { documents: [HOME] } },
+      { "Sermon notes": { documents: [HOME] } },
     );
     const { views, browser } = services(wrapper);
-    await wrapper.find(`${FOLDER} .f-data-browser-folder-btn`).trigger("click");
-    await flushPromises();
     browser.query.add({ kind: "literal", key: "text", value: "fellowship" });
     await flushPromises();
     fetch.mockClear();
@@ -764,7 +781,7 @@ describe("content views", () => {
 
 describe("new document dialog", () => {
   const open = async (top: Held = { documents: [HOME] }) => {
-    const mounted = await mountContent(top, { 2: {} }, ABOUT);
+    const mounted = await mountContent(top, { "Sermon notes": {} }, ABOUT);
     await mounted.wrapper.find("button.page-header-action").trigger("click");
     await flushPromises();
     return mounted;
@@ -820,44 +837,51 @@ describe("new document dialog", () => {
   it("writes the document at the top and leads on to its own page", async () => {
     const { wrapper, fetch } = await open();
     const editor = wrapper.findComponent(ContentEditor);
-    expect(editor.props("folder")).toBeUndefined();
+    expect(editor.props("folder")).toEqual([]);
     await editor.find("#content-title").setValue("About Us");
     await editor.find("#content-slug").setValue("about-us");
     await editor.find("form").trigger("submit");
     await vi.waitFor(() =>
-      expect(useRouter().push).toHaveBeenCalledWith("/content/6/page"),
+      expect(useRouter().push).toHaveBeenCalledWith("/content/about-us"),
     );
     expect(writes(fetch)).toEqual([
       [
         "/api/content",
-        { method: "POST", body: { slug: "about-us", title: "About Us" } },
+        {
+          method: "POST",
+          body: { kind: "document", slug: "about-us", title: "About Us" },
+        },
       ],
     ]);
   });
 
-  it("files the document in the folder that is open", async () => {
+  it("files the document in the folder that is open, at the folder's path", async () => {
+    at("Sermon notes");
     const { wrapper, fetch } = await mountContent(
       { folders: [NOTES] },
-      { 2: {} },
+      { "Sermon notes": {} },
       ABOUT,
     );
-    await wrapper.find(`${FOLDER} .f-data-browser-folder-btn`).trigger("click");
-    await flushPromises();
     await wrapper.find("button.page-header-action").trigger("click");
     await flushPromises();
     const editor = wrapper.findComponent(ContentEditor);
-    expect(editor.props("folder")).toBe(2);
+    expect(editor.props("folder")).toEqual(["Sermon notes"]);
     await editor.find("#content-title").setValue("About Us");
     await editor.find("#content-slug").setValue("about-us");
     await editor.find("form").trigger("submit");
     await vi.waitFor(() => expect(writes(fetch)).toHaveLength(1));
     expect(writes(fetch)[0]).toEqual([
-      "/api/content",
+      NOTES_API,
       {
         method: "POST",
-        body: { slug: "about-us", title: "About Us", folder: 2 },
+        body: { kind: "document", slug: "about-us", title: "About Us" },
       },
     ]);
+    await vi.waitFor(() =>
+      expect(useRouter().push).toHaveBeenCalledWith(
+        "/content/Sermon%20notes/about-us",
+      ),
+    );
   });
 });
 
@@ -873,7 +897,7 @@ describe("folders", () => {
       description: "It is made inside the folder that is open.",
     });
     const editor = wrapper.findComponent(FolderEditor);
-    expect(editor.props()).toEqual({ folder: null, parent: undefined });
+    expect(editor.props()).toEqual({ folder: null, parent: [] });
     fetch.mockClear();
     await editor.find("#folder-name").setValue(" Sermon notes ");
     await editor.find("form").trigger("submit");
@@ -882,8 +906,8 @@ describe("folders", () => {
     );
     expect(writes(fetch)).toEqual([
       [
-        "/api/content/folders",
-        { method: "POST", body: { name: "Sermon notes" } },
+        "/api/content",
+        { method: "POST", body: { kind: "folder", name: "Sermon notes" } },
       ],
     ]);
     // The top is listed again, the new folder with it.
@@ -891,27 +915,42 @@ describe("folders", () => {
     expect(dialog.props("open")).toBe(false);
   });
 
-  it("makes a new folder inside the folder that is open", async () => {
+  it("makes a new folder inside the folder that is open, at the folder's path", async () => {
+    at("Sermon notes");
     const { wrapper, fetch } = await mountContent(
       { folders: [NOTES] },
-      { 2: {} },
+      { "Sermon notes": {} },
     );
-    await wrapper.find(`${FOLDER} .f-data-browser-folder-btn`).trigger("click");
-    await flushPromises();
     await wrapper.find("button.content-new-folder").trigger("click");
     await flushPromises();
     const editor = wrapper.findComponent(FolderEditor);
-    expect(editor.props("parent")).toBe(2);
+    expect(editor.props("parent")).toEqual(["Sermon notes"]);
     await editor.find("#folder-name").setValue("Romans");
     await editor.find("form").trigger("submit");
     await vi.waitFor(() => expect(writes(fetch)).toHaveLength(1));
     expect(writes(fetch)[0]).toEqual([
-      "/api/content/folders",
-      { method: "POST", body: { name: "Romans", parent: 2 } },
+      NOTES_API,
+      { method: "POST", body: { kind: "folder", name: "Romans" } },
     ]);
   });
 
-  it("renames a folder from its row's actions, its name in the form to start from", async () => {
+  it("refuses a name that is no step of a path, before anything is asked", async () => {
+    const { wrapper, fetch } = await mountContent({ documents: [HOME] });
+    await wrapper.find("button.content-new-folder").trigger("click");
+    await flushPromises();
+    const editor = wrapper.findComponent(FolderEditor);
+    for (const name of ["Notes/Romans", "..", "."]) {
+      await editor.find("#folder-name").setValue(name);
+      await editor.find("form").trigger("submit");
+      await vi.waitFor(() =>
+        expect(editor.find("#folder-name-error").exists(), name).toBe(true),
+      );
+    }
+    expect(writes(fetch)).toEqual([]);
+    expect(wrapper.findComponent(FolderEditor).exists()).toBe(true);
+  });
+
+  it("renames a folder from its row's actions, at its own path, its name in the form to start from", async () => {
     const { wrapper, fetch } = await mountContent({ folders: [NOTES] });
     await act(wrapper, FOLDER, "Rename");
     const dialog = dialogOf(wrapper, "Rename folder");
@@ -922,11 +961,11 @@ describe("folders", () => {
     });
     const editor = wrapper.findComponent(FolderEditor);
     expect(editor.props("folder")).toEqual({
-      key: "2",
+      key: "Sermon notes",
       label: "Sermon notes",
       count: 1,
       values: { size: 4096, updatedAt: "2026-10-18T09:30:00.000Z" },
-      link: { to: "/content?folder=2" },
+      link: { to: IN_NOTES },
     });
     const name = editor.find("#folder-name");
     expect((name.element as HTMLInputElement).value).toBe("Sermon notes");
@@ -936,7 +975,24 @@ describe("folders", () => {
       expect(wrapper.findComponent(FolderEditor).exists()).toBe(false),
     );
     expect(writes(fetch)).toEqual([
-      ["/api/content/folders/2", { method: "PUT", body: { name: "Notes" } }],
+      [NOTES_API, { method: "PUT", body: { name: "Notes" } }],
+    ]);
+  });
+
+  it("renames a folder inside another under that folder's path", async () => {
+    at("Sermon notes");
+    const { wrapper, fetch } = await mountContent(
+      { folders: [NOTES] },
+      { "Sermon notes": { folders: [ROMANS] } },
+    );
+    await act(wrapper, FOLDER, "Rename");
+    const editor = wrapper.findComponent(FolderEditor);
+    await editor.find("#folder-name").setValue("Galatians");
+    await editor.find("form").trigger("submit");
+    await vi.waitFor(() => expect(writes(fetch)).toHaveLength(1));
+    expect(writes(fetch)[0]).toEqual([
+      "/api/content/Sermon%20notes/Romans",
+      { method: "PUT", body: { name: "Galatians" } },
     ]);
   });
 
@@ -960,7 +1016,7 @@ describe("folders", () => {
     await wrapper.find("button.content-new-folder").trigger("click");
     await flushPromises();
     fetch.mockRejectedValueOnce({
-      data: { message: "A folder here already has that name" },
+      data: { message: "Something here already has that name" },
     });
     const editor = wrapper.findComponent(FolderEditor);
     await editor.find("#folder-name").setValue("Sermon notes");
@@ -969,11 +1025,11 @@ describe("folders", () => {
       expect(editor.find(".content-editor-error").exists()).toBe(true),
     );
     expect(editor.find(".content-editor-error").text()).toBe(
-      "A folder here already has that name",
+      "Something here already has that name",
     );
   });
 
-  it("removes a folder from its row's actions, once asked by name", async () => {
+  it("removes a folder from its row's actions, at its own path, once asked by name", async () => {
     const confirm = vi.fn(() => true);
     vi.stubGlobal("confirm", confirm);
     const { wrapper, fetch } = await mountContent({ folders: [NOTES] });
@@ -982,10 +1038,7 @@ describe("folders", () => {
     expect(confirm).toHaveBeenCalledWith(
       "Delete Sermon notes? This cannot be undone.",
     );
-    expect(writes(fetch)[0]).toEqual([
-      "/api/content/folders/2",
-      { method: "DELETE" },
-    ]);
+    expect(writes(fetch)[0]).toEqual([NOTES_API, { method: "DELETE" }]);
     await flushPromises();
     expect(fetch).toHaveBeenLastCalledWith("/api/content", { query: {} });
   });
@@ -1021,24 +1074,20 @@ describe("folders", () => {
 });
 
 describe("moving", () => {
-  const CONTENT: [Held, Record<number, Held>] = [
+  const CONTENT: [Held, Inside] = [
     { folders: [NOTES], documents: [HOME] },
-    { 2: { folders: [ROMANS] }, 3: {} },
+    { "Sermon notes": { folders: [ROMANS] }, "Sermon notes/Romans": {} },
   ];
 
-  const enter = async (
-    wrapper: Awaited<ReturnType<typeof mountContent>>["wrapper"],
-  ) => {
-    await wrapper.find(`${FOLDER} .f-data-browser-folder-btn`).trigger("click");
-    await flushPromises();
-  };
+  /** The button that puts what is held down in the folder that is open. */
+  const dropOf = (wrapper: Mounted) => wrapper.find("button.content-move-drop");
 
   it("holds nothing until a move is asked for", async () => {
     const { wrapper } = await mountContent(...CONTENT);
     expect(wrapper.find(".content-move").exists()).toBe(false);
   });
 
-  it("picks a document up from its row, and puts it down in the folder opened next", async () => {
+  it("picks a document up from its row, and puts it down in the folder opened next, by the paths of both", async () => {
     const { wrapper, fetch } = await mountContent(...CONTENT);
     await act(wrapper, POST, "Move");
     const bar = wrapper.find(".content-move");
@@ -1047,46 +1096,53 @@ describe("moving", () => {
       "Moving Butte Bible Fellowship. Open the folder it belongs in.",
     );
     // Where it already is, is nowhere to put it.
-    const drop = bar.find("button.content-move-drop");
-    expect(drop.text()).toBe("Move here");
-    expect(drop.attributes("disabled")).toBeDefined();
+    expect(dropOf(wrapper).text()).toBe("Move here");
+    expect(dropOf(wrapper).attributes("disabled")).toBeDefined();
 
-    await enter(wrapper);
-    expect(drop.attributes("disabled")).toBeUndefined();
-    await drop.trigger("click");
+    // It is held across the pages: the next folder's still shows it.
+    const notes = await go(wrapper, "Sermon notes");
+    expect(notes.find(".content-move-text").text()).toBe(
+      "Moving Butte Bible Fellowship. Open the folder it belongs in.",
+    );
+    expect(dropOf(notes).attributes("disabled")).toBeUndefined();
+    await dropOf(notes).trigger("click");
     await vi.waitFor(() =>
-      expect(wrapper.find(".content-move").exists()).toBe(false),
+      expect(notes.find(".content-move").exists()).toBe(false),
     );
     expect(writes(fetch)).toEqual([
-      ["/api/content/5/folder", { method: "PATCH", body: { folder: 2 } }],
+      [
+        "/api/content/index",
+        { method: "PATCH", body: { parent: ["Sermon notes"] } },
+      ],
     ]);
     // The folder is listed again, the document now in it.
-    expect(fetch).toHaveBeenLastCalledWith("/api/content", {
-      query: { folder: 2 },
-    });
+    expect(fetch).toHaveBeenLastCalledWith(NOTES_API, { query: {} });
   });
 
-  it("puts a document back at the top: no folder is named", async () => {
+  it("puts a document back at the top: the path of no steps", async () => {
+    at("Sermon notes");
     const { wrapper, fetch } = await mountContent(
       { folders: [NOTES] },
-      { 2: { documents: [{ ...ABOUT, folder: 2 }] } },
+      { "Sermon notes": { documents: [ABOUT] } },
     );
-    await enter(wrapper);
     await act(wrapper, POST, "Move");
-    await wrapper.find(".f-data-browser-breadcrumb a").trigger("click");
-    await flushPromises();
-    await wrapper.find("button.content-move-drop").trigger("click");
+    const top = await go(wrapper);
+    await dropOf(top).trigger("click");
     await vi.waitFor(() => expect(writes(fetch)).toHaveLength(1));
     expect(writes(fetch)[0]).toEqual([
-      "/api/content/6/folder",
-      { method: "PATCH", body: {} },
+      "/api/content/Sermon%20notes/about-us",
+      { method: "PATCH", body: { parent: [] } },
     ]);
   });
 
-  it("picks a folder up from its row, and puts it down inside another, never inside itself", async () => {
+  it("picks a folder up from its row, and puts it down inside another, never inside itself or a folder under it", async () => {
     const { wrapper, fetch } = await mountContent(
       { folders: [{ ...ROMANS, parent: undefined }, NOTES] },
-      { 2: {}, 3: {} },
+      {
+        "Sermon notes": {},
+        Romans: { folders: [NOTES] },
+        "Romans/Sermon notes": {},
+      },
     );
     // Folders are listed as the API orders them, by name: Romans first,
     // then the sermon notes.
@@ -1094,25 +1150,22 @@ describe("moving", () => {
     expect(wrapper.find(".content-move-text").text()).toBe(
       "Moving Romans. Open the folder it belongs in.",
     );
-    const drop = wrapper.find("button.content-move-drop");
-    expect(drop.attributes("disabled")).toBeDefined();
+    expect(dropOf(wrapper).attributes("disabled")).toBeDefined();
 
-    // Inside itself is nowhere to put it.
-    await enter(wrapper);
-    expect(drop.attributes("disabled")).toBeDefined();
-    await wrapper.find(".f-data-browser-breadcrumb a").trigger("click");
-    await flushPromises();
+    // Inside itself is nowhere to put it, and neither is a folder under it.
+    const itself = await go(wrapper, "Romans");
+    expect(dropOf(itself).attributes("disabled")).toBeDefined();
+    const under = await go(itself, "Romans", "Sermon notes");
+    expect(dropOf(under).attributes("disabled")).toBeDefined();
 
-    await wrapper
-      .find(`${FOLDER}:nth-child(2) .f-data-browser-folder-btn`)
-      .trigger("click");
-    await flushPromises();
-    expect(drop.attributes("disabled")).toBeUndefined();
-    await drop.trigger("click");
+    // A folder of the same name elsewhere is another folder.
+    const notes = await go(under, "Sermon notes");
+    expect(dropOf(notes).attributes("disabled")).toBeUndefined();
+    await dropOf(notes).trigger("click");
     await vi.waitFor(() => expect(writes(fetch)).toHaveLength(1));
     expect(writes(fetch)[0]).toEqual([
-      "/api/content/folders/3/parent",
-      { method: "PATCH", body: { parent: 2 } },
+      "/api/content/Romans",
+      { method: "PATCH", body: { parent: ["Sermon notes"] } },
     ]);
   });
 
@@ -1129,14 +1182,14 @@ describe("moving", () => {
   it("says why a move was refused, and keeps hold", async () => {
     const { wrapper, fetch } = await mountContent(...CONTENT);
     await act(wrapper, POST, "Move");
-    await enter(wrapper);
+    const notes = await go(wrapper, "Sermon notes");
     fetch.mockRejectedValueOnce({ data: { message: "The folder is gone" } });
-    await wrapper.find("button.content-move-drop").trigger("click");
+    await dropOf(notes).trigger("click");
     await vi.waitFor(() =>
-      expect(wrapper.find(".content-error").exists()).toBe(true),
+      expect(notes.find(".content-error").exists()).toBe(true),
     );
-    expect(wrapper.find(".content-error").text()).toBe("The folder is gone");
-    expect(wrapper.find(".content-move").exists()).toBe(true);
+    expect(notes.find(".content-error").text()).toBe("The folder is gone");
+    expect(notes.find(".content-move").exists()).toBe(true);
   });
 });
 
@@ -1172,7 +1225,7 @@ describe("selection", () => {
     ).toEqual(["Delete", "Clear"]);
   });
 
-  it("removes the documents and folders selected, once asked by their count, and lists the folder afresh with none selected", async () => {
+  it("removes the documents and folders selected, each at its own path, once asked by their count, and lists the folder afresh with none selected", async () => {
     const confirm = vi.fn(() => true);
     vi.stubGlobal("confirm", confirm);
     const { wrapper, fetch } = await mountContent({
@@ -1183,9 +1236,8 @@ describe("selection", () => {
     await select(wrapper, 0, 1, 2);
     // What was removed is gone from what the folder lists next.
     fetch.mockImplementation(async (path, request) =>
-      request?.method === undefined &&
-      ["/api/content", "/api/content/folders"].includes(path)
-        ? []
+      request?.method === undefined && path === "/api/content"
+        ? folder({})
         : listing(path, request),
     );
     await press(wrapper, "Delete");
@@ -1194,13 +1246,29 @@ describe("selection", () => {
       "Delete 3 items? This cannot be undone.",
     );
     expect(writes(fetch)).toEqual([
-      ["/api/content/5", { method: "DELETE" }],
-      ["/api/content/6", { method: "DELETE" }],
-      ["/api/content/folders/2", { method: "DELETE" }],
+      ["/api/content/index", { method: "DELETE" }],
+      ["/api/content/about-us", { method: "DELETE" }],
+      [NOTES_API, { method: "DELETE" }],
     ]);
     expect(fetch).toHaveBeenLastCalledWith("/api/content", { query: {} });
     expect(wrapper.find(BAR).exists()).toBe(false);
     expect(wrapper.find(".content-error").exists()).toBe(false);
+  });
+
+  it("removes what is selected in a folder under the folder's path", async () => {
+    vi.stubGlobal("confirm", () => true);
+    at("Sermon notes");
+    const { wrapper, fetch } = await mountContent(
+      { folders: [NOTES] },
+      { "Sermon notes": { folders: [ROMANS], documents: [ABOUT] } },
+    );
+    await select(wrapper, 0, 1);
+    await press(wrapper, "Delete");
+    await flushPromises();
+    expect(writes(fetch)).toEqual([
+      ["/api/content/Sermon%20notes/about-us", { method: "DELETE" }],
+      ["/api/content/Sermon%20notes/Romans", { method: "DELETE" }],
+    ]);
   });
 
   it("asks about one as one, and keeps it when the question is declined", async () => {
@@ -1226,11 +1294,13 @@ describe("selection", () => {
     const listing = fetch.getMockImplementation()!;
     await select(wrapper, 0, 1);
     fetch.mockImplementation(async (path, request) => {
-      if (path === "/api/content/folders/2") {
+      if (path === NOTES_API && request?.method === "DELETE") {
         throw { data: { message: "The folder is not empty" } };
       }
       // The document went; the folder that was refused is still listed.
-      if (path === "/api/content" && request?.method === undefined) return [];
+      if (path === "/api/content" && request?.method === undefined) {
+        return folder({ folders: [NOTES] });
+      }
       return listing(path, request);
     });
     await press(wrapper, "Delete");
@@ -1252,31 +1322,42 @@ describe("selection", () => {
     vi.stubGlobal("confirm", () => true);
     const { wrapper, fetch } = await mountContent({ documents: [HOME] });
     await select(wrapper, 0);
-    fetch.mockImplementation(async (path, request) => {
+    fetch.mockImplementation(async (_path, request) => {
       if (request?.method !== undefined) throw { status: 404 };
-      return [];
+      return folder({});
     });
     await press(wrapper, "Delete");
     await flushPromises();
-    expect(writes(fetch)).toEqual([["/api/content/5", { method: "DELETE" }]]);
+    expect(writes(fetch)).toEqual([
+      ["/api/content/index", { method: "DELETE" }],
+    ]);
     expect(wrapper.find(".content-error").exists()).toBe(false);
     expect(wrapper.find(BAR).exists()).toBe(false);
   });
 });
 
-describe("a page's page", () => {
-  const mountPage = async (path = "/content/5/page") => {
-    vi.stubGlobal(
-      "$fetch",
-      vi.fn(async () => HOME),
-    );
-    setRoutePath(path, { id: "5" });
-    return mountSuspended(Content);
+describe("a document's page", () => {
+  /** The home page at the top, and About Us filed in the notes. */
+  const CONTENT: [Held, Inside] = [
+    { folders: [NOTES], documents: [HOME] },
+    { "Sermon notes": { documents: [ABOUT] } },
+  ];
+
+  /** The page of the document at a path, over what the API holds. */
+  const mountDocument = async (path: string[], answer?: unknown) => {
+    at(...path);
+    return mountContent(CONTENT[0], CONTENT[1], answer);
   };
 
-  it("heads the page the address names, and hands it to the page under it", async () => {
-    const { wrapper, error } = await mountPage();
-    expect(error).toBeUndefined();
+  it("edits the document the address names, read in the one request of its path, under a header that names it", async () => {
+    const { wrapper, fetch } = await mountDocument(["index"]);
+    expect(wrapper.findComponent(ContentDocument).props()).toEqual({
+      record: HOME,
+      folder: [],
+    });
+    expect(wrapper.findComponent(ContentFolder).exists()).toBe(false);
+    expect(wrapper.findComponent(Browser).exists()).toBe(false);
+    expect(reads(fetch)).toEqual([["/api/content/index", { query: {} }]]);
     const header = wrapper.findComponent(PageHeader);
     expect(header.props()).toMatchObject({
       title: "Butte Bible Fellowship",
@@ -1286,27 +1367,55 @@ describe("a page's page", () => {
     expect(header.find("a.page-header-back").attributes("href")).toBe(
       "/content",
     );
-    expect(header.findComponent(ContentMenu).props("record")).toEqual(HOME);
-    expect(wrapper.findComponent(NuxtPage).props("record")).toEqual(HOME);
+    expect(header.findComponent(ContentMenu).props()).toEqual({
+      record: HOME,
+      folder: [],
+    });
     expect(head()).toEqual({ title: "Butte Bible Fellowship" });
   });
 
-  it("offers the page's own pages as tabs, the page itself the first and only one, lit when read", async () => {
-    const { wrapper } = await mountPage();
+  it("leads back to the folder the document is filed in, named as the trail names it, and writes it under that folder's path", async () => {
+    const { wrapper } = await mountDocument(["Sermon notes", "about-us"]);
+    expect(wrapper.findComponent(ContentDocument).props()).toEqual({
+      record: ABOUT,
+      folder: ["Sermon notes"],
+    });
+    const header = wrapper.findComponent(PageHeader);
+    expect(header.props("back")).toEqual({
+      label: "Sermon notes",
+      to: IN_NOTES,
+      icon: "chevron-left",
+    });
+    expect(header.findComponent(ContentMenu).props("folder")).toEqual([
+      "Sermon notes",
+    ]);
+    expect(wrapper.findComponent(ContentEditor).props()).toEqual({
+      record: ABOUT,
+      folder: ["Sermon notes"],
+    });
+    expect(wrapper.findComponent(ContentBody).props("address")).toBe(
+      "/api/content/Sermon%20notes/about-us",
+    );
+  });
+
+  it("offers the document's own pages as tabs, the document itself the first and only one, at its own address, lit when read", async () => {
+    const { wrapper } = await mountDocument(["Sermon notes", "about-us"]);
     expect(wrapper.findComponent(PageHeader).props("tabs")).toEqual([
-      { label: "Document", to: "/content/5/page" },
+      { label: "Document", to: "/content/Sermon%20notes/about-us" },
     ]);
     const tabs = wrapper.findAll(".page-header-tabs .f-tabs-trigger");
     expect(tabs.map((tab) => [tab.element.tagName, tab.text()])).toEqual([
       ["A", "Document"],
     ]);
-    expect(tabs[0]?.attributes("href")).toBe("/content/5/page");
+    expect(tabs[0]?.attributes("href")).toBe(
+      "/content/Sermon%20notes/about-us",
+    );
     expect(tabs[0]?.attributes("data-state")).toBe("active");
   });
 
-  it("names the page afresh once the page under it saves it", async () => {
-    const { wrapper } = await mountPage();
-    wrapper.findComponent(NuxtPage).vm.$emit("saved", {
+  it("names the document afresh once its metadata is saved", async () => {
+    const { wrapper } = await mountDocument(["index"]);
+    wrapper.findComponent(ContentEditor).vm.$emit("saved", {
       ...HOME,
       title: "Welcome",
       description: "Come as you are.",
@@ -1319,46 +1428,43 @@ describe("a page's page", () => {
     expect(head()).toEqual({ title: "Welcome" });
   });
 
-  it("describes the page by its description, or not at all", async () => {
-    vi.stubGlobal(
-      "$fetch",
-      vi.fn(async () => ABOUT),
-    );
-    setRoutePath("/content/6/page", { id: "6" });
-    const { wrapper } = await mountSuspended(Content);
+  it("describes the document by its description, or not at all", async () => {
+    const { wrapper } = await mountDocument(["Sermon notes", "about-us"]);
     expect(wrapper.find(".page-header-title").text()).toBe("About Us");
     expect(wrapper.find(".page-header-description").exists()).toBe(false);
   });
 
-  it("throws a 404 when no page has the id", async () => {
-    vi.stubGlobal(
-      "$fetch",
-      vi.fn(async () => {
-        throw Object.assign(new Error("404"), { status: 404 });
-      }),
-    );
-    setRoutePath("/content/9/page", { id: "9" });
-    const { wrapper, error } = await mountSuspended(Content);
+  it("throws a 404 where a folder holds no document of the name", async () => {
+    at("Sermon notes", "index");
+    const fetch = api(...CONTENT);
+    vi.stubGlobal("$fetch", fetch);
+    const { wrapper, error } = await visit();
     expect(error).toMatchObject({
       statusCode: 404,
-      message: "Document not found",
+      message: "Nothing is at this address",
     });
     expect(wrapper.findComponent(PageHeader).exists()).toBe(false);
   });
 
-  it("throws a 404 for an address that names no number", async () => {
-    const fetch = vi.fn(async () => HOME);
-    vi.stubGlobal("$fetch", fetch);
-    setRoutePath("/content/x/page", { id: "x" });
-    const { error } = await mountSuspended(Content);
-    expect(error).toMatchObject({ statusCode: 404 });
-    expect(fetch).not.toHaveBeenCalled();
+  it("leaves the browser where it stands: the folder come back to is as it was left", async () => {
+    at("Sermon notes");
+    const { wrapper, fetch } = await mountContent(...CONTENT);
+    browserOf(wrapper).query.add({
+      kind: "literal",
+      key: "text",
+      value: "about",
+    });
+    await flushPromises();
+    const document = await go(wrapper, "Sermon notes", "about-us");
+    expect(document.findComponent(ContentDocument).exists()).toBe(true);
+    fetch.mockClear();
+    const back = await go(document, "Sermon notes");
+    expect(browserOf(back).pathKeys).toEqual(["Sermon notes"]);
+    expect(reads(fetch)).toEqual([[NOTES_API, { query: { q: "about" } }]]);
   });
-});
 
-describe("page page", () => {
-  it("lays the page out in two panels: its metadata, then what is written on it", () => {
-    const wrapper = mount(Page, { props: { record: HOME } });
+  it("lays the document out in two panels: its metadata, then what is written on it", async () => {
+    const { wrapper } = await mountDocument(["index"]);
     const panels = wrapper.find(".content-page").element.children;
     expect([...panels].map((panel) => panel.className)).toEqual([
       "content-page-side",
@@ -1372,10 +1478,9 @@ describe("page page", () => {
     expect(wrapper.findComponent(ContentBody).props("record")).toEqual(HOME);
     expect(wrapper.find(".content-editor-title").text()).toBe("Metadata");
     expect(wrapper.find(".content-body-title").text()).toBe("Content");
-    expect(wrapper.findComponent(PageHeader).exists()).toBe(false);
   });
 
-  it("lists the page's headings under its metadata, each linked to its own", async () => {
+  it("lists the document's headings under its metadata, each linked to its own", async () => {
     const body = {
       type: "root" as const,
       children: [
@@ -1393,7 +1498,10 @@ describe("page page", () => {
         },
       ],
     };
-    const wrapper = mount(Page, { props: { record: { ...HOME, body } } });
+    at("index");
+    const { wrapper } = await mountContent({
+      documents: [{ ...HOME, body }],
+    });
     await wrapper.vm.$nextTick();
     const link = wrapper.find(
       ".content-page-side > .content-editor + nav.toc a.toc-link",
@@ -1403,34 +1511,28 @@ describe("page page", () => {
     expect(wrapper.find(".content-body h2#our-vision").exists()).toBe(true);
   });
 
-  it("lists nothing under the metadata of a page with no headings", async () => {
-    const wrapper = mount(Page, { props: { record: HOME } });
+  it("lists nothing under the metadata of a document with no headings", async () => {
+    const { wrapper } = await mountDocument(["index"]);
     await wrapper.vm.$nextTick();
     expect(wrapper.find("nav.toc").exists()).toBe(false);
   });
-  it("passes the record the form saved up to the page around it", () => {
-    const wrapper = mount(Page, { props: { record: ABOUT } });
-    const changed = { ...ABOUT, title: "Messages" };
-    wrapper.findComponent(ContentEditor).vm.$emit("saved", changed);
-    expect(wrapper.emitted("saved")).toEqual([[changed]]);
-  });
 
-  /** The page, drawn on the screen, with its bar's two buttons. */
-  const mountWhole = () => {
-    const wrapper = mount(Page, {
-      props: { record: HOME },
-      attachTo: document.body,
-    });
+  /** The document's page, with its bar's two buttons. */
+  const mountWhole = async (path: string[], answer?: unknown) => {
+    const { wrapper, fetch } = await mountDocument(path, answer);
     return {
       wrapper,
+      fetch,
       save: wrapper.find("button.save-bar-save"),
       reset: wrapper.find("button.save-bar-reset"),
       content: () => wrapper.find(".content-body .f-data-editor-content"),
     };
   };
 
+  type Whole = Awaited<ReturnType<typeof mountWhole>>;
+
   /** Writes over the whole of what is written, as typing over a selection does. */
-  const write = async (page: ReturnType<typeof mountWhole>, text: string) => {
+  const write = async (page: Whole, text: string) => {
     await page.content().trigger("pointerdown");
     await page.wrapper.vm.$nextTick();
     page.wrapper
@@ -1445,8 +1547,8 @@ describe("page page", () => {
     await page.wrapper.vm.$nextTick();
   };
 
-  it("ends in one bar that saves the whole record, with nothing to do until something changes, and no button in either panel", () => {
-    const { wrapper, save, reset } = mountWhole();
+  it("ends in one bar that saves the whole record, with nothing to do until something changes, and no button in either panel", async () => {
+    const { wrapper, save, reset } = await mountWhole(["index"]);
     expect(wrapper.findAll("button.save-bar-save")).toHaveLength(1);
     expect(wrapper.findComponent(SaveBar).props()).toEqual({
       dirty: false,
@@ -1462,55 +1564,87 @@ describe("page page", () => {
     ).toHaveLength(1);
   });
 
-  it("saves the details and what is written at once, each where it is kept", async () => {
+  it("saves the details and what is written together, both at the document's path: what is written first, then the metadata", async () => {
     const changed = { ...HOME, title: "Welcome" };
-    const fetch = vi.fn(async () => changed);
-    vi.stubGlobal("$fetch", fetch);
-    const page = mountWhole();
+    const page = await mountWhole(["index"], changed);
     await page.wrapper.find("#content-title").setValue("Welcome");
     await write(page, "Since 2010.");
     expect(page.save.attributes("disabled")).toBeUndefined();
     await page.save.trigger("click");
     await flushPromises();
-    expect(fetch).toHaveBeenCalledTimes(2);
-    expect(fetch).toHaveBeenCalledWith("/api/content/5", {
-      method: "PUT",
-      body: expect.objectContaining({ title: "Welcome" }),
-    });
-    expect(fetch).toHaveBeenCalledWith("/api/content/5/body", {
-      method: "PATCH",
-      body: { body: expect.objectContaining({ type: "root" }) },
-    });
-    expect(page.wrapper.emitted("saved")).toEqual([[changed]]);
+    expect(writes(page.fetch)).toEqual([
+      [
+        "/api/content/index",
+        {
+          method: "PATCH",
+          body: { body: expect.objectContaining({ type: "root" }) },
+        },
+      ],
+      [
+        "/api/content/index",
+        { method: "PUT", body: expect.objectContaining({ title: "Welcome" }) },
+      ],
+    ]);
+    expect(page.wrapper.find(".page-header-title").text()).toBe("Welcome");
+    expect(useRouter().replace).not.toHaveBeenCalled();
     expect(page.save.attributes("disabled")).toBeDefined();
     expect(page.reset.attributes("disabled")).toBeDefined();
   });
 
-  it("saves only the panel that changed", async () => {
-    const fetch = vi.fn(async () => HOME);
-    vi.stubGlobal("$fetch", fetch);
-    const page = mountWhole();
+  it("follows a document whose slug changed to its new address, once all of it is written at the old one", async () => {
+    const moved = { ...ABOUT, slug: "who-we-are" };
+    const page = await mountWhole(["Sermon notes", "about-us"], moved);
+    await page.wrapper.find("#content-slug").setValue("who-we-are");
     await write(page, "Since 2010.");
     await page.save.trigger("click");
     await flushPromises();
-    expect(fetch).toHaveBeenCalledTimes(1);
-    expect(fetch).toHaveBeenCalledWith(
-      "/api/content/5/body",
-      expect.anything(),
+    expect(
+      writes(page.fetch).map(([path, request]) => [path, request?.method]),
+    ).toEqual([
+      ["/api/content/Sermon%20notes/about-us", "PATCH"],
+      ["/api/content/Sermon%20notes/about-us", "PUT"],
+    ]);
+    expect(useRouter().replace).toHaveBeenCalledWith(
+      "/content/Sermon%20notes/who-we-are",
     );
   });
 
+  it("leaves the metadata unwritten, and the document where it is, when what is written was not saved", async () => {
+    const page = await mountWhole(["index"], { ...HOME, slug: "welcome" });
+    await page.wrapper.find("#content-slug").setValue("welcome");
+    await write(page, "Since 2010.");
+    page.fetch.mockRejectedValueOnce(new Error("The server is away."));
+    await page.save.trigger("click");
+    await flushPromises();
+    expect(writes(page.fetch).map(([, request]) => request?.method)).toEqual([
+      "PATCH",
+    ]);
+    expect(useRouter().replace).not.toHaveBeenCalled();
+    expect(
+      page.wrapper.findAll(".save-bar-error").map((error) => error.text()),
+    ).toEqual(["The server is away."]);
+    expect(page.save.attributes("disabled")).toBeUndefined();
+  });
+
+  it("saves only the panel that changed", async () => {
+    const page = await mountWhole(["index"], HOME);
+    await write(page, "Since 2010.");
+    await page.save.trigger("click");
+    await flushPromises();
+    expect(writes(page.fetch)).toEqual([
+      ["/api/content/index", expect.objectContaining({ method: "PATCH" })],
+    ]);
+  });
+
   it("resets the details and what is written at once, to what was last saved", async () => {
-    const fetch = vi.fn(async () => HOME);
-    vi.stubGlobal("$fetch", fetch);
-    const page = mountWhole();
+    const page = await mountWhole(["index"], HOME);
     const field = page.wrapper.find("#content-title");
     await field.setValue("Welcome");
     await write(page, "A slip of the keys.");
     expect(page.reset.attributes("disabled")).toBeUndefined();
     await page.reset.trigger("click");
     await flushPromises();
-    expect(fetch).not.toHaveBeenCalled();
+    expect(writes(page.fetch)).toEqual([]);
     expect((field.element as HTMLInputElement).value).toBe(
       "Butte Bible Fellowship",
     );
@@ -1521,13 +1655,8 @@ describe("page page", () => {
   });
 
   it("says in the bar what went wrong with a save, and keeps what was written to try again", async () => {
-    vi.stubGlobal(
-      "$fetch",
-      vi.fn(async () => {
-        throw new Error("The server is away.");
-      }),
-    );
-    const page = mountWhole();
+    const page = await mountWhole(["index"]);
+    page.fetch.mockRejectedValue(new Error("The server is away."));
     await page.wrapper.find("#content-title").setValue("Welcome");
     await page.save.trigger("click");
     await flushPromises();

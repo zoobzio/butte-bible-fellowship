@@ -2,15 +2,19 @@ import type { ContentRecord } from "@bbf/schema/types";
 
 import { ref, useNuxtApp, useRouter } from "#imports";
 import { useApi } from "~/composables/api";
-import { BACK, endpoint } from "~/composables/content/routes";
+import { endpoint } from "~/composables/content/routes";
+import { browse } from "~/constants/content";
 import { failure } from "~/utils/errors";
 
 /**
- * The deletion of a page of the site, from its page's menu: asked by title
- * first, and back to the list once done. What fails reports through
+ * The deletion of a document, from its page's menu: asked by title first,
+ * and back to the folder it was filed in, at `folder`, once done. What fails reports through
  * `error`, which the next try clears.
  */
-export const useContentRemoval = (record: ContentRecord) => {
+export const useContentRemoval = (
+  record: ContentRecord,
+  folder: readonly string[],
+) => {
   const api = useApi();
   const router = useRouter();
   const { $t } = useNuxtApp();
@@ -26,8 +30,8 @@ export const useContentRemoval = (record: ContentRecord) => {
     error.value = null;
     removing.value = true;
     try {
-      await api(endpoint(record.id), { method: "DELETE" });
-      await router.push(BACK);
+      await api(endpoint([...folder, record.slug]), { method: "DELETE" });
+      await router.push(browse(folder));
     } catch (caught) {
       error.value = failure(caught) ?? $t.admin.editor.failed();
     } finally {

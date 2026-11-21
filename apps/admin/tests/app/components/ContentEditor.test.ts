@@ -88,14 +88,35 @@ describe("ContentEditor", () => {
     expect(fetch).toHaveBeenCalledWith("/api/content", {
       method: "POST",
       body: {
+        kind: "document",
         slug: "about-us",
         title: "About Us",
         description: "Who we are.",
       },
     });
     await vi.waitFor(() =>
-      expect(useRouter().push).toHaveBeenCalledWith("/content/6/page"),
+      expect(useRouter().push).toHaveBeenCalledWith("/content/about-us"),
     );
+  });
+
+  it("files a new page in the folder it is given, by the folder's path", async () => {
+    const fetch = vi.fn(async () => ABOUT);
+    vi.stubGlobal("$fetch", fetch);
+    const wrapper = mount(ContentEditor, {
+      props: { record: null, folder: ["Sermon notes"] },
+    });
+    await wrapper.find("#content-title").setValue("About Us");
+    await wrapper.find("#content-slug").setValue("about-us");
+    await wrapper.find("form").trigger("submit");
+    await vi.waitFor(() =>
+      expect(useRouter().push).toHaveBeenCalledWith(
+        "/content/Sermon%20notes/about-us",
+      ),
+    );
+    expect(fetch).toHaveBeenCalledWith("/api/content/Sermon%20notes", {
+      method: "POST",
+      body: { kind: "document", slug: "about-us", title: "About Us" },
+    });
   });
 
   it("saves a page's metadata in place, and says which was saved", async () => {
@@ -107,7 +128,7 @@ describe("ContentEditor", () => {
     await wrapper.find("form").trigger("submit");
     await vi.waitFor(() => expect(wrapper.emitted("saved")).toBeTruthy());
     expect(wrapper.emitted("saved")).toEqual([[changed]]);
-    expect(fetch).toHaveBeenCalledWith("/api/content/5", {
+    expect(fetch).toHaveBeenCalledWith("/api/content/index", {
       method: "PUT",
       body: expect.objectContaining({ title: "Welcome", slug: "index" }),
     });
@@ -154,7 +175,9 @@ describe("ContentEditor", () => {
     const changed = { ...HOME, title: "Welcome" };
     const fetch = vi.fn(async () => changed);
     vi.stubGlobal("$fetch", fetch);
-    const { wrapper, drafts } = mountHeld(ContentEditor, HOME);
+    const { wrapper, drafts } = mountHeld(ContentEditor, HOME, {
+      folder: ["Sermon notes"],
+    });
     expect(wrapper.find("button.content-editor-save").exists()).toBe(false);
     expect(wrapper.find('button[type="submit"]').exists()).toBe(false);
     expect(drafts.dirty.value).toBe(false);
@@ -163,7 +186,7 @@ describe("ContentEditor", () => {
     expect(drafts.dirty.value).toBe(true);
     expect(drafts.open.value).toBe(true);
     await drafts.save();
-    expect(fetch).toHaveBeenCalledWith("/api/content/5", {
+    expect(fetch).toHaveBeenCalledWith("/api/content/Sermon%20notes/index", {
       method: "PUT",
       body: expect.objectContaining({ title: "Welcome" }),
     });

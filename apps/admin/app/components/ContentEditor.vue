@@ -10,10 +10,13 @@ import { useContentEditor } from "~/composables/content/editor";
 <script setup lang="ts">
 defineOptions({ name: "ContentEditor" });
 
-/* `folder` is where a new page is filed: the folder open as it is added. */
-const { record, folder } = defineProps<{
+/*
+ * `folder` is the path of the folder the page is in: where a new page is
+ * filed, the folder open as it is added, and where one that exists is.
+ */
+const { record, folder = [] } = defineProps<{
   record: ContentRecord | null;
-  folder?: number;
+  folder?: string[];
 }>();
 
 const emit = defineEmits<{ saved: [record: ContentRecord] }>();
@@ -29,11 +32,13 @@ const { form, error, dirty, saving, save, reset } = useContentEditor(
 /*
  * A record that exists is saved as a whole, from the bar of the page it is
  * on, when there is one: the form hands itself in and keeps no button. A
- * new record, in its dialog, saves from the form's own.
+ * new record, in its dialog, saves from the form's own. The metadata is
+ * written last of the record's parts: a slug changed moves the page to
+ * another path, which the rest is written at.
  */
 const held =
   record !== null &&
-  useDraft({ dirty, open: dirty, saving, error, save, reset });
+  useDraft({ dirty, open: dirty, saving, error, save, reset, last: true });
 
 const title = useId();
 

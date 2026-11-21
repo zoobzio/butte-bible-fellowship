@@ -22,7 +22,9 @@ export interface Option<T extends string = string> {
  * is anything to put back, a change or an editor left open, and `saving`
  * while its save is under way. `save` writes the part and reports what
  * fails through `error`, never by throwing; `reset` puts back what was last
- * saved.
+ * saved. A part marked `last` is written after the rest, and only once
+ * they are: one whose save may move the record to another address, which
+ * the others are written at.
  */
 export interface Draft {
   dirty: Readonly<Ref<boolean>>;
@@ -31,6 +33,7 @@ export interface Draft {
   error: Readonly<Ref<string | null>>;
   save: () => Promise<void>;
   reset: () => void;
+  last?: boolean;
 }
 
 /**

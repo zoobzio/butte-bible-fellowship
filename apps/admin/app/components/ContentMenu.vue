@@ -9,11 +9,15 @@ import { useContentRemoval } from "~/composables/content/removal";
 <script setup lang="ts">
 defineOptions({ name: "ContentMenu" });
 
-const { record } = defineProps<{ record: ContentRecord }>();
+/* The document, and the path of the folder it is filed in. */
+const { record, folder } = defineProps<{
+  record: ContentRecord;
+  folder: string[];
+}>();
 
 const { $t } = useNuxtApp();
 
-const { removing, error, destroy } = useContentRemoval(record);
+const { removing, error, destroy } = useContentRemoval(record, folder);
 
 /* What can be done to the page, from its own page's header. */
 const menu = defineMenu(() => ({

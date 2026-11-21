@@ -6,11 +6,11 @@ import type { connectArticle, connectBody, connectForm } from "./input/connect";
 import type {
   contentArticle,
   contentBody,
-  contentDraft,
+  contentEntry,
   contentForm,
-  contentId,
+  contentMove,
+  contentPatch,
   contentPath,
-  contentPlacement,
   contentQuery,
   contentSort,
 } from "./input/content";
@@ -25,14 +25,7 @@ import type {
   eventWindow,
   eventsQuery,
 } from "./input/event";
-import type {
-  folderBody,
-  folderDraft,
-  folderId,
-  folderPlacement,
-  folderSort,
-  foldersQuery,
-} from "./input/folder";
+import type { folderBody, folderSort } from "./input/folder";
 import type { homeArticle, homeBody, homeForm, homeImage } from "./input/home";
 import type { listingQuery, sortDirection } from "./input/listing";
 import type {
@@ -78,6 +71,8 @@ import type {
   eventTime,
 } from "./models/event";
 import type { folderRecord, folderRecords } from "./models/folder";
+import type { contentLocation } from "./models/path";
+import type { contentResource } from "./models/resource";
 import type { hast, hastElement, hastText } from "./models/hast";
 import type { homeHero, homePage, homeRecord } from "./models/home";
 import type { link } from "./models/link";
@@ -188,8 +183,6 @@ export type ContentRecords = z.infer<typeof contentRecords>;
 
 export type ContentPath = z.infer<typeof contentPath>;
 
-export type ContentId = z.infer<typeof contentId>;
-
 export type ContentSort = z.infer<typeof contentSort>;
 
 export type ContentQuery = z.infer<typeof contentQuery>;
@@ -200,25 +193,23 @@ export type ContentForm = z.infer<typeof contentForm>;
 
 export type ContentArticle = z.infer<typeof contentArticle>;
 
-export type ContentPlacement = z.infer<typeof contentPlacement>;
+export type ContentEntry = z.infer<typeof contentEntry>;
 
-export type ContentDraft = z.infer<typeof contentDraft>;
+export type ContentMove = z.infer<typeof contentMove>;
+
+export type ContentPatch = z.infer<typeof contentPatch>;
+
+export type ContentLocation = z.infer<typeof contentLocation>;
+
+export type ContentResource = z.infer<typeof contentResource>;
 
 export type FolderRecord = z.infer<typeof folderRecord>;
 
 export type FolderRecords = z.infer<typeof folderRecords>;
 
-export type FolderId = z.infer<typeof folderId>;
-
 export type FolderSort = z.infer<typeof folderSort>;
 
-export type FoldersQuery = z.infer<typeof foldersQuery>;
-
 export type FolderBody = z.infer<typeof folderBody>;
-
-export type FolderPlacement = z.infer<typeof folderPlacement>;
-
-export type FolderDraft = z.infer<typeof folderDraft>;
 
 export type EventPath = z.infer<typeof eventPath>;
 

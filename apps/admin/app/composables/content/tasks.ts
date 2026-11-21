@@ -5,14 +5,9 @@ import type { ContentTasks } from "~/types/content";
 
 import { computed, ref, useNuxtApp, useState, watch } from "#imports";
 import { useApi } from "~/composables/api";
-import {
-  endpoint,
-  folder,
-  parent,
-  placement,
-} from "~/composables/content/routes";
+import { endpoint } from "~/composables/content/routes";
 import { failure, isNotFound } from "~/utils/errors";
-import { folderId, folderOf } from "~/utils/folders";
+import { isUnder, parentOf, samePath } from "~/utils/folders";
 
 /**
  * What the browser's rows have asked for and the content page has yet to
@@ -30,12 +25,14 @@ export const useContentRequests = (): Ref<ContentTasks> =>
 
 /**
  * What the content page carries out on the folder that is open, for the
- * browser given. `here` is that folder, none at the top. `renaming` is the
+ * browser given. `here` is that folder, by its path, the top's being of
+ * no steps. `renaming` is the
  * folder a rename was asked for, for the page to draw its form over, and
  * `renamed` ends it. `held` is what a move picked up: `drop` puts it down
  * in the open folder, `release` lets it go where it was, and `droppable`
  * says whether here is somewhere else to put it. A folder asked to be
- * removed is asked about by name first, then removed. The documents and
+ * removed is asked about by name first, then removed. Each is written at
+ * its own path: what the open folder holds, under the folder's. The documents and
  * folders selected, asked to be removed together, are asked about by their
  * count first, then removed, each on its own, so one that fails keeps none
  * of the rest: one already gone counts as removed, and only the ones that
@@ -54,7 +51,7 @@ export const useContentTasks = (
   const busy = ref(false);
   const error = ref<string | null>(null);
 
-  const here = computed(() => folderOf(browser.pathKeys));
+  const here = computed(() => browser.pathKeys);
   const renaming = computed(() => requests.value.renaming);
   const held = computed(() => requests.value.held);
 
@@ -72,27 +69,25 @@ export const useContentTasks = (
     }
   };
 
-  /* A folder is never put down in itself, and nothing where it already is. */
+  /*
+   * A folder is never put down in itself, nor in a folder under it, and
+   * nothing where it already is.
+   */
   const droppable = computed(() => {
     const item = held.value;
     if (item === null) return false;
-    if (item.kind === "folder" && item.id === here.value) return false;
-    return item.from !== here.value;
+    if (item.kind === "folder" && isUnder(here.value, item.path)) return false;
+    return !samePath(parentOf(item.path), here.value);
   });
 
   const drop = () =>
     run(async () => {
       const item = held.value;
       if (item === null) return;
-      await (item.kind === "folder"
-        ? api(parent(item.id), {
-            method: "PATCH",
-            body: { parent: here.value },
-          })
-        : api(placement(item.id), {
-            method: "PATCH",
-            body: { folder: here.value },
-          }));
+      await api(endpoint(item.path), {
+        method: "PATCH",
+        body: { parent: here.value },
+      });
       requests.value.held = null;
     });
 
@@ -118,7 +113,7 @@ export const useContentTasks = (
         return;
       }
       run(async () => {
-        await api(folder(folderId(asked)), { method: "DELETE" });
+        await api(endpoint([...here.value, asked.key]), { method: "DELETE" });
       });
     },
     { immediate: true },
@@ -133,14 +128,11 @@ export const useContentTasks = (
       if (count === 0) return;
       if (!globalThis.confirm($t.admin.content.confirmMany({ count }))) return;
       run(async () => {
-        const results = await Promise.allSettled([
-          ...asked.documents.map((id) =>
-            api(endpoint(Number(id)), { method: "DELETE" }),
+        const results = await Promise.allSettled(
+          [...asked.documents, ...asked.folders].map((step) =>
+            api(endpoint([...here.value, step]), { method: "DELETE" }),
           ),
-          ...asked.folders.map((id) =>
-            api(folder(Number(id)), { method: "DELETE" }),
-          ),
-        ]);
+        );
         const failed = results.find(
           (result) =>
             result.status === "rejected" && !isNotFound(result.reason),

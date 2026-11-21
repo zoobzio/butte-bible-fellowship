@@ -31,19 +31,19 @@ export type BrowserCrumb = ReturnType<UseBrowser<unknown>>["path"][number];
 
 /**
  * What is being moved: a document or a folder, picked up where it was, to be
- * put down in whichever folder is opened next. `from` is the folder it was
- * picked up in, none for the top.
+ * put down in whichever folder is opened next. `path` is where it is: the
+ * folder it was picked up in, and last its own step, a folder's name or a
+ * document's slug.
  */
 export interface Held {
   kind: "document" | "folder";
-  id: number;
+  path: string[];
   name: string;
-  from?: number;
 }
 
 /**
- * What is selected in the browser, by the keys of its rows: the documents
- * and the folders apart, as a folder's key and a document's may be the same.
+ * What is selected in the browser, by the keys of its rows, each the last
+ * step of its path: the documents and the folders apart.
  */
 export interface Selected {
   documents: string[];

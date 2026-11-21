@@ -15,14 +15,12 @@ import {
   connectBody,
   connectPage,
   connectRecord,
-  contentArticle,
   contentBody,
-  contentDraft,
-  contentId,
-  contentPlacement,
+  contentEntry,
+  contentPatch,
   contentQuery,
   contentRecord,
-  contentRecords,
+  contentResource,
   contentViewBody,
   eventBody,
   eventId,
@@ -35,12 +33,7 @@ import {
   eventRecord,
   eventsQuery,
   folderBody,
-  folderDraft,
-  folderId,
-  folderPlacement,
   folderRecord,
-  folderRecords,
-  foldersQuery,
   homeArticle,
   homeBody,
   homePage,
@@ -69,6 +62,18 @@ import {
 const json = (schema: unknown) => ({
   description: "OK",
   content: { "application/json": { schema } },
+});
+
+/**
+ * The path of the content an address names, as the address writes it: its
+ * names between slashes, however many.
+ */
+const contentAddress = z.object({
+  path: z.string().meta({
+    description:
+      "The names of the folders from the top down, and last, for a document, its slug, each a step of the address.",
+    examples: ["Sermon%20notes/Romans"],
+  }),
 });
 
 const document = createDocument(
@@ -155,61 +160,44 @@ const document = createDocument(
       "/admin/api/content": {
         get: {
           requestParams: { query: contentQuery },
-          responses: { 200: json(contentRecords) },
+          responses: { 200: json(contentResource) },
         },
         post: {
           requestBody: {
-            content: { "application/json": { schema: contentDraft } },
+            content: { "application/json": { schema: contentEntry } },
           },
-          responses: { 201: json(contentRecord) },
+          responses: { 201: json(z.union([contentRecord, folderRecord])) },
         },
       },
-      "/admin/api/content/{id}": {
-        put: {
-          requestParams: { path: contentId },
-          requestBody: {
-            content: { "application/json": { schema: contentBody } },
-          },
-          responses: { 200: json(contentRecord) },
-        },
-      },
-      "/admin/api/content/{id}/folder": {
-        patch: {
-          requestParams: { path: contentId },
-          requestBody: {
-            content: { "application/json": { schema: contentPlacement } },
-          },
-          responses: { 200: json(contentRecord) },
-        },
-      },
-      "/admin/api/folders": {
+      "/admin/api/content/{path}": {
         get: {
-          requestParams: { query: foldersQuery },
-          responses: { 200: json(folderRecords) },
+          requestParams: { path: contentAddress, query: contentQuery },
+          responses: { 200: json(contentResource) },
         },
         post: {
+          requestParams: { path: contentAddress },
           requestBody: {
-            content: { "application/json": { schema: folderDraft } },
+            content: { "application/json": { schema: contentEntry } },
           },
-          responses: { 201: json(folderRecord) },
+          responses: { 201: json(z.union([contentRecord, folderRecord])) },
         },
-      },
-      "/admin/api/folders/{id}": {
         put: {
-          requestParams: { path: folderId },
+          requestParams: { path: contentAddress },
           requestBody: {
-            content: { "application/json": { schema: folderBody } },
+            content: {
+              "application/json": {
+                schema: z.union([contentBody, folderBody]),
+              },
+            },
           },
-          responses: { 200: json(folderRecord) },
+          responses: { 200: json(z.union([contentRecord, folderRecord])) },
         },
-      },
-      "/admin/api/folders/{id}/parent": {
         patch: {
-          requestParams: { path: folderId },
+          requestParams: { path: contentAddress },
           requestBody: {
-            content: { "application/json": { schema: folderPlacement } },
+            content: { "application/json": { schema: contentPatch } },
           },
-          responses: { 200: json(folderRecord) },
+          responses: { 200: json(z.union([contentRecord, folderRecord])) },
         },
       },
       "/admin/api/views/{surface}": {
@@ -233,15 +221,6 @@ const document = createDocument(
             },
           },
           responses: { 200: json(viewRecord) },
-        },
-      },
-      "/admin/api/content/{id}/body": {
-        patch: {
-          requestParams: { path: contentId },
-          requestBody: {
-            content: { "application/json": { schema: contentArticle } },
-          },
-          responses: { 200: json(contentRecord) },
         },
       },
       "/api/pages/index": {
@@ -377,12 +356,14 @@ describe("the components", () => {
       "ConnectBody",
       "ConnectPage",
       "ConnectRecord",
-      "ContentArticle",
       "ContentBody",
-      "ContentDraft",
-      "ContentPlacement",
+      "ContentEntry",
+      "ContentLocation",
+      "ContentMove",
+      "ContentPatch",
       "ContentRecord",
       "ContentRecords",
+      "ContentResource",
       "ContentStatus",
       "ContentView",
       "ContentViewBody",
@@ -395,8 +376,6 @@ describe("the components", () => {
       "EventView",
       "EventViewBody",
       "FolderBody",
-      "FolderDraft",
-      "FolderPlacement",
       "FolderRecord",
       "FolderRecords",
       "Hast",
@@ -680,6 +659,51 @@ describe("the requests", () => {
           },
         },
       },
+    });
+  });
+
+  it("take a path of the content in the address, and what is made, moved or written there by its name", () => {
+    const path = "/admin/api/content/{path}";
+    expect(parameters(path, "get").path).toMatchObject({
+      in: "path",
+      required: true,
+      schema: { type: "string" },
+    });
+    expect(parameters(path, "get")).toHaveProperty("sort");
+    expect(parameters(path, "get")).not.toHaveProperty("folder");
+    expect(parameters("/admin/api/content", "get")).not.toHaveProperty(
+      "folder",
+    );
+    expect(document.paths?.[path]?.post?.requestBody).toMatchObject({
+      content: {
+        "application/json": {
+          schema: { $ref: "#/components/schemas/ContentEntry" },
+        },
+      },
+    });
+    expect(document.paths?.[path]?.patch?.requestBody).toMatchObject({
+      content: {
+        "application/json": {
+          schema: { $ref: "#/components/schemas/ContentPatch" },
+        },
+      },
+    });
+    expect(document.paths?.[path]?.get?.responses?.[200]).toMatchObject({
+      content: {
+        "application/json": {
+          schema: { $ref: "#/components/schemas/ContentResource" },
+        },
+      },
+    });
+    expect(schemas.ContentMove).toMatchObject({
+      required: ["parent"],
+      properties: {
+        parent: { $ref: "#/components/schemas/ContentLocation" },
+      },
+    });
+    expect(schemas.ContentLocation).toMatchObject({
+      type: "array",
+      items: { type: "string" },
     });
   });
 });

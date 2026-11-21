@@ -20,8 +20,8 @@
     "description": "The line under the title of the dialog that adds a new document: what the form asks for, where the document is filed, and where the rest is written."
   },
   "notFound": {
-    "defaultMessage": "Document not found",
-    "description": "The error shown when an address names a document that does not exist."
+    "defaultMessage": "Nothing is at this address",
+    "description": "The error shown when the address of a page of the content names neither a folder nor a document: one of its names is not there, or no longer is."
   },
   "page": {
     "defaultMessage": "Document",

@@ -18,8 +18,10 @@ const DRAFTS: InjectionKey<Set<Draft>> = Symbol("drafts");
  * and each panel under it hands in its own part with `useDraft`. `dirty`,
  * `open` and `saving` hold while any part does, and `errors` is what each
  * part's last save said went wrong. `save` writes every part with a change,
- * each in its own request, and leaves the rest alone; `reset` puts every
- * part back as it was last saved. Neither runs under a save.
+ * each in its own request, and leaves the rest alone: the parts marked
+ * `last` after the others, and not at all when one of the others failed,
+ * as what they write may move the record from under the rest. `reset` puts
+ * every part back as it was last saved. Neither runs under a save.
  */
 export const useDrafts = () => {
   const parts = shallowReactive(new Set<Draft>());
@@ -35,7 +37,12 @@ export const useDrafts = () => {
   const save = async () => {
     if (saving.value) return;
     const changed = [...parts].filter((part) => part.dirty.value);
-    await Promise.all(changed.map((part) => part.save()));
+    const first = changed.filter((part) => !part.last);
+    await Promise.all(first.map((part) => part.save()));
+    if (first.some((part) => part.error.value !== null)) return;
+    await Promise.all(
+      changed.filter((part) => part.last).map((part) => part.save()),
+    );
   };
 
   const reset = () => {

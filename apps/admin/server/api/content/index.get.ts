@@ -1,9 +1,6 @@
-import { contentQuery } from "@bbf/schema";
-import { defineEventHandler, getValidatedQuery } from "h3";
+import { defineEventHandler } from "h3";
 
-import { useContent } from "~~/server/composables/content";
+import { useContentPaths } from "~~/server/composables/paths";
 
-export default defineEventHandler(async (event) => {
-  const query = await getValidatedQuery(event, contentQuery.parse);
-  return useContent().list(query);
-});
+/** The top of the content, with what it holds: the path of no steps. */
+export default defineEventHandler((event) => useContentPaths().read(event));

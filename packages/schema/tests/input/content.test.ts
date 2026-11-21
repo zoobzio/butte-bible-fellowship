@@ -4,11 +4,11 @@ import {
   CONTENT_SORT_KEYS,
   contentArticle,
   contentBody,
-  contentDraft,
+  contentEntry,
   contentForm,
-  contentId,
+  contentMove,
+  contentPatch,
   contentPath,
-  contentPlacement,
   contentQuery,
 } from "../../src/input/content";
 
@@ -30,14 +30,6 @@ const form = (value: unknown) =>
   contentForm
     .safeParse(value)
     .error?.issues.map((issue) => issue.path.join(".")) ?? [];
-
-describe("contentId", () => {
-  it("names a page by its row's number, as the address writes it", () => {
-    expect(contentId.parse({ id: "3" })).toEqual({ id: 3 });
-    expect(contentId.safeParse({ id: "0" }).success).toBe(false);
-    expect(contentId.safeParse({ id: "about-us" }).success).toBe(false);
-  });
-});
 
 describe("contentPath", () => {
   it("names a page by its slug", () => {
@@ -84,21 +76,16 @@ describe("contentBody", () => {
 });
 
 describe("contentQuery", () => {
-  it("lists the pages at the top, or those filed in the folder it names", () => {
+  it("names no folder: the path it is asked of does", () => {
     expect(contentQuery.parse({})).toEqual({});
-    expect(contentQuery.parse({ folder: "4" })).toEqual({ folder: 4 });
-    expect(contentQuery.safeParse({ folder: "0" }).success).toBe(false);
-    expect(contentQuery.safeParse({ folder: "sermons" }).success).toBe(false);
+    expect(contentQuery.parse({ folder: "4" })).toEqual({});
   });
 
   it("searches the folder for a text, trimmed, and is no page of a listing: it carries neither a page nor a size", () => {
     expect(contentQuery.parse({ page: "2", q: " vision ", size: "5" })).toEqual(
       { q: "vision" },
     );
-    expect(contentQuery.parse({ folder: "4", q: "" })).toEqual({
-      folder: 4,
-      q: "",
-    });
+    expect(contentQuery.parse({ q: "" })).toEqual({ q: "" });
   });
 
   it("filters on the title and the slug by every text operator, and on the day last changed each way", () => {
@@ -160,27 +147,90 @@ describe("contentQuery", () => {
   });
 });
 
-describe("contentPlacement", () => {
-  it("files a page in a folder, or at the top when it names none", () => {
-    expect(contentPlacement.parse({ folder: 4 })).toEqual({ folder: 4 });
-    expect(contentPlacement.parse({})).toEqual({});
-    expect(contentPlacement.safeParse({ folder: 0 }).success).toBe(false);
-    expect(contentPlacement.safeParse({ folder: "4" }).success).toBe(false);
+describe("contentEntry", () => {
+  it("is a new document, by its metadata", () => {
+    const entry = { kind: "document", ...PAGE, description: "Who we are." };
+    expect(contentEntry.parse(entry)).toEqual(entry);
+    expect(contentEntry.parse({ kind: "document", ...PAGE })).toEqual({
+      kind: "document",
+      ...PAGE,
+    });
+    expect(
+      contentEntry.safeParse({ kind: "document", slug: "x" }).success,
+    ).toBe(false);
+    expect(
+      contentEntry.safeParse({ kind: "document", ...PAGE, slug: "About Us" })
+        .success,
+    ).toBe(false);
+  });
+
+  it("is a new folder, by its name, trimmed, which is one step of a path", () => {
+    expect(contentEntry.parse({ kind: "folder", name: " News " })).toEqual({
+      kind: "folder",
+      name: "News",
+    });
+    expect(contentEntry.safeParse({ kind: "folder" }).success).toBe(false);
+    expect(
+      contentEntry.safeParse({ kind: "folder", name: "a/b" }).success,
+    ).toBe(false);
+  });
+
+  it("says which it is, and names no folder it is made in: its path does", () => {
+    expect(contentEntry.safeParse(PAGE).success).toBe(false);
+    expect(contentEntry.safeParse({ name: "News" }).success).toBe(false);
+    expect(contentEntry.safeParse({ kind: "image", ...PAGE }).success).toBe(
+      false,
+    );
+    expect(
+      contentEntry.parse({ kind: "document", ...PAGE, folder: 4 }),
+    ).toEqual({ kind: "document", ...PAGE });
+    expect(contentBody.parse({ ...PAGE, folder: 4 })).toEqual(PAGE);
   });
 });
 
-describe("contentDraft", () => {
-  it("is a new page's metadata, and the folder it is made in", () => {
-    expect(contentDraft.parse(PAGE)).toEqual(PAGE);
-    expect(contentDraft.parse({ ...PAGE, folder: 4 })).toEqual({
-      ...PAGE,
-      folder: 4,
+describe("contentMove", () => {
+  it("names the folder something is moved into by its path, the top by none", () => {
+    expect(contentMove.parse({ parent: ["Sermon notes", "Romans"] })).toEqual({
+      parent: ["Sermon notes", "Romans"],
     });
-    expect(contentDraft.safeParse({ folder: 4 }).success).toBe(false);
+    expect(contentMove.parse({ parent: [] })).toEqual({ parent: [] });
   });
 
-  it("is where alone a folder is written with the metadata: an update leaves a page where it is", () => {
-    expect(contentBody.parse({ ...PAGE, folder: 4 })).toEqual(PAGE);
+  it("needs a path, each name of it a step", () => {
+    expect(contentMove.safeParse({}).success).toBe(false);
+    expect(contentMove.safeParse({ parent: "Romans" }).success).toBe(false);
+    expect(contentMove.safeParse({ parent: [4] }).success).toBe(false);
+    for (const step of ["", "a/b", ".", ".."]) {
+      expect(contentMove.safeParse({ parent: [step] }).success, step).toBe(
+        false,
+      );
+    }
+  });
+});
+
+describe("contentPatch", () => {
+  it("is a move, where it names a folder to move into", () => {
+    expect(contentPatch.parse({ parent: ["Romans"] })).toEqual({
+      parent: ["Romans"],
+    });
+    expect(contentPatch.parse({ parent: [] })).toEqual({ parent: [] });
+  });
+
+  it("is what is written on a document otherwise, or nothing at all, for one left without", () => {
+    expect(contentPatch.parse({ body: ARTICLE })).toEqual({ body: ARTICLE });
+    expect(contentPatch.parse({})).toEqual({});
+  });
+
+  it("is refused where it is neither: what it does not know is no article", () => {
+    expect(contentPatch.safeParse({ folder: 4 }).success).toBe(false);
+    expect(contentPatch.safeParse({ body: ARTICLE, title: "x" }).success).toBe(
+      false,
+    );
+    expect(contentPatch.safeParse({ parent: "Romans" }).success).toBe(false);
+    expect(contentPatch.safeParse({ parent: ["a/b"] }).success).toBe(false);
+    expect(contentPatch.safeParse({ body: "# Our vision" }).success).toBe(
+      false,
+    );
   });
 });
 

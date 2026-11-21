@@ -1,8 +1,6 @@
 import type {
   ContentArticle,
   ContentBody,
-  ContentDraft,
-  ContentPlacement,
   ContentQuery,
   ContentRecord,
   ContentRecords,
@@ -22,8 +20,9 @@ import { orRefused } from "~~/server/utils/conflicts";
 import { toDaySearch, toTextSearch } from "~~/server/utils/listing";
 
 /**
- * What filing a page comes to when it is not the page filed: `gone`, the
- * folder it was to be filed in is not there.
+ * What a write of a page comes to when it is not the page written: `taken`,
+ * its slug is another page's, or a folder's beside it; `gone`, the folder
+ * it was to be filed in is not there.
  */
 export type ContentRefusal =
   (typeof CONTENT_REFUSALS)[keyof typeof CONTENT_REFUSALS];
@@ -72,13 +71,16 @@ export const useContent = () => {
   const db = useDatabase();
 
   /**
-   * The pages filed in one folder, or at the top when the query names none,
-   * which its search leaves: the folder alone is searched, and none inside
-   * it.
+   * The pages filed in one folder, or at the top when none is named, which
+   * the query's search leaves: the folder alone is searched, and none
+   * inside it.
    */
-  const list = async (query: ContentQuery): Promise<ContentRecords> => {
+  const list = async (
+    folder: number | undefined,
+    query: ContentQuery,
+  ): Promise<ContentRecords> => {
     const rows = await db.admin.content.list({
-      folder_id: query.folder ?? null,
+      folder_id: folder ?? null,
       ...toSearch(query),
       ...toOrder(query),
     });
@@ -91,29 +93,32 @@ export const useContent = () => {
   };
 
   /**
-   * A new page, in the folder its draft names, or at the top: refused when
-   * that folder is gone.
+   * A new page, in the folder named, or at the top: refused when its slug
+   * is taken, or that folder is gone.
    */
   const create = (
-    draft: ContentDraft,
+    body: ContentBody,
+    folder?: number,
   ): Promise<ContentRecord | ContentRefusal | null> =>
     orRefused(CONTENT_REFUSALS, async () => {
       const written = await db.admin.content.create.first(
-        toContentDraftArguments(draft),
+        toContentDraftArguments(body, folder),
       );
       return written === null ? null : fetch(written.id);
     });
 
-  const update = async (
+  /** A page's metadata, replaced: refused when the slug it takes is taken. */
+  const update = (
     id: number,
     body: ContentBody,
-  ): Promise<ContentRecord | null> => {
-    const written = await db.admin.content.update.first({
-      ...toContentArguments(body),
-      id,
+  ): Promise<ContentRecord | ContentRefusal | null> =>
+    orRefused(CONTENT_REFUSALS, async () => {
+      const written = await db.admin.content.update.first({
+        ...toContentArguments(body),
+        id,
+      });
+      return written === null ? null : fetch(id);
     });
-    return written === null ? null : fetch(id);
-  };
 
   /**
    * What is written on a page, on its own: the tree, or none when the body
@@ -131,18 +136,18 @@ export const useContent = () => {
   };
 
   /**
-   * Where a page is filed, on its own: the folder, or the top when the
-   * placement names none. Nothing else of the page changes. It is refused
-   * when that folder is gone.
+   * Where a page is filed, on its own: the folder, or the top when none is
+   * named. Nothing else of the page changes. It is refused when that
+   * folder is gone, or holds a folder of the page's name.
    */
   const setFolder = (
     id: number,
-    placement: ContentPlacement,
+    folder?: number,
   ): Promise<ContentRecord | ContentRefusal | null> =>
     orRefused(CONTENT_REFUSALS, async () => {
       const written = await db.admin.content.folder.first({
         id,
-        folder_id: placement.folder ?? null,
+        folder_id: folder ?? null,
       });
       return written === null ? null : fetch(id);
     });

@@ -5,29 +5,42 @@ import { ABOUT } from "#test/support/records";
 import { useContentRemoval } from "~/composables/content/removal";
 
 describe("useContentRemoval", () => {
-  it("deletes the page, once asked by title, and leaves for the list", async () => {
+  it("deletes the page at its path, once asked by title, and leaves for the folder it was filed in", async () => {
     const fetch = vi.fn(async () => null);
     vi.stubGlobal("$fetch", fetch);
     const confirm = vi.fn(() => true);
     vi.stubGlobal("confirm", confirm);
-    const removal = useContentRemoval(ABOUT);
+    const removal = useContentRemoval(ABOUT, ["Sermon notes"]);
     const asked = removal.destroy();
     expect(removal.removing.value).toBe(true);
     await asked;
     expect(confirm).toHaveBeenCalledWith(
       "Delete About Us? This cannot be undone.",
     );
-    expect(fetch).toHaveBeenCalledWith("/api/content/6", { method: "DELETE" });
-    expect(useRouter().push).toHaveBeenCalledWith("/content");
+    expect(fetch).toHaveBeenCalledWith("/api/content/Sermon%20notes/about-us", {
+      method: "DELETE",
+    });
+    expect(useRouter().push).toHaveBeenCalledWith("/content/Sermon%20notes");
     expect(removal.removing.value).toBe(false);
     expect(removal.error.value).toBeNull();
+  });
+
+  it("leaves a page at the top for the top", async () => {
+    const fetch = vi.fn(async () => null);
+    vi.stubGlobal("$fetch", fetch);
+    vi.stubGlobal("confirm", () => true);
+    await useContentRemoval(ABOUT, []).destroy();
+    expect(fetch).toHaveBeenCalledWith("/api/content/about-us", {
+      method: "DELETE",
+    });
+    expect(useRouter().push).toHaveBeenCalledWith("/content");
   });
 
   it("keeps the page when the question is declined", async () => {
     const fetch = vi.fn(async () => null);
     vi.stubGlobal("$fetch", fetch);
     vi.stubGlobal("confirm", () => false);
-    await useContentRemoval(ABOUT).destroy();
+    await useContentRemoval(ABOUT, []).destroy();
     expect(fetch).not.toHaveBeenCalled();
     expect(useRouter().push).not.toHaveBeenCalled();
   });
@@ -38,7 +51,7 @@ describe("useContentRemoval", () => {
     });
     vi.stubGlobal("$fetch", fetch);
     vi.stubGlobal("confirm", () => true);
-    const removal = useContentRemoval(ABOUT);
+    const removal = useContentRemoval(ABOUT, []);
     await removal.destroy();
     expect(removal.error.value).toBe("The server is away.");
     expect(removal.removing.value).toBe(false);
@@ -57,7 +70,7 @@ describe("useContentRemoval", () => {
     vi.stubGlobal("$fetch", fetch);
     const confirm = vi.fn(() => true);
     vi.stubGlobal("confirm", confirm);
-    const removal = useContentRemoval(ABOUT);
+    const removal = useContentRemoval(ABOUT, []);
     const first = removal.destroy();
     await removal.destroy();
     expect(confirm).toHaveBeenCalledTimes(1);

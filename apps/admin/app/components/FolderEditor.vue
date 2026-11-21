@@ -10,12 +10,13 @@ import { useFolderEditor } from "~/composables/content/folder";
 defineOptions({ name: "FolderEditor" });
 
 /*
- * The folder to rename, or none for a new one, which is made inside
- * `parent`: the folder open as it is added, none at the top.
+ * The folder to rename, or none for a new one, which is made inside the
+ * folder at `parent`: the path of the folder that is open, the top's being
+ * of no steps.
  */
 const { folder, parent } = defineProps<{
   folder: BrowserFolder | null;
-  parent?: number;
+  parent: string[];
 }>();
 
 const emit = defineEmits<{ saved: [] }>();

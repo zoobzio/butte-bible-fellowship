@@ -16,7 +16,7 @@ const paragraph = (value: string) => ({
 });
 
 /** Where the body of the page the tests write is written. */
-const ADDRESS = "/api/content/5/body";
+const ADDRESS = "/api/content/index";
 
 const useBody = (record: Parameters<typeof useContentBody>[0]) =>
   useContentBody(record, ADDRESS);
@@ -64,7 +64,7 @@ describe("useContentBody", () => {
     expect(bio.saving.value).toBe(true);
     await saving;
     expect(fetch).toHaveBeenCalledTimes(1);
-    expect(fetch).toHaveBeenCalledWith("/api/content/5/body", {
+    expect(fetch).toHaveBeenCalledWith("/api/content/index", {
       method: "PATCH",
       body: { body: paragraph("Since 2010.") },
     });
@@ -83,7 +83,7 @@ describe("useContentBody", () => {
     bio.editor.run((chain) => chain.clearContent(true));
     expect(bio.editor.empty).toBe(true);
     await bio.save();
-    expect(fetch).toHaveBeenCalledWith("/api/content/5/body", {
+    expect(fetch).toHaveBeenCalledWith("/api/content/index", {
       method: "PATCH",
       body: {},
     });
@@ -195,7 +195,7 @@ describe("useContentBody", () => {
     expect(body.dirty.value).toBe(true);
     await body.save();
     const [first, ...rest] = CONNECT.children;
-    expect(fetch).toHaveBeenCalledWith("/api/content/5/body", {
+    expect(fetch).toHaveBeenCalledWith("/api/content/index", {
       method: "PATCH",
       body: {
         body: {

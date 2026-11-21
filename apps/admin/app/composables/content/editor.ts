@@ -4,8 +4,8 @@ import { contentForm, contentRecord } from "@bbf/schema";
 import { toContentBody, toContentForm } from "@bbf/utils/vm";
 import { computed, createForm, ref, useNuxtApp, useRouter } from "#imports";
 import { useApi } from "~/composables/api";
-import { ROUTE, endpoint } from "~/composables/content/routes";
-import { link } from "~/constants/content";
+import { endpoint } from "~/composables/content/routes";
+import { browse } from "~/constants/content";
 import { failure } from "~/utils/errors";
 
 /**
@@ -23,13 +23,17 @@ const blank = (value: string | undefined): string | undefined =>
  * the form. The form's store is shared under its id, so
  * each visit starts over from the record.
  *
- * A new page is filed in the `folder` given, the one open as it is added,
- * or at the top when there is none; a page that exists stays where it is.
+ * `folder` is the path of the folder the page is in: the one open as a new
+ * page is added, where it is filed, and the one a page that exists is
+ * filed in, where it stays. The top's is of no steps. The page's own path
+ * is that folder's, and its slug.
  *
  * A new page saved opens on its own page, where the writing waits; one
  * changed stays on the page, its fields showing what was kept, and the
- * record saved is handed to `saved`, for the page to name it afresh. A save
- * that fails reports through `error`, which the next submit clears.
+ * record saved is handed to `saved`, for the page to name it afresh. One
+ * whose slug changed has moved to another path, and its page with it: the
+ * address is put right in place of the old one. A save that fails reports
+ * through `error`, which the next submit clears.
  *
  * For the page that saves the page as a whole, `dirty` holds from the
  * first change to the next save, `save` submits the form without throwing,
@@ -38,7 +42,7 @@ const blank = (value: string | undefined): string | undefined =>
 export const useContentEditor = (
   record: ContentRecord | null,
   saved: (record: ContentRecord) => void = () => {},
-  folder?: number,
+  folder: readonly string[] = [],
 ) => {
   const api = useApi();
   const router = useRouter();
@@ -73,20 +77,26 @@ export const useContentEditor = (
     middleware: { description: blank },
     submit: async (form) => {
       const body = toContentBody(contentForm.parse(form.payload));
-      if (record === null) {
-        const created = await api(ROUTE, {
-          method: "POST",
-          body: { ...body, folder },
-        });
-        await router.push(link(contentRecord.parse(created)));
+      if (kept === null) {
+        const created = contentRecord.parse(
+          await api(endpoint(folder), {
+            method: "POST",
+            body: { kind: "document", ...body },
+          }),
+        );
+        await router.push(browse([...folder, created.slug]));
         return;
       }
+      const moved = kept.slug;
       const changed = contentRecord.parse(
-        await api(endpoint(record.id), { method: "PUT", body }),
+        await api(endpoint([...folder, moved]), { method: "PUT", body }),
       );
       kept = changed;
       form.update(toContentForm(changed));
       saved(changed);
+      if (changed.slug !== moved) {
+        await router.replace(browse([...folder, changed.slug]));
+      }
     },
   });
 

@@ -60,7 +60,7 @@ describe("useContentEditor", () => {
     );
   });
 
-  it("creates a page from what is written, and opens its own page, where the writing waits", async () => {
+  it("creates a page from what is written, at the top, and opens its own page, where the writing waits", async () => {
     const fetch = vi.fn(async () => ABOUT);
     vi.stubGlobal("$fetch", fetch);
     const editor = useContentEditor(null);
@@ -70,11 +70,30 @@ describe("useContentEditor", () => {
     await editor.form.submit();
     expect(fetch).toHaveBeenCalledWith("/api/content", {
       method: "POST",
-      body: { ...BARE, description: undefined },
+      body: { kind: "document", ...BARE, description: undefined },
     });
-    expect(useRouter().push).toHaveBeenCalledWith("/content/6/page");
+    expect(useRouter().push).toHaveBeenCalledWith("/content/about-us");
     expect(editor.form.submitted).toBe(true);
     expect(editor.error.value).toBeNull();
+  });
+
+  it("creates a page in the folder given, at the folder's path, and opens it under that folder", async () => {
+    const fetch = vi.fn(async () => ABOUT);
+    vi.stubGlobal("$fetch", fetch);
+    const editor = useContentEditor(null, undefined, [
+      "Sermon notes",
+      "Romans",
+    ]);
+    editor.form.set("title", "About Us");
+    editor.form.set("slug", "about-us");
+    await editor.form.submit();
+    expect(fetch).toHaveBeenCalledWith("/api/content/Sermon%20notes/Romans", {
+      method: "POST",
+      body: { kind: "document", ...BARE, description: undefined },
+    });
+    expect(useRouter().push).toHaveBeenCalledWith(
+      "/content/Sermon%20notes/Romans/about-us",
+    );
   });
 
   it("replaces the page's metadata when there is a record, stays, and hands the record saved on", async () => {
@@ -85,14 +104,54 @@ describe("useContentEditor", () => {
     const editor = useContentEditor(HOME, saved);
     editor.form.set("title", "Welcome");
     await editor.form.submit();
-    expect(fetch).toHaveBeenCalledWith("/api/content/5", {
+    expect(fetch).toHaveBeenCalledWith("/api/content/index", {
       method: "PUT",
       body: { ...FILLED, title: "Welcome" },
     });
     expect(saved).toHaveBeenCalledWith(changed);
     expect(useRouter().push).not.toHaveBeenCalled();
+    expect(useRouter().replace).not.toHaveBeenCalled();
     expect(editor.form.submitted).toBe(true);
     expect(editor.form.payload).toMatchObject({ title: "Welcome" });
+  });
+
+  it("writes a page at its own path: the folder it is filed in, and its slug", async () => {
+    const fetch = vi.fn(async () => HOME);
+    vi.stubGlobal("$fetch", fetch);
+    const editor = useContentEditor(HOME, undefined, ["Sermon notes"]);
+    editor.form.set("title", "Welcome");
+    await editor.form.submit();
+    expect(fetch).toHaveBeenCalledWith("/api/content/Sermon%20notes/index", {
+      method: "PUT",
+      body: { ...FILLED, title: "Welcome" },
+    });
+    expect(useRouter().replace).not.toHaveBeenCalled();
+  });
+
+  it("follows a page whose slug changed to its new path, in place of the old address, and writes it there from then on", async () => {
+    const moved = { ...HOME, slug: "welcome" };
+    const fetch = vi.fn(async () => moved);
+    vi.stubGlobal("$fetch", fetch);
+    const saved = vi.fn();
+    const editor = useContentEditor(HOME, saved, ["Sermon notes"]);
+    editor.form.set("slug", "welcome");
+    await editor.form.submit();
+    expect(fetch).toHaveBeenCalledWith("/api/content/Sermon%20notes/index", {
+      method: "PUT",
+      body: { ...FILLED, slug: "welcome" },
+    });
+    expect(saved).toHaveBeenCalledWith(moved);
+    expect(useRouter().replace).toHaveBeenCalledWith(
+      "/content/Sermon%20notes/welcome",
+    );
+    expect(useRouter().push).not.toHaveBeenCalled();
+
+    editor.form.set("title", "Welcome");
+    await editor.form.submit();
+    expect(fetch).toHaveBeenLastCalledWith(
+      "/api/content/Sermon%20notes/welcome",
+      { method: "PUT", body: { ...FILLED, slug: "welcome", title: "Welcome" } },
+    );
   });
 
   it("writes no description once the field is cleared", async () => {
@@ -102,7 +161,7 @@ describe("useContentEditor", () => {
     editor.form.set("description", " ");
     expect(editor.form.payload.description).toBeUndefined();
     await editor.form.submit();
-    expect(fetch).toHaveBeenCalledWith("/api/content/5", {
+    expect(fetch).toHaveBeenCalledWith("/api/content/index", {
       method: "PUT",
       body: { ...FILLED, description: undefined },
     });
@@ -170,7 +229,7 @@ describe("useContentEditor", () => {
     const editor = useContentEditor(HOME, saved);
     editor.form.set("title", "Welcome");
     await editor.save();
-    expect(fetch).toHaveBeenCalledWith("/api/content/5", {
+    expect(fetch).toHaveBeenCalledWith("/api/content/index", {
       method: "PUT",
       body: expect.objectContaining({ title: "Welcome" }),
     });

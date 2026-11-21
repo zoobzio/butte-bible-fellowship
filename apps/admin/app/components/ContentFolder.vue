@@ -1,34 +1,42 @@
 <script lang="ts">
+import type { useContentBrowser } from "~/composables/content/browser";
+import type { useContentViews } from "~/composables/content/views";
+
 import { Browser, Dialog, Icon, NuxtLink, Views } from "#components";
-import { computed, definePageMeta, ref, useHead, useNuxtApp } from "#imports";
+import { computed, ref, useHead, useNuxtApp } from "#imports";
 
 import ContentEditor from "~/components/ContentEditor.vue";
 import FolderEditor from "~/components/FolderEditor.vue";
 import PageHeader from "~/components/PageHeader.vue";
-import {
-  useBrowserRequest,
-  useContentBrowser,
-} from "~/composables/content/browser";
 import { useContentTasks } from "~/composables/content/tasks";
-import { useContentViews } from "~/composables/content/views";
-import { useViewsRequest } from "~/composables/views";
-import { link } from "~/constants/content";
+import { browse } from "~/constants/content";
 </script>
 
 <script setup lang="ts">
-definePageMeta({ middleware: "auth", auth: { scopes: ["content:read"] } });
-
-const { $t } = useNuxtApp();
-const browser = useContentBrowser();
+defineOptions({ name: "ContentFolder" });
 
 /*
- * The saved views sit over the browser: its sort and its search under a
+ * A folder of the content, browsed: the browser, which the page around
+ * this stood in the folder its address names and filled with what it
+ * holds, and the saved views over it, its sort and its search under a
  * name, the admin's own first and then whoever is signed in's, each a tab.
  * One picked is put in place in the folder that is open.
  */
-const views = useContentViews(browser);
+const { browser, views } = defineProps<{
+  browser: ReturnType<typeof useContentBrowser>;
+  views: ReturnType<typeof useContentViews>;
+}>();
+
+const { $t } = useNuxtApp();
 
 useHead(() => ({ title: $t.admin.content.title() }));
+
+/*
+ * The address is where the browser stands: a folder's row and a crumb of
+ * the trail are links to the folder's own page, which lists it. So a crumb
+ * picked moves nothing here, and is left to its link.
+ */
+const pt = { head: { breadcrumb: { onSelect: () => {} } } };
 
 /*
  * What the rows ask for, carried out on the folder that is open: a folder
@@ -78,9 +86,6 @@ const named = async () => {
   adding.value = null;
   await renamed();
 };
-
-await useViewsRequest(views);
-await useBrowserRequest(browser);
 </script>
 
 <template>
@@ -112,9 +117,26 @@ await useBrowserRequest(browser);
   </div>
   <p v-if="error" class="content-error" role="alert">{{ error }}</p>
   <Views :service="views" />
-  <Browser :service="browser">
+  <Browser :service="browser" :pt="pt">
+    <template #folder="{ folder }">
+      <NuxtLink
+        :to="browse([...here, folder.key])"
+        class="f-button f-data-browser-folder-btn"
+      >
+        <Icon name="folder" aria-hidden="true" />
+        <span class="f-span">{{ folder.label }}</span>
+        <span
+          v-if="folder.count != null"
+          class="f-caption f-data-browser-folder-count"
+        >
+          {{ folder.count }}
+        </span>
+      </NuxtLink>
+    </template>
     <template #cell:title="{ row }">
-      <NuxtLink :to="link(row)" class="f-anchor">{{ row.title }}</NuxtLink>
+      <NuxtLink :to="browse([...here, row.slug])" class="f-anchor">
+        {{ row.title }}
+      </NuxtLink>
     </template>
   </Browser>
   <Dialog

@@ -1,17 +1,10 @@
-/** The admin's API for the documents, and the page the editor goes back to. */
+/** The admin's API for the content, which a path is asked of. */
 export const ROUTE = "/api/content";
-export const BACK = "/content";
-export const endpoint = (id: number): string => `${ROUTE}/${id}`;
 
-/** Where what is written on a document is written, on its own. */
-export const body = (id: number): string => `${endpoint(id)}/body`;
-
-/** Where the folder a document is filed in is written, on its own. */
-export const placement = (id: number): string => `${endpoint(id)}/folder`;
-
-/** The admin's API for the content's folders, under the documents' own. */
-export const FOLDERS = `${ROUTE}/folders`;
-export const folder = (id: number): string => `${FOLDERS}/${id}`;
-
-/** Where the folder a folder is inside is written, on its own. */
-export const parent = (id: number): string => `${folder(id)}/parent`;
+/**
+ * Where something of the content is read and written: its path under the
+ * API's own route, each name encoded as a step of it. The top is the path
+ * of no steps.
+ */
+export const endpoint = (path: readonly string[] = []): string =>
+  [ROUTE, ...path.map((step) => encodeURIComponent(step))].join("/");

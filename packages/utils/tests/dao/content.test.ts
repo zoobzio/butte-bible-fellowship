@@ -1,4 +1,4 @@
-import { contentBody, contentDraft } from "@bbf/schema";
+import { contentBody } from "@bbf/schema";
 import { describe, expect, it } from "vitest";
 
 import {
@@ -32,12 +32,8 @@ describe("toContentArguments", () => {
 
 describe("toContentDraftArguments", () => {
   it("is the metadata, and the folder the page is made in", () => {
-    const draft = contentDraft.parse({
-      slug: "news",
-      title: "News",
-      folder: 3,
-    });
-    expect(toContentDraftArguments(draft)).toEqual({
+    const body = contentBody.parse({ slug: "news", title: "News" });
+    expect(toContentDraftArguments(body, 3)).toEqual({
       slug: "news",
       title: "News",
       description: null,
@@ -46,7 +42,7 @@ describe("toContentDraftArguments", () => {
   });
 
   it("writes no folder as null: the page is made at the top", () => {
-    const draft = contentDraft.parse({ slug: "news", title: "News" });
-    expect(toContentDraftArguments(draft).folder_id).toBeNull();
+    const body = contentBody.parse({ slug: "news", title: "News" });
+    expect(toContentDraftArguments(body).folder_id).toBeNull();
   });
 });
