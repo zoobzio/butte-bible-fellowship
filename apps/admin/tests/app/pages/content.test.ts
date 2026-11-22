@@ -228,7 +228,7 @@ describe("content page", () => {
     });
     expect(wrapper.find(".f-data-browser table").exists()).toBe(true);
     const folders = wrapper.findAll(`${FOLDER} .f-data-browser-folder-btn`);
-    expect(folders.map((folder) => folder.text())).toEqual(["Sermon notes1"]);
+    expect(folders.map((folder) => folder.text())).toEqual(["Sermon notes"]);
     const links = wrapper.findAll(`${POST} .f-td > a.f-anchor`);
     expect(links.map((link) => link.attributes("href"))).toEqual([
       "/content/index",
@@ -260,10 +260,10 @@ describe("content page", () => {
         `${FOLDER} .f-td:not(.f-data-browser-select, .f-data-browser-actions)`,
       )
       .map((cell) => cell.text());
-    // Its name and its count, nothing under the slug or the type, then
+    // Its name, nothing under the slug or the type, then
     // its size and the day.
     expect(cells).toEqual([
-      "Sermon notes1",
+      "Sermon notes",
       "",
       "",
       "4 kB",

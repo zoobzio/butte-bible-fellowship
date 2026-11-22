@@ -20,9 +20,14 @@
   height: var(--space-4);
 }
 
-/* While the folder is fetched, what it held last waits, dimmed. */
-.f-data-browser-loading .f-table {
+/*
+ * While the folder is fetched, what it held last waits, and dims only once
+ * the wait is long enough to be felt: a fetch that settles at once, as a
+ * view picked or a sort does, leaves the rows as steady as the table's.
+ */
+.f-data-browser.f-data-browser-loading .f-table {
   opacity: 0.6;
+  transition-delay: 300ms;
 }
 
 /*
@@ -82,15 +87,17 @@
 }
 
 /*
- * The trail: each folder above the open one a link back to it, a button
- * where it has no address of its own, a slash between two, and the open
- * one named in full after them.
+ * The trail: each folder above the open one a link back to it, a slash
+ * between two, and the open one named in full after them. A crumb reads
+ * as a link does in the rows under it: plain text, muted, that takes the
+ * primary and underlines as the pointer comes over it. One with no
+ * address of its own is a button, dressed the same.
  */
 .f-data-browser-breadcrumb .f-ol {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: var(--space-1);
+  gap: var(--space-2);
   margin: 0;
   padding: 0;
   list-style: none;
@@ -99,7 +106,7 @@
 .f-data-browser-breadcrumb .f-li {
   display: flex;
   align-items: center;
-  gap: var(--space-1);
+  gap: var(--space-2);
 }
 
 .f-data-browser-breadcrumb .f-li:not(:last-child)::after {
@@ -114,9 +121,8 @@
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
-  padding: var(--space-1) var(--space-2);
+  padding: 0;
   border: 0;
-  border-radius: var(--shape-sm);
   background: transparent;
   font: var(--type-label);
   font-weight: var(--weight-medium);
@@ -125,17 +131,18 @@
 .f-data-browser-breadcrumb .f-li > .f-anchor,
 .f-data-browser-breadcrumb .f-li > .f-button {
   color: var(--on-surface-muted);
-  text-decoration: none;
+  text-decoration: underline;
+  text-decoration-color: transparent;
   cursor: pointer;
   transition:
     color var(--transition-fast),
-    background var(--transition-fast);
+    text-decoration-color var(--transition-fast);
 }
 
 .f-data-browser-breadcrumb .f-li > .f-anchor:hover,
 .f-data-browser-breadcrumb .f-li > .f-button:hover {
-  color: var(--on-surface-high-contrast);
-  background: color-mix(in oklab, var(--primary-container) 30%, transparent);
+  color: var(--primary-high-contrast);
+  text-decoration-color: currentColor;
 }
 
 .f-data-browser-breadcrumb .f-li > .f-span {
@@ -252,7 +259,7 @@
 
 /*
  * A folder: its row is the way into it, the whole of its cell a button,
- * its icon before its name and how much it holds after.
+ * its icon before its name, and how much it holds after where that is shown.
  */
 .f-data-browser-folder-btn {
   display: flex;

@@ -125,12 +125,6 @@ const named = async () => {
       >
         <Icon name="folder" aria-hidden="true" />
         <span class="f-span">{{ folder.label }}</span>
-        <span
-          v-if="folder.count != null"
-          class="f-caption f-data-browser-folder-count"
-        >
-          {{ folder.count }}
-        </span>
       </NuxtLink>
     </template>
     <template #cell:title="{ row }">
