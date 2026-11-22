@@ -1,6 +1,6 @@
 /**
  * The kind of image each extension a photo is kept under names: the kinds
- * the schema's `staffAvatar` takes, and no other.
+ * the schema's `personAvatar` takes, and no other.
  */
 export const AVATAR_TYPES: Record<string, string> = {
   jpg: "image/jpeg",

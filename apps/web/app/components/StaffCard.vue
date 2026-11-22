@@ -14,7 +14,8 @@ const { member, compact = false } = defineProps<{
 
 const { $t } = useNuxtApp();
 
-const role = computed(() => $t.roles[member.role]());
+/* What they are called for what they do, where it is written, over their role. */
+const role = computed(() => member.title ?? $t.roles[member.role]());
 
 const initials = computed(() => {
   const names = member.name.trim().split(/\s+/);

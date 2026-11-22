@@ -15,9 +15,16 @@ admin keeps as its content, each filed in one of the `folders` or at the top,
 and each a document of the kind its `mime` says, its media type, an article
 being the site's own, with a `size` in bytes;
 `folders`, the content's folders, each named and inside another or at the
-top, however whoever writes it sorts them; `staff`, who serve the
-church, each in a `staff_role` — pastor, elder, staff — which is also the
-order the site lists them in; `events`, each held on a date, and every
+top, however whoever writes it sorts them; `people`, everyone the church
+keeps a row for, each in a `person_role` — pastor, elder, staff, member —
+which is also the order they are listed in: the first three serve the
+church and are the staff the site lists, and a member, which a person is
+until given another role, belongs to it and is the admin's alone to read;
+a person's name is written as a `first_name` and a `last_name`, with the
+`name` in full a column the database keeps in step with them, and beside
+what the site shows of them, their `title` among it, the table keeps what
+it never does, their `address` and their `birthday`;
+`events`, each held on a date, and every
 week on that date's day of the week when it is `recurring`, with the page
 written about it; and `sermons`, each preached on a day, with the page
 written about it and its recording on the church's YouTube channel; and `appearance`, how the site looks over what its theme says, a table of
@@ -29,8 +36,8 @@ and `views` is the arrangements of the admin's lists each of them has saved:
 one table for every list, each row a user's own, named for the list it is
 over by its `surface`, with the arrangement itself as `payload`.
 A sermon carries a `content_status` — draft, published, archived — and
-only the published reaches the site; the staff and the events carry none,
-and whoever is on the staff, and whatever event or page is written, is on
+only the published reaches the site; the people and the events carry none,
+and whoever serves the church, and whatever event or page is written, is on
 the site.
 
 The queries are grouped by the app that runs them. `web` is the reads the
@@ -45,10 +52,10 @@ would not have offered.
 
 ```
 bezoar.config.ts   the kit config: the output directory, the defaults for the rest
-src/migrations/    the schema, forward only: staff, events, sermons, users, staff search, like escape, search cost, staff status, events search, events trim, content, pages, folders, connect, views, documents, appearance
-src/seeds/         the staff, the events and the first admin user, each safe to run again
+src/migrations/    the schema, forward only: staff, events, sermons, users, staff search, like escape, search cost, staff status, events search, events trim, content, pages, folders, connect, views, documents, appearance, paths, people
+src/seeds/         the people, the events and the first admin user, each safe to run again
 src/queries/web/   what the site reads: home, about, connect, content, staff, events, sermons, appearance
-src/queries/admin/ what the admin app will read and write: the same, in full
+src/queries/admin/ what the admin app will read and write: the same, in full, the staff as the people they are among
 src/roles/         what each app's role may do: web reads, admin reads and writes
 tests/             the build, run through @bezoar/testing
 ```
@@ -62,8 +69,8 @@ first row or `null`; one with none returns the count of the rows it changed.
 ## Queries
 
 A query is named for what it does: `list` lists, `fetch` reads one.
-`web.staff.list` lists the staff, every member, in their order: by role,
-then by name. The web reads every event: `web.events.list` is the
+`web.staff.list` lists the staff, everyone but the members, in their
+order: by role, then by last name, then by first. The web reads every event: `web.events.list` is the
 calendar's feed — every recurring event by the day of the week its date
 falls on, Sunday first, then the one-offs on or after a date — and
 `web.events.weekly` and `web.events.upcoming` are its two halves on their
@@ -74,24 +81,26 @@ takes the newest published sermons, as many as asked, and
 `web.sermons.fetch` is a sermon's own page by slug, which alone carries its
 `body`, as an event's does.
 
-`admin.staff` has `list`, `fetch`, `create`, `update`, `photo`, `bio` and
-`delete`, over every member. `create` and `update`
-write a member's details, and neither their photo nor their bio: `photo`
+`admin.people` has `list`, `fetch`, `create`, `update`, `photo`, `bio` and
+`delete`, over every person, the staff and the members alike. `create` and `update`
+write a person's details, and neither their photo nor their bio: `photo`
 sets the photo's URL and `bio` the bio's tree, each on its own and each
 null to clear it, so a save of one never replaces another. `list` is
 one page, `size` rows from `offset`, sorted by the column `sort` names —
-`name`, `role`, `email`, `phone`, `created_at` or `updated_at` —
+`name`, `role`, `title`, `email`, `phone`, `birthday`, `created_at` or
+`updated_at`, by `name` being by the last name and then the first —
 in `direction`, `asc` or `desc`, a null last either way, and then in the
-site's order, by role and name, so `role` ascending is the site's order
-itself; with `sort` null, a search lists the nearest first, a row the text
+list's own order, by role and last name, so `role` ascending is that order
+itself, the staff as the site lists them and the members after; with `sort` null, a search lists the nearest first, a row the text
 is in before one it is only near, and the rest keep the site's order; each
 row carries `total`, how many rows the whole search holds, so
 a page and its count are one query. It takes the search the admin
 app's table commits, every part of it optional: `q`, text the name, the
-email, the phone, the summary or the bio must carry whatever its case,
+email, the phone, the title, the summary, the address or the bio must carry
+whatever its case,
 taken as typed, so a `%` or `_` is the character and not a wildcard, or
 must come near enough to in a run of words that a misspelling still finds
-its member; `search`, a column the database keeps in step with the five,
+its person; `search`, a column the database keeps in step with the seven,
 carries them as one text under a trigram index (`pg_trgm`), which serves
 the substring and the near match alike, the latter by strict word
 similarity at the extension's default threshold, the planner told what that
@@ -100,24 +109,24 @@ row, or, where those two find
 nothing, for the swapped or dropped letter a trigram misses in a short
 word, by each word typed coming within an edit or two of a word of the
 text (`fuzzystrmatch`), which reads every row and so runs only then; a role held,
-`role_is`, or not held, `role_not`; on each text column, the `name`, `email`, `phone`, `summary`
-and `photo`, the text it holds or does not, whatever its case, `name_is`
+`role_is`, or not held, `role_not`, so `role_not` of `member` is the staff; on each text column, the `name`, `title`, `email`, `phone`, `summary`,
+`address` and `photo`, the text it holds or does not, whatever its case, `name_is`
 and `name_not`, which take `present` or `missing` too, for whether the
 column is filled in, an empty one counted as missing, and the text it
 carries, does not carry, starts with or ends with, as typed,
 `name_contains`, `name_not_contains`, `name_starts_with` and
 `name_ends_with`, a `%` or `_` the character as in the search, by
 `like_escape`, and a column left empty not what it does not carry; and a
-day each member was last changed or added `before`, `after`, `on`,
+day each person was last changed or added `before`, `after`, `on`,
 `on_or_after` or `on_or_before`, as `updated_before` and the like. Left
 out or null, a part narrows nothing. The days are read in `tz`, the
 church's IANA time zone, which every search passes.
 
 `admin.events` has `list`, `fetch`, `create`, `update` and `delete`, by
-`id`, and as the staff have, a query for each part written on its own:
+`id`, and as the people have, a query for each part written on its own:
 `image`, the URL of the event's picture, and `body`, the rich text
 written about it. `create` and `update` write the details and leave both
-alone. Its `list` is searched as the staff's is: a page of `size` rows
+alone. Its `list` is searched as the people's is: a page of `size` rows
 from `offset`, each carrying the `total`; `q` looked for in the `search`
 column the events trim migration keeps, the title, the slug, the summary
 and the text of the body as one text, nearest first when no `sort` is
@@ -232,7 +241,7 @@ user by it on every request after. An `update` that changes the email
 unbinds the user until they sign in with the new one. The admin app passes
 `claim` only an email Google has verified.
 
-A member's `bio`, an event's `body` and a page's `body` are `jsonb`: the HTML tree (hast)
+A person's `bio`, an event's `body` and a page's `body` are `jsonb`: the HTML tree (hast)
 the app renders, written as the admin's editor hands it over and served to
 the site as it is, where a sermon's `body` is the Markdown it was written
 as. The events trim migration made the events' bodies so, each paragraph
@@ -240,6 +249,7 @@ of what was Markdown a paragraph of the tree, by `hast_paragraphs`, which
 the seeds write through too.
 
 An argument written into a column the schema lets be null — a summary, a
+title, an address, a birthday, a
 bio, a body, an image, an end time, a sermon's `speaker` or `video`, an
 event's `weeks` — is optional, and takes `null`; left out, it is null.
 Every other argument is required, a sermon's `status` and an event's
@@ -257,10 +267,10 @@ the next run. The build declares each role before the migrations and
 applies its grants after them, and then plans every query as every role,
 so the contract carries, by role, the queries the role may run.
 
-`web` has `SELECT` on `home`, `about`, `connect`, `content`, `staff`, `events` and `sermons`, and nothing else.
+`web` has `SELECT` on `home`, `about`, `connect`, `content`, `events` and `sermons`, and on the columns of `people` the site shows, a person's id, name, role, title, summary, bio, photo, email and phone, and nothing else.
 It may run every read of them, the admin app's plain reads among them, and
-no write; it may not read `users` at all, nor `folders` or `views`, which the site has no use for yet. `admin` has `SELECT`, `INSERT`,
-`UPDATE` and `DELETE` on `content`, `folders`, `staff`, `events`, `sermons`, `users` and `views`, and `SELECT` and `UPDATE` alone on
+no write; it may not read `users` at all, nor `folders` or `views`, which the site has no use for yet. Where a person lives and their birthday are columns it has no grant on, so the database refuses it `admin.people.fetch` and `admin.people.list`, and any read of its own that names them; that it lists the staff and not the members is its query's filter, as a sermon's status is. `admin` has `SELECT`, `INSERT`,
+`UPDATE` and `DELETE` on `content`, `folders`, `people`, `events`, `sermons`, `users` and `views`, and `SELECT` and `UPDATE` alone on
 `home`, `about` and `connect`, whose one row is neither added nor removed, and may run every query. Each `id` is an identity column, which
 Postgres fills without a privilege on its sequence, or for a view a UUID it is handed, so the tables are the
 whole of each grant.

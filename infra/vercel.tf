@@ -38,7 +38,7 @@ resource "vercel_project_environment_variable" "database_url" {
   comment    = "Postgres on Neon, as bbf_${each.key}, a member of the ${each.key} role"
 }
 
-# Where the admin keeps the staff's photos: a public Blob store, connected
+# Where the admin keeps the people's photos: a public Blob store, connected
 # to the admin project alone, which gives it BLOB_READ_WRITE_TOKEN. The site
 # reads a photo by the URL the database holds, and needs no token.
 resource "vercel_blob_store" "avatars" {

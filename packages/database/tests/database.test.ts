@@ -41,7 +41,7 @@ afterAll(() => db.close());
 const HEADING = "Discover God’s **Love, Grace & Truth**";
 
 describe("the build", () => {
-  it("carries the staff, events, sermons, users, staff search, like escape, search cost, staff status, events search, events trim, content, pages, folders, connect, views, documents, appearance and paths migrations in order", () => {
+  it("carries the staff, events, sermons, users, staff search, like escape, search cost, staff status, events search, events trim, content, pages, folders, connect, views, documents, appearance, paths and people migrations in order", () => {
     expect(migrations.map((migration) => migration.name)).toEqual([
       "staff",
       "events",
@@ -61,12 +61,13 @@ describe("the build", () => {
       "documents",
       "appearance",
       "paths",
+      "people",
     ]);
   });
 
-  it("carries the staff, events and users seeds in order, and none of the content", () => {
+  it("carries the people, events and users seeds in order, and none of the content", () => {
     expect(seeds.map((seed) => seed.name)).toEqual([
-      "01_staff",
+      "01_people",
       "02_events",
       "03_users",
     ]);
@@ -80,8 +81,14 @@ describe("the build", () => {
     ]);
   });
 
-  it("reads the roles of the staff from the schema, in the order the site lists them", () => {
-    expect(contract.enums.staff_role).toEqual(["pastor", "elder", "staff"]);
+  it("reads the roles of the people from the schema, in the order they are listed, the members last", () => {
+    expect(contract.enums).not.toHaveProperty("staff_role");
+    expect(contract.enums.person_role).toEqual([
+      "pastor",
+      "elder",
+      "staff",
+      "member",
+    ]);
   });
 
   it("reads the admin's user roles from the schema", () => {
@@ -301,7 +308,7 @@ describe("web", () => {
   });
 });
 
-describe("admin.staff", () => {
+describe("admin.people", () => {
   const bio = {
     type: "root",
     children: [
@@ -315,33 +322,40 @@ describe("admin.staff", () => {
   };
 
   const member = {
-    name: "Pastor Name",
+    first_name: "Pastor",
+    last_name: "Name",
     role: "pastor" as const,
     email: "pastor@example.com",
   };
 
   const photo = "https://cdn.example.com/staff/pastor.jpg";
 
-  it("creates, reads, updates and deletes a member", async () => {
-    const created = await db.admin.staff.create.first(member);
+  it("creates, reads, updates and deletes a person", async () => {
+    const created = await db.admin.people.create.first(member);
     expect(created?.created_at).toBeInstanceOf(Date);
     const id = created!.id;
 
     // A member is created without a photo or a bio: each is set on its own.
-    expect(await db.admin.staff.fetch.first({ id })).toMatchObject({
+    expect(await db.admin.people.fetch.first({ id })).toMatchObject({
+      first_name: "Pastor",
+      last_name: "Name",
+      name: "Pastor Name",
+      title: null,
+      address: null,
+      birthday: null,
       summary: null,
       bio: null,
       phone: null,
       photo: null,
       email: member.email,
     });
-    const portrayed = await db.admin.staff.photo.first({ id, photo });
+    const portrayed = await db.admin.people.photo.first({ id, photo });
     expect(portrayed?.updated_at).toBeInstanceOf(Date);
-    expect(await db.admin.staff.fetch.first({ id })).toMatchObject({
+    expect(await db.admin.people.fetch.first({ id })).toMatchObject({
       photo,
       email: member.email,
     });
-    expect(await db.admin.staff.photo.first({ id: 0, photo })).toBeNull();
+    expect(await db.admin.people.photo.first({ id: 0, photo })).toBeNull();
 
     const tz = "America/Los_Angeles";
     const page = { size: 25, offset: 0, tz, sort: "role", direction: "asc" };
@@ -349,7 +363,7 @@ describe("admin.staff", () => {
       timeZone: tz,
       dateStyle: "short",
     }).format(new Date());
-    const list = await db.admin.staff.list(page);
+    const list = await db.admin.people.list(page);
     expect(list.map((row) => row.name)).toEqual([
       "Pastor Name",
       "Elder Name",
@@ -360,26 +374,26 @@ describe("admin.staff", () => {
     expect((await db.web.staff.list())[0]?.name).toBe("Pastor Name");
 
     expect(
-      (await db.admin.staff.list({ ...page, q: "PASTOR" })).map((r) => r.name),
+      (await db.admin.people.list({ ...page, q: "PASTOR" })).map((r) => r.name),
     ).toEqual(["Pastor Name"]);
     // The text is taken as typed: a wildcard of LIKE is the character itself.
-    expect(await db.admin.staff.list({ ...page, q: "%" })).toEqual([]);
-    expect(await db.admin.staff.list({ ...page, q: "_" })).toEqual([]);
-    expect(await db.admin.staff.list({ ...page, q: "\\" })).toEqual([]);
-    expect(await db.admin.staff.list({ ...page, q: "r N" })).toHaveLength(4);
+    expect(await db.admin.people.list({ ...page, q: "%" })).toEqual([]);
+    expect(await db.admin.people.list({ ...page, q: "_" })).toEqual([]);
+    expect(await db.admin.people.list({ ...page, q: "\\" })).toEqual([]);
+    expect(await db.admin.people.list({ ...page, q: "r N" })).toHaveLength(4);
     expect(
-      (await db.admin.staff.list({ ...page, role_is: "elder" })).map(
+      (await db.admin.people.list({ ...page, role_is: "elder" })).map(
         (r) => r.name,
       ),
     ).toEqual(["Elder Name", "Elder Name", "Elder Name"]);
     expect(
-      (await db.admin.staff.list({ ...page, role_not: "elder" })).map(
+      (await db.admin.people.list({ ...page, role_not: "elder" })).map(
         (r) => r.name,
       ),
     ).toEqual(["Pastor Name"]);
     expect(
       (
-        await db.admin.staff.list({
+        await db.admin.people.list({
           ...page,
           role_is: "elder",
           role_not: "pastor",
@@ -390,22 +404,22 @@ describe("admin.staff", () => {
     // The text is looked for in the email, the phone, the summary and the
     // bio too.
     expect(
-      (await db.admin.staff.list({ ...page, q: "@EXAMPLE" })).map(
+      (await db.admin.people.list({ ...page, q: "@EXAMPLE" })).map(
         (r) => r.name,
       ),
     ).toEqual(["Pastor Name"]);
-    expect(await db.admin.staff.list({ ...page, q: "how long" })).toHaveLength(
+    expect(await db.admin.people.list({ ...page, q: "how long" })).toHaveLength(
       3,
     );
-    expect(await db.admin.staff.list({ ...page, q: "story" })).toEqual([]);
+    expect(await db.admin.people.list({ ...page, q: "story" })).toEqual([]);
     // Near enough finds a member too: a misspelling, but not another word.
     expect(
-      (await db.admin.staff.list({ ...page, q: "Pastor Nme" })).map(
+      (await db.admin.people.list({ ...page, q: "Pastor Nme" })).map(
         (r) => r.name,
       ),
     ).toEqual(["Pastor Name"]);
     expect(
-      (await db.admin.staff.list({ ...page, q: "Eldre Name" })).map(
+      (await db.admin.people.list({ ...page, q: "Eldre Name" })).map(
         (r) => r.name,
       ),
     ).toEqual(["Elder Name", "Elder Name", "Elder Name"]);
@@ -414,163 +428,163 @@ describe("admin.staff", () => {
     // Only where nothing is in or near the text: a word typed right finds
     // its members, and a misspelled one beside it widens nothing.
     expect(
-      (await db.admin.staff.list({ ...page, q: "Edler" })).map((r) => r.name),
+      (await db.admin.people.list({ ...page, q: "Edler" })).map((r) => r.name),
     ).toEqual(["Elder Name", "Elder Name", "Elder Name"]);
     expect(
-      (await db.admin.staff.list({ ...page, q: "Eldr" })).map((r) => r.name),
+      (await db.admin.people.list({ ...page, q: "Eldr" })).map((r) => r.name),
     ).toEqual(["Elder Name", "Elder Name", "Elder Name"]);
-    expect(await db.admin.staff.list({ ...page, q: "Eldr Nmae" })).toEqual([]);
+    expect(await db.admin.people.list({ ...page, q: "Eldr Nmae" })).toEqual([]);
     expect(
-      (await db.admin.staff.list({ ...page, q: "Pastor Edler" })).map(
+      (await db.admin.people.list({ ...page, q: "Pastor Edler" })).map(
         (r) => r.name,
       ),
     ).toEqual(["Pastor Name"]);
-    expect(await db.admin.staff.list({ ...page, q: "Deacon" })).toEqual([]);
-    expect(await db.admin.staff.list({ ...page, q: "Bob" })).toEqual([]);
+    expect(await db.admin.people.list({ ...page, q: "Deacon" })).toEqual([]);
+    expect(await db.admin.people.list({ ...page, q: "Bob" })).toEqual([]);
 
     // A text column held or not, whatever the case: the value, or whether
     // the column is filled in, an empty one counted as missing.
     expect(
-      (await db.admin.staff.list({ ...page, photo_is: "present" })).map(
+      (await db.admin.people.list({ ...page, photo_is: "present" })).map(
         (r) => r.name,
       ),
     ).toEqual(["Pastor Name"]);
     expect(
-      (await db.admin.staff.list({ ...page, photo_not: "missing" })).map(
+      (await db.admin.people.list({ ...page, photo_not: "missing" })).map(
         (r) => r.name,
       ),
     ).toEqual(["Pastor Name"]);
     expect(
-      await db.admin.staff.list({ ...page, email_is: "missing" }),
+      await db.admin.people.list({ ...page, email_is: "missing" }),
     ).toHaveLength(3);
     expect(
-      await db.admin.staff.list({ ...page, email_not: "present" }),
+      await db.admin.people.list({ ...page, email_not: "present" }),
     ).toHaveLength(3);
     expect(
-      await db.admin.staff.list({ ...page, summary_is: "missing" }),
+      await db.admin.people.list({ ...page, summary_is: "missing" }),
     ).toHaveLength(1);
-    expect(await db.admin.staff.list({ ...page, phone_is: "present" })).toEqual(
-      [],
-    );
     expect(
-      (await db.admin.staff.list({ ...page, name_is: "PASTOR NAME" })).map(
+      await db.admin.people.list({ ...page, phone_is: "present" }),
+    ).toEqual([]);
+    expect(
+      (await db.admin.people.list({ ...page, name_is: "PASTOR NAME" })).map(
         (r) => r.name,
       ),
     ).toEqual(["Pastor Name"]);
     expect(
-      (await db.admin.staff.list({ ...page, name_is: "Pastor" })).map(
+      (await db.admin.people.list({ ...page, name_is: "Pastor" })).map(
         (r) => r.name,
       ),
     ).toEqual([]);
     expect(
-      (await db.admin.staff.list({ ...page, name_not: "elder name" })).map(
+      (await db.admin.people.list({ ...page, name_not: "elder name" })).map(
         (r) => r.name,
       ),
     ).toEqual(["Pastor Name"]);
     // A column left empty is not what it does not hold.
     expect(
-      await db.admin.staff.list({ ...page, email_not: "pastor@example.com" }),
+      await db.admin.people.list({ ...page, email_not: "pastor@example.com" }),
     ).toHaveLength(3);
     // The text a column carries, or does not, or starts or ends with, as
     // typed: a wildcard of LIKE is the character itself.
     expect(
-      (await db.admin.staff.list({ ...page, name_contains: "STOR" })).map(
+      (await db.admin.people.list({ ...page, name_contains: "STOR" })).map(
         (r) => r.name,
       ),
     ).toEqual(["Pastor Name"]);
-    expect(await db.admin.staff.list({ ...page, email_contains: "%" })).toEqual(
-      [],
-    );
-    expect(await db.admin.staff.list({ ...page, name_contains: "_" })).toEqual(
+    expect(
+      await db.admin.people.list({ ...page, email_contains: "%" }),
+    ).toEqual([]);
+    expect(await db.admin.people.list({ ...page, name_contains: "_" })).toEqual(
       [],
     );
     expect(
-      (await db.admin.staff.list({ ...page, name_not_contains: "Past" })).map(
+      (await db.admin.people.list({ ...page, name_not_contains: "Past" })).map(
         (r) => r.name,
       ),
     ).toEqual(["Elder Name", "Elder Name", "Elder Name"]);
     expect(
-      await db.admin.staff.list({ ...page, email_not_contains: "example" }),
+      await db.admin.people.list({ ...page, email_not_contains: "example" }),
     ).toHaveLength(3);
     expect(
-      (await db.admin.staff.list({ ...page, name_starts_with: "pa" })).map(
+      (await db.admin.people.list({ ...page, name_starts_with: "pa" })).map(
         (r) => r.name,
       ),
     ).toEqual(["Pastor Name"]);
     expect(
-      await db.admin.staff.list({ ...page, name_starts_with: "ame" }),
+      await db.admin.people.list({ ...page, name_starts_with: "ame" }),
     ).toEqual([]);
     expect(
-      await db.admin.staff.list({ ...page, name_ends_with: "ame" }),
+      await db.admin.people.list({ ...page, name_ends_with: "ame" }),
     ).toHaveLength(4);
     expect(
-      (await db.admin.staff.list({ ...page, photo_ends_with: ".JPG" })).map(
+      (await db.admin.people.list({ ...page, photo_ends_with: ".JPG" })).map(
         (r) => r.name,
       ),
     ).toEqual(["Pastor Name"]);
     expect(
-      await db.admin.staff.list({ ...page, summary_contains: "elder" }),
+      await db.admin.people.list({ ...page, summary_contains: "elder" }),
     ).toHaveLength(3);
     expect(
-      await db.admin.staff.list({
+      await db.admin.people.list({
         ...page,
         summary_starts_with: "A few",
         summary_ends_with: "fellowship.",
         name_is: "elder name",
       }),
     ).toHaveLength(3);
-    await db.admin.staff.update({
+    await db.admin.people.update({
       id,
       ...member,
       summary: null,
       phone: "",
     });
-    expect(await db.admin.staff.list({ ...page, phone_is: "present" })).toEqual(
-      [],
-    );
     expect(
-      await db.admin.staff.list({ ...page, phone_is: "missing" }),
+      await db.admin.people.list({ ...page, phone_is: "present" }),
+    ).toEqual([]);
+    expect(
+      await db.admin.people.list({ ...page, phone_is: "missing" }),
     ).toHaveLength(4);
     expect(
-      await db.admin.staff.list({ ...page, phone_not: "missing" }),
+      await db.admin.people.list({ ...page, phone_not: "missing" }),
     ).toEqual([]);
     // A page is `size` rows from `offset`, each carrying the whole count.
     expect(
-      (await db.admin.staff.list({ ...page, size: 2, offset: 2 })).map(
+      (await db.admin.people.list({ ...page, size: 2, offset: 2 })).map(
         (r) => r.total,
       ),
     ).toEqual([4, 4]);
-    expect(await db.admin.staff.list({ ...page, size: 2, offset: 4 })).toEqual(
+    expect(await db.admin.people.list({ ...page, size: 2, offset: 4 })).toEqual(
       [],
     );
 
     expect(
-      await db.admin.staff.list({ ...page, created_on: today }),
+      await db.admin.people.list({ ...page, created_on: today }),
     ).toHaveLength(4);
     expect(
-      await db.admin.staff.list({ ...page, updated_before: today }),
+      await db.admin.people.list({ ...page, updated_before: today }),
     ).toEqual([]);
     expect(
-      await db.admin.staff.list({ ...page, updated_after: today }),
+      await db.admin.people.list({ ...page, updated_after: today }),
     ).toEqual([]);
     expect(
-      await db.admin.staff.list({ ...page, created_before: today }),
+      await db.admin.people.list({ ...page, created_before: today }),
     ).toEqual([]);
     expect(
-      await db.admin.staff.list({ ...page, created_on_or_after: today }),
+      await db.admin.people.list({ ...page, created_on_or_after: today }),
     ).toHaveLength(4);
     expect(
-      await db.admin.staff.list({ ...page, updated_on_or_before: today }),
+      await db.admin.people.list({ ...page, updated_on_or_before: today }),
     ).toHaveLength(4);
     expect(
-      await db.admin.staff.list({
+      await db.admin.people.list({
         ...page,
         created_on_or_after: today,
         created_on_or_before: today,
       }),
     ).toHaveLength(4);
     expect(
-      await db.admin.staff.list({
+      await db.admin.people.list({
         ...page,
         updated_on_or_after: "2000-01-01",
         updated_on_or_before: "2000-12-31",
@@ -579,28 +593,30 @@ describe("admin.staff", () => {
 
     // The sort asked for, a null last either way, then the site's order.
     expect(
-      (await db.admin.staff.list({ ...page, direction: "desc" })).map(
+      (await db.admin.people.list({ ...page, direction: "desc" })).map(
         (r) => r.name,
       ),
     ).toEqual(["Elder Name", "Elder Name", "Elder Name", "Pastor Name"]);
     expect(
-      (await db.admin.staff.list({ ...page, sort: "name" })).map((r) => r.name),
+      (await db.admin.people.list({ ...page, sort: "name" })).map(
+        (r) => r.name,
+      ),
     ).toEqual(["Elder Name", "Elder Name", "Elder Name", "Pastor Name"]);
     expect(
       (
-        await db.admin.staff.list({ ...page, sort: "name", direction: "desc" })
+        await db.admin.people.list({ ...page, sort: "name", direction: "desc" })
       ).map((r) => r.name),
     ).toEqual(["Pastor Name", "Elder Name", "Elder Name", "Elder Name"]);
     for (const direction of ["asc", "desc"]) {
       expect(
-        (await db.admin.staff.list({ ...page, sort: "email", direction })).map(
+        (await db.admin.people.list({ ...page, sort: "email", direction })).map(
           (r) => r.email,
         ),
       ).toEqual(["pastor@example.com", null, null, null]);
     }
     expect(
       (
-        await db.admin.staff.list({
+        await db.admin.people.list({
           ...page,
           sort: "created_at",
           direction: "desc",
@@ -608,7 +624,7 @@ describe("admin.staff", () => {
       ).map((r) => r.name),
     ).toEqual(["Pastor Name", "Elder Name", "Elder Name", "Elder Name"]);
 
-    const updated = await db.admin.staff.update.first({
+    const updated = await db.admin.people.update.first({
       ...member,
       id,
       role: "staff",
@@ -619,7 +635,7 @@ describe("admin.staff", () => {
     expect(updated?.updated_at).toBeInstanceOf(Date);
     // An update replaces the member's details, and leaves the photo and
     // the bio as they were.
-    expect(await db.admin.staff.fetch.first({ id })).toMatchObject({
+    expect(await db.admin.people.fetch.first({ id })).toMatchObject({
       role: "staff",
       summary: "Serving since 2010.",
       bio: null,
@@ -627,56 +643,56 @@ describe("admin.staff", () => {
       email: null,
       phone: "530-555-0100",
     });
-    const written = await db.admin.staff.bio.first({ id, bio });
+    const written = await db.admin.people.bio.first({ id, bio });
     expect(written?.updated_at).toBeInstanceOf(Date);
-    expect((await db.admin.staff.photo.first({ id, photo: null }))?.id).toBe(
+    expect((await db.admin.people.photo.first({ id, photo: null }))?.id).toBe(
       id,
     );
-    expect(await db.admin.staff.fetch.first({ id })).toMatchObject({
+    expect(await db.admin.people.fetch.first({ id })).toMatchObject({
       role: "staff",
       summary: "Serving since 2010.",
       bio,
       photo: null,
     });
-    expect(await db.admin.staff.bio.first({ id: 0, bio })).toBeNull();
+    expect(await db.admin.people.bio.first({ id: 0, bio })).toBeNull();
     // The bio's text and the phone are searched once they are written.
     expect(
-      (await db.admin.staff.list({ ...page, q: "pastor's story" })).map(
+      (await db.admin.people.list({ ...page, q: "pastor's story" })).map(
         (r) => r.name,
       ),
     ).toEqual(["Pastor Name"]);
     expect(
-      (await db.admin.staff.list({ ...page, q: "555-0100" })).map(
+      (await db.admin.people.list({ ...page, q: "555-0100" })).map(
         (r) => r.name,
       ),
     ).toEqual(["Pastor Name"]);
 
     // Without a sort, a search lists the nearest first: the exact match
     // before the near one, though the site's order would put it after.
-    const near = await db.admin.staff.create.first({
+    const near = await db.admin.people.create.first({
       ...member,
-      name: "Near Name",
+      first_name: "Near",
       phone: "530-555-0101",
     });
     const unsorted = { ...page, sort: null };
     expect(
-      (await db.admin.staff.list({ ...unsorted, q: "530-555-0100" })).map(
+      (await db.admin.people.list({ ...unsorted, q: "530-555-0100" })).map(
         (r) => r.name,
       ),
     ).toEqual(["Pastor Name", "Near Name"]);
     expect(
-      (await db.admin.staff.list({ ...page, q: "530-555-0100" })).map(
+      (await db.admin.people.list({ ...page, q: "530-555-0100" })).map(
         (r) => r.name,
       ),
     ).toEqual(["Near Name", "Pastor Name"]);
-    expect((await db.admin.staff.list(unsorted)).map((r) => r.name)).toEqual([
+    expect((await db.admin.people.list(unsorted)).map((r) => r.name)).toEqual([
       "Near Name",
       "Elder Name",
       "Elder Name",
       "Elder Name",
       "Pastor Name",
     ]);
-    await db.admin.staff.delete({ id: near!.id });
+    await db.admin.people.delete({ id: near!.id });
     expect((await db.web.staff.list()).map((row) => row.name)).toEqual([
       "Elder Name",
       "Elder Name",
@@ -684,18 +700,19 @@ describe("admin.staff", () => {
       "Pastor Name",
     ]);
 
-    expect(await db.admin.staff.delete({ id })).toBe(1);
-    expect(await db.admin.staff.fetch.first({ id })).toBeNull();
-    expect(await db.admin.staff.delete({ id })).toBe(0);
+    expect(await db.admin.people.delete({ id })).toBe(1);
+    expect(await db.admin.people.fetch.first({ id })).toBeNull();
+    expect(await db.admin.people.delete({ id })).toBe(0);
   });
 
-  it("carries no status: a member written is on the site", async () => {
-    const created = await db.admin.staff.create.first({
-      name: "Office Name",
+  it("carries no status: whoever serves the church is on the site once written", async () => {
+    const created = await db.admin.people.create.first({
+      first_name: "Office",
+      last_name: "Name",
       role: "staff",
     });
     expect(
-      await db.admin.staff.fetch.first({ id: created!.id }),
+      await db.admin.people.fetch.first({ id: created!.id }),
     ).not.toHaveProperty("status");
     expect((await db.web.staff.list()).map((row) => row.name)).toEqual([
       "Elder Name",
@@ -703,12 +720,79 @@ describe("admin.staff", () => {
       "Elder Name",
       "Office Name",
     ]);
-    expect(await db.admin.staff.delete({ id: created!.id })).toBe(1);
+    expect(await db.admin.people.delete({ id: created!.id })).toBe(1);
+  });
+
+  it("keeps a member off the site, with all that is kept of them", async () => {
+    const created = await db.admin.people.create.first({
+      first_name: "Pew",
+      last_name: "Abbott",
+      role: "member",
+      title: "Greeter",
+      address: "123 Main St\nButte, MT 59701",
+      birthday: "1980-04-12",
+    });
+    const id = created!.id;
+    expect(await db.admin.people.fetch.first({ id })).toMatchObject({
+      name: "Pew Abbott",
+      role: "member",
+      title: "Greeter",
+      address: "123 Main St\nButte, MT 59701",
+      birthday: "1980-04-12",
+    });
+    expect((await db.web.staff.list()).map((row) => row.name)).toEqual([
+      "Elder Name",
+      "Elder Name",
+      "Elder Name",
+    ]);
+
+    const page = {
+      size: 25,
+      offset: 0,
+      tz: "America/Los_Angeles",
+      sort: null,
+      direction: "asc",
+    };
+    // The members come after those who serve, and by name is by last name.
+    expect((await db.admin.people.list(page)).at(-1)?.name).toBe("Pew Abbott");
+    expect(
+      (await db.admin.people.list({ ...page, sort: "name" }))[0]?.name,
+    ).toBe("Pew Abbott");
+    expect(
+      (await db.admin.people.list({ ...page, role_not: "member" })).map(
+        (row) => row.name,
+      ),
+    ).toEqual(["Elder Name", "Elder Name", "Elder Name"]);
+    // The title and the address are searched and filtered.
+    for (const q of ["greeter", "main st"]) {
+      expect(
+        (await db.admin.people.list({ ...page, q })).map((row) => row.name),
+      ).toEqual(["Pew Abbott"]);
+    }
+    expect(
+      (await db.admin.people.list({ ...page, address_contains: "butte" })).map(
+        (row) => row.name,
+      ),
+    ).toEqual(["Pew Abbott"]);
+    expect(
+      await db.admin.people.list({ ...page, title_is: "present" }),
+    ).toHaveLength(1);
+    expect(await db.admin.people.delete({ id })).toBe(1);
+  });
+
+  it("makes a person a member unless told otherwise", async () => {
+    const [row] = await db.build
+      .insertInto("people")
+      .values({ first_name: "Plain", last_name: "Name" })
+      .returning(["id", "role", "name"])
+      .execute();
+    expect(row).toMatchObject({ role: "member", name: "Plain Name" });
+    expect(await db.admin.people.delete({ id: row!.id })).toBe(1);
   });
 
   it("refuses a role that is not one", async () => {
     await expect(
-      db.admin.staff.create({ ...member, role: "deacon" as never }),
+      db.admin.people.create({ ...member, role: "deacon" as never }),
     ).rejects.toThrow(/role: Invalid option/);
   });
 });
@@ -2832,6 +2916,8 @@ describe("roles", () => {
           !name.startsWith("admin.users.") &&
           !name.startsWith("admin.folders.") &&
           !name.startsWith("admin.views.") &&
+          // The people's private columns are not web's to read.
+          !name.startsWith("admin.people.") &&
           /\.(fetch|list|locate|upcoming|weekly)$/.test(name),
       ),
     );
@@ -2950,15 +3036,34 @@ describe("roles", () => {
     ).rejects.toThrow(/permission denied for table users/);
   });
 
+  it("keeps a person's private columns, and the members, from web", async () => {
+    await expect(
+      // @ts-expect-error: not a query of web.
+      web.query("admin.people.fetch", { id: 1 }),
+    ).rejects.toBeInstanceOf(ForbiddenQueryError);
+    for (const column of ["address", "birthday"] as const) {
+      await expect(
+        web.build.selectFrom("people").select(column).execute(),
+      ).rejects.toThrow(/permission denied for table people/);
+    }
+    await expect(
+      web.build.selectFrom("people").selectAll().execute(),
+    ).rejects.toThrow(/permission denied for table people/);
+    expect(
+      await web.build.selectFrom("people").select("name").execute(),
+    ).toHaveLength(3);
+  });
+
   it("writes as admin, with ids the database fills", async () => {
-    const created = await admin.admin.staff.create.first({
-      name: "Office Name",
+    const created = await admin.admin.people.create.first({
+      first_name: "Office",
+      last_name: "Name",
       role: "staff",
     });
     expect(created?.id).toBeGreaterThan(0);
     expect(
-      await admin.admin.staff.fetch.first({ id: created!.id }),
+      await admin.admin.people.fetch.first({ id: created!.id }),
     ).toMatchObject({ name: "Office Name" });
-    expect(await admin.admin.staff.delete({ id: created!.id })).toBe(1);
+    expect(await admin.admin.people.delete({ id: created!.id })).toBe(1);
   });
 });

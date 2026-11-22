@@ -1,4 +1,4 @@
-import { staffBody } from "@bbf/schema";
+import { personBody } from "@bbf/schema";
 import { describe, expect, it } from "vitest";
 
 import { failure, isNotFound } from "~/utils/errors";
@@ -15,7 +15,7 @@ describe("isNotFound", () => {
 
 describe("failure", () => {
   it("says each issue of a body the schema refused, with its field", () => {
-    const { error } = staffBody.safeParse({ name: "Jane", email: "x" });
+    const { error } = personBody.safeParse({ name: "Jane", email: "x" });
     const said = failure(error);
     expect(said).toContain("email:");
     expect(said).toContain("role:");
@@ -44,8 +44,8 @@ describe("failure", () => {
 
   it("says what the server said, when it said something", () => {
     expect(
-      failure({ status: 404, data: { message: "Staff member not found" } }),
-    ).toBe("Staff member not found");
+      failure({ status: 404, data: { message: "Person not found" } }),
+    ).toBe("Person not found");
   });
 
   it("says what an error says, or that something went wrong", () => {

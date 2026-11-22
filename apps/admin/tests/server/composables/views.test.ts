@@ -14,7 +14,7 @@ const PAYLOAD = { sorting: [{ id: "name", desc: true }], pageSize: 50 };
 
 const ROW = {
   id: ID,
-  surface: "staff",
+  surface: "people",
   name: "Elders",
   payload: PAYLOAD as unknown,
   created_at: new Date("2026-10-17T18:00:00Z"),
@@ -23,7 +23,7 @@ const ROW = {
 
 const RECORD = {
   id: ID,
-  surface: "staff",
+  surface: "people",
   name: "Elders",
   payload: PAYLOAD,
   createdAt: "2026-10-17T18:00:00.000Z",
@@ -51,13 +51,13 @@ afterEach(() => {
 
 describe("useViews", () => {
   it("lists a user's views of one list, each as the admin reads it", async () => {
-    expect(await useViews().list(SUB, "staff")).toEqual([RECORD]);
-    expect(list).toHaveBeenLastCalledWith({ sub: SUB, surface: "staff" });
-    expect(await useViews().list("someone-else", "staff")).toEqual([]);
+    expect(await useViews().list(SUB, "people")).toEqual([RECORD]);
+    expect(list).toHaveBeenLastCalledWith({ sub: SUB, surface: "people" });
+    expect(await useViews().list("someone-else", "people")).toEqual([]);
   });
 
   it("saves a view under the id its address names, for the user, and hands back the record", async () => {
-    const path = { surface: "staff" as const, id: ID };
+    const path = { surface: "people" as const, id: ID };
     const body = { name: "The elders", payload: { ...PAYLOAD, pageSize: 10 } };
     expect(await useViews().save(SUB, path, body)).toEqual({
       ...RECORD,
@@ -66,7 +66,7 @@ describe("useViews", () => {
     });
     expect(saved).toHaveBeenLastCalledWith({
       sub: SUB,
-      surface: "staff",
+      surface: "people",
       id: ID,
       name: "The elders",
       payload: body.payload,
@@ -77,22 +77,22 @@ describe("useViews", () => {
     expect(
       await useViews().save(
         SUB,
-        { surface: "staff", id: TAKEN },
+        { surface: "people", id: TAKEN },
         { name: "Elders", payload: PAYLOAD },
       ),
     ).toBeNull();
   });
 
   it("removes a user's view, and says whether there was one", async () => {
-    expect(await useViews().remove(SUB, { surface: "staff", id: ID })).toBe(
+    expect(await useViews().remove(SUB, { surface: "people", id: ID })).toBe(
       true,
     );
     expect(deleted).toHaveBeenLastCalledWith({
       sub: SUB,
-      surface: "staff",
+      surface: "people",
       id: ID,
     });
-    expect(await useViews().remove(SUB, { surface: "staff", id: TAKEN })).toBe(
+    expect(await useViews().remove(SUB, { surface: "people", id: TAKEN })).toBe(
       false,
     );
   });

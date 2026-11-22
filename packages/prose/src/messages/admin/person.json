@@ -1,0 +1,70 @@
+{
+  "name": {
+    "defaultMessage": "Name",
+    "description": "The heading of the table column for a person's name in full, their first name and then their last."
+  },
+  "firstName": {
+    "defaultMessage": "First name",
+    "description": "The label of the field for a person's first name."
+  },
+  "lastName": {
+    "defaultMessage": "Last name",
+    "description": "The label of the field for a person's last name, which the list is put in order by."
+  },
+  "role": {
+    "defaultMessage": "Role",
+    "description": "The label of the field, and the heading of the table column, for a person's role in the church: pastor, elder, staff or member."
+  },
+  "title": {
+    "defaultMessage": "Title",
+    "description": "The label of the field, and the heading of the table column, for what a person is called for what they do in the church, such as Worship Director."
+  },
+  "titleHint": {
+    "defaultMessage": "Shown on the site in place of their role.",
+    "description": "The hint under the field for a person's title: where it is shown."
+  },
+  "photo": {
+    "defaultMessage": "Photo URL",
+    "description": "The heading of the table column for the address of a person's photo."
+  },
+  "picture": {
+    "defaultMessage": "Photo",
+    "description": "The label of the field for a person's photo, which is picked from the device and uploaded when the person is saved."
+  },
+  "email": {
+    "defaultMessage": "Email",
+    "description": "The label of the field for a person's email address."
+  },
+  "phone": {
+    "defaultMessage": "Phone",
+    "description": "The label of the field for a person's phone number."
+  },
+  "address": {
+    "defaultMessage": "Address",
+    "description": "The label of the field, and the heading of the table column, for where a person lives: their postal address."
+  },
+  "birthday": {
+    "defaultMessage": "Birthday",
+    "description": "The label of the field, and the heading of the table column, for the day a person was born."
+  },
+  "bio": {
+    "defaultMessage": "Bio",
+    "description": "The label of the rich text editor for a person's bio in full."
+  },
+  "photoUpload": {
+    "defaultMessage": "Upload photo",
+    "description": "What the badge on a person's picture that picks an image as their photo does, shown under the pointer, when they have none."
+  },
+  "photoChange": {
+    "defaultMessage": "Change photo",
+    "description": "What the badge on a person's picture that picks an image to take their photo's place does, shown under the pointer."
+  },
+  "photoRemove": {
+    "defaultMessage": "Remove photo",
+    "description": "The accessible name of the badge on a person's picture that removes their photo."
+  },
+  "bioEmpty": {
+    "defaultMessage": "Click to write a bio.",
+    "description": "What stands in for a person's bio when they have none: an invitation to click and start writing."
+  }
+}

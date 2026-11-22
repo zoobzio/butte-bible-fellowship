@@ -21,9 +21,9 @@ import {
   page,
   sermon,
   sermonBody,
-  staffBody,
+  personBody,
   staffMember,
-  staffRecord,
+  personRecord,
 } from "@bbf/schema";
 import { makeTestBezoar } from "@bezoar/testing";
 import { fuzzystrmatch } from "@electric-sql/pglite/contrib/fuzzystrmatch";
@@ -37,7 +37,7 @@ import {
   toEventArguments,
   toHomeArguments,
   toSermonArguments,
-  toStaffArguments,
+  toPersonArguments,
 } from "../src/dao";
 import {
   toChurchEvent,
@@ -52,7 +52,7 @@ import {
   toHomeRecord,
   toSermon,
   toStaffMember,
-  toStaffRecord,
+  toPersonRecord,
 } from "../src/dto";
 
 import {
@@ -356,7 +356,7 @@ describe("events", () => {
   });
 });
 
-describe("staff", () => {
+describe("people", () => {
   const bio = {
     type: "root",
     children: [
@@ -378,27 +378,28 @@ describe("staff", () => {
     ],
   };
 
-  it("writes a member from their body, and reads them back as listed", async () => {
-    const body = staffBody.parse({
-      name: "Pastor Name",
+  it("writes a person from their body, and reads them back as listed", async () => {
+    const body = personBody.parse({
+      firstName: "Pastor",
+      lastName: "Name",
       role: "pastor",
       summary: "Serving since 2010.",
       phone: "530-555-0100",
     });
-    const created = await db.admin.staff.create.first(toStaffArguments(body));
+    const created = await db.admin.people.create.first(toPersonArguments(body));
     const id = created!.id;
-    await db.admin.staff.bio({ id, bio });
+    await db.admin.people.bio({ id, bio });
 
-    expect(await db.admin.staff.fetch.first({ id })).toMatchObject({ bio });
+    expect(await db.admin.people.fetch.first({ id })).toMatchObject({ bio });
 
-    const record = toStaffRecord((await db.admin.staff.fetch.first({ id }))!);
+    const record = toPersonRecord((await db.admin.people.fetch.first({ id }))!);
     expect(record).toMatchObject({
       id,
       name: "Pastor Name",
       role: "pastor",
       bio,
     });
-    expect(staffRecord.safeParse(record).success).toBe(true);
+    expect(personRecord.safeParse(record).success).toBe(true);
     const [first] = (await db.web.staff.list()).map(toStaffMember);
     expect(first).toEqual({
       id,
@@ -410,21 +411,25 @@ describe("staff", () => {
     });
     expect(staffMember.safeParse(first).success).toBe(true);
 
-    const row = await db.admin.staff.fetch.first({ id });
+    const row = await db.admin.people.fetch.first({ id });
     expect(toStaffMember(row!)).toEqual(first);
 
-    expect(await db.admin.staff.delete({ id })).toBe(1);
+    expect(await db.admin.people.delete({ id })).toBe(1);
   });
 
-  it("writes a member the site lists, and the admin does", async () => {
-    const body = staffBody.parse({ name: "Office Name", role: "staff" });
-    const created = await db.admin.staff.create.first(toStaffArguments(body));
+  it("writes someone who serves, whom the site lists, and the admin does", async () => {
+    const body = personBody.parse({
+      firstName: "Office",
+      lastName: "Name",
+      role: "staff",
+    });
+    const created = await db.admin.people.create.first(toPersonArguments(body));
     expect(
       (await db.web.staff.list()).map(toStaffMember).map((m) => m.name),
     ).toContain("Office Name");
     expect(
       (
-        await db.admin.staff.list({
+        await db.admin.people.list({
           size: 25,
           offset: 0,
           tz: "America/Los_Angeles",
@@ -432,10 +437,28 @@ describe("staff", () => {
           direction: "asc",
         })
       )
-        .map(toStaffRecord)
+        .map(toPersonRecord)
         .map((m) => m.name),
     ).toContain("Office Name");
-    expect(await db.admin.staff.delete({ id: created!.id })).toBe(1);
+    expect(await db.admin.people.delete({ id: created!.id })).toBe(1);
+  });
+  it("writes a member the admin lists, and the site does not", async () => {
+    const body = personBody.parse({
+      firstName: "Pew",
+      lastName: "Abbott",
+      role: "member",
+      address: "123 Main St",
+      birthday: "1980-04-12",
+    });
+    const created = await db.admin.people.create.first(toPersonArguments(body));
+    const id = created!.id;
+    const record = toPersonRecord((await db.admin.people.fetch.first({ id }))!);
+    expect(record).toMatchObject({ ...body, id, name: "Pew Abbott" });
+    expect(personRecord.safeParse(record).success).toBe(true);
+    expect(
+      (await db.web.staff.list()).map(toStaffMember).map((m) => m.name),
+    ).not.toContain("Pew Abbott");
+    expect(await db.admin.people.delete({ id })).toBe(1);
   });
 });
 

@@ -19,6 +19,7 @@ const ROW = {
   id: 1,
   name: "Jane Doe",
   role: "elder" as const,
+  title: null,
   summary: "Has served since 2010.",
   bio: null,
   photo: null,

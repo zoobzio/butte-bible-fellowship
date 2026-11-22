@@ -44,15 +44,15 @@ import {
   sermonPath,
   sermons,
   sermonsQuery,
-  staffBio,
-  staffBody,
-  staffId,
-  staffListing,
+  personBio,
+  personBody,
+  personId,
+  personListing,
   staffMember,
   staffMembers,
-  staffQuery,
-  staffRecord,
-  staffViewBody,
+  personQuery,
+  personRecord,
+  peopleViewBody,
   viewList,
   viewPath,
   viewRecord,
@@ -117,11 +117,11 @@ const document = createDocument(
           responses: { 200: json(sermon) },
         },
       },
-      "/api/staff": {
+      "/api/people": {
         get: { responses: { 200: json(staffMembers) } },
         post: {
           requestBody: {
-            content: { "application/json": { schema: staffBody } },
+            content: { "application/json": { schema: personBody } },
           },
           responses: { 201: json(staffMember) },
         },
@@ -129,32 +129,32 @@ const document = createDocument(
       "/api/pages/{slug}": {
         get: { responses: { 200: json(page) } },
       },
-      "/admin/api/staff": {
+      "/admin/api/people": {
         get: {
-          requestParams: { query: staffQuery },
-          responses: { 200: json(staffListing) },
+          requestParams: { query: personQuery },
+          responses: { 200: json(personListing) },
         },
       },
-      "/admin/api/staff/{id}": {
+      "/admin/api/people/{id}": {
         get: {
-          requestParams: { path: staffId },
-          responses: { 200: json(staffRecord) },
+          requestParams: { path: personId },
+          responses: { 200: json(personRecord) },
         },
         put: {
-          requestParams: { path: staffId },
+          requestParams: { path: personId },
           requestBody: {
-            content: { "application/json": { schema: staffBody } },
+            content: { "application/json": { schema: personBody } },
           },
-          responses: { 200: json(staffRecord) },
+          responses: { 200: json(personRecord) },
         },
       },
-      "/admin/api/staff/{id}/bio": {
+      "/admin/api/people/{id}/bio": {
         patch: {
-          requestParams: { path: staffId },
+          requestParams: { path: personId },
           requestBody: {
-            content: { "application/json": { schema: staffBio } },
+            content: { "application/json": { schema: personBio } },
           },
-          responses: { 200: json(staffRecord) },
+          responses: { 200: json(personRecord) },
         },
       },
       "/admin/api/content": {
@@ -213,7 +213,7 @@ const document = createDocument(
             content: {
               "application/json": {
                 schema: z.union([
-                  staffViewBody,
+                  peopleViewBody,
                   contentViewBody,
                   eventViewBody,
                 ]),
@@ -388,16 +388,16 @@ describe("the components", () => {
       "HomeRecord",
       "Mime",
       "Page",
+      "PeopleView",
+      "PeopleViewBody",
+      "PersonBio",
+      "PersonBody",
+      "PersonListing",
+      "PersonRecord",
+      "PersonRole",
       "Sermon",
       "SermonBody",
-      "StaffBio",
-      "StaffBody",
-      "StaffListing",
       "StaffMember",
-      "StaffRecord",
-      "StaffRole",
-      "StaffView",
-      "StaffViewBody",
       "ViewRecord",
       "ViewRecords",
       "ViewSurface",
@@ -405,16 +405,25 @@ describe("the components", () => {
   });
 
   it("carry each record's description, its Markdown as a string, and its listing", () => {
-    expect(schemas.StaffRecord).toMatchObject({
-      required: ["id", "name", "role", "createdAt", "updatedAt"],
+    expect(schemas.PersonRecord).toMatchObject({
+      required: [
+        "id",
+        "firstName",
+        "lastName",
+        "name",
+        "role",
+        "createdAt",
+        "updatedAt",
+      ],
       properties: {
         id: { type: "integer" },
-        role: { $ref: "#/components/schemas/StaffRole" },
+        role: { $ref: "#/components/schemas/PersonRole" },
         bio: { $ref: "#/components/schemas/Hast" },
+        birthday: { format: "date" },
         createdAt: { format: "date-time" },
       },
     });
-    expect(schemas.StaffRecord).not.toHaveProperty("properties.status");
+    expect(schemas.PersonRecord).not.toHaveProperty("properties.status");
     expect(schemas.EventRecord).not.toHaveProperty("properties.status");
     expect(schemas.EventRecord).toMatchObject({
       required: [
@@ -434,12 +443,12 @@ describe("the components", () => {
         start: { $ref: "#/components/schemas/EventTime" },
       },
     });
-    expect(schemas.StaffListing).toMatchObject({
+    expect(schemas.PersonListing).toMatchObject({
       required: ["items", "total"],
       properties: {
         items: {
           type: "array",
-          items: { $ref: "#/components/schemas/StaffRecord" },
+          items: { $ref: "#/components/schemas/PersonRecord" },
         },
         total: { type: "integer", minimum: 0 },
       },
@@ -525,19 +534,25 @@ describe("the components", () => {
     expect(schemas.StaffMember).toMatchObject({
       required: ["id", "name", "role"],
       properties: {
-        role: { $ref: "#/components/schemas/StaffRole" },
+        role: { $ref: "#/components/schemas/PersonRole" },
         email: { format: "email" },
         photo: { format: "uri" },
         bio: { $ref: "#/components/schemas/Hast" },
       },
     });
-    expect(schemas.StaffBody).toMatchObject({
-      properties: { role: { $ref: "#/components/schemas/StaffRole" } },
+    expect(schemas.StaffMember).not.toHaveProperty("properties.address");
+    expect(schemas.StaffMember).not.toHaveProperty("properties.birthday");
+    expect(schemas.PersonBody).toMatchObject({
+      required: ["firstName", "lastName", "role"],
+      properties: {
+        role: { $ref: "#/components/schemas/PersonRole" },
+        birthday: { format: "date" },
+      },
     });
-    expect(schemas.StaffBody).not.toHaveProperty("properties.status");
-    expect(schemas.StaffBody).not.toHaveProperty("properties.bio");
-    expect(schemas.StaffBody).not.toHaveProperty("properties.photo");
-    expect(schemas.StaffBio).toMatchObject({
+    expect(schemas.PersonBody).not.toHaveProperty("properties.status");
+    expect(schemas.PersonBody).not.toHaveProperty("properties.bio");
+    expect(schemas.PersonBody).not.toHaveProperty("properties.photo");
+    expect(schemas.PersonBio).toMatchObject({
       properties: { bio: { $ref: "#/components/schemas/Hast" } },
     });
   });
@@ -592,7 +607,7 @@ describe("the requests", () => {
   });
 
   it("take a listing's page and size, optional, with their defaults", () => {
-    const { page, size } = parameters("/admin/api/staff", "get");
+    const { page, size } = parameters("/admin/api/people", "get");
     expect(page).toMatchObject({
       in: "query",
       schema: { minimum: 1, default: 1 },
@@ -604,13 +619,22 @@ describe("the requests", () => {
     });
   });
 
-  it("take the staff's sort as a column and a direction, each optional", () => {
-    const { sort, direction } = parameters("/admin/api/staff", "get");
+  it("take the people's sort as a column and a direction, each optional", () => {
+    const { sort, direction } = parameters("/admin/api/people", "get");
     expect(sort).toMatchObject({
       in: "query",
       schema: {
         type: "string",
-        enum: ["name", "role", "email", "phone", "createdAt", "updatedAt"],
+        enum: [
+          "name",
+          "role",
+          "title",
+          "email",
+          "phone",
+          "birthday",
+          "createdAt",
+          "updatedAt",
+        ],
       },
     });
     expect(sort?.required).toBeUndefined();
@@ -624,7 +648,7 @@ describe("the requests", () => {
   it("take a record's id in the path, required, as a number from one", () => {
     for (const [path, method] of [
       ["/admin/api/events/{id}", "get"],
-      ["/admin/api/staff/{id}", "put"],
+      ["/admin/api/people/{id}", "put"],
     ] as const) {
       expect(parameters(path, method).id).toMatchObject({
         in: "path",

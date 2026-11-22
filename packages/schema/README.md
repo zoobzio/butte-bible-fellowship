@@ -27,7 +27,7 @@ src/models/      what the API answers with: one file per kind of thing
   link.ts        where a link leads: a path of the site, or a web address
   event.ts       an event of the church, the list of them, and the days and times it names
   hast.ts        rich text as the API serves it: an HTML syntax tree of elements and text
-  staff.ts       someone who serves the church, the list of them, and their roles
+  person.ts      someone of the church as the admin reads them, the staff as the site lists them, and their roles
   status.ts      the statuses a sermon passes through
   sermon.ts      a sermon preached at the church, and the list of them
   page.ts        a page's front matter: its title, description and image
@@ -40,7 +40,7 @@ src/input/       what a request carries, one file per group of endpoints
   folder.ts      the content's folders: the id of one, the query of a level's, the name of a write, and where one is
   home.ts        the home page: the metadata and the body of a write, and its hero's picture as it is uploaded
   event.ts       the events: the path of one, the query of the list, the body of a write
-  staff.ts       the staff: the id of one, the body of a write
+  person.ts      the people: the id of one, the query of the list, the body of a write
   sermon.ts      the sermons: the path of one, the query of the list, the body of a write
   view.ts        the saved views: the list one is of and its id, the payload each list's views are held to, and the body of a save
 src/index.ts     every schema, models and inputs
@@ -60,19 +60,25 @@ that directory's `index.ts`, and a type beside it in `types.ts`.
 A model is the response: `churchEvent`, `staffMember`, `sermon`,
 `page`, with `churchEvents`, `staffMembers` and `sermons`, the lists the
 API answers with, and the primitives they are built from — `eventDay`,
-`eventTime`, `slug`, `contentStatus`, `staffRole`, `mime`, and `hast`, rich text
+`eventTime`, `slug`, `contentStatus`, `personRole`, `mime`, and `hast`, rich text
 as an HTML syntax tree. A column written as Markdown — a sermon's `body` —
 goes over the wire as `hast`: the tree the site's pages are built to,
 which the app renders with its own components, so the wire never carries
 Markdown and the app never parses it. `@bbf/utils`'s `toHast` builds it,
 through the same presets as the pages. A body still takes the Markdown:
-`sermonBody.body` is the string as written. A member's `bio` and an
+`sermonBody.body` is the string as written. A person's `bio` and an
 event's `body` are `hast` everywhere: the admin's editor writes the tree,
-`staffBio.bio` and `eventArticle.body` carry it, and the site reads it as
-it was stored. A member is written in three parts, each on its own, so a
-save of one never replaces another: `staffBody` is their details,
-`staffBio` their bio, and `staffAvatar` their photo as it is uploaded, a
-JPEG, PNG or WebP file of `STAFF_AVATAR_SIZE` at most. An event is written
+`personBio.bio` and `eventArticle.body` carry it, and the site reads it as
+it was stored. A person is written in three parts, each on its own, so a
+save of one never replaces another: `personBody` is their details,
+`personBio` their bio, and `personAvatar` their photo as it is uploaded, a
+JPEG, PNG or WebP file of `PERSON_AVATAR_SIZE` at most. Their name is written
+in its two parts, `firstName` and `lastName`, and a record carries it in
+full beside them, as `name`. A person is whoever the church keeps a row
+for, and their `personRole` says who they are to it: `pastor`, `elder` and
+`staff` serve it and are whom the site lists, as `staffMember`, and a
+`member` belongs to it and is the admin's alone to read. A `personRecord`
+carries what the site is never served: their `address` and their `birthday`. An event is written
 the same way: `eventBody` is its details, `eventArticle` what is written
 about it, and `eventImage` its picture as it is uploaded. A page of the site
 is written in two: `contentBody` is its metadata, what a page's front matter
@@ -111,20 +117,20 @@ answered with: every event of the span, unpaged. An event is written with the da
 the week, which a record names as its `day` and the site's `churchEvent`
 carries in place of the date. A body says what a model cannot: only a
 recurring event picks its weeks, and an end comes after its start — the
-rules the database's constraints keep, checked before a query runs. A member's phone number is ten digits, however they are
-typed: `staffPhone` takes the usual ways of writing one and keeps it one
+rules the database's constraints keep, checked before a query runs. A person's phone number is ten digits, however they are
+typed: `personPhone` takes the usual ways of writing one and keeps it one
 way, as `530-555-0100`. Only a write is held to it, so a record with an
 older number still reads. A sermon's body also carries what the site never
 shows: the `status` that decides whether it reaches the site, a draft
-until the body says otherwise. A member and an event carry none: whoever
-is on the staff, and whatever event is written, is on the site.
+until the body says otherwise. A person and an event carry none: whoever
+serves the church, and whatever event is written, is on the site.
 
 A saved view is a named arrangement of one of the admin's lists, and every
 list's are stored in one table, the arrangement as JSON, so the schema is
 what holds each to its shape. `VIEW_SURFACES` names the lists that have
-views, `staff`, `content` and `events`, and `VIEW_PAYLOADS` and `VIEW_BODIES` carry, by
+views, `people`, `content` and `events`, and `VIEW_PAYLOADS` and `VIEW_BODIES` carry, by
 that name, the schema of the list's payload and of a save of it:
-`staffView` and `staffViewBody`, `contentView` and `contentViewBody`,
+`peopleView` and `peopleViewBody`, `contentView` and `contentViewBody`,
 `eventView` and `eventViewBody`.
 `tableView` builds the payload of a view
 over a table — its sort, its columns' order, pinning, visibility and widths, its
@@ -156,8 +162,8 @@ Every schema is documented where it is declared. A model or a body is
 `.meta({ id, description })`, so the document names it once under
 `components.schemas` and refers to it from every operation that uses it:
 `ChurchEvent`, `StaffMember`, `Sermon`, `Page`, `EventBody`,
-`StaffBody`, `StaffBio`, `SermonBody`. A primitive used by both — `EventDay`, `EventTime`,
-`ContentStatus`, `StaffRole`, `Mime` — is one component too, and so is `Hast`, with
+`PersonBody`, `PersonBio`, `SermonBody`. A primitive used by both — `EventDay`, `EventTime`,
+`ContentStatus`, `PersonRole`, `Mime` — is one component too, and so is `Hast`, with
 `HastElement` and `HastText`, which refer to each other as a tree does; rendered the same in a request and a response. A field is
 `.meta({ description, examples })`, and its format comes from its zod type:
 `z.iso.date()` is `date`, `z.iso.datetime()` is `date-time`, `z.url()` is
@@ -202,14 +208,15 @@ what it renders: the components, their references, the parameters.
   alone. `@bbf/schema/models/event` and the like reach one file.
 - `@bbf/schema/types`: the type each schema infers, under its `PascalCase`
   name — `ChurchEvent`, `ChurchEvents`, `EventDay`, `EventTime`, `Hast`, `HastElement`,
-  `HastText`, `ContentStatus`, `StaffRole`, `Mime`, `StaffMember`, `StaffMembers`,
+  `HastText`, `ContentStatus`, `PersonRole`, `Mime`, `StaffMember`, `StaffMembers`,
+  `PersonRecord`, `PersonListing`,
   `Page`, `Sermon`, `Sermons`, `Slug`, `EventPath`, `EventsQuery`,
   `EventBody`, `ContentRecord`, `ContentRecords`, `ContentBody`, `ContentForm`,
   `ContentArticle`, `ContentPlacement`, `ContentDraft`, `FolderRecord`,
   `FolderRecords`, `FolderBody`, `FolderPlacement`, `FolderDraft`,
   `HomeRecord`, `HomeHero`, `HomePage`, `HomeBody`, `HomeForm`, `HomeArticle`,
   `HomeImage`, `AboutRecord`, `AboutBody`, `AboutForm`, `AboutArticle`, `Link`,
-  `StaffId`, `StaffBody`, `StaffBio`, `SermonPath`, `SermonsQuery`,
+  `PersonId`, `PersonQuery`, `PersonBody`, `PersonForm`, `PersonBio`, `SermonPath`, `SermonsQuery`,
   `SermonBody`. Nothing here
   reaches a bundle: a file that only needs the shape imports from here and
   carries no zod.

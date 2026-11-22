@@ -13,6 +13,6 @@ export * from "./path";
 export * from "./resource";
 export * from "./sermon";
 export * from "./slug";
-export * from "./staff";
+export * from "./person";
 export * from "./status";
 export * from "./view";

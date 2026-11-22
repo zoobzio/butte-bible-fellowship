@@ -15,7 +15,7 @@ providers.tf      how each provider connects: Vercel, Neon, and Postgres as Neon
 variables.tf      the team, the repository, the region, and the Neon organization
 neon.tf           the Neon project: one branch, one database, its owner
 database.tf       the `web` and `admin` groups and the login user of each app
-vercel.tf         the two projects, their environment variables, and the Blob store of the staff's photos
+vercel.tf         the two projects, their environment variables, and the Blob store of the people's photos
 imports.tf        adopts the Vercel project that already exists
 outputs.tf        the ids, and the owner's connection string for migrations
 tests/            `terraform test`: the roles, the connection strings, the projects
@@ -47,9 +47,9 @@ deploys; it is never an app's.
 
 ## Storage
 
-The admin app uploads each staff member's photo to a public Vercel Blob
+The admin app uploads each person's photo to a public Vercel Blob
 store, `vercel_blob_store.avatars`, and writes the URL the store answers
-with to the member's row; the site shows the photo by that URL. The store
+with to the person's row; the site shows the photo by that URL. The store
 is connected to the admin project alone, which is what gives the app
 `BLOB_READ_WRITE_TOKEN`: the site only reads, and needs no token. A
 `pnpm dev` with no token keeps the photos in the app's own `.data`

@@ -18,15 +18,15 @@ describe("useApi", () => {
     const fetch = vi.fn(async () => ({ ok: true }));
     vi.stubGlobal("$fetch", fetch);
     const api = useApi();
-    expect(await api("/api/staff", { method: "POST", body: { a: 1 } })).toEqual(
-      { ok: true },
-    );
-    expect(fetch).toHaveBeenCalledWith("/api/staff", {
+    expect(
+      await api("/api/people", { method: "POST", body: { a: 1 } }),
+    ).toEqual({ ok: true });
+    expect(fetch).toHaveBeenCalledWith("/api/people", {
       method: "POST",
       body: { a: 1 },
     });
-    await api("/api/staff/1");
-    expect(fetch).toHaveBeenLastCalledWith("/api/staff/1", {});
+    await api("/api/people/1");
+    expect(fetch).toHaveBeenLastCalledWith("/api/people/1", {});
   });
 
   it("carries a form as it is, for an upload", async () => {
@@ -34,8 +34,8 @@ describe("useApi", () => {
     vi.stubGlobal("$fetch", fetch);
     const body = new FormData();
     body.append("file", new File(["x"], "x.png", { type: "image/png" }));
-    await useApi()("/api/staff/1/avatar", { method: "PATCH", body });
-    expect(fetch).toHaveBeenCalledWith("/api/staff/1/avatar", {
+    await useApi()("/api/people/1/avatar", { method: "PATCH", body });
+    expect(fetch).toHaveBeenCalledWith("/api/people/1/avatar", {
       method: "PATCH",
       body,
     });
@@ -45,7 +45,7 @@ describe("useApi", () => {
     let resolve!: (value: unknown) => void;
     const fetch = vi.fn(() => new Promise((r) => (resolve = r)));
     vi.stubGlobal("$fetch", fetch);
-    const pending = useApi()("/api/staff");
+    const pending = useApi()("/api/people");
     expect(indicator.start).toHaveBeenCalledTimes(1);
     expect(indicator.finish).not.toHaveBeenCalled();
     resolve({ ok: true });
@@ -61,7 +61,7 @@ describe("useApi", () => {
         throw failure;
       }),
     );
-    await expect(useApi()("/api/staff")).rejects.toBe(failure);
+    await expect(useApi()("/api/people")).rejects.toBe(failure);
     expect(indicator.start).toHaveBeenCalledTimes(1);
     expect(indicator.finish).toHaveBeenCalledWith({ error: true });
   });
@@ -72,11 +72,11 @@ describe("useApi", () => {
     // The API is built at module scope, where there is no instance yet.
     setNuxtInstance(false);
     const api = useApi();
-    expect(await api("/api/staff")).toEqual({ ok: true });
+    expect(await api("/api/people")).toEqual({ ok: true });
     expect(indicator.start).not.toHaveBeenCalled();
     expect(indicator.finish).not.toHaveBeenCalled();
     setNuxtInstance(true);
-    await api("/api/staff");
+    await api("/api/people");
     expect(indicator.start).toHaveBeenCalledTimes(1);
     expect(indicator.finish).toHaveBeenCalledTimes(1);
   });

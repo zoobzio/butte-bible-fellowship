@@ -5,7 +5,7 @@ import { toViewRecord } from "../../src/dto/view";
 
 const ROW = {
   id: "0b1f4c4e-6f0a-4d0e-9a57-3f0c1c2d4e5f",
-  surface: "staff",
+  surface: "people",
   name: "Elders",
   payload: { sorting: [{ id: "name", desc: true }], pageSize: 50 },
   created_at: new Date("2026-10-17T18:00:00.000Z"),
@@ -17,7 +17,7 @@ describe("toViewRecord", () => {
     const record = toViewRecord(ROW);
     expect(record).toEqual({
       id: ROW.id,
-      surface: "staff",
+      surface: "people",
       name: "Elders",
       payload: ROW.payload,
       createdAt: "2026-10-17T18:00:00.000Z",

@@ -15,7 +15,7 @@ src/issuers/google.json   Google's discovery document, vendored
 .output/                  the kit's output (generated, not committed)
 ```
 
-Scopes follow the admin's records (`content:*`, `events:*`, `settings:*`, `site:*`, `staff:*`, `users:*`), and `views:*` is each user's own saved views of the admin's lists; roles
+Scopes follow the admin's records (`content:*`, `events:*`, `people:*`, `settings:*`, `site:*`, `users:*`), and `views:*` is each user's own saved views of the admin's lists; roles
 are `admin` and `editor`, the same `user_role` the `users` table of
 `@bbf/database` holds. The admin grants each role its scopes. Google publishes no `roles` claim, so the build warns that the
 admin must supply roles from its own records. The `resource` URL is a

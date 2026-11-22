@@ -8,6 +8,7 @@ export default defineConfig({
     badge: "lucide:badge-check",
     briefcase: "lucide:briefcase",
     "calendar-clock": "lucide:calendar-clock",
+    cake: "lucide:cake",
     "calendar-days": "lucide:calendar-days",
     camera: "lucide:camera",
     "chevron-left": "lucide:chevron-left",
@@ -22,6 +23,7 @@ export default defineConfig({
     // over code brackets: a search that takes a grammar.
     magic: "lucide:search-code",
     mail: "lucide:mail",
+    "map-pin": "lucide:map-pin",
     menu: "lucide:menu",
     moon: "lucide:moon",
     palette: "lucide:palette",

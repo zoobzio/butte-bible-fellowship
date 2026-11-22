@@ -1,5 +1,5 @@
 import type { Contract } from "@bbf/database";
-import type { StaffBody, StaffRecord } from "@bbf/schema/types";
+import type { PersonBody, PersonRecord } from "@bbf/schema/types";
 import type { Arguments, Row } from "bezoar";
 
 import type {
@@ -9,7 +9,7 @@ import type {
   toEventArguments,
   toHomeArguments,
   toSermonArguments,
-  toStaffArguments,
+  toPersonArguments,
 } from "../src/dao";
 import {
   toAboutDocument,
@@ -24,9 +24,9 @@ import {
   toHomeRecord,
   toSermon,
   toStaffMember,
-  toStaffRecord,
+  toPersonRecord,
 } from "../src/dto";
-import { toStaffBody, toStaffForm } from "../src/vm";
+import { toPersonBody, toPersonForm } from "../src/vm";
 
 declare const listed: Row<Contract, "web.events.list">;
 declare const weekly: Row<Contract, "web.events.weekly">;
@@ -38,8 +38,8 @@ declare const webContent: Row<Contract, "web.content.fetch">;
 declare const adminContent: Row<Contract, "admin.content.fetch">;
 declare const adminContentList: Row<Contract, "admin.content.list">;
 declare const webStaff: Row<Contract, "web.staff.list">;
-declare const adminStaff: Row<Contract, "admin.staff.fetch">;
-declare const adminStaffList: Row<Contract, "admin.staff.list">;
+declare const adminStaff: Row<Contract, "admin.people.fetch">;
+declare const adminPersonList: Row<Contract, "admin.people.list">;
 declare const listedSermon: Row<Contract, "web.sermons.list">;
 declare const fetchedSermon: Row<Contract, "web.sermons.fetch">;
 declare const adminSermon: Row<Contract, "admin.sermons.fetch">;
@@ -57,10 +57,10 @@ export const contentRecords = [adminContent, adminContentList].map(
   toContentRecord,
 );
 export const eventRecords = [adminEvent, adminEvents].map(toEventRecord);
-export const staffRecords = [adminStaff, adminStaffList].map(toStaffRecord);
+export const personRecords = [adminStaff, adminPersonList].map(toPersonRecord);
 
 // @ts-expect-error Site row is not a record.
-export const noRecord = toStaffRecord(webStaff);
+export const noRecord = toPersonRecord(webStaff);
 
 // @ts-expect-error Site row has no id.
 export const noContentRecord = toContentRecord(webContent);
@@ -83,7 +83,7 @@ export const updateContent: Arguments<Contract, "admin.content.update"> = {
 };
 
 declare const eventArguments: ReturnType<typeof toEventArguments>;
-declare const staffArguments: ReturnType<typeof toStaffArguments>;
+declare const personArguments: ReturnType<typeof toPersonArguments>;
 declare const sermonArguments: ReturnType<typeof toSermonArguments>;
 export const createEvent: Arguments<Contract, "admin.events.create"> =
   eventArguments;
@@ -91,10 +91,10 @@ export const updateEvent: Arguments<Contract, "admin.events.update"> = {
   ...eventArguments,
   id: 1,
 };
-export const createStaff: Arguments<Contract, "admin.staff.create"> =
-  staffArguments;
-export const updateStaff: Arguments<Contract, "admin.staff.update"> = {
-  ...staffArguments,
+export const createStaff: Arguments<Contract, "admin.people.create"> =
+  personArguments;
+export const updateStaff: Arguments<Contract, "admin.people.update"> = {
+  ...personArguments,
   id: 1,
 };
 export const createSermon: Arguments<Contract, "admin.sermons.create"> =
@@ -108,12 +108,12 @@ export const updateSermon: Arguments<Contract, "admin.sermons.update"> = {
 export const updateNothing: Arguments<Contract, "admin.events.update"> =
   eventArguments;
 
-declare const staffRecord: StaffRecord;
-export const staffForm = toStaffForm(staffRecord);
-export const staffBody: StaffBody = toStaffBody(staffForm);
+declare const personRecord: PersonRecord;
+export const personForm = toPersonForm(personRecord);
+export const personBody: PersonBody = toPersonBody(personForm);
 
 // @ts-expect-error A form carries no bio: it is written on its own.
-export const noTree = toStaffBody({ ...staffForm, bio: staffRecord.bio });
+export const noTree = toPersonBody({ ...personForm, bio: personRecord.bio });
 
 declare const webHome: Row<Contract, "web.home.fetch">;
 declare const adminHome: Row<Contract, "admin.home.fetch">;

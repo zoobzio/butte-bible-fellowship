@@ -22,11 +22,14 @@ export type Checks = [
   Assert<Equal<Row<Contract, "web.events.upcoming">["date"], string>>,
   Assert<Equal<Row<Contract, "web.staff.list">["bio"], unknown>>,
   Assert<
-    Equal<Row<Contract, "web.staff.list">["role"], "pastor" | "elder" | "staff">
+    Equal<
+      Row<Contract, "web.staff.list">["role"],
+      "pastor" | "elder" | "staff" | "member"
+    >
   >,
   Assert<
     Equal<
-      "status" extends keyof Row<Contract, "admin.staff.fetch"> ? true : false,
+      "status" extends keyof Row<Contract, "admin.people.fetch"> ? true : false,
       false
     >
   >,
@@ -111,10 +114,10 @@ export type Checks = [
   >,
   Assert<Equal<Row<Contract, "web.sermons.fetch">["body"], string | null>>,
   Assert<Equal<Arguments<Contract, "web.events.upcoming">, { from: string }>>,
-  Assert<Equal<Returns<Contract, "admin.staff.delete">, number>>,
+  Assert<Equal<Returns<Contract, "admin.people.delete">, number>>,
   Assert<
     Equal<
-      Returns<Contract, "admin.staff.create">,
+      Returns<Contract, "admin.people.create">,
       { id: number; created_at: Date }[]
     >
   >,
@@ -124,10 +127,10 @@ export type Checks = [
       (number | null)[] | null | undefined
     >
   >,
-  Assert<Equal<Arguments<Contract, "admin.staff.bio">["bio"], unknown>>,
+  Assert<Equal<Arguments<Contract, "admin.people.bio">["bio"], unknown>>,
   Assert<
     Equal<
-      Arguments<Contract, "admin.staff.photo">["photo"],
+      Arguments<Contract, "admin.people.photo">["photo"],
       string | null | undefined
     >
   >,
@@ -135,27 +138,27 @@ export type Checks = [
   Assert<Equal<Arguments<Contract, "admin.events.update">["id"], number>>,
   Assert<
     Equal<
-      Arguments<Contract, "admin.staff.list">["sort"],
+      Arguments<Contract, "admin.people.list">["sort"],
       string | null | undefined
     >
   >,
-  Assert<Equal<Arguments<Contract, "admin.staff.list">["direction"], string>>,
-  Assert<Equal<Row<Contract, "admin.staff.list">["total"], number>>,
+  Assert<Equal<Arguments<Contract, "admin.people.list">["direction"], string>>,
+  Assert<Equal<Row<Contract, "admin.people.list">["total"], number>>,
   Assert<
     Equal<
-      Arguments<Contract, "admin.staff.list">["q"],
-      string | null | undefined
-    >
-  >,
-  Assert<
-    Equal<
-      Arguments<Contract, "admin.staff.list">["name_contains"],
+      Arguments<Contract, "admin.people.list">["q"],
       string | null | undefined
     >
   >,
   Assert<
     Equal<
-      Arguments<Contract, "admin.staff.list">["updated_on_or_after"],
+      Arguments<Contract, "admin.people.list">["name_contains"],
+      string | null | undefined
+    >
+  >,
+  Assert<
+    Equal<
+      Arguments<Contract, "admin.people.list">["updated_on_or_after"],
       string | null | undefined
     >
   >,
@@ -203,16 +206,18 @@ export type Checks = [
 export const wrongDay: Arguments<Contract, "admin.events.list">["day_is"] =
   "funday";
 
-export const spare: Arguments<Contract, "admin.staff.create"> = {
-  name: "x",
+export const spare: Arguments<Contract, "admin.people.create"> = {
+  first_name: "x",
+  last_name: "y",
   role: "staff",
 };
 
 // @ts-expect-error Role is required.
-export const incomplete: Arguments<Contract, "admin.staff.create"> = {
-  name: "x",
+export const incomplete: Arguments<Contract, "admin.people.create"> = {
+  first_name: "x",
+  last_name: "y",
 };
 
 // @ts-expect-error Role must be an enum label.
-export const wrongRole: Arguments<Contract, "admin.staff.create">["role"] =
+export const wrongRole: Arguments<Contract, "admin.people.create">["role"] =
   "deacon";

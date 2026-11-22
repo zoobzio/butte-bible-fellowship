@@ -7,7 +7,7 @@ const header: HeaderConfig = {
   links: [
     { label: "admin.navigation.site", to: "/site" },
     { label: "admin.navigation.content", to: "/content" },
-    { label: "admin.navigation.staff", to: "/staff" },
+    { label: "admin.navigation.people", to: "/people" },
     { label: "admin.navigation.events", to: "/events" },
     { label: "admin.navigation.settings", to: "/settings" },
   ],

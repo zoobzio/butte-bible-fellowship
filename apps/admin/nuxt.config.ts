@@ -19,7 +19,7 @@ export default defineNuxtConfig({
   bezoar: { role: "admin" },
 
   routeRules: {
-    "/": { redirect: { to: "/staff", statusCode: 302 } },
+    "/": { redirect: { to: "/people", statusCode: 302 } },
   },
 
   app: {

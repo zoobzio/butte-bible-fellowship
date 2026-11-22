@@ -9,6 +9,7 @@ describe("toOptions", () => {
       { value: "pastor", label: "[roles.pastor]" },
       { value: "elder", label: "[roles.elder]" },
       { value: "staff", label: "[roles.staff]" },
+      { value: "member", label: "[roles.member]" },
     ]);
     expect(
       toOptions(WEEK_OPTIONS, (message) => message).map((o) => o.value),

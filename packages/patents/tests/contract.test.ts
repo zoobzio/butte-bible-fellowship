@@ -14,7 +14,7 @@ describe("the built contract", () => {
   it("carries the vocabularies of the documents", () => {
     expect(scopes).toEqual(resource.scopes_supported);
     expect(roles).toEqual(claims.id_token.roles.values);
-    expect(isScope("staff:write")).toBe(true);
+    expect(isScope("people:write")).toBe(true);
     expect(isScope("staff:delete")).toBe(false);
     expect(isRole("admin")).toBe(true);
   });

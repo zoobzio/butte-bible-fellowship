@@ -35,20 +35,20 @@ import type {
 } from "./input/operators";
 import type { sermonBody, sermonPath, sermonsQuery } from "./input/sermon";
 import type {
-  staffBio,
-  staffBody,
-  staffForm,
-  staffId,
-  staffQuery,
-  staffSort,
-} from "./input/staff";
+  personBio,
+  personBody,
+  personForm,
+  personId,
+  personQuery,
+  personSort,
+} from "./input/person";
 import type {
   contentView,
   contentViewBody,
   eventView,
   eventViewBody,
-  staffView,
-  staffViewBody,
+  peopleView,
+  peopleViewBody,
   viewList,
   viewPath,
 } from "./input/view";
@@ -80,12 +80,12 @@ import type { page } from "./models/page";
 import type { sermon, sermons } from "./models/sermon";
 import type { slug } from "./models/slug";
 import type {
-  staffListing,
+  personListing,
   staffMember,
   staffMembers,
-  staffRecord,
-  staffRole,
-} from "./models/staff";
+  personRecord,
+  personRole,
+} from "./models/person";
 import type { contentStatus } from "./models/status";
 import type { viewRecord, viewRecords, viewSurface } from "./models/view";
 
@@ -113,15 +113,15 @@ export type HastText = z.infer<typeof hastText>;
 
 export type ContentStatus = z.infer<typeof contentStatus>;
 
-export type StaffRole = z.infer<typeof staffRole>;
+export type PersonRole = z.infer<typeof personRole>;
 
 export type StaffMember = z.infer<typeof staffMember>;
 
 export type StaffMembers = z.infer<typeof staffMembers>;
 
-export type StaffRecord = z.infer<typeof staffRecord>;
+export type PersonRecord = z.infer<typeof personRecord>;
 
-export type StaffListing = z.infer<typeof staffListing>;
+export type PersonListing = z.infer<typeof personListing>;
 
 export type Sermon = z.infer<typeof sermon>;
 
@@ -239,17 +239,17 @@ export type EventQuery = z.infer<typeof eventQuery>;
 
 export type EventWindow = z.infer<typeof eventWindow>;
 
-export type StaffId = z.infer<typeof staffId>;
+export type PersonId = z.infer<typeof personId>;
 
-export type StaffSort = z.infer<typeof staffSort>;
+export type PersonSort = z.infer<typeof personSort>;
 
-export type StaffQuery = z.infer<typeof staffQuery>;
+export type PersonQuery = z.infer<typeof personQuery>;
 
-export type StaffBody = z.infer<typeof staffBody>;
+export type PersonBody = z.infer<typeof personBody>;
 
-export type StaffForm = z.infer<typeof staffForm>;
+export type PersonForm = z.infer<typeof personForm>;
 
-export type StaffBio = z.infer<typeof staffBio>;
+export type PersonBio = z.infer<typeof personBio>;
 
 export type SermonPath = z.infer<typeof sermonPath>;
 
@@ -273,9 +273,9 @@ export interface ViewBody {
   payload: unknown;
 }
 
-export type StaffView = z.infer<typeof staffView>;
+export type PeopleView = z.infer<typeof peopleView>;
 
-export type StaffViewBody = z.infer<typeof staffViewBody>;
+export type PeopleViewBody = z.infer<typeof peopleViewBody>;
 
 export type ContentView = z.infer<typeof contentView>;
 

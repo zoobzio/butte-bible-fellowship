@@ -4,7 +4,7 @@ import { viewRecord, viewRecords, viewSurface } from "../../src/models/view";
 
 const VIEW = {
   id: "0b1f4c4e-6f0a-4d0e-9a57-3f0c1c2d4e5f",
-  surface: "staff",
+  surface: "people",
   name: "Elders",
   payload: { sorting: [{ id: "name", desc: true }], pageSize: 50 },
   createdAt: "2026-10-17T18:00:00.000Z",
@@ -13,7 +13,7 @@ const VIEW = {
 
 describe("viewSurface", () => {
   it("names a list of the admin that has views, and no other", () => {
-    expect(viewSurface.parse("staff")).toBe("staff");
+    expect(viewSurface.parse("people")).toBe("people");
     expect(viewSurface.parse("content")).toBe("content");
     expect(viewSurface.parse("events")).toBe("events");
     expect(viewSurface.safeParse("sermons").success).toBe(false);

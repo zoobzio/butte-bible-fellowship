@@ -9,7 +9,7 @@ import {
   SORT_DIRECTIONS,
 } from "./listing";
 import { DATE_OPERATORS, MATCH_OPERATORS, TEXT_OPERATORS } from "./operators";
-import { STAFF_SORT_KEYS } from "./staff";
+import { PERSON_SORT_KEYS } from "./person";
 
 /** How long a view's name may be. */
 export const VIEW_NAME_LENGTH = 80;
@@ -127,25 +127,27 @@ export const tableView = ({
     clauses: clauses(columns),
   });
 
-/** The columns of the staff a view may filter by: the list's own filters. */
-export const STAFF_VIEW_COLUMNS = [
+/** The columns of the people a view may filter by: the list's own filters. */
+export const PEOPLE_VIEW_COLUMNS = [
   "name",
   "role",
+  "title",
   "email",
   "phone",
   "summary",
+  "address",
   "photo",
   "updatedAt",
   "createdAt",
 ] as const;
 
-export const staffView = tableView({
-  sorts: STAFF_SORT_KEYS,
-  columns: STAFF_VIEW_COLUMNS,
+export const peopleView = tableView({
+  sorts: PERSON_SORT_KEYS,
+  columns: PEOPLE_VIEW_COLUMNS,
 }).meta({
-  id: "StaffView",
+  id: "PeopleView",
   description:
-    "A view of the staff: the table's sort, its columns, its page's size and its search.",
+    "A view of the people: the table's sort, its columns, its page's size and its search.",
 });
 
 /**
@@ -279,7 +281,7 @@ export const eventView = calendarView({
  * reads a stored one through.
  */
 export const VIEW_PAYLOADS = {
-  staff: staffView,
+  people: peopleView,
   content: contentView,
   events: eventView,
 } satisfies Record<z.infer<typeof viewSurface>, z.ZodType>;
@@ -314,10 +316,10 @@ export const viewBody = <P extends z.ZodType>(payload: P) =>
     payload,
   });
 
-export const staffViewBody = viewBody(staffView).meta({
-  id: "StaffViewBody",
+export const peopleViewBody = viewBody(peopleView).meta({
+  id: "PeopleViewBody",
   description:
-    "A view of the staff as it is saved: what a save writes, or replaces.",
+    "A view of the people as it is saved: what a save writes, or replaces.",
 });
 
 export const contentViewBody = viewBody(contentView).meta({
@@ -334,7 +336,7 @@ export const eventViewBody = viewBody(eventView).meta({
 
 /** What a save of a view carries, by the list the view is of. */
 export const VIEW_BODIES = {
-  staff: staffViewBody,
+  people: peopleViewBody,
   content: contentViewBody,
   events: eventViewBody,
 } satisfies Record<z.infer<typeof viewSurface>, z.ZodType>;

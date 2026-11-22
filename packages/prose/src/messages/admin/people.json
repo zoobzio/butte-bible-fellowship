@@ -1,0 +1,38 @@
+{
+  "title": {
+    "defaultMessage": "People",
+    "description": "The title of the page that lists the people of the church: its staff and its members."
+  },
+  "new": {
+    "defaultMessage": "New person",
+    "description": "The button that opens the form of a new person, and the title of that form's dialog."
+  },
+  "newDescription": {
+    "defaultMessage": "Their details come first. Their photo and bio are added on their page, once they are saved.",
+    "description": "The line under the title of the dialog that adds a new person: what the form asks for, and where the rest is written."
+  },
+  "notFound": {
+    "defaultMessage": "Person not found",
+    "description": "The error shown when an address names a person that does not exist."
+  },
+  "description": {
+    "defaultMessage": "Everyone of the church: those who serve it, whom the site introduces, and its members.",
+    "description": "The line under the title of the page that lists the people: what the list is."
+  },
+  "allView": {
+    "defaultMessage": "Everyone",
+    "description": "The name of the view of the people list that the admin starts with: every person, staff and members alike, in the list's own order, with its usual columns. Shown as the first tab over the list, beside the views a user has saved."
+  },
+  "staffView": {
+    "defaultMessage": "Staff",
+    "description": "The name of the view of the people list that shows only those who serve the church, the pastor, the elders and the staff, who are the ones the site lists: everyone but the members. Shown as the second tab over the list."
+  },
+  "confirmMany": {
+    "defaultMessage": "Delete {count, plural, one {# person} other {# people}}? This cannot be undone.",
+    "description": "The question asked before the people selected in the list are deleted together. `count` is how many are selected."
+  },
+  "profile": {
+    "defaultMessage": "Profile",
+    "description": "The tab of a person's page that holds their details, their photo and their bio."
+  }
+}

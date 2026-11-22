@@ -8,7 +8,7 @@ const PAYLOAD = { sorting: [{ id: "name", desc: true }], pageSize: 50 };
 
 const RECORD = {
   id: ID,
-  surface: "staff",
+  surface: "people",
   name: "Elders",
   payload: PAYLOAD,
   createdAt: "2026-10-17T18:00:00.000Z",
@@ -28,8 +28,8 @@ describe("useViewStorage", () => {
   it("loads the views of its list as they were stored", async () => {
     const fetch = vi.fn(async () => [RECORD]);
     vi.stubGlobal("$fetch", fetch);
-    expect(await useViewStorage("staff").load(service)).toEqual([RECORD]);
-    expect(fetch).toHaveBeenCalledWith("/api/views/staff", {});
+    expect(await useViewStorage("people").load(service)).toEqual([RECORD]);
+    expect(fetch).toHaveBeenCalledWith("/api/views/people", {});
   });
 
   it("hands back a payload its list's schema would refuse, for the views to set aside", async () => {
@@ -38,7 +38,7 @@ describe("useViewStorage", () => {
       "$fetch",
       vi.fn(async () => [stale]),
     );
-    expect(await useViewStorage("staff").load(service)).toEqual([stale]);
+    expect(await useViewStorage("people").load(service)).toEqual([stale]);
   });
 
   it("refuses an answer that is not the views", async () => {
@@ -46,17 +46,17 @@ describe("useViewStorage", () => {
       "$fetch",
       vi.fn(async () => ({ items: [] })),
     );
-    await expect(useViewStorage("staff").load(service)).rejects.toThrow();
+    await expect(useViewStorage("people").load(service)).rejects.toThrow();
   });
 
   it("saves a view under its id: its name and its payload, and nothing else of it", async () => {
     const fetch = vi.fn(async () => RECORD);
     vi.stubGlobal("$fetch", fetch);
-    await useViewStorage<typeof PAYLOAD>("staff").save(
+    await useViewStorage<typeof PAYLOAD>("people").save(
       { ...VIEW, payload: PAYLOAD },
       service,
     );
-    expect(fetch).toHaveBeenCalledWith(`/api/views/staff/${ID}`, {
+    expect(fetch).toHaveBeenCalledWith(`/api/views/people/${ID}`, {
       method: "PUT",
       body: { name: "Elders", payload: PAYLOAD },
     });
@@ -65,8 +65,8 @@ describe("useViewStorage", () => {
   it("removes a view by its id", async () => {
     const fetch = vi.fn(async () => null);
     vi.stubGlobal("$fetch", fetch);
-    await useViewStorage("staff").remove({ ...VIEW, payload: {} }, service);
-    expect(fetch).toHaveBeenCalledWith(`/api/views/staff/${ID}`, {
+    await useViewStorage("people").remove({ ...VIEW, payload: {} }, service);
+    expect(fetch).toHaveBeenCalledWith(`/api/views/people/${ID}`, {
       method: "DELETE",
     });
   });
@@ -79,7 +79,7 @@ describe("useViewStorage", () => {
       }),
     );
     await expect(
-      useViewStorage("staff").save({ ...VIEW, payload: {} }, service),
+      useViewStorage("people").save({ ...VIEW, payload: {} }, service),
     ).rejects.toThrow("not yours");
   });
 });
@@ -87,7 +87,7 @@ describe("useViewStorage", () => {
 describe("useViewsRequest", () => {
   it("loads the views for the page they sit on", async () => {
     const init = vi.fn(async () => true);
-    const { data } = await useViewsRequest({ id: "staff", init });
+    const { data } = await useViewsRequest({ id: "people", init });
     expect(init).toHaveBeenCalledTimes(1);
     expect(data.value).toBe(true);
   });

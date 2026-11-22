@@ -11,9 +11,9 @@ row and builds the model the API answers with: `toChurchEvent`,
 `toStaffMember`, `toSermon`, and `toContentDocument`, `toHomeDocument`,
 `toAboutDocument` and `toConnectDocument`, a page of the site as the document its app renders. `dao/` takes an input a request carries and
 builds the arguments a query takes: `toEventArguments`,
-`toStaffArguments`, `toSermonArguments`, `toContentArguments`. `vm/` takes a record the API
-answered with and builds what a form holds, and back: `toStaffForm`,
-`toStaffBody`. Nothing here touches a connection, a request or the
+`toPersonArguments`, `toSermonArguments`, `toContentArguments`. `vm/` takes a record the API
+answered with and builds what a form holds, and back: `toPersonForm`,
+`toPersonBody`. Nothing here touches a connection, a request or the
 runtime: an app's composable runs the query and hands the row or the body
 here, and a form hands its payload.
 
@@ -28,7 +28,7 @@ src/dto/        a row into the model the API answers with, one file per kind
   home.ts       toHomeRecord: the home page's row into a HomeRecord; toHomeDocument: into the document the site renders, its hero in its front matter
   event.ts      toChurchEvent: any row of the events into a ChurchEvent
   hast.ts       toHast: a column of Markdown into the Hast the API answers with
-  staff.ts      toStaffMember: a row of the staff into a StaffMember
+  person.ts     toStaffMember: a row of the staff into a StaffMember; toPersonRecord: a row of the people into a PersonRecord
   sermon.ts     toSermon: any row of the sermons into a Sermon
 src/dao/        an input into the arguments a query takes, one file per kind
   about.ts      toAboutArguments: an AboutBody into what admin.about.update takes
@@ -36,7 +36,7 @@ src/dao/        an input into the arguments a query takes, one file per kind
   content.ts    toContentArguments: a ContentBody into what admin.content.create takes
   home.ts       toHomeArguments: a HomeBody into what admin.home.update takes
   event.ts      toEventArguments: an EventBody into what admin.events.create takes
-  staff.ts      toStaffArguments: a StaffBody into what admin.staff.create takes
+  person.ts     toPersonArguments: a PersonBody into what admin.people.create takes
   sermon.ts     toSermonArguments: a SermonBody into what admin.sermons.create takes
 src/vm/         a record into what a form holds, and a form's payload into a body
   about.ts      toAboutForm: an AboutRecord into an AboutForm; toAboutBody: back
@@ -44,7 +44,7 @@ src/vm/         a record into what a form holds, and a form's payload into a bod
   content.ts    toContentForm: a ContentRecord into a ContentForm; toContentBody: back
   hast.ts       toHtml: a Hast into the HTML an editor holds; fromHtml: back
   home.ts       toHomeForm: a HomeRecord into a HomeForm; toHomeBody: back
-  staff.ts      toStaffForm: a StaffRecord's details into a StaffForm; toStaffBody: a StaffForm into a StaffBody
+  person.ts     toPersonForm: a PersonRecord's details into a PersonForm; toPersonBody: a PersonForm into a PersonBody
 src/hast.ts     toContent: any hast tree into the schema's shape, for dto/ and vm/
 src/types.ts    the rows and the arguments the transforms speak, from the contract, and the forms
 src/index.ts    every transform
@@ -98,7 +98,7 @@ parser kept is not built, nor is an attribute left `undefined`, nor a node
 Markdown never makes. Nothing is cast: the parser's shape goes in, the
 wire's comes out, as with any row. `toSermon` runs a sermon's `body`
 through it; the body a request carries, and the column, stay Markdown. A
-member's `bio` and an event's `body` are stored as the tree already, and
+person's `bio` and an event's `body` are stored as the tree already, and
 `toStaffMember` and `toChurchEvent` check each against the schema's `hast`
 as they read it.
 
@@ -117,13 +117,13 @@ through `hast-util-to-html` and `fromHtml` reads the editor's string back
 through `hast-util-from-html`, as a fragment, and builds the schema's
 `hast` from it node by node, through the same `toContent` the Markdown
 pipeline's tree goes through: no position, no attribute left `undefined`,
-no comment or doctype. A form holds a member's details and nothing else:
-their photo and their bio are each written on their own, so `toStaffForm`
+no comment or doctype. A form holds a person's details and nothing else:
+their photo and their bio are each written on their own, so `toPersonForm`
 leaves both behind. What a form leaves blank, a body leaves out, as a
 column's null is; what is written is trimmed. A form carries no `id` and
 no timestamps: those are the record's, and the route's.
 
-`toEventArguments`, `toStaffArguments` and `toSermonArguments` build what
+`toEventArguments`, `toPersonArguments` and `toSermonArguments` build what
 `create` takes; an `update` takes the same and the `id` of the row it
 replaces, so it is spread with one. `tests/types.ts` proves both fit, and that a row from
 every query of a kind is taken, so a column renamed or a field added on
@@ -135,10 +135,10 @@ either side fails `pnpm typecheck` here, before it reaches an app.
   `@bbf/utils/vm` reach one direction, and `@bbf/utils/dto/event` and the
   like one file.
 - `@bbf/utils/types`: `EventRow`, `StaffRow`, `SermonRow`, the rows the
-  `dto/` transforms take, and `EventArguments`, `StaffArguments`,
+  `dto/` transforms take, and `EventArguments`, `PersonArguments`,
   `SermonArguments`, what the `dao/` transforms build, each derived from
-  the database's contract through `bezoar`; and `StaffForm`, what the
-  `vm/` transforms speak, derived from the schema's `StaffBody` with the
+  the database's contract through `bezoar`; and `PersonForm`, what the
+  `vm/` transforms speak, derived from the schema's `PersonBody` with the
   bio as a string.
 
 The package exports its sources, as `@bbf/schema` does: there is nothing

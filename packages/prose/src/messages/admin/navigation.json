@@ -1,7 +1,7 @@
 {
-  "staff": {
-    "defaultMessage": "Staff",
-    "description": "The header link to the list of staff members."
+  "people": {
+    "defaultMessage": "People",
+    "description": "The header link to the list of the people of the church: its staff and its members."
   },
   "events": {
     "defaultMessage": "Events",

@@ -5,12 +5,12 @@ import { z } from "zod";
  * views are kept under. A list has its views once it is named here and
  * its payload's schema is among `VIEW_PAYLOADS`.
  */
-export const VIEW_SURFACES = ["staff", "content", "events"] as const;
+export const VIEW_SURFACES = ["people", "content", "events"] as const;
 
 export const viewSurface = z.enum(VIEW_SURFACES).meta({
   id: "ViewSurface",
   description: "A list of the admin a view is saved over.",
-  examples: ["staff"],
+  examples: ["people"],
 });
 
 export const viewRecord = z
@@ -22,7 +22,7 @@ export const viewRecord = z
     }),
     surface: z.string().meta({
       description: "The list it is a view of.",
-      examples: ["staff"],
+      examples: ["people"],
     }),
     name: z.string().meta({ examples: ["Elders"] }),
     payload: z.unknown().meta({

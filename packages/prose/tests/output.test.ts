@@ -93,7 +93,7 @@ describe("bundles", () => {
       "admin.editor.confirm",
       "admin.content.moving",
       "admin.content.confirmMany",
-      "admin.staff.confirmMany",
+      "admin.people.confirmMany",
       "connect.map",
       "admin.appearance.pick",
     ];
@@ -143,11 +143,11 @@ describe("bundles", () => {
     ).toBe("Delete Harvest Dinner? This cannot be undone.");
     expect(
       [1, 3].map((count) =>
-        prosary.format("admin.staff.confirmMany", { count }),
+        prosary.format("admin.people.confirmMany", { count }),
       ),
     ).toEqual([
-      "Delete 1 member? This cannot be undone.",
-      "Delete 3 members? This cannot be undone.",
+      "Delete 1 person? This cannot be undone.",
+      "Delete 3 people? This cannot be undone.",
     ]);
     expect(
       [1, 3].map((count) =>

@@ -15,7 +15,7 @@ interface Written {
 
 /**
  * Tells the table of contents of a piece of writing, a page's body, an
- * event's or a member's bio, as it is written, once its headings can be
+ * event's or a person's bio, as it is written, once its headings can be
  * linked to. The editor gives its headings their ids once it is on. Until
  * then the writing is drawn as plain HTML under `root`, whose headings
  * are given theirs here, each time it is drawn; `tell` is called only

@@ -8,5 +8,5 @@ export * from "./folder";
 export * from "./hast";
 export * from "./home";
 export * from "./sermon";
-export * from "./staff";
+export * from "./person";
 export * from "./view";

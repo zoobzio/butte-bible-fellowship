@@ -9,7 +9,7 @@ import {
   useEventImage,
   useHomeImage,
   useLocalStore,
-  useStaffAvatar,
+  usePersonAvatar,
 } from "~~/server/composables/avatars";
 
 const BLOB = "https://store.public.blob.vercel-storage.com/staff";
@@ -37,7 +37,7 @@ vi.mock("nitropack/runtime", () => ({
 
 vi.mock("h3", async (original) => ({
   ...(await original<typeof import("h3")>()),
-  getRequestURL: () => new URL("http://localhost:3001/api/staff/1/avatar"),
+  getRequestURL: () => new URL("http://localhost:3001/api/people/1/avatar"),
 }));
 
 const EVENT = {} as H3Event;
@@ -47,26 +47,31 @@ const image = (type = "image/png") =>
 
 const ROW = {
   id: 1,
+  first_name: "Jane",
+  last_name: "Doe",
   name: "Jane Doe",
   role: "elder" as const,
+  title: null,
   summary: null,
   bio: null,
   photo: null as string | null,
   email: null,
   phone: null,
+  address: null,
+  birthday: null,
   created_at: new Date("2026-10-17T18:00:00Z"),
   updated_at: new Date("2026-10-18T09:30:00Z"),
 };
 
-/* One member, whose photo the queries read and write. */
-const member = { ...ROW };
+/* One person, whose photo the queries read and write. */
+const person = { ...ROW };
 const fetched = vi.fn(async ({ id }: { id: number }) =>
-  id === 1 ? { ...member } : null,
+  id === 1 ? { ...person } : null,
 );
 const portrayed = vi.fn(
   async ({ id, photo }: { id: number; photo: string | null }) => {
     if (id !== 1) return null;
-    member.photo = photo;
+    person.photo = photo;
     return { id, updated_at: ROW.updated_at };
   },
 );
@@ -124,14 +129,14 @@ const hung = vi.fn(async ({ image }: { image: string | null }) => {
 
 Object.assign(service, {
   admin: {
-    staff: { fetch: { first: fetched }, photo: { first: portrayed } },
+    people: { fetch: { first: fetched }, photo: { first: portrayed } },
     events: { fetch: { first: found }, image: { first: pictured } },
     home: { fetch: { first: opened }, image: { first: hung } },
   },
 });
 
 afterEach(() => {
-  member.photo = null;
+  person.photo = null;
   worship.image = null;
   home.hero_image = null;
   housed = true;
@@ -145,7 +150,7 @@ afterEach(() => {
 });
 
 describe("useBlobStore", () => {
-  it("keeps a photo in Vercel Blob, public, under the member's id and a name of its own, as its kind", async () => {
+  it("keeps a photo in Vercel Blob, public, under the person's id and a name of its own, as its kind", async () => {
     const file = image("image/webp");
     expect(await useBlobStore().put(7, file)).toBe(`${BLOB}/7-abc.webp`);
     expect(put).toHaveBeenCalledWith("staff/7.webp", file, {
@@ -216,9 +221,9 @@ describe("useLocalStore", () => {
   });
 });
 
-describe("useStaffAvatar", () => {
-  it("keeps the image, points the member at it, and hands back the record", async () => {
-    const record = await useStaffAvatar(EVENT).replace(1, image());
+describe("usePersonAvatar", () => {
+  it("keeps the image, points the person at it, and hands back the record", async () => {
+    const record = await usePersonAvatar(EVENT).replace(1, image());
     expect(put).toHaveBeenCalledTimes(1);
     expect(portrayed).toHaveBeenCalledWith({
       id: 1,
@@ -228,34 +233,34 @@ describe("useStaffAvatar", () => {
     expect(del).not.toHaveBeenCalled();
   });
 
-  it("drops the photo the member had, once they show the new one", async () => {
-    member.photo = `${BLOB}/1-old.png`;
-    await useStaffAvatar(EVENT).replace(1, image());
+  it("drops the photo the person had, once they show the new one", async () => {
+    person.photo = `${BLOB}/1-old.png`;
+    await usePersonAvatar(EVENT).replace(1, image());
     expect(del).toHaveBeenCalledTimes(1);
     expect(del).toHaveBeenCalledWith(`${BLOB}/1-old.png`);
   });
 
   it("leaves a photo kept elsewhere where it is", async () => {
-    member.photo = "https://cdn.example.com/staff/jane-doe.jpg";
-    const record = await useStaffAvatar(EVENT).replace(1, image());
+    person.photo = "https://cdn.example.com/staff/jane-doe.jpg";
+    const record = await usePersonAvatar(EVENT).replace(1, image());
     expect(record?.photo).toBe(`${BLOB}/1-abc.png`);
     expect(del).not.toHaveBeenCalled();
   });
 
-  it("keeps nothing for a member there is not", async () => {
-    expect(await useStaffAvatar(EVENT).replace(9, image())).toBeNull();
+  it("keeps nothing for a person there is not", async () => {
+    expect(await usePersonAvatar(EVENT).replace(9, image())).toBeNull();
     expect(put).not.toHaveBeenCalled();
   });
 
-  it("drops the image again when the member is gone by the time it is kept", async () => {
+  it("drops the image again when the person is gone by the time it is kept", async () => {
     portrayed.mockResolvedValueOnce(null);
-    expect(await useStaffAvatar(EVENT).replace(1, image())).toBeNull();
+    expect(await usePersonAvatar(EVENT).replace(1, image())).toBeNull();
     expect(del).toHaveBeenCalledWith(`${BLOB}/1-abc.png`);
   });
 
-  it("drops the image again when the member cannot be pointed at it, and says so", async () => {
+  it("drops the image again when the person cannot be pointed at it, and says so", async () => {
     portrayed.mockRejectedValueOnce(new Error("The database is away."));
-    await expect(useStaffAvatar(EVENT).replace(1, image())).rejects.toThrow(
+    await expect(usePersonAvatar(EVENT).replace(1, image())).rejects.toThrow(
       "The database is away.",
     );
     expect(del).toHaveBeenCalledWith(`${BLOB}/1-abc.png`);
@@ -263,24 +268,24 @@ describe("useStaffAvatar", () => {
 
   it("saves the photo even when the last one cannot be dropped", async () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
-    member.photo = `${BLOB}/1-old.png`;
+    person.photo = `${BLOB}/1-old.png`;
     del.mockRejectedValueOnce(new Error("The store is away."));
-    const record = await useStaffAvatar(EVENT).replace(1, image());
+    const record = await usePersonAvatar(EVENT).replace(1, image());
     expect(record?.photo).toBe(`${BLOB}/1-abc.png`);
     expect(warn).toHaveBeenCalledTimes(1);
   });
 
-  it("clears a member's photo, and drops it from the store", async () => {
-    member.photo = `${BLOB}/1-old.png`;
-    const record = await useStaffAvatar(EVENT).clear(1);
+  it("clears a person's photo, and drops it from the store", async () => {
+    person.photo = `${BLOB}/1-old.png`;
+    const record = await usePersonAvatar(EVENT).clear(1);
     expect(portrayed).toHaveBeenCalledWith({ id: 1, photo: null });
     expect(record).toMatchObject({ id: 1 });
     expect(record?.photo).toBeUndefined();
     expect(del).toHaveBeenCalledWith(`${BLOB}/1-old.png`);
   });
 
-  it("drops the photo of a member who is gone, a missing or a foreign one left be", async () => {
-    const avatars = useStaffAvatar(EVENT);
+  it("drops the photo of a person who is gone, a missing or a foreign one left be", async () => {
+    const avatars = usePersonAvatar(EVENT);
     await avatars.discard(`${BLOB}/1-old.png`);
     expect(del).toHaveBeenCalledWith(`${BLOB}/1-old.png`);
     del.mockClear();
@@ -289,8 +294,8 @@ describe("useStaffAvatar", () => {
     expect(del).not.toHaveBeenCalled();
   });
 
-  it("clears nothing for a member there is not", async () => {
-    expect(await useStaffAvatar(EVENT).clear(9)).toBeNull();
+  it("clears nothing for a person there is not", async () => {
+    expect(await usePersonAvatar(EVENT).clear(9)).toBeNull();
     expect(portrayed).not.toHaveBeenCalled();
     expect(del).not.toHaveBeenCalled();
   });

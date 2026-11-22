@@ -4,7 +4,7 @@ import {
   CONTENT_VIEW_COLUMNS,
   EVENT_CALENDAR_VIEWS,
   EVENT_VIEW_COLUMNS,
-  STAFF_VIEW_COLUMNS,
+  PEOPLE_VIEW_COLUMNS,
   VIEW_BODIES,
   VIEW_CLAUSES_SIZE,
   VIEW_NAME_LENGTH,
@@ -15,8 +15,8 @@ import {
   contentViewBody,
   eventView,
   eventViewBody,
-  staffView,
-  staffViewBody,
+  peopleView,
+  peopleViewBody,
   tableView,
   viewList,
   viewPath,
@@ -82,28 +82,29 @@ describe("tableView", () => {
   });
 });
 
-describe("staffView", () => {
-  it("accepts the staff table's arrangement, and hands it back as it came", () => {
-    expect(staffView.parse(ELDERS)).toEqual(ELDERS);
-    expect(staffView.parse({})).toEqual(BLANK);
+describe("peopleView", () => {
+  it("accepts the people table's arrangement, and hands it back as it came", () => {
+    expect(peopleView.parse(ELDERS)).toEqual(ELDERS);
+    expect(peopleView.parse({})).toEqual(BLANK);
   });
 
   it("drops what is no part of an arrangement", () => {
-    expect(staffView.parse({ ...ELDERS, pageIndex: 3 })).toEqual(ELDERS);
+    expect(peopleView.parse({ ...ELDERS, pageIndex: 3 })).toEqual(ELDERS);
   });
 
-  it("sorts by a column the API sorts the staff by, and no other", () => {
+  it("sorts by a column the API sorts the people by, and no other", () => {
     const sorted = (id: string) =>
-      staffView.safeParse({ sorting: [{ id, desc: false }] }).success;
+      peopleView.safeParse({ sorting: [{ id, desc: false }] }).success;
     expect(sorted("updatedAt")).toBe(true);
     expect(sorted("summary")).toBe(false);
     expect(sorted("bio")).toBe(false);
   });
 
-  it("filters by a column of the staff, under an operator the schema names", () => {
+  it("filters by a column of the people, under an operator the schema names", () => {
     const filtered = (filter: Record<string, string>) =>
-      staffView.safeParse({ clauses: [{ kind: "filter", ...filter }] }).success;
-    for (const key of STAFF_VIEW_COLUMNS) {
+      peopleView.safeParse({ clauses: [{ kind: "filter", ...filter }] })
+        .success;
+    for (const key of PEOPLE_VIEW_COLUMNS) {
       expect(filtered({ key, value: "x" }), key).toBe(true);
     }
     expect(filtered({ key: "bio", value: "x" })).toBe(false);
@@ -115,26 +116,27 @@ describe("staffView", () => {
   });
 
   it("keeps a page within what the API lists", () => {
-    expect(staffView.safeParse({ pageSize: 100 }).success).toBe(true);
-    expect(staffView.safeParse({ pageSize: 101 }).success).toBe(false);
-    expect(staffView.safeParse({ pageSize: 0 }).success).toBe(false);
-    expect(staffView.safeParse({ pageSize: 2.5 }).success).toBe(false);
+    expect(peopleView.safeParse({ pageSize: 100 }).success).toBe(true);
+    expect(peopleView.safeParse({ pageSize: 101 }).success).toBe(false);
+    expect(peopleView.safeParse({ pageSize: 0 }).success).toBe(false);
+    expect(peopleView.safeParse({ pageSize: 2.5 }).success).toBe(false);
   });
 
   it("holds each member to its shape, and the search to a size", () => {
-    expect(staffView.safeParse({ sorting: "name" }).success).toBe(false);
+    expect(peopleView.safeParse({ sorting: "name" }).success).toBe(false);
     expect(
-      staffView.safeParse({ columnVisibility: { name: "no" } }).success,
+      peopleView.safeParse({ columnVisibility: { name: "no" } }).success,
     ).toBe(false);
     expect(
-      staffView.safeParse({ columnSizing: { name: "wide" } }).success,
+      peopleView.safeParse({ columnSizing: { name: "wide" } }).success,
     ).toBe(false);
     expect(
-      staffView.safeParse({ clauses: [{ kind: "sort", key: "name" }] }).success,
+      peopleView.safeParse({ clauses: [{ kind: "sort", key: "name" }] })
+        .success,
     ).toBe(false);
     const clause = { kind: "literal", key: "text", value: "x" };
     expect(
-      staffView.safeParse({
+      peopleView.safeParse({
         clauses: Array.from({ length: VIEW_CLAUSES_SIZE + 1 }, () => clause),
       }).success,
     ).toBe(false);
@@ -299,8 +301,8 @@ describe("VIEW_PAYLOADS and VIEW_BODIES", () => {
   it("have a schema for every list that has views", () => {
     expect(Object.keys(VIEW_PAYLOADS)).toEqual([...VIEW_SURFACES]);
     expect(Object.keys(VIEW_BODIES)).toEqual([...VIEW_SURFACES]);
-    expect(VIEW_PAYLOADS.staff).toBe(staffView);
-    expect(VIEW_BODIES.staff).toBe(staffViewBody);
+    expect(VIEW_PAYLOADS.people).toBe(peopleView);
+    expect(VIEW_BODIES.people).toBe(peopleViewBody);
     expect(VIEW_PAYLOADS.content).toBe(contentView);
     expect(VIEW_BODIES.content).toBe(contentViewBody);
   });
@@ -308,16 +310,18 @@ describe("VIEW_PAYLOADS and VIEW_BODIES", () => {
 
 describe("viewList and viewPath", () => {
   it("name a list that has views, and a view of it by its UUID", () => {
-    expect(viewList.parse({ surface: "staff" })).toEqual({ surface: "staff" });
+    expect(viewList.parse({ surface: "people" })).toEqual({
+      surface: "people",
+    });
     expect(viewList.parse({ surface: "content" })).toEqual({
       surface: "content",
     });
     expect(viewList.safeParse({ surface: "sermons" }).success).toBe(false);
-    expect(viewPath.parse({ surface: "staff", id: ID })).toEqual({
-      surface: "staff",
+    expect(viewPath.parse({ surface: "people", id: ID })).toEqual({
+      surface: "people",
       id: ID,
     });
-    expect(viewPath.safeParse({ surface: "staff", id: "3" }).success).toBe(
+    expect(viewPath.safeParse({ surface: "people", id: "3" }).success).toBe(
       false,
     );
     expect(viewPath.safeParse({ surface: "sermons", id: ID }).success).toBe(
@@ -326,31 +330,31 @@ describe("viewList and viewPath", () => {
   });
 });
 
-describe("staffViewBody", () => {
-  it("is a view's name, trimmed, and its payload through the staff's schema", () => {
-    expect(staffViewBody.parse({ name: " Elders ", payload: {} })).toEqual({
+describe("peopleViewBody", () => {
+  it("is a view's name, trimmed, and its payload through the people's schema", () => {
+    expect(peopleViewBody.parse({ name: " Elders ", payload: {} })).toEqual({
       name: "Elders",
       payload: BLANK,
     });
-    expect(staffViewBody.parse({ name: "Elders", payload: ELDERS })).toEqual({
+    expect(peopleViewBody.parse({ name: "Elders", payload: ELDERS })).toEqual({
       name: "Elders",
       payload: ELDERS,
     });
   });
 
-  it("needs a name of a length, and a payload the staff's schema accepts", () => {
-    expect(staffViewBody.safeParse({ name: "  ", payload: {} }).success).toBe(
+  it("needs a name of a length, and a payload the people's schema accepts", () => {
+    expect(peopleViewBody.safeParse({ name: "  ", payload: {} }).success).toBe(
       false,
     );
     expect(
-      staffViewBody.safeParse({
+      peopleViewBody.safeParse({
         name: "x".repeat(VIEW_NAME_LENGTH + 1),
         payload: {},
       }).success,
     ).toBe(false);
-    expect(staffViewBody.safeParse({ name: "Elders" }).success).toBe(false);
+    expect(peopleViewBody.safeParse({ name: "Elders" }).success).toBe(false);
     expect(
-      staffViewBody.safeParse({
+      peopleViewBody.safeParse({
         name: "Elders",
         payload: { sorting: [{ id: "bio", desc: false }] },
       }).success,

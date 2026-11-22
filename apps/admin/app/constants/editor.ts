@@ -1,11 +1,12 @@
-import type { EventForm, StaffRole } from "@bbf/schema/types";
+import type { EventForm, PersonRole } from "@bbf/schema/types";
 
 import type { Choice } from "~/types/editor";
 
-export const ROLE_OPTIONS: Choice<StaffRole>[] = [
+export const ROLE_OPTIONS: Choice<PersonRole>[] = [
   { value: "pastor", label: "roles.pastor" },
   { value: "elder", label: "roles.elder" },
   { value: "staff", label: "roles.staff" },
+  { value: "member", label: "roles.member" },
 ];
 
 /** The weeks of the month, each as the form's select writes it. */

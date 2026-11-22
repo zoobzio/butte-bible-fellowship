@@ -37,26 +37,26 @@ through the `@bbf/nuxt` layer.
 | `sermons.json`    | the sermons page: its titles, play button, channel link     |
 | `events.json`     | the events pages, their title, an event’s days, the week    |
 | `connect.json`    | the connect page: its cards’ headings and labels, its map   |
-| `roles.json`      | a staff member's roles, as the site and the admin name them |
+| `roles.json`      | a person's roles, as the site and the admin name them       |
 
-| File                    | Messages                                                       |
-| ----------------------- | -------------------------------------------------------------- |
-| `admin/site.json`       | what the admin is: the line under the church's name            |
-| `admin/navigation.json` | the header's links: the sections the admin edits               |
-| `admin/login.json`      | the login page                                                 |
-| `admin/account.json`    | the account menu: its name and the way out                     |
-| `admin/editor.json`     | what every editor shares: its buttons, prompts and fields      |
-| `admin/events.json`     | the events section: its pages' titles and not found            |
-| `admin/event.json`      | an event's fields, its picture's controls, and the hints       |
-| `admin/weeks.json`      | the weeks of the month a repeating event is held in            |
-| `admin/staff.json`      | the staff section: its pages' titles and not found             |
-| `admin/member.json`     | a staff member's fields, their photo's controls, and the hints |
-| `admin/content.json`    | the content section: its pages' titles and not found           |
-| `admin/page.json`       | a page's metadata fields, its body's editor, and the hints     |
-| `admin/pages.json`      | the site's own pages: their list, their names and not found    |
-| `admin/home.json`       | the home page's hero: its fields, its picture's controls       |
-| `admin/connect.json`    | the connect page's fields: how to reach the church, the hints  |
-| `admin/settings.json`   | the settings page: its title and its tab                       |
+| File                    | Messages                                                      |
+| ----------------------- | ------------------------------------------------------------- |
+| `admin/site.json`       | what the admin is: the line under the church's name           |
+| `admin/navigation.json` | the header's links: the sections the admin edits              |
+| `admin/login.json`      | the login page                                                |
+| `admin/account.json`    | the account menu: its name and the way out                    |
+| `admin/editor.json`     | what every editor shares: its buttons, prompts and fields     |
+| `admin/events.json`     | the events section: its pages' titles and not found           |
+| `admin/event.json`      | an event's fields, its picture's controls, and the hints      |
+| `admin/weeks.json`      | the weeks of the month a repeating event is held in           |
+| `admin/people.json`     | the people section: its pages' titles and not found           |
+| `admin/person.json`     | a person's fields, their photo's controls, and the hints      |
+| `admin/content.json`    | the content section: its pages' titles and not found          |
+| `admin/page.json`       | a page's metadata fields, its body's editor, and the hints    |
+| `admin/pages.json`      | the site's own pages: their list, their names and not found   |
+| `admin/home.json`       | the home page's hero: its fields, its picture's controls      |
+| `admin/connect.json`    | the connect page's fields: how to reach the church, the hints |
+| `admin/settings.json`   | the settings page: its title and its tab                      |
 
 Messages are ICU MessageFormat, where an ASCII apostrophe is the escape
 character — write a typographic one (`You’re`).

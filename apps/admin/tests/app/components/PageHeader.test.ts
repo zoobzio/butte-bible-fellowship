@@ -5,30 +5,30 @@ import { setRoutePath } from "#imports";
 import PageHeader from "~/components/PageHeader.vue";
 
 const TABS = [
-  { label: "Profile", to: "/staff/1/profile" },
-  { label: "Sermons", to: "/staff/1/sermons" },
+  { label: "Profile", to: "/people/1/profile" },
+  { label: "Sermons", to: "/people/1/sermons" },
 ];
 
 describe("PageHeader", () => {
   it("titles the page, and offers the one thing to do beside it", () => {
     const wrapper = mount(PageHeader, {
-      props: { title: "Staff", to: "/staff/new", action: "New member" },
+      props: { title: "Staff", to: "/people/new", action: "New person" },
     });
     expect(wrapper.find("h1.page-header-title").text()).toBe("Staff");
     const action = wrapper.find(".page-header-actions a.page-header-action");
-    expect(action.attributes("href")).toBe("/staff/new");
-    expect(action.text()).toBe("New member");
+    expect(action.attributes("href")).toBe("/people/new");
+    expect(action.text()).toBe("New person");
   });
 
   it("offers the one thing to do as a button when it leads to no page, and says when it is asked for", async () => {
     const wrapper = mount(PageHeader, {
-      props: { title: "Staff", action: "New member" },
+      props: { title: "Staff", action: "New person" },
     });
     expect(wrapper.find("a.page-header-action").exists()).toBe(false);
     const action = wrapper.find(".page-header-actions button");
     expect(action.classes()).toEqual(["page-header-action"]);
     expect(action.attributes("type")).toBe("button");
-    expect(action.text()).toBe("New member");
+    expect(action.text()).toBe("New person");
     expect(wrapper.emitted("action")).toBeUndefined();
     await action.trigger("click");
     expect(wrapper.emitted("action")).toEqual([[]]);
@@ -52,7 +52,7 @@ describe("PageHeader", () => {
 
   it("takes what else a page offers beside the title, after the link", () => {
     const wrapper = mount(PageHeader, {
-      props: { title: "Jane Doe", to: "/staff/new", action: "New member" },
+      props: { title: "Jane Doe", to: "/people/new", action: "New person" },
       slots: { default: '<button class="menu">Actions</button>' },
     });
     const actions = wrapper.find(".page-header-actions");
@@ -63,20 +63,20 @@ describe("PageHeader", () => {
 
   it("offers the way back to the page above, over the title", () => {
     const wrapper = mount(PageHeader, {
-      props: { title: "Jane Doe", back: { label: "Staff", to: "/staff" } },
+      props: { title: "Jane Doe", back: { label: "Staff", to: "/people" } },
     });
     const heading = wrapper.find(".page-header-heading");
     expect(
       [...heading.element.children].map((child) => child.className),
     ).toEqual(["page-header-back", "page-header-title"]);
     const back = heading.find("a.page-header-back");
-    expect(back.attributes("href")).toBe("/staff");
+    expect(back.attributes("href")).toBe("/people");
     expect(back.text()).toBe("Staff");
     expect(back.find("svg").exists()).toBe(false);
     const iconed = mount(PageHeader, {
       props: {
         title: "Jane Doe",
-        back: { label: "Staff", to: "/staff", icon: "chevron-left" },
+        back: { label: "Staff", to: "/people", icon: "chevron-left" },
       },
     }).find("a.page-header-back");
     expect(iconed.find("svg").attributes("aria-hidden")).toBe("true");
@@ -90,7 +90,7 @@ describe("PageHeader", () => {
   });
 
   it("offers the record's pages as tabs under the title, each a link", () => {
-    setRoutePath("/staff/1/sermons", { id: "1" });
+    setRoutePath("/people/1/sermons", { id: "1" });
     const wrapper = mount(PageHeader, {
       props: { title: "Jane Doe", tabs: TABS },
     });
@@ -103,14 +103,14 @@ describe("PageHeader", () => {
         tab.attributes("data-state"),
       ]),
     ).toEqual([
-      ["A", "Profile", "/staff/1/profile", "inactive"],
-      ["A", "Sermons", "/staff/1/sermons", "active"],
+      ["A", "Profile", "/people/1/profile", "inactive"],
+      ["A", "Sermons", "/people/1/sermons", "active"],
     ]);
     expect(wrapper.find('[role="tablist"]').exists()).toBe(true);
   });
 
   it("lights the tab of the page being read, or of a page under it", () => {
-    setRoutePath("/staff/1/profile/photo", { id: "1" });
+    setRoutePath("/people/1/profile/photo", { id: "1" });
     const wrapper = mount(PageHeader, {
       props: { title: "Jane Doe", tabs: TABS },
     });
@@ -120,13 +120,13 @@ describe("PageHeader", () => {
   });
 
   it("offers nothing when there is nothing to do", () => {
-    const wrapper = mount(PageHeader, { props: { title: "New member" } });
-    expect(wrapper.find("h1").text()).toBe("New member");
+    const wrapper = mount(PageHeader, { props: { title: "New person" } });
+    expect(wrapper.find("h1").text()).toBe("New person");
     expect(wrapper.find("a").exists()).toBe(false);
     expect(wrapper.find(".page-header-actions").exists()).toBe(false);
     expect(wrapper.find(".page-header-tabs").exists()).toBe(false);
     expect(
-      mount(PageHeader, { props: { title: "New member", tabs: [] } })
+      mount(PageHeader, { props: { title: "New person", tabs: [] } })
         .find(".page-header-tabs")
         .exists(),
     ).toBe(false);

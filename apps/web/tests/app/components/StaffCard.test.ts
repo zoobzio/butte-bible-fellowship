@@ -41,6 +41,16 @@ describe("StaffCard", () => {
     expect(card("elder").text()).not.toBe("elder");
   });
 
+  it("names them by their title, where one is written, in place of their role", () => {
+    const wrapper = mountCard({
+      id: 1,
+      name: "Jane Doe",
+      role: "staff",
+      title: "Worship Director",
+    });
+    expect(wrapper.find(".staff-card-role").text()).toBe("Worship Director");
+  });
+
   it("shows the person's photo when they have one", () => {
     const wrapper = mountCard({
       id: 1,

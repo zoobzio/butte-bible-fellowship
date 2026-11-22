@@ -101,17 +101,17 @@ describe("bridge", () => {
 
 describe("requiredScope", () => {
   it("reads with a GET and writes with anything else", () => {
-    expect(requiredScope("/api/staff", "GET")).toBe("staff:read");
-    expect(requiredScope("/api/staff/3", "HEAD")).toBe("staff:read");
-    expect(requiredScope("/api/staff", "POST")).toBe("staff:write");
+    expect(requiredScope("/api/people", "GET")).toBe("people:read");
+    expect(requiredScope("/api/people/3", "HEAD")).toBe("people:read");
+    expect(requiredScope("/api/people", "POST")).toBe("people:write");
     expect(requiredScope("/api/events/3", "PUT")).toBe("events:write");
     expect(requiredScope("/api/events/3", "DELETE")).toBe("events:write");
     expect(requiredScope("/api/content", "GET")).toBe("content:read");
     expect(requiredScope("/api/content/3/body", "PATCH")).toBe("content:write");
     expect(requiredScope("/api/site/home", "GET")).toBe("site:read");
     expect(requiredScope("/api/site/about/body", "PATCH")).toBe("site:write");
-    expect(requiredScope("/api/views/staff", "GET")).toBe("views:read");
-    expect(requiredScope("/api/views/staff/0b1f4c4e", "PUT")).toBe(
+    expect(requiredScope("/api/views/people", "GET")).toBe("views:read");
+    expect(requiredScope("/api/views/people/0b1f4c4e", "PUT")).toBe(
       "views:write",
     );
   });
@@ -119,6 +119,6 @@ describe("requiredScope", () => {
   it("needs a scope nobody holds for records the contract does not name", () => {
     expect(requiredScope("/api/sermons", "GET")).toBeUndefined();
     expect(requiredScope("/api", "GET")).toBeUndefined();
-    expect(requiredScope("/staff", "GET")).toBeUndefined();
+    expect(requiredScope("/people", "GET")).toBeUndefined();
   });
 });

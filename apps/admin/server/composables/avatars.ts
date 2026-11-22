@@ -1,4 +1,4 @@
-import type { EventRecord, HomeRecord, StaffRecord } from "@bbf/schema/types";
+import type { EventRecord, HomeRecord, PersonRecord } from "@bbf/schema/types";
 import type { H3Event } from "h3";
 
 import { randomUUID } from "node:crypto";
@@ -10,7 +10,7 @@ import { keys } from "objectively";
 
 import { useEvents } from "~~/server/composables/events";
 import { useHome } from "~~/server/composables/home";
-import { useStaff } from "~~/server/composables/staff";
+import { usePeople } from "~~/server/composables/people";
 import {
   AVATAR_KEY,
   AVATAR_ROUTE,
@@ -19,7 +19,7 @@ import {
 } from "~~/server/constants/avatars";
 
 /**
- * Where the pictures are kept: the staff's photos, and the events'
+ * Where the pictures are kept: the people's photos, and the events'
  * pictures. `put` keeps a record's picture under a name no other has and
  * answers with the URL it is read at; `remove` drops a picture the store
  * keeps, and leaves a URL that is another's alone.
@@ -29,7 +29,7 @@ export interface AvatarStore {
   remove: (url: string) => Promise<void>;
 }
 
-/** The folder the staff's photos are kept in, and the events' pictures. */
+/** The folder the people's photos are kept in, and the events' pictures. */
 export const STAFF_FOLDER = "staff";
 export const EVENT_FOLDER = "events";
 
@@ -69,7 +69,7 @@ export const useBlobStore = (folder = STAFF_FOLDER): AvatarStore => ({
 /**
  * The server's own data directory, as development keeps the photos when
  * there is no Blob store to write to: read back from this app, at
- * `/avatars`, under the origin the request came to. A member's photo is
+ * `/avatars`, under the origin the request came to. A person's photo is
  * named by their id, and another kind of record's by its folder first.
  */
 export const useLocalStore = (
@@ -159,12 +159,16 @@ export const usePictures = <R>(store: AvatarStore, records: Pictured<R>) => {
   return { replace, clear, discard };
 };
 
-/** A member's photo, written on its own, kept with the staff's. */
-export const useStaffAvatar = (event: H3Event) => {
-  const staff = useStaff();
-  return usePictures<StaffRecord>(useAvatarStore(event, STAFF_FOLDER), {
-    fetch: staff.fetch,
-    set: staff.setPhoto,
+/**
+ * A person's photo, written on its own. The folder is still named for the
+ * staff, whose photos were the first kept there, so the ones kept stay
+ * where they are read.
+ */
+export const usePersonAvatar = (event: H3Event) => {
+  const people = usePeople();
+  return usePictures<PersonRecord>(useAvatarStore(event, STAFF_FOLDER), {
+    fetch: people.fetch,
+    set: people.setPhoto,
     of: (record) => record.photo,
   });
 };

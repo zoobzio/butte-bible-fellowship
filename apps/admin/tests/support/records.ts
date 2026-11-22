@@ -6,7 +6,7 @@ import type {
   EventRecord,
   FolderRecord,
   HomeRecord,
-  StaffRecord,
+  PersonRecord,
 } from "@bbf/schema/types";
 
 export const BIO = {
@@ -21,8 +21,10 @@ export const BIO = {
   ],
 };
 
-export const STAFF: StaffRecord = {
+export const PERSON: PersonRecord = {
   id: 1,
+  firstName: "Jane",
+  lastName: "Doe",
   name: "Jane Doe",
   role: "elder",
   summary: "Has served since 2010.",

@@ -30,7 +30,7 @@ export type EventRecordRow = Row<Contract, "admin.events.fetch">;
 
 export type StaffRow = Row<Contract, "web.staff.list">;
 
-export type StaffRecordRow = Row<Contract, "admin.staff.fetch">;
+export type PersonRecordRow = Row<Contract, "admin.people.fetch">;
 
 type SermonColumns = Row<Contract, "web.sermons.fetch">;
 
@@ -62,6 +62,6 @@ export type ConnectArguments = Arguments<Contract, "admin.connect.update">;
 
 export type EventArguments = Arguments<Contract, "admin.events.create">;
 
-export type StaffArguments = Arguments<Contract, "admin.staff.create">;
+export type PersonArguments = Arguments<Contract, "admin.people.create">;
 
 export type SermonArguments = Arguments<Contract, "admin.sermons.create">;

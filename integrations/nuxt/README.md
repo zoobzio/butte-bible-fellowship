@@ -58,7 +58,7 @@ merges over: the site's tagline, and no links.
 ```ts
 const header: HeaderConfig = {
   tagline: "admin.site.tag",
-  links: [{ label: "admin.navigation.staff", to: "/staff" }],
+  links: [{ label: "admin.navigation.people", to: "/people" }],
 };
 ```
 
