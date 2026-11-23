@@ -2,7 +2,7 @@ import type { PersonRecord } from "@bbf/schema/types";
 
 import { personListing } from "@bbf/schema";
 import { createTable, navigateTo } from "#imports";
-import { useListingFetch } from "~/composables/listing";
+import { useListingFetch, useListingRefresh } from "~/composables/listing";
 import { ROUTE } from "~/composables/people/routes";
 import { usePeopleRequests } from "~/composables/people/tasks";
 import { PEOPLE_TABLE, link } from "~/constants/people";
@@ -14,10 +14,15 @@ import { PEOPLE_TABLE, link } from "~/constants/people";
  * carry out. The layer's factory names the columns, the actions and the
  * search's text literal from the prose as the table is built in setup, in
  * the visitor's locale.
+ *
+ * The table syncs: each poll asks for the page with the mark it was last
+ * read at, and the API answers only where the people have changed since,
+ * with the page as it now stands, which lands without the table loading.
  */
 export const usePeopleTable = createTable<PersonRecord>("people", {
   ...PEOPLE_TABLE,
   fetch: useListingFetch(ROUTE, personListing),
+  refresh: useListingRefresh(ROUTE, personListing),
   actions: {
     edit: {
       label: "admin.editor.edit",

@@ -11,6 +11,7 @@ import { toPersonArguments, toPersonRecord } from "@bbf/utils";
 import { TIME_ZONE } from "#layers/bbf/shared/constants/time";
 import { useDatabase } from "#layers/bbf/server/composables/database";
 
+import { useChanges } from "~~/server/composables/changes";
 import { toDaySearch, toListing, toTextSearch } from "~~/server/utils/listing";
 
 /** The text columns of a person, each filtered by the text operators. */
@@ -67,15 +68,24 @@ const toOrder = (query: PersonQuery) => ({
 
 export const usePeople = () => {
   const db = useDatabase();
+  const changes = useChanges();
 
-  /** One page of the search, and how many people the whole search holds. */
-  const list = (query: PersonQuery): Promise<PersonListing> => {
+  /**
+   * One page of the search, and how many people the whole search holds,
+   * with the mark the people stand at as its `since`. Asked with that mark
+   * again, and no one added, changed or removed since, nothing: the page
+   * the asker holds still stands, and is not read again.
+   */
+  const list = async (query: PersonQuery): Promise<PersonListing | null> => {
+    const since = await changes.mark("people");
+    if (query.since === since) return null;
     const search = { ...toSearch(query), ...toOrder(query) };
-    return toListing(
+    const listing = await toListing(
       query,
       (window) => db.admin.people.list({ ...search, ...window }),
       toPersonRecord,
     );
+    return { ...listing, since };
   };
 
   const fetch = async (id: number): Promise<PersonRecord | null> => {

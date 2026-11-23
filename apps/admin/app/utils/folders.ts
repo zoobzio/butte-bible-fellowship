@@ -88,6 +88,7 @@ export const toListing = (
           toBrowserFolder(folder, path),
         ),
         files: resource.files,
+        ...(resource.since === undefined ? {} : { since: resource.since }),
       }
     : { folders: [], files: [] };
 

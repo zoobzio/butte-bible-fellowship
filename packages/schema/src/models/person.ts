@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 import { hast } from "./hast";
-import { listing } from "./listing";
+import { listing, mark } from "./listing";
 
 export const PERSON_ROLES = ["pastor", "elder", "staff", "member"] as const;
 
@@ -133,7 +133,10 @@ export const personRecord = z
       "Someone of the church, whether they serve it or belong to it, as the admin reads them: every column of their row.",
   });
 
-export const personListing = listing(personRecord).meta({
-  id: "PersonListing",
-  description: "A page of the people, as the admin lists them, in their order.",
-});
+export const personListing = listing(personRecord)
+  .extend({ since: mark })
+  .meta({
+    id: "PersonListing",
+    description:
+      "A page of the people, as the admin lists them, in their order.",
+  });

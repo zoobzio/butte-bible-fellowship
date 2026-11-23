@@ -161,8 +161,13 @@ const described = vi.fn(async (args: { id: number; bio: unknown }) =>
 );
 const deleted = vi.fn(async ({ id }: { id: number }) => (id === 1 ? 1 : 0));
 
+/* The mark the people stand at, as the database counts their writes. */
+const MARK = "7";
+const marked = vi.fn(async (_: { surface: string }) => ({ version: MARK }));
+
 Object.assign(service, {
   admin: {
+    changes: { fetch: { first: marked } },
     people: {
       list,
       fetch: { first: fetched },
@@ -184,16 +189,39 @@ afterEach(() => {
     portrayed,
     described,
     deleted,
+    marked,
   ]) {
     query.mockClear();
   }
 });
 
 describe("usePeople", () => {
+  it("hands back the mark the people stand at with a page, and nothing for a page asked since that mark", async () => {
+    const listing = await usePeople().list({ page: 1, size: 25 });
+    expect(marked).toHaveBeenCalledWith({ surface: "people" });
+    expect(listing?.since).toBe(MARK);
+    list.mockClear();
+    expect(await usePeople().list({ page: 1, size: 25, since: MARK })).toBe(
+      null,
+    );
+    expect(list).not.toHaveBeenCalled();
+    expect(
+      await usePeople().list({ page: 1, size: 25, since: "6" }),
+    ).toMatchObject({ total: 2, since: MARK });
+    expect(
+      await usePeople().list({
+        page: 1,
+        size: 25,
+        since: "2026-10-17T18:00:00.000Z",
+      }),
+    ).toMatchObject({ total: 2, since: MARK });
+  });
+
   it("asks the database for one page of the people, which carries how many there are in all", async () => {
     expect(await usePeople().list({ page: 1, size: 1 })).toEqual({
       items: [RECORD],
       total: 2,
+      since: MARK,
     });
     expect(list).toHaveBeenCalledWith({
       ...NONE,
@@ -205,6 +233,7 @@ describe("usePeople", () => {
     expect(await usePeople().list({ page: 2, size: 1 })).toEqual({
       items: [JOHN],
       total: 2,
+      since: MARK,
     });
     expect(list).toHaveBeenLastCalledWith({
       ...NONE,
@@ -218,6 +247,7 @@ describe("usePeople", () => {
     expect(await usePeople().list({ page: 3, size: 1, q: "o" })).toEqual({
       items: [],
       total: 2,
+      since: MARK,
     });
     expect(list).toHaveBeenCalledTimes(2);
     expect(list).toHaveBeenLastCalledWith({
@@ -267,6 +297,7 @@ describe("usePeople", () => {
     expect(await usePeople().list({ page: 1, size: 25, q: "ROE" })).toEqual({
       items: [JOHN],
       total: 1,
+      since: MARK,
     });
     await usePeople().list({ page: 1, size: 25, q: "", roleIs: "pastor" });
     expect(list).toHaveBeenLastCalledWith({
@@ -289,7 +320,7 @@ describe("usePeople", () => {
   it("hands the database what each text column is or is not, present or missing among them", async () => {
     expect(
       await usePeople().list({ page: 1, size: 25, emailIs: "missing" }),
-    ).toEqual({ items: [], total: 0 });
+    ).toEqual({ items: [], total: 0, since: MARK });
     await usePeople().list({
       page: 1,
       size: 25,
@@ -381,11 +412,11 @@ describe("usePeople", () => {
   it("counts nothing when the search finds nothing", async () => {
     expect(
       await usePeople().list({ page: 1, size: 25, roleIs: "pastor" }),
-    ).toEqual({ items: [], total: 0 });
+    ).toEqual({ items: [], total: 0, since: MARK });
     expect(list).toHaveBeenCalledTimes(1);
     expect(
       await usePeople().list({ page: 2, size: 25, roleIs: "pastor" }),
-    ).toEqual({ items: [], total: 0 });
+    ).toEqual({ items: [], total: 0, since: MARK });
     expect(list).toHaveBeenCalledTimes(3);
   });
 

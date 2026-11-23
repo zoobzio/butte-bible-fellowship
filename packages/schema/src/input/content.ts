@@ -4,7 +4,7 @@ import { hast } from "../models/hast";
 import { contentLocation } from "../models/path";
 import { slug } from "../models/slug";
 import { folderBody } from "./folder";
-import { dayColumn, listingQuery, sorting, textColumn } from "./listing";
+import { dayColumn, listingQuery, since, sorting, textColumn } from "./listing";
 
 export const contentPath = z.object({
   slug: slug.meta({
@@ -38,6 +38,7 @@ export const contentQuery = z.object({
   ...textColumn("slug", "slug"),
   ...textColumn("mime", "media type"),
   ...dayColumn("updatedAt", "The day the pages listed were last changed"),
+  since,
 });
 
 export const contentBody = z

@@ -21,6 +21,7 @@ import {
   setResponseStatus,
 } from "h3";
 
+import { useChanges } from "~~/server/composables/changes";
 import { useContent } from "~~/server/composables/content";
 import { useFolders } from "~~/server/composables/folders";
 import { useContentTree } from "~~/server/composables/tree";
@@ -68,14 +69,22 @@ export const useContentPaths = () => {
 
   /**
    * What the path names: a document, or a folder with what it holds, which
-   * the query searches and sorts.
+   * the query searches and sorts. A folder comes with the mark the content
+   * stands at as its `since`; asked with that mark again, and nothing of
+   * the content added, changed or removed since, the answer is empty: what
+   * the asker holds still stands, and is not read again.
    */
-  const read = async (event: H3Event): Promise<ContentResource> => {
+  const read = async (event: H3Event): Promise<ContentResource | null> => {
     const path = locationOf(event);
     const query = await getValidatedQuery(event, contentQuery.parse);
+    const since = await useChanges().mark("content");
+    if (query.since === since) {
+      setResponseStatus(event, 204);
+      return null;
+    }
     const resource = await tree.read(path, query);
     if (resource === null) throw nowhere();
-    return resource;
+    return resource.kind === "folder" ? { ...resource, since } : resource;
   };
 
   /** A new document or a new folder, made in the folder the path names. */

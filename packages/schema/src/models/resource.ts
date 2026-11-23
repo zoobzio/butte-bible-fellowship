@@ -2,6 +2,7 @@ import { z } from "zod";
 
 import { contentRecord, contentRecords } from "./content";
 import { folderRecord, folderRecords } from "./folder";
+import { mark } from "./listing";
 
 export const contentResource = z
   .discriminatedUnion("kind", [
@@ -16,6 +17,7 @@ export const contentResource = z
       files: contentRecords.meta({
         description: "The documents filed in it, which the search leaves.",
       }),
+      since: mark,
     }),
     z.object({
       kind: z.literal("document"),

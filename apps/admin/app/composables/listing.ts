@@ -3,13 +3,14 @@ import type { ZodType } from "zod";
 import type {
   Listing,
   TableFetch,
+  TableRefresh,
   TableRecord,
   TableService,
 } from "~/types/listing";
 
 import { useRequest } from "#imports";
 import { useApi } from "~/composables/api";
-import { toFetchResult, toListingQuery } from "~/utils/listing";
+import { answered, toFetchResult, toListingQuery } from "~/utils/listing";
 
 export const useListingFetch = <T extends TableRecord>(
   path: string,
@@ -23,6 +24,29 @@ export const useListingFetch = <T extends TableRecord>(
   };
 
   return fetch;
+};
+
+/**
+ * The poll of a table's sync, over the same route as its fetch: the page
+ * the table shows, asked for with the mark it was last read at. The API
+ * answers nothing where the list still stands, and the page as it now is,
+ * with the mark to ask with next, where anything was added, changed or
+ * removed.
+ */
+export const useListingRefresh = <T extends TableRecord>(
+  path: string,
+  schema: ZodType<Listing<T>>,
+) => {
+  const api = useApi();
+
+  const refresh: TableRefresh<T> = async ({ since, ...params }) => {
+    const data = await api(path, {
+      query: { ...toListingQuery(params), since },
+    });
+    return answered(data) ? toFetchResult(schema.parse(data)) : null;
+  };
+
+  return refresh;
 };
 
 /**

@@ -13,6 +13,8 @@ export type BrowserFetch<T> = BrowserOptions<T>["fetch"];
 
 export type BrowserFetchParams = Parameters<BrowserFetch<unknown>>[0];
 
+export type BrowserRefresh<T> = NonNullable<BrowserOptions<T>["refresh"]>;
+
 export type BrowserFetchResult<T> = Awaited<ReturnType<BrowserFetch<T>>>;
 
 /**

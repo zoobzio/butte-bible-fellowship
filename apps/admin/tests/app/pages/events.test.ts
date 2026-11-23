@@ -28,6 +28,7 @@ const WEEKLY: ViewRecord = {
   payload: {
     view: "week",
     clauses: [{ kind: "filter", key: "recurring", op: "is", value: "true" }],
+    interval: 0,
   },
   createdAt: "2026-10-17T18:00:00.000Z",
   updatedAt: "2026-10-18T09:30:00.000Z",
@@ -257,7 +258,10 @@ describe("events views", () => {
     expect(path).toBe(`/api/views/events/${view.id}`);
     expect(request).toEqual({
       method: "PUT",
-      body: { name: "This week", payload: { view: "week", clauses: [] } },
+      body: {
+        name: "This week",
+        payload: { view: "week", clauses: [], interval: 0 },
+      },
     });
     expect(
       eventViewBody.safeParse((request as { body: unknown }).body).success,

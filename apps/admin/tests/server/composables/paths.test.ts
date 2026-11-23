@@ -17,12 +17,18 @@ const tree = {
 };
 const content = { update: vi.fn() };
 const folders = { update: vi.fn() };
+/* The mark the content stands at, as the database counts its writes. */
+const MARK = "7";
+const changes = { mark: vi.fn(async () => MARK) };
 
 vi.mock("~~/server/composables/tree", () => ({
   useContentTree: () => tree,
 }));
 vi.mock("~~/server/composables/content", () => ({
   useContent: () => content,
+}));
+vi.mock("~~/server/composables/changes", () => ({
+  useChanges: () => changes,
 }));
 vi.mock("~~/server/composables/folders", () => ({
   useFolders: () => folders,
@@ -92,7 +98,7 @@ describe("useContentPaths", () => {
       tree.read.mockResolvedValue(FOLDER);
       expect(await serve()("GET", "/api/content")).toEqual({
         status: 200,
-        body: FOLDER,
+        body: { ...FOLDER, since: MARK },
       });
       expect(tree.read).toHaveBeenCalledWith([], {});
     });
@@ -146,6 +152,35 @@ describe("useContentPaths", () => {
         sort: "size",
         direction: "desc",
         titleContains: "ro",
+      });
+    });
+
+    it("hands a folder back with the mark the content stands at, a document without, and answers nothing to one asked since that mark", async () => {
+      const request = serve();
+      tree.read.mockResolvedValue(FOLDER);
+      expect(await request("GET", "/api/content/Sermon%20notes")).toEqual({
+        status: 200,
+        body: { ...FOLDER, since: MARK },
+      });
+      expect(changes.mark).toHaveBeenCalledWith("content");
+      const document = { kind: "document", record: ABOUT };
+      tree.read.mockResolvedValue(document);
+      expect(await request("GET", "/api/content/about-us")).toEqual({
+        status: 200,
+        body: document,
+      });
+
+      tree.read.mockClear();
+      expect(
+        await request("GET", `/api/content/Sermon%20notes?since=${MARK}`),
+      ).toEqual({ status: 204, body: null });
+      expect(tree.read).not.toHaveBeenCalled();
+      tree.read.mockResolvedValue(FOLDER);
+      expect(
+        await request("GET", "/api/content/Sermon%20notes?since=6"),
+      ).toEqual({ status: 200, body: { ...FOLDER, since: MARK } });
+      expect(tree.read).toHaveBeenLastCalledWith(["Sermon notes"], {
+        since: "6",
       });
     });
 

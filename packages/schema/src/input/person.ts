@@ -2,7 +2,7 @@ import { z } from "zod";
 
 import { hast } from "../models/hast";
 import { personRole } from "../models/person";
-import { dayColumn, listingQuery, sorting, textColumn } from "./listing";
+import { dayColumn, listingQuery, since, sorting, textColumn } from "./listing";
 
 export const personId = z.object({
   id: z.coerce
@@ -49,6 +49,7 @@ export const personQuery = listingQuery.extend({
   ...textColumn("photo", "photo's URL"),
   ...dayColumn("updatedAt", "The day the people listed were last changed"),
   ...dayColumn("createdAt", "The day the people listed were added"),
+  since,
 });
 
 /**

@@ -34,6 +34,7 @@ const BLANK = {
   columnSizing: {},
   pageSize: 25,
   clauses: [],
+  interval: 0,
 };
 
 const ELDERS = {
@@ -53,6 +54,7 @@ const ELDERS = {
       value: "2026-01-01",
     },
   ],
+  interval: 30_000,
 };
 
 describe("tableView", () => {
@@ -144,7 +146,12 @@ describe("peopleView", () => {
 });
 
 /** A browser as it starts: nothing sorted or searched. */
-const UNSORTED = { sortField: null, sortDirection: "asc", clauses: [] };
+const UNSORTED = {
+  sortField: null,
+  sortDirection: "asc",
+  clauses: [],
+  interval: 0,
+};
 
 const IMAGES = {
   sortField: "size",
@@ -153,6 +160,7 @@ const IMAGES = {
     { kind: "literal", key: "text", value: "easter" },
     { kind: "filter", key: "mime", op: "starts with", value: "image/" },
   ],
+  interval: 60_000,
 };
 
 describe("browserView", () => {
@@ -186,7 +194,11 @@ describe("calendarView", () => {
   });
 
   it("fills in whatever a view leaves out, the first of the calendar's views with it", () => {
-    expect(view.parse({})).toEqual({ view: "week", clauses: [] });
+    expect(view.parse({})).toEqual({
+      view: "week",
+      clauses: [],
+      interval: 0,
+    });
   });
 
   it("shows a view the calendar offers, and filters by the columns named to filter by", () => {
@@ -212,11 +224,16 @@ describe("eventView", () => {
       { kind: "literal", key: "text", value: "study" },
       { kind: "filter", key: "recurring", op: "is", value: "true" },
     ],
+    interval: 10_000,
   };
 
   it("accepts the events calendar's arrangement, and hands it back as it came", () => {
     expect(eventView.parse(WEEKLY)).toEqual(WEEKLY);
-    expect(eventView.parse({})).toEqual({ view: "month", clauses: [] });
+    expect(eventView.parse({})).toEqual({
+      view: "month",
+      clauses: [],
+      interval: 0,
+    });
   });
 
   it("drops what is no part of an arrangement, the day the calendar stands on with it", () => {

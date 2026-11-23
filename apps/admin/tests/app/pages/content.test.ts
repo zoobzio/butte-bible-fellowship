@@ -712,6 +712,7 @@ describe("content views", () => {
               sortField: null,
               sortDirection: "asc",
               clauses: [{ kind: "literal", key: "text", value: "fellowship" }],
+              interval: 0,
             },
           },
         },

@@ -1,6 +1,6 @@
 import type { ContentRecord, ContentResource } from "@bbf/schema/types";
 
-import type { BrowserFetch } from "~/types/content";
+import type { BrowserFetch, BrowserRefresh } from "~/types/content";
 
 import { contentResource } from "@bbf/schema";
 import {
@@ -15,6 +15,7 @@ import { endpoint } from "~/composables/content/routes";
 import { useContentRequests } from "~/composables/content/tasks";
 import { CONTENT_BROWSER, browse } from "~/constants/content";
 import { isNotFound } from "~/utils/errors";
+import { answered } from "~/utils/listing";
 import {
   samePath,
   toContentQuery,
@@ -40,6 +41,24 @@ export const useFolderFetch = (): BrowserFetch<ContentRecord> => {
 };
 
 /**
+ * The poll of the browser's sync, over the same request as its fetch: the
+ * open folder, asked for with the mark it was last read at. The API
+ * answers nothing where the content still stands, and the folder as it now
+ * is, with the mark to ask with next, where anything was added, changed or
+ * removed.
+ */
+export const useFolderRefresh = (): BrowserRefresh<ContentRecord> => {
+  const api = useApi();
+
+  return async ({ path, since, ...search }) => {
+    const data = await api(endpoint(path), {
+      query: { ...toContentQuery(search), since },
+    });
+    return answered(data) ? toListing(contentResource.parse(data), path) : null;
+  };
+};
+
+/**
  * The content browser: the config of the constants over the admin's API. A
  * document's edit is the way to its page, under the folder that is open.
  * Its move, and a folder's rename, move and delete, are left as requests
@@ -49,10 +68,16 @@ export const useFolderFetch = (): BrowserFetch<ContentRecord> => {
  * left as a request too. The layer's factory
  * names the columns, the actions and the root from the prose as the
  * browser is built in setup, in the visitor's locale.
+ *
+ * The browser syncs: each poll asks for the open folder with the mark it
+ * was last read at, and the API answers only where the content has changed
+ * since, with the folder as it now stands, which lands without the browser
+ * loading.
  */
 export const useContentBrowser = createBrowser<ContentRecord>("content", {
   ...CONTENT_BROWSER,
   fetch: useFolderFetch(),
+  refresh: useFolderRefresh(),
   actions: {
     edit: {
       label: "admin.editor.edit",
@@ -128,7 +153,10 @@ export const useContentPath = (): string[] => toPath(useRoute().params.path);
  * search is dropped with the selection, as they are on any move; come back
  * to, it is asked for as the browser was left, its sort and its search
  * kept. Every visit asks: what a folder holds may have changed since. A
- * document leaves the browser where it stands.
+ * folder put in place marks the browser's sync with the mark it came
+ * with, as a fetch of the browser's own does, so the next poll asks from
+ * there, a whole interval off. A document
+ * leaves the browser where it stands.
  */
 export const useContentRequest = (
   browser: ReturnType<typeof useContentBrowser>,
@@ -166,6 +194,7 @@ export const useContentRequest = (
         state.folders = folders;
         state.files = files;
         state.initialized = true;
+        browser.sync?.mark(resource.since);
       }
       return resource;
     },

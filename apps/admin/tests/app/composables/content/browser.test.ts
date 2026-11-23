@@ -9,6 +9,7 @@ import {
   useContentPath,
   useContentRequest,
   useFolderFetch,
+  useFolderRefresh,
 } from "~/composables/content/browser";
 
 /** The notes as the API answers with them: Romans inside, About Us filed. */
@@ -74,6 +75,34 @@ describe("useFolderFetch", () => {
   });
 });
 
+describe("useFolderRefresh", () => {
+  const poll = () =>
+    useFolderRefresh()(
+      { path: ["Sermon notes"], ...PLAIN, sortField: "size", since: "7" },
+      undefined as never,
+    );
+
+  it("asks for the open folder with the mark it was last read at, and hands back nothing where the API answers nothing", async () => {
+    const fetch = vi.fn(async () => undefined);
+    vi.stubGlobal("$fetch", fetch);
+    expect(await poll()).toBe(null);
+    expect(fetch.mock.calls).toEqual([
+      [
+        "/api/content/Sermon%20notes",
+        { query: { sort: "size", direction: "asc", since: "7" } },
+      ],
+    ]);
+  });
+
+  it("hands back the folder as it now stands, with the mark to ask with next, where the content has changed", async () => {
+    vi.stubGlobal(
+      "$fetch",
+      vi.fn(async () => ({ ...FOLDER, since: "8" })),
+    );
+    expect(await poll()).toMatchObject({ files: [ABOUT], since: "8" });
+  });
+});
+
 describe("useContentRequest", () => {
   /** The request of a path, made in setup as the page makes it. */
   const request = (path: string[]) =>
@@ -113,6 +142,17 @@ describe("useContentRequest", () => {
     ]);
     expect(browser.files).toEqual([ABOUT]);
     expect(browser.folders.map((folder) => folder.key)).toEqual(["Romans"]);
+  });
+
+  it("marks the browser's sync with the mark the folder came with, so its next poll asks from there", async () => {
+    vi.stubGlobal(
+      "$fetch",
+      vi.fn(async () => ({ ...FOLDER, since: "7" })),
+    );
+    const { browser, request: asked } = request(["Sermon notes"]);
+    expect(browser.sync?.since).toBe(null);
+    await asked;
+    expect(browser.sync?.since).toBe("7");
   });
 
   it("hands a document on and leaves the browser as it stands", async () => {

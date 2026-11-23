@@ -41,7 +41,7 @@ afterAll(() => db.close());
 const HEADING = "Discover God’s **Love, Grace & Truth**";
 
 describe("the build", () => {
-  it("carries the staff, events, sermons, users, staff search, like escape, search cost, staff status, events search, events trim, content, pages, folders, connect, views, documents, appearance, paths and people migrations in order", () => {
+  it("carries the staff, events, sermons, users, staff search, like escape, search cost, staff status, events search, events trim, content, pages, folders, connect, views, documents, appearance, paths, people and changes migrations in order", () => {
     expect(migrations.map((migration) => migration.name)).toEqual([
       "staff",
       "events",
@@ -62,6 +62,7 @@ describe("the build", () => {
       "appearance",
       "paths",
       "people",
+      "changes",
     ]);
   });
 
@@ -124,8 +125,8 @@ describe("the build", () => {
       "web.sermons.list",
       "web.staff.list",
     ]);
-    expect(names.filter((name) => name.startsWith("admin."))).toHaveLength(56);
-    expect(names).toHaveLength(69);
+    expect(names.filter((name) => name.startsWith("admin."))).toHaveLength(57);
+    expect(names).toHaveLength(70);
   });
 });
 
@@ -2873,6 +2874,59 @@ describe("admin.views", () => {
   });
 });
 
+describe("admin.changes", () => {
+  const mark = async (surface: string) =>
+    (await db.admin.changes.fetch.first({ surface }))?.version;
+
+  it("counts every write to the people, a removal among them, and leaves the mark where nothing is written", async () => {
+    const before = await mark("people");
+    expect(before).toMatch(/^\d+$/);
+    await db.admin.people.fetch.first({ id: 1 });
+    expect(await mark("people")).toBe(before);
+
+    const made = await db.admin.people.create.first({
+      first_name: "Counted",
+      last_name: "Person",
+      role: "member",
+      email: "counted@example.com",
+    });
+    const added = await mark("people");
+    expect(BigInt(added!)).toBe(BigInt(before!) + 1n);
+
+    await db.admin.people.photo.first({ id: made!.id, photo: null });
+    const changed = await mark("people");
+    expect(BigInt(changed!)).toBe(BigInt(added!) + 1n);
+
+    expect(await db.admin.people.delete({ id: made!.id })).toBe(1);
+    expect(BigInt((await mark("people"))!)).toBe(BigInt(changed!) + 1n);
+  });
+
+  it("counts the content's documents and its folders as one list, apart from the people", async () => {
+    const people = await mark("people");
+    const before = BigInt((await mark("content"))!);
+    const folder = await db.admin.folders.create.first({ name: "Counted" });
+    const made = BigInt((await mark("content"))!);
+    expect(made).toBeGreaterThan(before);
+    const page = await db.admin.content.create.first({
+      slug: "counted",
+      title: "Counted",
+      folder_id: folder!.id,
+    });
+    const filed = BigInt((await mark("content"))!);
+    expect(filed).toBeGreaterThan(made);
+    await db.admin.content.delete({ id: page!.id });
+    const removed = BigInt((await mark("content"))!);
+    expect(removed).toBeGreaterThan(filed);
+    await db.admin.folders.delete({ id: folder!.id });
+    expect(BigInt((await mark("content"))!)).toBeGreaterThan(removed);
+    expect(await mark("people")).toBe(people);
+  });
+
+  it("keeps no count for a list that is none of its own", async () => {
+    expect(await mark("events")).toBeUndefined();
+  });
+});
+
 describe("roles", () => {
   type Scoped<R extends keyof typeof contract.roles> = Awaited<
     ReturnType<typeof makeTestBezoar<typeof contract, R>>
@@ -2916,6 +2970,7 @@ describe("roles", () => {
           !name.startsWith("admin.users.") &&
           !name.startsWith("admin.folders.") &&
           !name.startsWith("admin.views.") &&
+          !name.startsWith("admin.changes.") &&
           // The people's private columns are not web's to read.
           !name.startsWith("admin.people.") &&
           /\.(fetch|list|locate|upcoming|weekly)$/.test(name),
@@ -2949,6 +3004,24 @@ describe("roles", () => {
     ).toMatchObject({ size: written!.size, count: 1 });
     await admin.admin.content.delete({ id: page!.id });
     expect(await admin.admin.folders.delete({ id: folder!.id })).toBe(1);
+  });
+
+  it("counts what admin writes, and keeps the count from web", async () => {
+    const mark = async () =>
+      (await admin.admin.changes.fetch.first({ surface: "people" }))!.version;
+    const before = await mark();
+    const made = await admin.admin.people.create.first({
+      first_name: "Granted",
+      last_name: "Person",
+      role: "member",
+      email: "granted@example.com",
+    });
+    await admin.admin.people.delete({ id: made!.id });
+    expect(BigInt(await mark())).toBe(BigInt(before) + 2n);
+    await expect(
+      // @ts-expect-error: not a query of web.
+      web.query("admin.changes.fetch", { surface: "people" }),
+    ).rejects.toBeInstanceOf(ForbiddenQueryError);
   });
 
   it("refuses a write as web, by name and in the database", async () => {

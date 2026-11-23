@@ -171,4 +171,9 @@ describe("personListing", () => {
       false,
     );
   });
+
+  it("carries the mark the people were read at, to be asked with next", () => {
+    const page = { items: [RECORD], total: 1, since: "7" };
+    expect(personListing.parse(page)).toEqual(page);
+  });
 });

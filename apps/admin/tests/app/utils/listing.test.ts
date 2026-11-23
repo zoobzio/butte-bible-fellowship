@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { toFetchResult, toListingQuery } from "~/utils/listing";
+import { answered, toFetchResult, toListingQuery } from "~/utils/listing";
 
 describe("toListingQuery", () => {
   it("asks for the page the table is on, counted from one, at its size", () => {
@@ -102,10 +102,27 @@ describe("toFetchResult", () => {
     });
   });
 
+  it("hands on the mark the list was read at, where it came with one", () => {
+    expect(toFetchResult({ items: ["a"], total: 1, since: "7" })).toEqual({
+      data: ["a"],
+      rowCount: 1,
+      since: "7",
+    });
+  });
+
   it("hands on an empty list as no rows of none", () => {
     expect(toFetchResult({ items: [], total: 0 })).toEqual({
       data: [],
       rowCount: 0,
     });
+  });
+});
+
+describe("answered", () => {
+  it("is whether the API said anything: an empty answer is a list that still stands", () => {
+    for (const nothing of [undefined, null, ""]) {
+      expect(answered(nothing)).toBe(false);
+    }
+    expect(answered({ items: [], total: 0 })).toBe(true);
   });
 });

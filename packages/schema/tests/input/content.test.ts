@@ -81,6 +81,13 @@ describe("contentQuery", () => {
     expect(contentQuery.parse({ folder: "4" })).toEqual({});
   });
 
+  it("takes the mark the folder was last read at, whatever it holds", () => {
+    expect(contentQuery.parse({ since: "7" })).toEqual({ since: "7" });
+    expect(contentQuery.parse({ since: "2026-10-17T18:00:00.000Z" })).toEqual({
+      since: "2026-10-17T18:00:00.000Z",
+    });
+  });
+
   it("searches the folder for a text, trimmed, and is no page of a listing: it carries neither a page nor a size", () => {
     expect(contentQuery.parse({ page: "2", q: " vision ", size: "5" })).toEqual(
       { q: "vision" },

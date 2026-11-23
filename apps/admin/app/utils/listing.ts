@@ -72,4 +72,13 @@ export const toFetchResult = <T extends TableRecord>(
 ): TableFetchResult<T> => ({
   data: listing.items,
   rowCount: listing.total,
+  ...(listing.since === undefined ? {} : { since: listing.since }),
 });
+
+/**
+ * Whether the API answered with anything. Asked with the mark a list was
+ * last read at, it answers nothing, 204 and empty, where the list still
+ * stands.
+ */
+export const answered = (data: unknown): boolean =>
+  data !== undefined && data !== null && data !== "";

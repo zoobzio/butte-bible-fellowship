@@ -62,6 +62,21 @@ const clauses = (columns: readonly string[]) =>
     });
 
 /**
+ * How often a view's list asks for what changed while it is on screen, in
+ * milliseconds. Zero, never, which is what a view saved before it carried
+ * one reads as.
+ */
+const interval = z
+  .int()
+  .nonnegative()
+  .default(0)
+  .meta({
+    description:
+      "How often the list asks for what changed while it is shown, in milliseconds. Zero, never.",
+    examples: [30000],
+  });
+
+/**
  * The schema of a view over one of the admin's tables: the table's
  * arrangement as it is saved, and as it is put back. `sorts` names the
  * columns the list's API sorts by and `columns` the ones it filters by, so
@@ -125,6 +140,7 @@ export const tableView = ({
         examples: [25],
       }),
     clauses: clauses(columns),
+    interval,
   });
 
 /** The columns of the people a view may filter by: the list's own filters. */
@@ -181,6 +197,7 @@ export const browserView = ({
       description: "Which way the list is sorted.",
     }),
     clauses: clauses(columns),
+    interval,
   });
 
 /**
@@ -244,6 +261,7 @@ export const calendarView = ({
         description: "How much of time the calendar shows at once.",
       }),
     clauses: clauses(columns),
+    interval,
   });
 
 /**

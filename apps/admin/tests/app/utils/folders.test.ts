@@ -139,6 +139,15 @@ describe("toListing", () => {
     });
   });
 
+  it("hands on the mark the folder was read at, where it came with one", () => {
+    expect(
+      toListing(
+        { kind: "folder", folders: [], files: [ABOUT], since: "7" },
+        [],
+      ),
+    ).toEqual({ folders: [], files: [ABOUT], since: "7" });
+  });
+
   it("lists nothing of a document, which holds neither", () => {
     expect(toListing({ kind: "document", record: HOME }, ["index"])).toEqual({
       folders: [],

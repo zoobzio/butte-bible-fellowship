@@ -178,6 +178,21 @@ export const matchColumn = <K extends string, T extends z.ZodType>(
     ],
   );
 
+/**
+ * The mark a list was last read at, handed back to ask whether it still
+ * stands: what the list answered with as its own `since`. Whatever it
+ * holds is compared and never read into, so a mark that is none of the
+ * list's is only one the list has moved on from.
+ */
+export const since = z
+  .string()
+  .optional()
+  .meta({
+    description:
+      "The mark the list was last read at, as it answered then. Where nothing was added, changed or removed since, the answer is 204 and empty. Left out, or any other mark, the list as it stands.",
+    examples: ["42"],
+  });
+
 export const listingQuery = z.object({
   page: z.coerce
     .number()

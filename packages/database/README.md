@@ -34,7 +34,11 @@ palette to as `seeds`, the overrides of the theme's tokens those come to as
 visitor starts with as `input`. Beside them, `users` is who may sign in to the admin app,
 and `views` is the arrangements of the admin's lists each of them has saved:
 one table for every list, each row a user's own, named for the list it is
-over by its `surface`, with the arrangement itself as `payload`.
+over by its `surface`, with the arrangement itself as `payload`; and
+`changes` is what the admin's lists that keep themselves up to date have
+been through: a row for the `people` and one for the `content`, its
+documents and its folders together, each a `version` that a trigger makes
+one more with every statement that writes to the list's tables.
 A sermon carries a `content_status` — draft, published, archived — and
 only the published reaches the site; the people and the events carry none,
 and whoever serves the church, and whatever event or page is written, is on
@@ -52,7 +56,7 @@ would not have offered.
 
 ```
 bezoar.config.ts   the kit config: the output directory, the defaults for the rest
-src/migrations/    the schema, forward only: staff, events, sermons, users, staff search, like escape, search cost, staff status, events search, events trim, content, pages, folders, connect, views, documents, appearance, paths, people
+src/migrations/    the schema, forward only: staff, events, sermons, users, staff search, like escape, search cost, staff status, events search, events trim, content, pages, folders, connect, views, documents, appearance, paths, people, changes
 src/seeds/         the people, the events and the first admin user, each safe to run again
 src/queries/web/   what the site reads: home, about, connect, content, staff, events, sermons, appearance
 src/queries/admin/ what the admin app will read and write: the same, in full, the staff as the people they are among
@@ -232,6 +236,14 @@ the database holds it to no shape: each list's arrangement is its own, and
 the admin's API checks it against the surface's schema of `@bbf/schema`
 before it is saved. A user removed takes their views along.
 
+`admin.changes` has `fetch`, the `version` of the list a `surface` names,
+as text: the mark a list is read at. The admin's API reads it before the
+list and hands it back with it; asked for the list again with that mark,
+it reads the mark alone, and the list only where the two differ. A count
+is kept, and no date compared, because a row removed leaves nothing behind
+to be found newer than a date, and because a count read before the list
+is never ahead of it, where two clocks may be.
+
 `admin.users` has the same, and two more for signing in. A user is added
 by their email and a `user_role` — `admin` or `editor`, the roles of
 `@bbf/patents` — and is bound to Google's subject (`sub`) the first time
@@ -269,9 +281,9 @@ so the contract carries, by role, the queries the role may run.
 
 `web` has `SELECT` on `home`, `about`, `connect`, `content`, `events` and `sermons`, and on the columns of `people` the site shows, a person's id, name, role, title, summary, bio, photo, email and phone, and nothing else.
 It may run every read of them, the admin app's plain reads among them, and
-no write; it may not read `users` at all, nor `folders` or `views`, which the site has no use for yet. Where a person lives and their birthday are columns it has no grant on, so the database refuses it `admin.people.fetch` and `admin.people.list`, and any read of its own that names them; that it lists the staff and not the members is its query's filter, as a sermon's status is. `admin` has `SELECT`, `INSERT`,
+no write; it may not read `users` at all, nor `folders`, `views` or `changes`, which the site has no use for yet. Where a person lives and their birthday are columns it has no grant on, so the database refuses it `admin.people.fetch` and `admin.people.list`, and any read of its own that names them; that it lists the staff and not the members is its query's filter, as a sermon's status is. `admin` has `SELECT`, `INSERT`,
 `UPDATE` and `DELETE` on `content`, `folders`, `people`, `events`, `sermons`, `users` and `views`, and `SELECT` and `UPDATE` alone on
-`home`, `about` and `connect`, whose one row is neither added nor removed, and may run every query. Each `id` is an identity column, which
+`home`, `about` and `connect`, whose one row is neither added nor removed, and on `changes`, whose rows the triggers of the lists' tables write as whoever wrote to them, and may run every query. Each `id` is an identity column, which
 Postgres fills without a privilege on its sequence, or for a view a UUID it is handed, so the tables are the
 whole of each grant.
 

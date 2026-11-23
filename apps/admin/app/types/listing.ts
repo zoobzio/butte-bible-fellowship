@@ -3,7 +3,13 @@ import type { ListingQuery } from "@bbf/schema/types";
 import type { AppProsaryMessage, TableOptions, UseTable } from "#imports";
 import type { z } from "zod";
 
-export type Listing<T> = z.infer<ReturnType<typeof listing<z.ZodType<T>>>>;
+/**
+ * A page of a list as the API answers with it, and the mark it was read
+ * at where the list keeps one: what to ask it with next, as `since`.
+ */
+export type Listing<T> = z.infer<ReturnType<typeof listing<z.ZodType<T>>>> & {
+  since?: string;
+};
 
 export type RecordLink<T> = (record: T) => string;
 
@@ -55,6 +61,10 @@ export type TableConfig<T extends TableRecord> = Omit<
 export type TableFetch<T extends TableRecord> = TableOptions<T>["fetch"];
 
 export type TableFetchParams = Parameters<TableFetch<TableRecord>>[0];
+
+export type TableRefresh<T extends TableRecord> = NonNullable<
+  TableOptions<T>["refresh"]
+>;
 
 export type TableFetchResult<T extends TableRecord> = Awaited<
   ReturnType<TableFetch<T>>
