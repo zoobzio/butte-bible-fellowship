@@ -82,8 +82,7 @@ describe("events page", () => {
     const { wrapper, fetch } = await mountEvents([WORSHIP, DINNER]);
     expect(wrapper.findComponent(PageHeader).props()).toEqual({
       title: "Events",
-      description:
-        "What the church holds: the weekly gatherings and the one-off events on its calendar.",
+      description: "Weekly gatherings and one-time events.",
       action: "New event",
     });
     expect(wrapper.find("a.page-header-action").exists()).toBe(false);
@@ -295,8 +294,7 @@ describe("new event dialog", () => {
     expect(dialog.props()).toMatchObject({
       open: true,
       title: "New event",
-      description:
-        "Its details come first. Its picture and what is written about it are added on its page, once it is saved.",
+      description: "You can add a picture and description after saving.",
     });
     const content = document.body.querySelector(".f-dialog-content")!;
     expect(content.getAttribute("role")).toBe("dialog");

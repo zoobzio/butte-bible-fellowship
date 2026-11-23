@@ -4,7 +4,7 @@
     "description": "The title of the page that browses the documents by folder, and the name of the top of the content in the trail of folders over them."
   },
   "description": {
-    "defaultMessage": "The documents written here, in folders of your own making: what each says, and what search engines show for it.",
+    "defaultMessage": "Documents, organized in folders.",
     "description": "The line under the title of the page that browses the content: what it holds. The home page, About Us and the connect page are not among the documents: they are under Site."
   },
   "allView": {
@@ -16,11 +16,11 @@
     "description": "The button that opens the form of a new document, and the title of that form's dialog."
   },
   "newDescription": {
-    "defaultMessage": "Its metadata comes first, and it is filed in the folder that is open. What is written on it is added on its own page, once it is saved.",
-    "description": "The line under the title of the dialog that adds a new document: what the form asks for, where the document is filed, and where the rest is written."
+    "defaultMessage": "Created in the current folder. You can add content after saving.",
+    "description": "The line under the title of the dialog that adds a new document: where the document is filed, and that its content is added after it is saved."
   },
   "notFound": {
-    "defaultMessage": "Nothing is at this address",
+    "defaultMessage": "Folder or document not found",
     "description": "The error shown when the address of a page of the content names neither a folder nor a document: one of its names is not there, or no longer is."
   },
   "page": {
@@ -40,7 +40,7 @@
     "description": "The button that opens the form of a new folder, and the title of that form's dialog."
   },
   "newFolderDescription": {
-    "defaultMessage": "It is made inside the folder that is open.",
+    "defaultMessage": "Created in the current folder.",
     "description": "The line under the title of the dialog that adds a new folder: where the folder is made."
   },
   "folderName": {
@@ -56,7 +56,7 @@
     "description": "The title of the dialog that renames a folder."
   },
   "renameFolderDescription": {
-    "defaultMessage": "It stays where it is, with everything in it.",
+    "defaultMessage": "The folder’s contents are not affected.",
     "description": "The line under the title of the dialog that renames a folder: what a new name leaves as it is."
   },
   "move": {
@@ -64,8 +64,8 @@
     "description": "The action on a document's or a folder's row that picks it up, to be put down in another folder."
   },
   "moving": {
-    "defaultMessage": "Moving {name}. Open the folder it belongs in.",
-    "description": "What the page says over the folders while a document or a folder is picked up to be moved, and what to do next. `name` is the document's title or the folder's name."
+    "defaultMessage": "Moving {name}. Open the destination folder, then choose Move here.",
+    "description": "What the page says over the folders while a document or a folder is picked up to be moved, and what to do next; “Move here” is the button that finishes the move. `name` is the document's title or the folder's name."
   },
   "confirmMany": {
     "defaultMessage": "Delete {count, plural, one {# item} other {# items}}? This cannot be undone.",

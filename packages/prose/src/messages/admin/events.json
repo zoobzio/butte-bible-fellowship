@@ -12,11 +12,11 @@
     "description": "The error shown when an address names an event that does not exist."
   },
   "newDescription": {
-    "defaultMessage": "Its details come first. Its picture and what is written about it are added on its page, once it is saved.",
-    "description": "The line under the title of the dialog that adds a new event: what the form asks for, and where the rest is written."
+    "defaultMessage": "You can add a picture and description after saving.",
+    "description": "The line under the title of the dialog that adds a new event: its picture and description are added after it is saved."
   },
   "description": {
-    "defaultMessage": "What the church holds: the weekly gatherings and the one-off events on its calendar.",
+    "defaultMessage": "Weekly gatherings and one-time events.",
     "description": "The line under the title of the page that lists the events: what the list is."
   },
   "details": {

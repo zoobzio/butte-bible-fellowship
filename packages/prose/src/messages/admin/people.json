@@ -8,15 +8,15 @@
     "description": "The button that opens the form of a new person, and the title of that form's dialog."
   },
   "newDescription": {
-    "defaultMessage": "Their details come first. Their photo and bio are added on their page, once they are saved.",
-    "description": "The line under the title of the dialog that adds a new person: what the form asks for, and where the rest is written."
+    "defaultMessage": "You can add a photo and bio after saving.",
+    "description": "The line under the title of the dialog that adds a new person: their photo and bio are added after they are saved."
   },
   "notFound": {
     "defaultMessage": "Person not found",
     "description": "The error shown when an address names a person that does not exist."
   },
   "description": {
-    "defaultMessage": "Everyone of the church: those who serve it, whom the site introduces, and its members.",
+    "defaultMessage": "Church staff and members.",
     "description": "The line under the title of the page that lists the people: what the list is."
   },
   "allView": {

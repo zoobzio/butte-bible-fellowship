@@ -17,8 +17,7 @@ describe("SiteHeader", () => {
     const wrapper = mountHeader("home", "/site/home/content");
     expect(wrapper.findComponent(PageHeader).props()).toMatchObject({
       title: "Home",
-      description:
-        "The hero the site opens with, its picture, and the welcome written under it.",
+      description: "The hero heading, image and welcome text.",
       action: undefined,
     });
     expect(wrapper.find(".page-header-actions").exists()).toBe(false);

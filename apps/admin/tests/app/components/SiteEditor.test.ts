@@ -122,8 +122,8 @@ describe("SiteEditor", () => {
     expect(
       wrapper.findAll(".f-data-form-field-hint").map((hint) => hint.text()),
     ).toEqual([
-      "The street address in full. The page’s map is drawn from it.",
-      "One line for each line of the page.",
+      "The full street address. Also used for the map.",
+      "One entry per line.",
     ]);
   });
 

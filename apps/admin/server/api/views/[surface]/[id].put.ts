@@ -27,7 +27,7 @@ export default defineEventHandler(async (event) => {
   if (record === null) {
     throw createError({
       statusCode: 409,
-      message: "That view is not yours to save",
+      message: "You can only save your own views",
     });
   }
   return record;

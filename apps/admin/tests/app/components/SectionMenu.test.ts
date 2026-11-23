@@ -74,8 +74,8 @@ describe("SectionMenu", () => {
     expect(marks[0]!.attributes()).toMatchObject({
       role: "img",
       "data-status": "invalid",
-      title: "Needs fixing",
-      "aria-label": "Needs fixing",
+      title: "Has errors",
+      "aria-label": "Has errors",
     });
   });
 });

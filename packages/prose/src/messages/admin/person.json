@@ -64,7 +64,7 @@
     "description": "The accessible name of the badge on a person's picture that removes their photo."
   },
   "bioEmpty": {
-    "defaultMessage": "Click to write a bio.",
+    "defaultMessage": "Click to add a bio.",
     "description": "What stands in for a person's bio when they have none: an invitation to click and start writing."
   }
 }

@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
   if (record === null) {
     throw createError({
       statusCode: 500,
-      message: "Person was not written",
+      message: "Could not save the person",
     });
   }
   setResponseStatus(event, 201);

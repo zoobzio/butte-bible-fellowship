@@ -118,11 +118,11 @@ describe("useAppearanceEditor", () => {
   it("heads each section with its name and what it sets", () => {
     expect(useAppearanceEditor(APPEARANCE, "palette")).toMatchObject({
       title: "Color palette",
-      hint: "Each color is drawn out into every shade the site uses. Pick one of the theme’s colors, or type a hex code.",
+      hint: "Pick a theme color or enter a hex code. Shades are generated automatically.",
     });
     expect(useAppearanceEditor(APPEARANCE, "modifiers")).toMatchObject({
       title: "Modifiers",
-      hint: "What a visitor starts with, until they choose their own.",
+      hint: "Default settings for visitors, which they can change for themselves.",
     });
   });
 

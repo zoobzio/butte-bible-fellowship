@@ -129,10 +129,10 @@ describe("EventEditor", () => {
     const hint = (id: string) => wrapper.find(`#${id}-hint`).text();
     expect(hint("event-slug")).toBe("Lowercase words joined by hyphens.");
     expect(hint("event-date")).toBe(
-      "A recurring event is held every week on this date’s day of the week.",
+      "Weekly events repeat on this date’s day of the week.",
     );
     expect(hint("event-weeks")).toBe(
-      "For a recurring event: which of the month’s weeks. None picked is every week.",
+      "For weekly events, pick the weeks of the month. Leave empty for every week.",
     );
     expect(wrapper.find("#event-date").attributes("aria-describedby")).toBe(
       "event-date-hint",
@@ -222,7 +222,7 @@ describe("EventEditor", () => {
       expect(wrapper.find("#event-end-error").exists()).toBe(true),
     );
     expect(wrapper.find("#event-end-error").text()).toBe(
-      "an event ends after it starts",
+      "End time must be after the start time",
     );
     expect(wrapper.find("#event-end").attributes("aria-invalid")).toBe("true");
     expect(wrapper.find(".event-editor-error").exists()).toBe(false);

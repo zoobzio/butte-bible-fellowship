@@ -8,7 +8,7 @@
     "description": "The section of the appearance settings that sets the site's colors: its name in the menu beside the settings, and the heading over its form."
   },
   "paletteHint": {
-    "defaultMessage": "Each color is drawn out into every shade the site uses. Pick one of the theme’s colors, or type a hex code.",
+    "defaultMessage": "Pick a theme color or enter a hex code. Shades are generated automatically.",
     "description": "The line under the heading of the color palette of the appearance settings: how a color is set, and what setting it does."
   },
   "modifiers": {
@@ -16,7 +16,7 @@
     "description": "The section of the appearance settings that sets what a visitor starts with, the color scheme, the contrast, the text size and the like: its name in the menu beside the settings, and the heading over its form."
   },
   "modifiersHint": {
-    "defaultMessage": "What a visitor starts with, until they choose their own.",
+    "defaultMessage": "Default settings for visitors, which they can change for themselves.",
     "description": "The line under the heading of the modifiers of the appearance settings: whom they apply to."
   },
   "primary": {
@@ -60,7 +60,7 @@
     "description": "The accessible name of one of the theme's own colors, a button that sets the field to it. `name` is the color's name among the theme's, and `hex` its hex code."
   },
   "notFound": {
-    "defaultMessage": "The appearance settings could not be found.",
+    "defaultMessage": "Appearance settings not found",
     "description": "What the appearance settings say when there is nothing stored to change."
   }
 }

@@ -159,7 +159,9 @@ describe("bundles", () => {
     ]);
     expect(
       prosary.format("admin.content.moving", { name: "Sermon notes" }),
-    ).toBe("Moving Sermon notes. Open the folder it belongs in.");
+    ).toBe(
+      "Moving Sermon notes. Open the destination folder, then choose Move here.",
+    );
   });
 });
 

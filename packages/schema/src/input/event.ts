@@ -87,7 +87,7 @@ export const eventWindow = eventQuery
       ctx.issues.push({
         code: "custom",
         input: ctx.value,
-        message: "a span ends on or after the day it starts",
+        message: "End date cannot be before the start date",
         path: ["to"],
       });
     }
@@ -119,7 +119,7 @@ const timing = (ctx: z.core.ParsePayload<EventTiming>) => {
     ctx.issues.push({
       code: "custom",
       input: ctx.value,
-      message: "only a recurring event picks its weeks",
+      message: "Only weekly events can have weeks",
       path: ["weeks"],
     });
   }
@@ -127,7 +127,7 @@ const timing = (ctx: z.core.ParsePayload<EventTiming>) => {
     ctx.issues.push({
       code: "custom",
       input: ctx.value,
-      message: "an event ends after it starts",
+      message: "End time must be after the start time",
       path: ["end"],
     });
   }

@@ -222,7 +222,7 @@ describe("useEventEditor", () => {
     await editor.form.submit();
     expect(fetch).not.toHaveBeenCalled();
     expect(editor.form.field("end").error).toBe(
-      "an event ends after it starts",
+      "End time must be after the start time",
     );
   });
 

@@ -4,7 +4,7 @@
     "description": "The label of the field for the church's full street address, on the connect page."
   },
   "addressHint": {
-    "defaultMessage": "The street address in full. The page’s map is drawn from it.",
+    "defaultMessage": "The full street address. Also used for the map.",
     "description": "The hint under the field for the church's street address: how to write it, and what else it is used for."
   },
   "phone": {
@@ -24,7 +24,7 @@
     "description": "The label of the field for the hours the church's office keeps, on the connect page."
   },
   "hoursHint": {
-    "defaultMessage": "One line for each line of the page.",
+    "defaultMessage": "One entry per line.",
     "description": "The hint under the field for the office's hours: each line typed is a line of the card on the site."
   }
 }

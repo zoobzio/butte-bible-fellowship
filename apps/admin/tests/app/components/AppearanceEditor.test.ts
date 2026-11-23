@@ -82,7 +82,7 @@ describe("AppearanceEditor", () => {
         .map((title) => title.text()),
     ).toEqual(["Color palette"]);
     expect(palette.find(".appearance-editor-hint").text()).toContain(
-      "type a hex code",
+      "enter a hex code",
     );
     expect(
       palette
@@ -96,7 +96,7 @@ describe("AppearanceEditor", () => {
         .map((title) => title.text()),
     ).toEqual(["Modifiers"]);
     expect(modifiers.find(".appearance-editor-hint").text()).toBe(
-      "What a visitor starts with, until they choose their own.",
+      "Default settings for visitors, which they can change for themselves.",
     );
   });
 

@@ -28,17 +28,20 @@ import { toLocation } from "~~/server/utils/paths";
 
 /** What a request is told when its path names nothing. */
 const nowhere = () =>
-  createError({ statusCode: 404, message: "Nothing is at that path" });
+  createError({ statusCode: 404, message: "Folder or document not found" });
 
 /** What a write is told when what it names is already something's name. */
 const taken = (where: "here" | "there") =>
   createError({
     statusCode: 409,
-    message: `Something ${where} already has that name`,
+    message:
+      where === "here"
+        ? "That name is already in use"
+        : "That name is already in use in the destination folder",
   });
 
 const gone = () =>
-  createError({ statusCode: 409, message: "The folder is gone" });
+  createError({ statusCode: 409, message: "The folder no longer exists" });
 
 /**
  * The content's API, which is one route: whatever follows it is a path of
@@ -58,7 +61,7 @@ export const useContentPaths = () => {
   const locationOf = (event: H3Event): ContentLocation => {
     const location = toLocation(getRouterParam(event, "path"));
     if (location === undefined) {
-      throw createError({ statusCode: 400, message: "No such path" });
+      throw createError({ statusCode: 400, message: "Invalid path" });
     }
     return location;
   };
@@ -88,7 +91,7 @@ export const useContentPaths = () => {
     if (record === "taken") throw taken("here");
     if (record === "gone") throw gone();
     if (record === null) {
-      throw createError({ statusCode: 500, message: "Nothing was written" });
+      throw createError({ statusCode: 500, message: "Could not save" });
     }
     setResponseStatus(event, 201);
     return record;

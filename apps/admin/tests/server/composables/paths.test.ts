@@ -126,7 +126,7 @@ describe("useContentPaths", () => {
       ]) {
         expect(await request("GET", address), address).toMatchObject({
           status: 400,
-          body: { message: "No such path" },
+          body: { message: "Invalid path" },
         });
       }
       expect(tree.read).not.toHaveBeenCalled();
@@ -154,7 +154,7 @@ describe("useContentPaths", () => {
       const request = serve();
       expect(await request("GET", "/api/content/gone")).toMatchObject({
         status: 404,
-        body: { message: "Nothing is at that path" },
+        body: { message: "Folder or document not found" },
       });
       expect(
         (await request("GET", "/api/content?sort=description")).status,
@@ -211,9 +211,9 @@ describe("useContentPaths", () => {
       const entry = { kind: "folder", name: "Romans" };
       const refusals = [
         ["missing", 404, "Folder not found"],
-        ["taken", 409, "Something here already has that name"],
-        ["gone", 409, "The folder is gone"],
-        [null, 500, "Nothing was written"],
+        ["taken", 409, "That name is already in use"],
+        ["gone", 409, "The folder no longer exists"],
+        [null, 500, "Could not save"],
       ] as const;
       for (const [refusal, status, message] of refusals) {
         tree.create.mockResolvedValue(refusal);
@@ -348,9 +348,9 @@ describe("useContentPaths", () => {
     it("says what the content refused a move, or a writing, over", async () => {
       const request = serve();
       const moves = [
-        ["missing", 404, "Nothing is at that path"],
-        ["taken", 409, "Something there already has that name"],
-        ["gone", 409, "The folder is gone"],
+        ["missing", 404, "Folder or document not found"],
+        ["taken", 409, "That name is already in use in the destination folder"],
+        ["gone", 409, "The folder no longer exists"],
         [
           "refused",
           409,
@@ -392,7 +392,7 @@ describe("useContentPaths", () => {
       tree.remove.mockResolvedValue("missing");
       expect(await request("DELETE", "/api/content/gone")).toMatchObject({
         status: 404,
-        body: { message: "Nothing is at that path" },
+        body: { message: "Folder or document not found" },
       });
       tree.remove.mockResolvedValue("refused");
       expect(

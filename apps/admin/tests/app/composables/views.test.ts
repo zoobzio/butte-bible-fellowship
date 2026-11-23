@@ -75,12 +75,12 @@ describe("useViewStorage", () => {
     vi.stubGlobal(
       "$fetch",
       vi.fn(async () => {
-        throw new Error("That view is not yours to save");
+        throw new Error("You can only save your own views");
       }),
     );
     await expect(
       useViewStorage("people").save({ ...VIEW, payload: {} }, service),
-    ).rejects.toThrow("not yours");
+    ).rejects.toThrow("your own views");
   });
 });
 

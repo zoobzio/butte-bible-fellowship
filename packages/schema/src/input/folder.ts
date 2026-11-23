@@ -22,7 +22,7 @@ export const folderBody = z
       .trim()
       .min(1)
       .refine((name) => isStep(name), {
-        error: "a name without / \\ ? # or %, and not . or ..",
+        error: "Names cannot contain / \\ ? # or %, or be . or ..",
       })
       .meta({
         description:

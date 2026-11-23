@@ -16,7 +16,7 @@
     "description": "The label of the rich text editor for what is written on a page."
   },
   "bodyEmpty": {
-    "defaultMessage": "Click to write the page.",
+    "defaultMessage": "Click to start writing.",
     "description": "What stands in for what is written on a page when there is nothing: an invitation to click and start writing."
   }
 }

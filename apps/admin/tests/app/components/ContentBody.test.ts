@@ -83,7 +83,7 @@ describe("ContentBody", () => {
       "true",
     );
     expect(content(wrapper).attributes("data-placeholder")).toBe(
-      "Click to write the page.",
+      "Click to start writing.",
     );
   });
 

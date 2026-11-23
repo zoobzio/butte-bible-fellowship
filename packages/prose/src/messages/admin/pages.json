@@ -4,7 +4,7 @@
     "description": "The title of the admin's page that lists the pages of the site with a layout of their own, each on a card, and the way back to it from the page of one."
   },
   "description": {
-    "defaultMessage": "The pages of the site with a layout of their own. Open one to change what it says.",
+    "defaultMessage": "The site’s main pages. Select one to edit.",
     "description": "The line under the title of the page that lists the site's own pages: what it holds, and what to do there."
   },
   "content": {
@@ -20,7 +20,7 @@
     "description": "The name of the site's home page: the heading of its card, and the title of its page in the admin."
   },
   "homeDescription": {
-    "defaultMessage": "The hero the site opens with, its picture, and the welcome written under it.",
+    "defaultMessage": "The hero heading, image and welcome text.",
     "description": "The line on the home page's card, and under the title of its page in the admin: what of the home page is changed there."
   },
   "about": {
@@ -28,7 +28,7 @@
     "description": "The name of the site's About Us page: the heading of its card, and the title of its page in the admin."
   },
   "aboutDescription": {
-    "defaultMessage": "The title and description the page opens with, and the church’s vision and beliefs written under them.",
+    "defaultMessage": "The page title and description, and the church’s vision and beliefs.",
     "description": "The line on the About Us page's card, and under the title of its page in the admin: what of About Us is changed there."
   },
   "connect": {
@@ -36,7 +36,7 @@
     "description": "The name of the site's connect page: the heading of its card, and the title of its page in the admin."
   },
   "connectDescription": {
-    "defaultMessage": "How to find and reach the church: its address, phone, fax and email, and its office hours.",
+    "defaultMessage": "The church’s address, phone, fax, email and office hours.",
     "description": "The line on the connect page's card, and under the title of its page in the admin: what of the connect page is changed there."
   },
   "notFound": {

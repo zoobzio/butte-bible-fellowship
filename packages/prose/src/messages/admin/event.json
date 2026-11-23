@@ -8,7 +8,7 @@
     "description": "The label of the field, and the heading of the table column, for the date an event is held."
   },
   "dateHint": {
-    "defaultMessage": "A recurring event is held every week on this date’s day of the week.",
+    "defaultMessage": "Weekly events repeat on this date’s day of the week.",
     "description": "The hint under the date field: what the date means for an event that recurs."
   },
   "day": {
@@ -24,7 +24,7 @@
     "description": "The label of the field for which weeks of the month a repeating event is held in, each picked from a list."
   },
   "weeksHint": {
-    "defaultMessage": "For a recurring event: which of the month’s weeks. None picked is every week.",
+    "defaultMessage": "For weekly events, pick the weeks of the month. Leave empty for every week.",
     "description": "The hint under the weeks field: which events it is for, what is picked, and what picking none means."
   },
   "weeksEmpty": {
@@ -52,7 +52,7 @@
     "description": "The label of the rich text editor for what is written about an event, for its own page."
   },
   "bodyEmpty": {
-    "defaultMessage": "Click to write about the event.",
+    "defaultMessage": "Click to add a description.",
     "description": "What stands in for what is written about an event when there is nothing: an invitation to click and start writing."
   },
   "imageUpload": {

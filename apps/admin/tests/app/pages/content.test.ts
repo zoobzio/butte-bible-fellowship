@@ -88,7 +88,7 @@ const api = (
       (document) => document.slug === steps.at(-1),
     );
     if (record === undefined) {
-      throw Object.assign(new Error("Nothing is at that path"), {
+      throw Object.assign(new Error("Folder or document not found"), {
         status: 404,
       });
     }
@@ -194,8 +194,7 @@ describe("content page", () => {
     expect(wrapper.findComponent(ContentFolder).exists()).toBe(true);
     expect(wrapper.findComponent(PageHeader).props()).toEqual({
       title: "Content",
-      description:
-        "The documents written here, in folders of your own making: what each says, and what search engines show for it.",
+      description: "Documents, organized in folders.",
       action: "New document",
     });
     expect(wrapper.find("button.content-new-folder").text()).toBe("New folder");
@@ -386,7 +385,7 @@ describe("content page", () => {
     const { wrapper, error } = await visit();
     expect(error).toMatchObject({
       statusCode: 404,
-      message: "Nothing is at this address",
+      message: "Folder or document not found",
     });
     expect(reads(fetch)).toEqual([
       ["/api/content/Sermon%20notes/Gone/deeper", { query: {} }],
@@ -803,7 +802,7 @@ describe("new document dialog", () => {
       open: true,
       title: "New document",
       description:
-        "Its metadata comes first, and it is filed in the folder that is open. What is written on it is added on its own page, once it is saved.",
+        "Created in the current folder. You can add content after saving.",
     });
     const content = document.body.querySelector(".f-dialog-content")!;
     expect(content.getAttribute("role")).toBe("dialog");
@@ -894,7 +893,7 @@ describe("folders", () => {
     expect(dialog.props()).toMatchObject({
       open: true,
       title: "New folder",
-      description: "It is made inside the folder that is open.",
+      description: "Created in the current folder.",
     });
     const editor = wrapper.findComponent(FolderEditor);
     expect(editor.props()).toEqual({ folder: null, parent: [] });
@@ -957,7 +956,7 @@ describe("folders", () => {
     expect(dialog.props()).toMatchObject({
       open: true,
       title: "Rename folder",
-      description: "It stays where it is, with everything in it.",
+      description: "The folder’s contents are not affected.",
     });
     const editor = wrapper.findComponent(FolderEditor);
     expect(editor.props("folder")).toEqual({
@@ -1016,7 +1015,7 @@ describe("folders", () => {
     await wrapper.find("button.content-new-folder").trigger("click");
     await flushPromises();
     fetch.mockRejectedValueOnce({
-      data: { message: "Something here already has that name" },
+      data: { message: "That name is already in use" },
     });
     const editor = wrapper.findComponent(FolderEditor);
     await editor.find("#folder-name").setValue("Sermon notes");
@@ -1025,7 +1024,7 @@ describe("folders", () => {
       expect(editor.find(".content-editor-error").exists()).toBe(true),
     );
     expect(editor.find(".content-editor-error").text()).toBe(
-      "Something here already has that name",
+      "That name is already in use",
     );
   });
 
@@ -1093,7 +1092,7 @@ describe("moving", () => {
     const bar = wrapper.find(".content-move");
     expect(bar.attributes("role")).toBe("status");
     expect(bar.find(".content-move-text").text()).toBe(
-      "Moving Butte Bible Fellowship. Open the folder it belongs in.",
+      "Moving Butte Bible Fellowship. Open the destination folder, then choose Move here.",
     );
     // Where it already is, is nowhere to put it.
     expect(dropOf(wrapper).text()).toBe("Move here");
@@ -1102,7 +1101,7 @@ describe("moving", () => {
     // It is held across the pages: the next folder's still shows it.
     const notes = await go(wrapper, "Sermon notes");
     expect(notes.find(".content-move-text").text()).toBe(
-      "Moving Butte Bible Fellowship. Open the folder it belongs in.",
+      "Moving Butte Bible Fellowship. Open the destination folder, then choose Move here.",
     );
     expect(dropOf(notes).attributes("disabled")).toBeUndefined();
     await dropOf(notes).trigger("click");
@@ -1148,7 +1147,7 @@ describe("moving", () => {
     // then the sermon notes.
     await act(wrapper, `${FOLDER}:nth-child(1)`, "Move");
     expect(wrapper.find(".content-move-text").text()).toBe(
-      "Moving Romans. Open the folder it belongs in.",
+      "Moving Romans. Open the destination folder, then choose Move here.",
     );
     expect(dropOf(wrapper).attributes("disabled")).toBeDefined();
 
@@ -1183,12 +1182,16 @@ describe("moving", () => {
     const { wrapper, fetch } = await mountContent(...CONTENT);
     await act(wrapper, POST, "Move");
     const notes = await go(wrapper, "Sermon notes");
-    fetch.mockRejectedValueOnce({ data: { message: "The folder is gone" } });
+    fetch.mockRejectedValueOnce({
+      data: { message: "The folder no longer exists" },
+    });
     await dropOf(notes).trigger("click");
     await vi.waitFor(() =>
       expect(notes.find(".content-error").exists()).toBe(true),
     );
-    expect(notes.find(".content-error").text()).toBe("The folder is gone");
+    expect(notes.find(".content-error").text()).toBe(
+      "The folder no longer exists",
+    );
     expect(notes.find(".content-move").exists()).toBe(true);
   });
 });
@@ -1441,7 +1444,7 @@ describe("a document's page", () => {
     const { wrapper, error } = await visit();
     expect(error).toMatchObject({
       statusCode: 404,
-      message: "Nothing is at this address",
+      message: "Folder or document not found",
     });
     expect(wrapper.findComponent(PageHeader).exists()).toBe(false);
   });

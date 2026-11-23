@@ -12,7 +12,7 @@ export default defineEventHandler(async (event) => {
   const body = await readValidatedBody(event, eventBody.parse);
   const record = await useEvents().create(body);
   if (record === null) {
-    throw createError({ statusCode: 500, message: "Event was not written" });
+    throw createError({ statusCode: 500, message: "Could not save the event" });
   }
   setResponseStatus(event, 201);
   return record;

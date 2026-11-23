@@ -80,7 +80,7 @@ describe("EventBody", () => {
       "true",
     );
     expect(content(wrapper).attributes("data-placeholder")).toBe(
-      "Click to write about the event.",
+      "Click to add a description.",
     );
   });
 

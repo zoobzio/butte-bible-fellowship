@@ -29,8 +29,7 @@ describe("site page", () => {
     const wrapper = mount(Index);
     expect(wrapper.findComponent(PageHeader).props()).toMatchObject({
       title: "Site",
-      description:
-        "The pages of the site with a layout of their own. Open one to change what it says.",
+      description: "The site’s main pages. Select one to edit.",
       back: undefined,
       action: undefined,
       tabs: undefined,
@@ -63,9 +62,9 @@ describe("site page", () => {
     expect(
       wrapper.findAll(".site-card-description").map((line) => line.text()),
     ).toEqual([
-      "The hero the site opens with, its picture, and the welcome written under it.",
-      "The title and description the page opens with, and the church’s vision and beliefs written under them.",
-      "How to find and reach the church: its address, phone, fax and email, and its office hours.",
+      "The hero heading, image and welcome text.",
+      "The page title and description, and the church’s vision and beliefs.",
+      "The church’s address, phone, fax, email and office hours.",
     ]);
   });
 

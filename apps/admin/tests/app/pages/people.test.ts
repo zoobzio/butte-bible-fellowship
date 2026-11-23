@@ -79,8 +79,7 @@ describe("people page", () => {
     const { wrapper, fetch } = await mountPeople([PERSON]);
     expect(wrapper.findComponent(PageHeader).props()).toEqual({
       title: "People",
-      description:
-        "Everyone of the church: those who serve it, whom the site introduces, and its members.",
+      description: "Church staff and members.",
       action: "New person",
     });
     expect(wrapper.find("a.page-header-action").exists()).toBe(false);
@@ -612,8 +611,7 @@ describe("new person dialog", () => {
     expect(dialog.props()).toMatchObject({
       open: true,
       title: "New person",
-      description:
-        "Their details come first. Their photo and bio are added on their page, once they are saved.",
+      description: "You can add a photo and bio after saving.",
     });
     const content = document.body.querySelector(".f-dialog-content")!;
     expect(content.getAttribute("role")).toBe("dialog");

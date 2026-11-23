@@ -310,7 +310,7 @@ describe("appearance tab", () => {
     const { wrapper, error } = await mountSuspended(Appearance);
     expect(error).toMatchObject({
       statusCode: 404,
-      message: "The appearance settings could not be found.",
+      message: "Appearance settings not found",
     });
     expect(wrapper.findComponent(SectionMenu).exists()).toBe(false);
   });

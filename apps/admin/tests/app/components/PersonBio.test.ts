@@ -80,7 +80,7 @@ describe("PersonBio", () => {
       "true",
     );
     expect(content(wrapper).attributes("data-placeholder")).toBe(
-      "Click to write a bio.",
+      "Click to add a bio.",
     );
   });
 
