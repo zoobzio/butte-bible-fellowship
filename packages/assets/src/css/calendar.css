@@ -306,10 +306,19 @@
   text-align: center;
 }
 
-/* While the days are fetched, what they held last waits, dimmed. */
+/*
+ * While the days are fetched, what they held last waits, and dims only
+ * once the wait is long enough to be felt: a fetch that settles at once,
+ * as a view picked does, leaves the days as steady as the table's rows.
+ */
+.f-data-calendar :is(.f-data-calendar-grid, .f-data-calendar-agenda) {
+  transition: opacity var(--transition-fast);
+}
+
 .f-data-calendar[data-loading]
   :is(.f-data-calendar-grid, .f-data-calendar-agenda) {
   opacity: 0.6;
+  transition-delay: 300ms;
 }
 
 /* On a narrow page a day of the agenda stands over what is held on it. */
