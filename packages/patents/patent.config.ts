@@ -12,6 +12,9 @@ export default defineConfig({
       "events:write": "Create, edit and remove events",
       "people:read": "View the people of the church: its staff and its members",
       "people:write": "Create, edit and remove people",
+      "sermons:read": "View sermons",
+      "sermons:write":
+        "Add sermons from the church's YouTube channel, and set which reach the site",
       "settings:read": "View the site's settings: how it looks",
       "settings:write": "Change the site's settings",
       "site:read":

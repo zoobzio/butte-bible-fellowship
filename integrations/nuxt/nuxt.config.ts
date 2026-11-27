@@ -41,6 +41,14 @@ export default defineNuxtConfig({
 
   alias: { "#prosary-handlers": handlers },
 
+  // The church's YouTube channel, by its id: where the site sends a
+  // reader for every recording, and what the admin syncs the sermons from.
+  runtimeConfig: {
+    public: {
+      youtube: { channel: "UCCVz4wFgCBmw-Iwyz61OPng" },
+    },
+  },
+
   $development: {
     bezoar: { driver: "pglite", migrate: true, roles: true, seed: true },
   },

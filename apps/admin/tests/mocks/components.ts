@@ -19,4 +19,5 @@ export { default as Form } from "@zoobzio/vue/components/form.vue";
 export { default as ImageInput } from "@zoobzio/vue/components/image-input.vue";
 export { default as Table } from "@zoobzio/vue/components/table.vue";
 export { default as Tabs } from "@zoobzio/vue/components/tabs.vue";
+export { default as Timeline } from "@zoobzio/vue/components/timeline.vue";
 export { default as Views } from "@zoobzio/vue/components/views.vue";

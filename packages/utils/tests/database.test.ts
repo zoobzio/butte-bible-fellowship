@@ -537,17 +537,27 @@ describe("sermons", () => {
     expect(await db.admin.sermons.delete({ id })).toBe(1);
   });
 
-  it("writes a draft the site does not list", async () => {
-    const body = sermonBody.parse({
-      slug: "draft",
-      title: "Draft",
-      date: "2026-10-04",
-    });
-    const created = await db.admin.sermons.create.first(
-      toSermonArguments(body),
+  it("writes a sermon with no status as published, which the site lists, and a draft it does not", async () => {
+    const body = { slug: "written", title: "Written", date: "2026-10-04" };
+    const published = await db.admin.sermons.create.first(
+      toSermonArguments(sermonBody.parse(body)),
     );
-    expect(await db.web.sermons.list({ limit: 3 })).toEqual([]);
+    expect(
+      (await db.web.sermons.list({ limit: 3 })).map((row) => row.slug),
+    ).toEqual(["written"]);
+
+    const draft = await db.admin.sermons.create.first(
+      toSermonArguments(
+        sermonBody.parse({ ...body, slug: "draft", status: "draft" }),
+      ),
+    );
+    expect(
+      (await db.web.sermons.list({ limit: 3 })).map((row) => row.slug),
+    ).toEqual(["written"]);
     expect(await db.web.sermons.fetch.first({ slug: "draft" })).toBeNull();
-    expect(await db.admin.sermons.delete({ id: created!.id })).toBe(1);
+
+    for (const row of [published!, draft!]) {
+      expect(await db.admin.sermons.delete({ id: row.id })).toBe(1);
+    }
   });
 });

@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { toSermonArguments } from "../../src/dao/sermon";
 
 describe("toSermonArguments", () => {
-  it("writes what a body leaves out as null, a draft", () => {
+  it("writes what a body leaves out as null, published", () => {
     const body = sermonBody.parse({
       slug: "faith-and-works",
       title: "Faith & Works",
@@ -19,7 +19,7 @@ describe("toSermonArguments", () => {
       image: null,
       video: null,
       date: "2026-10-04",
-      status: "draft",
+      status: "published",
     });
   });
 

@@ -2,6 +2,7 @@ import { z } from "zod";
 
 import { slug } from "../models/slug";
 import { contentStatus } from "../models/status";
+import { dayColumn, matchColumn, since, textColumn } from "./listing";
 
 export const sermonPath = z.object({
   slug: slug.meta({
@@ -60,8 +61,8 @@ export const sermonBody = z
       description: "The day it was preached, as YYYY-MM-DD.",
       examples: ["2026-10-04"],
     }),
-    status: contentStatus.default("draft").meta({
-      description: "Whether it reaches the site. Left out, a draft.",
+    status: contentStatus.default("published").meta({
+      description: "Whether it reaches the site. Left out, published.",
     }),
   })
   .meta({
@@ -69,3 +70,65 @@ export const sermonBody = z
     description:
       "A sermon as it is written: what creating one takes, and what updating one replaces.",
   });
+
+export const sermonForm = sermonBody.omit({ body: true }).meta({
+  description:
+    "A sermon's details as the admin's form holds them: the body, less what is written about it, which is shown on its own.",
+});
+
+export const sermonId = z.object({
+  id: z.coerce
+    .number()
+    .int()
+    .positive()
+    .meta({
+      description: "What names it to the admin: its row's number.",
+      examples: [1],
+    }),
+});
+
+/**
+ * Where a batch of the sermons ends, as the batch after it is asked for:
+ * the day its last sermon was preached and that sermon's id, joined by a
+ * dot.
+ */
+export const SERMON_CURSOR = /^(\d{4}-\d{2}-\d{2})\.([1-9]\d*)$/;
+
+export const SERMON_BATCH_MAX = 100;
+
+export const sermonBatchQuery = z.object({
+  cursor: z
+    .string()
+    .regex(SERMON_CURSOR, "a cursor: the one a batch of the sermons ended with")
+    .optional()
+    .meta({
+      description:
+        "Where the batch before ended, as it answered. Left out, the first batch.",
+      examples: ["2026-10-04.12"],
+    }),
+  limit: z.coerce
+    .number()
+    .int()
+    .min(1)
+    .max(SERMON_BATCH_MAX)
+    .default(30)
+    .meta({
+      description: `How many sermons the batch holds, up to ${SERMON_BATCH_MAX}.`,
+      examples: [30],
+    }),
+  since,
+  q: z
+    .string()
+    .trim()
+    .optional()
+    .meta({
+      description:
+        "Free text the sermons are searched for, in the title, the speaker and the summary, without regard to case. Left out or empty, every sermon.",
+      examples: ["faith"],
+    }),
+  ...matchColumn("status", contentStatus, "status"),
+  ...textColumn("title", "title"),
+  ...textColumn("speaker", "speaker"),
+  ...textColumn("summary", "summary"),
+  ...dayColumn("date", "The day the sermons listed were preached"),
+});

@@ -1,7 +1,7 @@
 import { useDatabase } from "#layers/bbf/server/composables/database";
 
 /** The admin's lists the database keeps a count of the writes of. */
-export type ChangeSurface = "people" | "content";
+export type ChangeSurface = "people" | "content" | "sermons";
 
 /**
  * What the admin's lists have been through, as the database counts it: one

@@ -11,12 +11,6 @@ export default defineNuxtConfig({
 
   bezoar: { role: "web" },
 
-  runtimeConfig: {
-    public: {
-      youtube: { channel: "UCCVz4wFgCBmw-Iwyz61OPng" },
-    },
-  },
-
   routeRules: {
     "/calendar": { redirect: { to: "/events", statusCode: 301 } },
     ...Object.fromEntries(

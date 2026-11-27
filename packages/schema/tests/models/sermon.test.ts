@@ -1,6 +1,13 @@
 import { describe, expect, it } from "vitest";
 
-import { sermon, sermons } from "../../src/models/sermon";
+import {
+  sermon,
+  sermonBatch,
+  sermonDetail,
+  sermonRecord,
+  sermonSync,
+  sermons,
+} from "../../src/models/sermon";
 
 const SERMON = {
   slug: "faith-and-works",
@@ -72,5 +79,61 @@ describe("sermons", () => {
 
   it("rejects what is not a list", () => {
     expect(sermons.safeParse({ sermons: [SERMON] }).success).toBe(false);
+  });
+});
+
+const RECORD = {
+  id: 12,
+  ...SERMON,
+  status: "draft",
+  createdAt: "2026-10-17T18:00:00.000Z",
+  updatedAt: "2026-10-18T09:30:00.000Z",
+};
+
+describe("sermonRecord", () => {
+  it("accepts a sermon as the admin lists it, whether or not it reaches the site", () => {
+    expect(sermonRecord.parse(RECORD)).toEqual(RECORD);
+    expect(sermonRecord.safeParse({ ...RECORD, status: "live" }).success).toBe(
+      false,
+    );
+    expect(sermonRecord.safeParse(SERMON).success).toBe(false);
+  });
+
+  it("leaves out what is written about it", () => {
+    expect(sermonRecord.parse({ ...RECORD, body: BODY })).toEqual(RECORD);
+  });
+});
+
+describe("sermonDetail", () => {
+  it("accepts a sermon as the admin reads it on its own page, what is written about it as Markdown", () => {
+    const detail = { ...RECORD, body: "## James 2\n\nWhat faith does." };
+    expect(sermonDetail.parse(detail)).toEqual(detail);
+    expect(sermonDetail.parse(RECORD)).toEqual(RECORD);
+    expect(sermonDetail.safeParse({ ...RECORD, body: BODY }).success).toBe(
+      false,
+    );
+  });
+});
+
+describe("sermonBatch", () => {
+  it("carries the sermons, the way to the batch after them and the mark they were read at", () => {
+    const batch = { items: [RECORD], cursor: "2026-10-04.12", since: "42" };
+    expect(sermonBatch.parse(batch)).toEqual(batch);
+    expect(sermonBatch.parse({ items: [], cursor: null })).toEqual({
+      items: [],
+      cursor: null,
+    });
+    expect(sermonBatch.safeParse({ items: [] }).success).toBe(false);
+  });
+});
+
+describe("sermonSync", () => {
+  it("counts the recordings found and the sermons added", () => {
+    expect(sermonSync.parse({ found: 15, added: 2 })).toEqual({
+      found: 15,
+      added: 2,
+    });
+    expect(sermonSync.safeParse({ found: 15, added: -1 }).success).toBe(false);
+    expect(sermonSync.safeParse({ found: 15 }).success).toBe(false);
   });
 });

@@ -16,7 +16,8 @@ describe("viewSurface", () => {
     expect(viewSurface.parse("people")).toBe("people");
     expect(viewSurface.parse("content")).toBe("content");
     expect(viewSurface.parse("events")).toBe("events");
-    expect(viewSurface.safeParse("sermons").success).toBe(false);
+    expect(viewSurface.parse("sermons")).toBe("sermons");
+    expect(viewSurface.safeParse("hymns").success).toBe(false);
   });
 });
 

@@ -33,7 +33,14 @@ import type {
   MATCH_OPERATORS,
   TEXT_OPERATORS,
 } from "./input/operators";
-import type { sermonBody, sermonPath, sermonsQuery } from "./input/sermon";
+import type {
+  sermonBatchQuery,
+  sermonForm,
+  sermonBody,
+  sermonId,
+  sermonPath,
+  sermonsQuery,
+} from "./input/sermon";
 import type {
   personBio,
   personBody,
@@ -49,6 +56,8 @@ import type {
   eventViewBody,
   peopleView,
   peopleViewBody,
+  sermonView,
+  sermonViewBody,
   viewList,
   viewPath,
 } from "./input/view";
@@ -77,7 +86,14 @@ import type { hast, hastElement, hastText } from "./models/hast";
 import type { homeHero, homePage, homeRecord } from "./models/home";
 import type { link } from "./models/link";
 import type { page } from "./models/page";
-import type { sermon, sermons } from "./models/sermon";
+import type {
+  sermon,
+  sermonBatch,
+  sermonDetail,
+  sermonRecord,
+  sermonSync,
+  sermons,
+} from "./models/sermon";
 import type { slug } from "./models/slug";
 import type {
   personListing,
@@ -126,6 +142,16 @@ export type PersonListing = z.infer<typeof personListing>;
 export type Sermon = z.infer<typeof sermon>;
 
 export type Sermons = z.infer<typeof sermons>;
+
+export type SermonRecord = z.infer<typeof sermonRecord>;
+
+export type SermonDetail = z.infer<typeof sermonDetail>;
+
+export type SermonForm = z.infer<typeof sermonForm>;
+
+export type SermonBatch = z.infer<typeof sermonBatch>;
+
+export type SermonSync = z.infer<typeof sermonSync>;
 
 export type Page = z.infer<typeof page>;
 
@@ -257,6 +283,10 @@ export type SermonsQuery = z.infer<typeof sermonsQuery>;
 
 export type SermonBody = z.infer<typeof sermonBody>;
 
+export type SermonId = z.infer<typeof sermonId>;
+
+export type SermonBatchQuery = z.infer<typeof sermonBatchQuery>;
+
 export type ViewSurface = z.infer<typeof viewSurface>;
 
 export type ViewRecord = z.infer<typeof viewRecord>;
@@ -284,3 +314,7 @@ export type ContentViewBody = z.infer<typeof contentViewBody>;
 export type EventView = z.infer<typeof eventView>;
 
 export type EventViewBody = z.infer<typeof eventViewBody>;
+
+export type SermonView = z.infer<typeof sermonView>;
+
+export type SermonViewBody = z.infer<typeof sermonViewBody>;

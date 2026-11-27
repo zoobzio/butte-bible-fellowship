@@ -94,6 +94,8 @@ describe("bundles", () => {
       "admin.content.moving",
       "admin.content.confirmMany",
       "admin.people.confirmMany",
+      "admin.sermons.added",
+      "admin.sermons.watch",
       "connect.map",
       "admin.appearance.pick",
     ];
@@ -120,6 +122,15 @@ describe("bundles", () => {
     expect(prosary.format("sermons.play", { title: "Faith & Works" })).toBe(
       "Play “Faith & Works”",
     );
+    expect(prosary.format("admin.sermons.added", { count: 1 })).toBe(
+      "1 sermon added.",
+    );
+    expect(prosary.format("admin.sermons.added", { count: 3 })).toBe(
+      "3 sermons added.",
+    );
+    expect(
+      prosary.format("admin.sermons.watch", { title: "Faith & Works" }),
+    ).toBe("Watch “Faith & Works” on YouTube");
     expect(
       prosary.format("events.day", { date: "Sunday, October 4", count: 3 }),
     ).toBe("Sunday, October 4, 3 events");

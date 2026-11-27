@@ -1,0 +1,271 @@
+/*
+ * Foundation's timeline, as the admin lays out what happened in order: the
+ * search and the refresh over a history, as a commit history reads. A rail
+ * runs down its side; each group, a month or a day, hangs a node on it
+ * beside its heading, and under the heading a card holds the group's
+ * records, a row each with a rule between. The search's own dress is in
+ * `search.css`, the table's, the browser's and the calendar's too. Each
+ * rule is scoped to the timeline's own root so a Fab or a list elsewhere
+ * keeps its own dress. The layer's icons are bare `svg` elements, and its
+ * reset lays an `svg` out as a block: every part that holds one is a flex
+ * box here, so an icon sits in line with its label.
+ */
+
+.f-data-timeline {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-4);
+}
+
+.f-data-timeline svg {
+  flex: none;
+  width: var(--space-4);
+  height: var(--space-4);
+}
+
+/*
+ * The controls: the search takes the width the refresh after it leaves,
+ * which stands as tall as it does on one line, at its top once its chips
+ * wrap. With no search it keeps to the trailing edge.
+ */
+.f-data-timeline-controls {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}
+
+/* The Fabs of the controls, and the one that loads more, outlined as a table's are. */
+.f-data-timeline-controls > .f-button,
+.f-data-timeline-more {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border: 1px var(--stroke-solid) var(--rule);
+  border-radius: var(--shape-sm);
+  background: transparent;
+  color: var(--on-surface);
+  font: var(--type-label);
+  cursor: pointer;
+  transition:
+    color var(--transition-fast),
+    border-color var(--transition-fast),
+    background var(--transition-fast);
+}
+
+.f-data-timeline-controls > .f-button {
+  min-height: calc(var(--space-6) + 2 * var(--space-1) + 2px);
+  min-width: calc(var(--space-6) + 2 * var(--space-1) + 2px);
+}
+
+.f-data-timeline-controls > .f-button:has(> svg:only-child) {
+  padding: var(--space-2);
+}
+
+.f-data-timeline-controls > .f-button:hover:not(:disabled),
+.f-data-timeline-more:hover:not(:disabled) {
+  color: var(--on-surface-high-contrast);
+  border-color: color-mix(in oklab, var(--primary) 65%, transparent);
+  background: color-mix(in oklab, var(--primary-container) 30%, transparent);
+}
+
+.f-data-timeline-more:disabled {
+  color: var(--on-surface-muted);
+  cursor: default;
+}
+
+/*
+ * The history. Its rail is each group's own, drawn down the gutter the
+ * group keeps at its leading edge, so the rail runs unbroken from the
+ * first heading to the foot of the last card.
+ */
+.f-data-timeline-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.f-data-timeline-groups,
+.f-data-timeline-records {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.f-data-timeline-group {
+  position: relative;
+  padding: 0 0 var(--space-5) var(--space-6);
+}
+
+.f-data-timeline-group::before {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: calc(var(--space-3) / 2 - 1px);
+  width: 2px;
+  background: var(--rule);
+  content: "";
+}
+
+/* The rail starts at the first node, and ends with the last card. */
+.f-data-timeline-group:first-child::before {
+  top: var(--space-2);
+}
+
+.f-data-timeline-group:last-child {
+  padding-bottom: 0;
+}
+
+/*
+ * A group's heading: what the records under it share, in small muted
+ * type, and before it the node, a ring on the rail that the rail does not
+ * show through.
+ */
+.f-data-timeline-heading {
+  position: relative;
+  margin: 0 0 var(--space-3);
+  color: var(--on-surface-muted);
+  font: var(--type-label);
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--type-label-letter-spacing);
+  line-height: var(--space-5);
+}
+
+.f-data-timeline-heading::before {
+  position: absolute;
+  top: calc((var(--space-5) - var(--space-3)) / 2);
+  left: calc(-1 * var(--space-6));
+  box-sizing: border-box;
+  width: var(--space-3);
+  height: var(--space-3);
+  border: 2px var(--stroke-solid) var(--on-surface-muted);
+  border-radius: var(--shape-full);
+  background: var(--surface);
+  content: "";
+}
+
+/* The group that holds today is marked at its node. */
+.f-data-timeline-group[data-today] .f-data-timeline-heading::before {
+  border-color: var(--primary);
+}
+
+/* The card of a group's records, its corners rounded and what passes them clipped. */
+.f-data-timeline-records {
+  overflow: hidden;
+  border: 1px var(--stroke-solid) var(--rule);
+  border-radius: var(--shape-md);
+  background: var(--surface);
+}
+
+.f-data-timeline-item + .f-data-timeline-item {
+  border-top: 1px var(--stroke-solid) var(--rule);
+}
+
+/*
+ * A record's row: its name over when it was, between whatever a page puts
+ * before the two and after them, each of which stands the height of both.
+ * The columns have no gap of their own, so a row with nothing before or
+ * after its name keeps no room for it.
+ */
+.f-data-timeline-record {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-areas:
+    "prepend label append"
+    "prepend time append";
+  align-items: center;
+  row-gap: var(--space-1);
+  padding: var(--space-3) var(--space-4);
+  transition: background var(--transition-fast);
+}
+
+.f-data-timeline-record:hover {
+  background: color-mix(in oklab, var(--surface-container) 60%, transparent);
+}
+
+.f-data-timeline-record[data-selected] {
+  background: color-mix(in oklab, var(--primary-container) 30%, transparent);
+}
+
+/* The name, a button or a link, reads as the row's title, on one line. */
+.f-data-timeline-record-label {
+  grid-area: label;
+  justify-self: start;
+  align-self: end;
+  max-width: 100%;
+  overflow: hidden;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--on-surface-high-contrast);
+  font: var(--type-body);
+  font-weight: var(--weight-medium);
+  text-align: left;
+  text-decoration: none;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color var(--transition-fast);
+}
+
+.f-data-timeline-record-label:hover {
+  color: var(--primary);
+}
+
+.f-data-timeline-record-time {
+  grid-area: time;
+  align-self: start;
+  min-width: 0;
+  margin: 0;
+  color: var(--on-surface-muted);
+  font: var(--type-label);
+  letter-spacing: var(--type-label-letter-spacing);
+}
+
+/* With no time under it, the name stands at the middle of its row. */
+.f-data-timeline-record-label:not(:has(~ .f-data-timeline-record-time)) {
+  grid-row: 1 / -1;
+  align-self: center;
+}
+
+/* The way to the batch after: one button, under the rail's last card. */
+.f-data-timeline-more {
+  justify-self: start;
+  margin: var(--space-4) 0 0 var(--space-6);
+}
+
+/* Nothing found: one line, centered, in a card of its own. */
+.f-data-timeline-empty {
+  margin: 0;
+  padding: var(--space-6) var(--space-3);
+  border: 1px var(--stroke-solid) var(--rule);
+  border-radius: var(--shape-md);
+  background: var(--surface);
+  color: var(--on-surface-muted);
+  text-align: center;
+}
+
+/*
+ * While the records are fetched anew, what was held waits, and dims only
+ * once the wait is long enough to be felt, as the calendar's days do.
+ */
+.f-data-timeline-groups {
+  transition: opacity var(--transition-fast);
+}
+
+.f-data-timeline[data-loading] .f-data-timeline-groups {
+  opacity: 0.6;
+  transition-delay: 300ms;
+}
+
+/* On a narrow page what follows a record's name drops under it. */
+@media (max-width: 44rem) {
+  .f-data-timeline-record {
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-areas:
+      "prepend label"
+      "prepend time"
+      "append append";
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "title": {
+    "defaultMessage": "Title",
+    "description": "The label of a sermon's title: the field of a sermon's page, and what the search of the sermons names the field it filters on."
+  },
+  "speaker": {
+    "defaultMessage": "Speaker",
+    "description": "The label of who preached a sermon: the field of a sermon's page, and what the search of the sermons names the field it filters on."
+  },
+  "status": {
+    "defaultMessage": "Status",
+    "description": "The label of whether a sermon reaches the site, a draft, published or archived: the field of a sermon's page, and what the search of the sermons names the field it filters on."
+  },
+  "preached": {
+    "defaultMessage": "Preached",
+    "description": "The label of the day a sermon was preached: the field of a sermon's page, and what the search of the sermons names the field it filters on."
+  },
+  "picture": {
+    "defaultMessage": "Picture",
+    "description": "The label of the field of a sermon's page for the URL of its picture. One left empty is pictured by a frame of its recording."
+  },
+  "video": {
+    "defaultMessage": "YouTube video",
+    "description": "The label of the field of a sermon's page for YouTube's id for its recording."
+  },
+  "recording": {
+    "defaultMessage": "Recording",
+    "description": "The heading over a sermon's recording, played on its page."
+  },
+  "unrecorded": {
+    "defaultMessage": "This sermon has no recording.",
+    "description": "What stands in the place of a sermon's recording on its page when it has none."
+  },
+  "body": {
+    "defaultMessage": "About",
+    "description": "The heading over what is written about a sermon, on its page."
+  },
+  "bodyEmpty": {
+    "defaultMessage": "Nothing is written about this sermon yet.",
+    "description": "What stands in for what is written about a sermon, on its page, when there is nothing."
+  }
+}

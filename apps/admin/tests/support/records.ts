@@ -7,6 +7,7 @@ import type {
   FolderRecord,
   HomeRecord,
   PersonRecord,
+  SermonRecord,
 } from "@bbf/schema/types";
 
 export const BIO = {
@@ -153,4 +154,39 @@ export const APPEARANCE_SET: AppearanceRecord = {
   seeds: { primary: "#7c3aed" },
   input: { color: "dark", text: "lg" },
   updatedAt: "2026-11-19T18:00:00.000Z",
+};
+
+/** A sermon on the site, and one synced from YouTube and not yet on it. */
+export const FAITH: SermonRecord = {
+  id: 12,
+  slug: "faith-and-works",
+  title: "Faith & Works",
+  speaker: "Pastor Name",
+  video: "dQw4w9WgXcQ",
+  date: "2026-10-04",
+  status: "published",
+  createdAt: "2026-10-17T18:00:00.000Z",
+  updatedAt: "2026-10-18T09:30:00.000Z",
+};
+
+export const GRACE: SermonRecord = {
+  id: 13,
+  slug: "grace",
+  title: "Grace",
+  video: "a_b-c123456",
+  date: "2026-10-11",
+  status: "draft",
+  createdAt: "2026-10-17T18:00:00.000Z",
+  updatedAt: "2026-10-18T09:30:00.000Z",
+};
+
+/** A sermon preached the month before, with no recording. */
+export const HOPE: SermonRecord = {
+  id: 9,
+  slug: "hope",
+  title: "Hope",
+  date: "2026-09-27",
+  status: "archived",
+  createdAt: "2026-10-17T18:00:00.000Z",
+  updatedAt: "2026-10-18T09:30:00.000Z",
 };

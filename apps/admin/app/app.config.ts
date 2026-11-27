@@ -9,6 +9,7 @@ const header: HeaderConfig = {
     { label: "admin.navigation.content", to: "/content" },
     { label: "admin.navigation.people", to: "/people" },
     { label: "admin.navigation.events", to: "/events" },
+    { label: "admin.navigation.sermons", to: "/sermons" },
     { label: "admin.navigation.settings", to: "/settings" },
   ],
 };

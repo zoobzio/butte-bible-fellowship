@@ -15,6 +15,9 @@ import {
   contentViewBody,
   eventView,
   eventViewBody,
+  SERMON_VIEW_COLUMNS,
+  sermonView,
+  sermonViewBody,
   peopleView,
   peopleViewBody,
   tableView,
@@ -268,6 +271,50 @@ describe("eventView", () => {
   });
 });
 
+describe("sermonView", () => {
+  const DRAFTS = {
+    clauses: [
+      { kind: "literal", key: "text", value: "james" },
+      { kind: "filter", key: "status", op: "is", value: "draft" },
+      { kind: "filter", key: "date", op: "on or after", value: "2026-10-01" },
+    ],
+    interval: 30_000,
+  };
+
+  it("accepts the sermons timeline's arrangement, and hands it back as it came", () => {
+    expect(sermonView.parse(DRAFTS)).toEqual(DRAFTS);
+    expect(sermonView.parse({})).toEqual({ clauses: [], interval: 0 });
+  });
+
+  it("drops what is no part of an arrangement, how far down it was read with it", () => {
+    expect(sermonView.parse({ ...DRAFTS, cursor: "2026-10-04.12" })).toEqual(
+      DRAFTS,
+    );
+  });
+
+  it("filters by a column the API filters the sermons by, and by no other", () => {
+    const filtered = (filter: Record<string, string>) =>
+      sermonView.safeParse({ clauses: [{ kind: "filter", ...filter }] })
+        .success;
+    for (const key of SERMON_VIEW_COLUMNS) {
+      expect(filtered({ key, value: "x" }), key).toBe(true);
+    }
+    expect(filtered({ key: "video", value: "abc123" })).toBe(false);
+    expect(filtered({ key: "title", op: "sounds like", value: "x" })).toBe(
+      false,
+    );
+  });
+
+  it("is saved under a name", () => {
+    expect(sermonViewBody.parse({ name: " Drafts ", payload: DRAFTS })).toEqual(
+      { name: "Drafts", payload: DRAFTS },
+    );
+    expect(sermonViewBody.safeParse({ name: "", payload: {} }).success).toBe(
+      false,
+    );
+  });
+});
+
 describe("contentView", () => {
   it("accepts the content browser's arrangement, and hands it back as it came", () => {
     expect(contentView.parse(IMAGES)).toEqual(IMAGES);
@@ -333,7 +380,7 @@ describe("viewList and viewPath", () => {
     expect(viewList.parse({ surface: "content" })).toEqual({
       surface: "content",
     });
-    expect(viewList.safeParse({ surface: "sermons" }).success).toBe(false);
+    expect(viewList.safeParse({ surface: "hymns" }).success).toBe(false);
     expect(viewPath.parse({ surface: "people", id: ID })).toEqual({
       surface: "people",
       id: ID,
@@ -341,7 +388,7 @@ describe("viewList and viewPath", () => {
     expect(viewPath.safeParse({ surface: "people", id: "3" }).success).toBe(
       false,
     );
-    expect(viewPath.safeParse({ surface: "sermons", id: ID }).success).toBe(
+    expect(viewPath.safeParse({ surface: "hymns", id: ID }).success).toBe(
       false,
     );
   });

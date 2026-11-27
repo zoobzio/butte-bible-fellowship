@@ -6,3 +6,4 @@ export * from "./event";
 export * from "./hast";
 export * from "./home";
 export * from "./person";
+export * from "./sermon";

@@ -8,6 +8,8 @@
     "events:write",
     "people:read",
     "people:write",
+    "sermons:read",
+    "sermons:write",
     "settings:read",
     "settings:write",
     "site:read",

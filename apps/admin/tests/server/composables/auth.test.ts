@@ -106,6 +106,11 @@ describe("requiredScope", () => {
     expect(requiredScope("/api/people", "POST")).toBe("people:write");
     expect(requiredScope("/api/events/3", "PUT")).toBe("events:write");
     expect(requiredScope("/api/events/3", "DELETE")).toBe("events:write");
+    expect(requiredScope("/api/sermons", "GET")).toBe("sermons:read");
+    expect(requiredScope("/api/sermons/sync", "POST")).toBe("sermons:write");
+    expect(requiredScope("/api/sermons/3/status", "PATCH")).toBe(
+      "sermons:write",
+    );
     expect(requiredScope("/api/content", "GET")).toBe("content:read");
     expect(requiredScope("/api/content/3/body", "PATCH")).toBe("content:write");
     expect(requiredScope("/api/site/home", "GET")).toBe("site:read");
@@ -117,7 +122,7 @@ describe("requiredScope", () => {
   });
 
   it("needs a scope nobody holds for records the contract does not name", () => {
-    expect(requiredScope("/api/sermons", "GET")).toBeUndefined();
+    expect(requiredScope("/api/hymns", "GET")).toBeUndefined();
     expect(requiredScope("/api", "GET")).toBeUndefined();
     expect(requiredScope("/people", "GET")).toBeUndefined();
   });

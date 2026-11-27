@@ -92,6 +92,23 @@ and the sermons the API serves, and its title is a message of
 interface, as the headings and labels of the connect page's cards are. What is kept in the database
 is written in one language, as an event is.
 
+The sermons come from the church's YouTube channel, named by its id in
+the layer's `runtimeConfig.public.youtube.channel`. The admin's Sermons
+section lists them on a timeline, the latest preached first, under the
+month each falls in, each with a frame of its recording, and searches
+them by free text and by title, speaker, status, summary and the day
+preached. Its Sync with YouTube button reads the channel's
+public feed, its fifteen newest uploads, and adds a sermon for each
+recording the database does not hold: its title and who preached it, read
+from a name of the form `Title - Speaker`, the first paragraph written
+under it as its summary, and the Sunday it was published on or before as
+the day it was preached. A recording held already is left as it is, so a
+sync is safe to run again. Each is added published, as its recording
+already is, and so is on the site at once. A sermon's title on the
+timeline leads to its own page: its details in a form that is read and
+not yet changed, its recording played beside them, and what is written
+about it under that.
+
 The site answers for a page where a built one was served, from
 `server/routes/i18n/[...path].ts`: `index`, `about-us` and `connect` from
 their own tables, any other slug from the content. `useHomePage`,

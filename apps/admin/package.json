@@ -28,6 +28,7 @@
     "@vercel/blob": "catalog:",
     "@zoobzio/editor": "catalog:",
     "@zoobzio/nuxt": "catalog:",
+    "@zoobzio/query": "catalog:",
     "@zoobzio/vue": "catalog:",
     "bezoar": "catalog:",
     "github-slugger": "catalog:",

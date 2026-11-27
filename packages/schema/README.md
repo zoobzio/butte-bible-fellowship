@@ -128,10 +128,10 @@ serves the church, and whatever event is written, is on the site.
 A saved view is a named arrangement of one of the admin's lists, and every
 list's are stored in one table, the arrangement as JSON, so the schema is
 what holds each to its shape. `VIEW_SURFACES` names the lists that have
-views, `people`, `content` and `events`, and `VIEW_PAYLOADS` and `VIEW_BODIES` carry, by
+views, `people`, `content`, `events` and `sermons`, and `VIEW_PAYLOADS` and `VIEW_BODIES` carry, by
 that name, the schema of the list's payload and of a save of it:
 `peopleView` and `peopleViewBody`, `contentView` and `contentViewBody`,
-`eventView` and `eventViewBody`.
+`eventView` and `eventViewBody`, `sermonView` and `sermonViewBody`.
 `tableView` builds the payload of a view
 over a table — its sort, its columns' order, pinning, visibility and widths, its
 page's size and its search — from the columns the list's API sorts by and
@@ -141,7 +141,9 @@ over a browser, which the content is: its one sort and its search, and not
 the folder that is open, so a view is put in place wherever the browser
 stands. `calendarView` builds it over a calendar, which the events are:
 how much of time it shows at once, of the views the calendar offers, and
-its search, and not the day it stands on. A save is checked against it;
+its search, and not the day it stands on. `timelineView` builds it over a
+timeline, which the sermons are: its search alone, and not how far down it
+was read. A save is checked against it;
 `viewRecord` carries the payload back as it was stored, unchecked, so a
 view saved before its list changed still reads, and the admin, which reads
 each through the same schema, sets it aside rather than failing the list.

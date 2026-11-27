@@ -36,11 +36,12 @@ and `views` is the arrangements of the admin's lists each of them has saved:
 one table for every list, each row a user's own, named for the list it is
 over by its `surface`, with the arrangement itself as `payload`; and
 `changes` is what the admin's lists that keep themselves up to date have
-been through: a row for the `people` and one for the `content`, its
-documents and its folders together, each a `version` that a trigger makes
-one more with every statement that writes to the list's tables.
-A sermon carries a `content_status` — draft, published, archived — and
-only the published reaches the site; the people and the events carry none,
+been through: a row for the `people`, one for the `content`, its
+documents and its folders together, and one for the `sermons`, each a
+`version` that a trigger makes one more with every statement that writes
+to the list's tables.
+A sermon carries a `content_status` — draft, published, archived —
+published unless told otherwise, and only the published reaches the site; the people and the events carry none,
 and whoever serves the church, and whatever event or page is written, is on
 the site.
 
@@ -56,7 +57,7 @@ would not have offered.
 
 ```
 bezoar.config.ts   the kit config: the output directory, the defaults for the rest
-src/migrations/    the schema, forward only: staff, events, sermons, users, staff search, like escape, search cost, staff status, events search, events trim, content, pages, folders, connect, views, documents, appearance, paths, people, changes
+src/migrations/    the schema, forward only: staff, events, sermons, users, staff search, like escape, search cost, staff status, events search, events trim, content, pages, folders, connect, views, documents, appearance, paths, people, changes, sermons sync, sermons published
 src/seeds/         the people, the events and the first admin user, each safe to run again
 src/queries/web/   what the site reads: home, about, connect, content, staff, events, sermons, appearance
 src/queries/admin/ what the admin app will read and write: the same, in full, the staff as the people they are among
@@ -146,7 +147,20 @@ any sort the admin's own order holds: the recurring events Sunday first,
 then the one-offs by date. An event's day of the week is never stored:
 `event_day_of` reads it from the date.
 `admin.sermons` has `list`, `fetch`, `create`, `update` and `delete`, by
-`id`.
+`id`. `batch` is what the admin's timeline reads: `size` sermons with no
+`body`, the latest preached first and of a day the latest added, from the
+first, or from after the sermon `after_date` and `after_id` name together,
+the last of the batch before. It is searched as a list is, in the same
+order: `q` is free text, read in the title, the speaker and the summary,
+`status_is` and `status_not` a status held or not, each of `title`,
+`speaker` and `summary` takes the text operators, and `date`, the day
+preached, the day operators; each left null narrows nothing. `import` adds the recordings of the church's
+YouTube channel the sermons do not hold yet, each published, in one
+statement: `entries` is a JSON array, each entry a `video`, a `title`, a
+`speaker`, a `summary`, the `date` it was preached, and a `slug` with the
+`fallback` it goes by where another sermon has the slug. A video held
+already is left as it is, so an import is safe to run again, and only the
+sermons added come back.
 
 `web.home.fetch` and `web.about.fetch` each read the one row of their
 table, and take no argument: the page's title and description, what is

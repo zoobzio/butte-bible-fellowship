@@ -1,0 +1,54 @@
+{
+  "title": {
+    "defaultMessage": "Sermons",
+    "description": "The title of the page that lists the sermons."
+  },
+  "description": {
+    "defaultMessage": "Recordings from the church's YouTube channel.",
+    "description": "The line under the title of the page that lists the sermons: what the list is."
+  },
+  "sync": {
+    "defaultMessage": "Sync with YouTube",
+    "description": "The button that checks the church's YouTube channel for recordings the sermons do not hold yet, and adds each to the site."
+  },
+  "syncing": {
+    "defaultMessage": "Syncing…",
+    "description": "The label of the sync button while the church's YouTube channel is being checked."
+  },
+  "added": {
+    "defaultMessage": "{count, plural, one {# sermon} other {# sermons}} added.",
+    "description": "What the sermons page says after a sync that added sermons. `count` is how many were added. Each is published, and so on the site at once."
+  },
+  "current": {
+    "defaultMessage": "Already up to date.",
+    "description": "What the sermons page says after a sync that found no recording the sermons did not already hold."
+  },
+  "draft": {
+    "defaultMessage": "Draft",
+    "description": "The label of a sermon that has not been put on the site yet."
+  },
+  "published": {
+    "defaultMessage": "Published",
+    "description": "The label of a sermon that is on the site."
+  },
+  "archived": {
+    "defaultMessage": "Archived",
+    "description": "The label of a sermon that was taken off the site and kept."
+  },
+  "watch": {
+    "defaultMessage": "Watch “{title}” on YouTube",
+    "description": "The accessible name of the link beside a sermon to its recording on YouTube. `title` is the sermon's title."
+  },
+  "allView": {
+    "defaultMessage": "All sermons",
+    "description": "The name of the view of the sermons timeline that the admin starts with: every sermon, the latest preached first. Shown as the first tab over the timeline, beside the views a user has saved."
+  },
+  "notFound": {
+    "defaultMessage": "Sermon not found",
+    "description": "The error shown when an address names a sermon that does not exist."
+  },
+  "details": {
+    "defaultMessage": "Details",
+    "description": "The tab of a sermon's page that holds its details, its recording and what is written about it."
+  }
+}

@@ -41,7 +41,7 @@ afterAll(() => db.close());
 const HEADING = "Discover God’s **Love, Grace & Truth**";
 
 describe("the build", () => {
-  it("carries the staff, events, sermons, users, staff search, like escape, search cost, staff status, events search, events trim, content, pages, folders, connect, views, documents, appearance, paths, people and changes migrations in order", () => {
+  it("carries the staff, events, sermons, users, staff search, like escape, search cost, staff status, events search, events trim, content, pages, folders, connect, views, documents, appearance, paths, people, changes, sermons sync and sermons published migrations in order", () => {
     expect(migrations.map((migration) => migration.name)).toEqual([
       "staff",
       "events",
@@ -63,6 +63,8 @@ describe("the build", () => {
       "paths",
       "people",
       "changes",
+      "sermons_sync",
+      "sermons_published",
     ]);
   });
 
@@ -125,8 +127,8 @@ describe("the build", () => {
       "web.sermons.list",
       "web.staff.list",
     ]);
-    expect(names.filter((name) => name.startsWith("admin."))).toHaveLength(57);
-    expect(names).toHaveLength(70);
+    expect(names.filter((name) => name.startsWith("admin."))).toHaveLength(59);
+    expect(names).toHaveLength(72);
   });
 });
 
@@ -2509,6 +2511,34 @@ describe("admin.sermons", () => {
     status: "published" as const,
   };
 
+  /* Every part of a batch's search left out: null. */
+  const NO_SERMON_SEARCH = {
+    q: null as string | null,
+    status_is: null as "draft" | "published" | "archived" | null,
+    status_not: null as "draft" | "published" | "archived" | null,
+    ...(Object.fromEntries(
+      [
+        ...["title", "speaker", "summary"].flatMap((column) =>
+          [
+            "contains",
+            "not_contains",
+            "starts_with",
+            "ends_with",
+            "is",
+            "not",
+          ].map((operator) => `${column}_${operator}`),
+        ),
+        ...["before", "after", "on", "on_or_after", "on_or_before"].map(
+          (operator) => `date_${operator}`,
+        ),
+      ].map((name) => [name, null]),
+    ) as Record<
+      | `${"title" | "speaker" | "summary"}_${"contains" | "not_contains" | "starts_with" | "ends_with" | "is" | "not"}`
+      | `date_${"before" | "after" | "on" | "on_or_after" | "on_or_before"}`,
+      string | null
+    >),
+  };
+
   it("creates, reads, updates and deletes a sermon", async () => {
     const created = await db.admin.sermons.create.first(sermon);
     expect(created?.slug).toBe("faith-and-works");
@@ -2593,6 +2623,231 @@ describe("admin.sermons", () => {
 
     for (const row of [older, newer, later]) {
       expect(await db.admin.sermons.delete({ id: row!.id })).toBe(1);
+    }
+  });
+
+  it("reads the sermons a batch at a time, each from after the one before, with no body", async () => {
+    const made = [];
+    for (const [slug, date] of [
+      ["first", "2026-09-20"],
+      ["second", "2026-09-27"],
+      ["early", "2026-10-04"],
+      ["late", "2026-10-04"],
+    ] as const) {
+      made.push(
+        await db.admin.sermons.create.first({
+          ...sermon,
+          slug,
+          video: slug,
+          body: "Kept off the list.",
+          date,
+        }),
+      );
+    }
+
+    const first = await db.admin.sermons.batch({
+      ...NO_SERMON_SEARCH,
+      after_date: null,
+      after_id: null,
+      size: 3,
+    });
+    // Of a day, the latest added leads.
+    expect(first.map((row) => row.slug)).toEqual(["late", "early", "second"]);
+    expect(first[0]).not.toHaveProperty("body");
+    expect(first[0]).toMatchObject({
+      status: "published",
+      date: "2026-10-04",
+      video: "late",
+    });
+
+    const last = first.at(-1)!;
+    const rest = await db.admin.sermons.batch({
+      ...NO_SERMON_SEARCH,
+      after_date: last.date,
+      after_id: last.id,
+      size: 3,
+    });
+    expect(rest.map((row) => row.slug)).toEqual(["first"]);
+
+    for (const row of made) {
+      expect(await db.admin.sermons.delete({ id: row!.id })).toBe(1);
+    }
+  });
+
+  it("searches the sermons a batch is of, by free text and by each filter, in the same order", async () => {
+    const made = [];
+    for (const row of [
+      {
+        slug: "grace",
+        title: "Grace",
+        speaker: null,
+        summary: "Ephesians 2.",
+        date: "2026-10-11",
+        status: "draft" as const,
+      },
+      {
+        slug: "faith",
+        title: "Faith & Works",
+        speaker: "Pastor Name",
+        summary: "James 2.",
+        date: "2026-10-04",
+        status: "published" as const,
+      },
+      {
+        slug: "hope",
+        title: "Hope 100%",
+        speaker: "Guest Speaker",
+        summary: null,
+        date: "2026-09-27",
+        status: "archived" as const,
+      },
+    ]) {
+      made.push(
+        await db.admin.sermons.create.first({
+          ...sermon,
+          ...row,
+          video: row.slug,
+        }),
+      );
+    }
+    const found = async (search: Partial<typeof NO_SERMON_SEARCH>) =>
+      (
+        await db.admin.sermons.batch({
+          ...NO_SERMON_SEARCH,
+          ...search,
+          after_date: null,
+          after_id: null,
+          size: 10,
+        })
+      ).map((row) => row.slug);
+
+    expect(await found({})).toEqual(["grace", "faith", "hope"]);
+    // The free text reads the title, the speaker and the summary, whatever the case.
+    expect(await found({ q: "FAITH" })).toEqual(["faith"]);
+    expect(await found({ q: "guest" })).toEqual(["hope"]);
+    expect(await found({ q: "ephesians" })).toEqual(["grace"]);
+    // What is typed is text, and no pattern.
+    expect(await found({ q: "100%" })).toEqual(["hope"]);
+    expect(await found({ q: "%" })).toEqual(["hope"]);
+    expect(await found({ status_is: "draft" })).toEqual(["grace"]);
+    expect(await found({ status_not: "draft" })).toEqual(["faith", "hope"]);
+    expect(await found({ title_starts_with: "fa" })).toEqual(["faith"]);
+    expect(await found({ title_not_contains: "works" })).toEqual([
+      "grace",
+      "hope",
+    ]);
+    expect(await found({ speaker_is: "missing" })).toEqual(["grace"]);
+    expect(await found({ speaker_is: "present" })).toEqual(["faith", "hope"]);
+    expect(await found({ speaker_is: "pastor name" })).toEqual(["faith"]);
+    expect(await found({ speaker_not: "Pastor Name" })).toEqual([
+      "grace",
+      "hope",
+    ]);
+    expect(await found({ summary_ends_with: "2." })).toEqual([
+      "grace",
+      "faith",
+    ]);
+    expect(await found({ date_on: "2026-10-04" })).toEqual(["faith"]);
+    expect(await found({ date_before: "2026-10-04" })).toEqual(["hope"]);
+    expect(await found({ date_after: "2026-10-04" })).toEqual(["grace"]);
+    expect(
+      await found({
+        date_on_or_after: "2026-10-01",
+        date_on_or_before: "2026-10-04",
+      }),
+    ).toEqual(["faith"]);
+    // Every part of a search narrows it.
+    expect(await found({ q: "2", status_not: "draft" })).toEqual(["faith"]);
+
+    // A cursor holds under a search: the batch after it is of the same search.
+    const [first] = await db.admin.sermons.batch({
+      ...NO_SERMON_SEARCH,
+      status_not: "published",
+      after_date: null,
+      after_id: null,
+      size: 1,
+    });
+    expect(first?.slug).toBe("grace");
+    const rest = await db.admin.sermons.batch({
+      ...NO_SERMON_SEARCH,
+      status_not: "published",
+      after_date: first!.date,
+      after_id: first!.id,
+      size: 5,
+    });
+    expect(rest.map((row) => row.slug)).toEqual(["hope"]);
+
+    for (const row of made) {
+      expect(await db.admin.sermons.delete({ id: row!.id })).toBe(1);
+    }
+  });
+
+  it("imports the recordings it does not hold, each published, and leaves the ones it does", async () => {
+    const held = await db.admin.sermons.create.first(sermon);
+    const entries = [
+      {
+        video: "abc123",
+        slug: "renamed",
+        fallback: "renamed-abc123",
+        title: "Renamed on YouTube",
+        summary: null,
+        date: "2026-10-04",
+      },
+      {
+        video: "new001",
+        slug: "faith-and-works",
+        fallback: "faith-and-works-new001",
+        title: "Faith & Works",
+        speaker: "Guest Speaker",
+        summary: "James 2, again.",
+        date: "2026-10-11",
+      },
+      {
+        video: "new002",
+        slug: "grace",
+        fallback: "grace-new002",
+        title: "Grace",
+        summary: null,
+        date: "2026-10-18",
+      },
+    ];
+
+    // Written out as JSON, as the admin hands them over: a list given as
+    // it is would reach Postgres as an array, which is not JSON.
+    const json = JSON.stringify(entries);
+    const added = await db.admin.sermons.import({ entries: json });
+    // The video held is left out, and a slug taken gives way to its fallback.
+    expect(added.map((row) => [row.video, row.slug])).toEqual([
+      ["new001", "faith-and-works-new001"],
+      ["new002", "grace"],
+    ]);
+    expect(await db.admin.sermons.fetch.first({ id: held!.id })).toMatchObject({
+      title: "Faith & Works",
+      slug: "faith-and-works",
+    });
+    expect(
+      await db.admin.sermons.fetch.first({ id: added[0]!.id }),
+    ).toMatchObject({
+      title: "Faith & Works",
+      summary: "James 2, again.",
+      speaker: "Guest Speaker",
+      date: "2026-10-11",
+      // No status is written: a sermon is published unless told otherwise.
+      status: "published",
+    });
+    // What an entry leaves out is left empty.
+    expect(
+      await db.admin.sermons.fetch.first({ id: added[1]!.id }),
+    ).toMatchObject({ speaker: null, summary: null, image: null });
+    // Each is on the site at once, beside the one held.
+    expect(await db.web.sermons.list({ limit: 5 })).toHaveLength(3);
+
+    // Asked again, nothing is new.
+    expect(await db.admin.sermons.import({ entries: json })).toEqual([]);
+    expect(await db.admin.sermons.import({ entries: "[]" })).toEqual([]);
+
+    for (const row of [held!, ...added]) {
+      expect(await db.admin.sermons.delete({ id: row.id })).toBe(1);
     }
   });
 
@@ -2922,6 +3177,28 @@ describe("admin.changes", () => {
     expect(await mark("people")).toBe(people);
   });
 
+  it("counts every write to the sermons, an import among them, apart from the rest", async () => {
+    const people = await mark("people");
+    const before = BigInt((await mark("sermons"))!);
+    const [added] = await db.admin.sermons.import({
+      entries: JSON.stringify([
+        {
+          video: "counted1",
+          slug: "counted",
+          fallback: "counted-counted1",
+          title: "Counted",
+          summary: null,
+          date: "2026-10-04",
+        },
+      ]),
+    });
+    const imported = BigInt((await mark("sermons"))!);
+    expect(imported).toBe(before + 1n);
+    await db.admin.sermons.delete({ id: added!.id });
+    expect(BigInt((await mark("sermons"))!)).toBe(imported + 1n);
+    expect(await mark("people")).toBe(people);
+  });
+
   it("keeps no count for a list that is none of its own", async () => {
     expect(await mark("events")).toBeUndefined();
   });
@@ -2973,7 +3250,7 @@ describe("roles", () => {
           !name.startsWith("admin.changes.") &&
           // The people's private columns are not web's to read.
           !name.startsWith("admin.people.") &&
-          /\.(fetch|list|locate|upcoming|weekly)$/.test(name),
+          /\.(batch|fetch|list|locate|upcoming|weekly)$/.test(name),
       ),
     );
   });

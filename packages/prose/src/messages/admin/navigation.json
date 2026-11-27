@@ -7,6 +7,10 @@
     "defaultMessage": "Events",
     "description": "The header link to the list of events."
   },
+  "sermons": {
+    "defaultMessage": "Sermons",
+    "description": "The header link to the list of sermons."
+  },
   "content": {
     "defaultMessage": "Content",
     "description": "The header link to the content: its documents, by folder."

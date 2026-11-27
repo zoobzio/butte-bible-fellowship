@@ -1,7 +1,7 @@
-import { sermon } from "@bbf/schema";
+import { sermon, sermonDetail, sermonRecord } from "@bbf/schema";
 import { describe, expect, it } from "vitest";
 
-import { toSermon } from "../../src/dto/sermon";
+import { toSermon, toSermonDetail, toSermonRecord } from "../../src/dto/sermon";
 
 const ROW = {
   slug: "faith-and-works",
@@ -82,5 +82,71 @@ describe("toSermon", () => {
 
   it("builds what the schema accepts", () => {
     expect(sermon.safeParse(toSermon(ROW)).success).toBe(true);
+  });
+});
+
+describe("toSermonRecord", () => {
+  const RECORD_ROW = {
+    ...ROW,
+    id: 12,
+    status: "draft" as const,
+    created_at: new Date("2026-10-17T18:00:00Z"),
+    updated_at: new Date("2026-10-18T09:30:00Z"),
+  };
+
+  it("builds a sermon as the admin lists it, with whether it reaches the site", () => {
+    const record = toSermonRecord(RECORD_ROW);
+    expect(record).toEqual({
+      id: 12,
+      slug: "faith-and-works",
+      title: "Faith & Works",
+      video: "dQw4w9WgXcQ",
+      date: "2026-10-04",
+      status: "draft",
+      createdAt: "2026-10-17T18:00:00.000Z",
+      updatedAt: "2026-10-18T09:30:00.000Z",
+    });
+    expect(sermonRecord.parse(record)).toEqual(record);
+  });
+
+  it("carries what else the row has", () => {
+    expect(
+      toSermonRecord({
+        ...RECORD_ROW,
+        speaker: "Pastor Name",
+        summary: "James 2.",
+        image: "https://cdn.example.com/sermons/faith-and-works.jpg",
+        video: null,
+      }),
+    ).toMatchObject({
+      speaker: "Pastor Name",
+      summary: "James 2.",
+      image: "https://cdn.example.com/sermons/faith-and-works.jpg",
+      video: undefined,
+    });
+  });
+});
+
+describe("toSermonDetail", () => {
+  const row = {
+    ...ROW,
+    id: 7,
+    body: "## James 2\n\nWhat faith does.",
+    status: "published" as const,
+    created_at: new Date("2026-10-17T18:00:00.000Z"),
+    updated_at: new Date("2026-10-18T09:30:00.000Z"),
+  };
+
+  it("builds a sermon as the admin reads it on its own page, what is written about it as it was written", () => {
+    const detail = toSermonDetail(row);
+    expect(detail).toEqual({
+      ...toSermonRecord(row),
+      body: "## James 2\n\nWhat faith does.",
+    });
+    expect(sermonDetail.parse(detail)).toEqual(detail);
+  });
+
+  it("leaves out what is written about a sermon with nothing written", () => {
+    expect(toSermonDetail({ ...row, body: null }).body).toBeUndefined();
   });
 });

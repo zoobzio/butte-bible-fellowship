@@ -5,6 +5,7 @@
 @import "./table.css";
 @import "./browser.css";
 @import "./calendar.css";
+@import "./timeline.css";
 @import "./views.css";
 /* Keep last. Its longhands must override the font shorthands above. */
 @import "./fonts.css";

@@ -14,10 +14,11 @@ src/css/index.css      the entry: imports the rest, in order
 src/css/base.css       site properties, reset, page shell, links
 src/css/prose.css      the measure, headings, body copy, quotes, images, tables
 src/css/components.css the call to action, toggle button and Foundation's parts
-src/css/search.css     the search of Foundation's data table, data browser and calendar
+src/css/search.css     the search of Foundation's data table, data browser, calendar and timeline
 src/css/table.css      Foundation's data table: toolbar, card, pagination
 src/css/browser.css    Foundation's data browser: toolbar, trail, card of folders and files
 src/css/calendar.css   Foundation's calendar: controls, toolbar, the grid of days and the agenda
+src/css/timeline.css   Foundation's timeline: controls, the rail, each group's card of records
 src/css/views.css      Foundation's saved views: the tabs over a table, the menu of a view's actions, the dialogs' forms
 src/css/fonts.css      the font stacks, where @nuxt/fonts can see them
 ```

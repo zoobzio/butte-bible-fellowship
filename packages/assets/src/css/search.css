@@ -1,8 +1,8 @@
 /*
- * The search of Foundation's data table, of its data browser and of its
- * calendar, one field over each: what is committed as chips, then the
+ * The search of Foundation's data table, of its data browser, of its
+ * calendar and of its timeline, one field over each: what is committed as chips, then the
  * input, and under it the panels of what can be typed next. Each rule is
- * scoped to the roots of the three, so an autocomplete or a chip elsewhere
+ * scoped to the roots of the four, so an autocomplete or a chip elsewhere
  * keeps its own dress.
  */
 
@@ -10,7 +10,12 @@
  * The search: chips and the input in one field, which reads as the
  * toolbar's buttons do on hover and on focus. The panels hang under it.
  */
-:is(.f-data-table-search, .f-data-browser-search, .f-data-calendar-search) {
+:is(
+  .f-data-table-search,
+  .f-data-browser-search,
+  .f-data-calendar-search,
+  .f-data-timeline-search
+) {
   position: relative;
   display: flex;
   flex: 1;
@@ -30,21 +35,30 @@
 :is(
   .f-data-table-search,
   .f-data-browser-search,
-  .f-data-calendar-search
+  .f-data-calendar-search,
+  .f-data-timeline-search
 ):hover {
   border-color: color-mix(in oklab, var(--primary) 65%, transparent);
   background: color-mix(in oklab, var(--primary-container) 30%, transparent);
 }
 
 /* Focused, the field's border alone marks it: no ring, as a chip or the panel focused draws none. */
-:is(.f-data-table-search, .f-data-browser-search, .f-data-calendar-search):has(
-  .f-autocomplete-input:focus
-) {
+:is(
+  .f-data-table-search,
+  .f-data-browser-search,
+  .f-data-calendar-search,
+  .f-data-timeline-search
+):has(.f-autocomplete-input:focus) {
   border-color: var(--primary);
 }
 
 /* The icon leads the whole field, before any chip. */
-:is(.f-data-table-search, .f-data-browser-search, .f-data-calendar-search)
+:is(
+    .f-data-table-search,
+    .f-data-browser-search,
+    .f-data-calendar-search,
+    .f-data-timeline-search
+  )
   > svg {
   color: var(--on-surface-muted);
 }
@@ -55,7 +69,12 @@
  * the hint's glyphs land where the typed ones do; the key, placed on its
  * own, takes the second.
  */
-:is(.f-data-table-search, .f-data-browser-search, .f-data-calendar-search)
+:is(
+    .f-data-table-search,
+    .f-data-browser-search,
+    .f-data-calendar-search,
+    .f-data-timeline-search
+  )
   > .f-group {
   position: relative;
   display: grid;
@@ -66,8 +85,14 @@
   min-width: 8rem;
 }
 
-:is(.f-data-table, .f-data-browser, .f-data-calendar) .f-autocomplete-input,
-:is(.f-data-table-search, .f-data-browser-search, .f-data-calendar-search)
+:is(.f-data-table, .f-data-browser, .f-data-calendar, .f-data-timeline)
+  .f-autocomplete-input,
+:is(
+    .f-data-table-search,
+    .f-data-browser-search,
+    .f-data-calendar-search,
+    .f-data-timeline-search
+  )
   > .f-group
   > .f-group[aria-hidden] {
   grid-area: 1 / 1;
@@ -83,19 +108,25 @@
   letter-spacing: normal;
 }
 
-:is(.f-data-table, .f-data-browser, .f-data-calendar) .f-autocomplete-input {
+:is(.f-data-table, .f-data-browser, .f-data-calendar, .f-data-timeline)
+  .f-autocomplete-input {
   display: block;
   background: transparent;
   color: var(--on-surface-high-contrast);
   outline: none;
 }
 
-:is(.f-data-table, .f-data-browser, .f-data-calendar)
+:is(.f-data-table, .f-data-browser, .f-data-calendar, .f-data-timeline)
   .f-autocomplete-input::placeholder {
   color: var(--on-surface-muted);
 }
 
-:is(.f-data-table-search, .f-data-browser-search, .f-data-calendar-search)
+:is(
+    .f-data-table-search,
+    .f-data-browser-search,
+    .f-data-calendar-search,
+    .f-data-timeline-search
+  )
   > .f-group
   > .f-group[aria-hidden] {
   overflow: hidden;
@@ -104,14 +135,24 @@
 }
 
 /* The typed part, unseen, holds the completion's place. */
-:is(.f-data-table-search, .f-data-browser-search, .f-data-calendar-search)
+:is(
+    .f-data-table-search,
+    .f-data-browser-search,
+    .f-data-calendar-search,
+    .f-data-timeline-search
+  )
   > .f-group
   > .f-group[aria-hidden]
   .f-span:first-child {
   color: transparent;
 }
 
-:is(.f-data-table-search, .f-data-browser-search, .f-data-calendar-search)
+:is(
+    .f-data-table-search,
+    .f-data-browser-search,
+    .f-data-calendar-search,
+    .f-data-timeline-search
+  )
   > .f-group
   > .f-group[aria-hidden]
   .f-span:last-child {
@@ -119,7 +160,7 @@
 }
 
 /* The key hint, a keycap; it steps aside once the input has focus. */
-:is(.f-data-table, .f-data-browser, .f-data-calendar) .f-kbd {
+:is(.f-data-table, .f-data-browser, .f-data-calendar, .f-data-timeline) .f-kbd {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -133,20 +174,25 @@
   line-height: 1;
 }
 
-:is(.f-data-table-search, .f-data-browser-search, .f-data-calendar-search):has(
-    .f-autocomplete-input:focus
-  )
+:is(
+    .f-data-table-search,
+    .f-data-browser-search,
+    .f-data-calendar-search,
+    .f-data-timeline-search
+  ):has(.f-autocomplete-input:focus)
   .f-kbd {
   visibility: hidden;
 }
 
 @media (hover: none) {
-  :is(.f-data-table, .f-data-browser, .f-data-calendar) .f-kbd {
+  :is(.f-data-table, .f-data-browser, .f-data-calendar, .f-data-timeline)
+    .f-kbd {
     display: none;
   }
 }
 
-:is(.f-data-table, .f-data-browser, .f-data-calendar) .f-chip {
+:is(.f-data-table, .f-data-browser, .f-data-calendar, .f-data-timeline)
+  .f-chip {
   display: inline-flex;
   align-items: center;
   gap: var(--space-1);
@@ -161,12 +207,15 @@
   transition: background var(--transition-fast);
 }
 
-:is(.f-data-table, .f-data-browser, .f-data-calendar) .f-chip > svg {
+:is(.f-data-table, .f-data-browser, .f-data-calendar, .f-data-timeline)
+  .f-chip
+  > svg {
   width: var(--space-3);
   height: var(--space-3);
 }
 
-:is(.f-data-table, .f-data-browser, .f-data-calendar) .f-chip:hover {
+:is(.f-data-table, .f-data-browser, .f-data-calendar, .f-data-timeline)
+  .f-chip:hover {
   background: color-mix(in oklab, var(--primary-container) 75%, transparent);
 }
 
@@ -178,7 +227,8 @@
  * it. Reka writes `flex-direction: column` inline on the content, hence
  * the override.
  */
-:is(.f-data-table, .f-data-browser, .f-data-calendar) .f-autocomplete-content {
+:is(.f-data-table, .f-data-browser, .f-data-calendar, .f-data-timeline)
+  .f-autocomplete-content {
   position: absolute;
   top: calc(100% + var(--space-2));
   left: calc(-1 * var(--space-2));
@@ -192,10 +242,11 @@
  * windows its rows. Those rows are positioned absolutely and so give the
  * viewport no width of its own: it must be sized here.
  */
-:is(.f-data-table, .f-data-browser, .f-data-calendar)
+:is(.f-data-table, .f-data-browser, .f-data-calendar, .f-data-timeline)
   .f-autocomplete-content
   > .f-group,
-:is(.f-data-table, .f-data-browser, .f-data-calendar) .f-autocomplete-viewport {
+:is(.f-data-table, .f-data-browser, .f-data-calendar, .f-data-timeline)
+  .f-autocomplete-viewport {
   box-sizing: border-box;
   flex: 0 0 auto;
   min-width: 10rem;
@@ -206,7 +257,7 @@
   box-shadow: var(--elevation-mid);
 }
 
-:is(.f-data-table, .f-data-browser, .f-data-calendar)
+:is(.f-data-table, .f-data-browser, .f-data-calendar, .f-data-timeline)
   .f-autocomplete-content
   > *
   + * {
@@ -218,17 +269,18 @@
  * scroller's root; the element that scrolls is its viewport, so the
  * height is capped there.
  */
-:is(.f-data-table, .f-data-browser, .f-data-calendar) .f-autocomplete-viewport {
+:is(.f-data-table, .f-data-browser, .f-data-calendar, .f-data-timeline)
+  .f-autocomplete-viewport {
   width: 16rem;
 }
 
-:is(.f-data-table, .f-data-browser, .f-data-calendar)
+:is(.f-data-table, .f-data-browser, .f-data-calendar, .f-data-timeline)
   .f-autocomplete-viewport
   .f-scroll-area-viewport {
   max-height: 16rem;
 }
 
-:is(.f-data-table, .f-data-browser, .f-data-calendar)
+:is(.f-data-table, .f-data-browser, .f-data-calendar, .f-data-timeline)
   .f-autocomplete-viewport
   .f-scroll-area-thumb {
   background: var(--rule);
@@ -236,16 +288,17 @@
 }
 
 /* The scroller offers a way back to the top; a short panel has no use for it. */
-:is(.f-data-table, .f-data-browser, .f-data-calendar)
+:is(.f-data-table, .f-data-browser, .f-data-calendar, .f-data-timeline)
   .f-autocomplete-viewport
   > .f-button {
   display: none;
 }
 
-:is(.f-data-table, .f-data-browser, .f-data-calendar)
+:is(.f-data-table, .f-data-browser, .f-data-calendar, .f-data-timeline)
   .f-autocomplete-content
   .f-button,
-:is(.f-data-table, .f-data-browser, .f-data-calendar) .f-autocomplete-item {
+:is(.f-data-table, .f-data-browser, .f-data-calendar, .f-data-timeline)
+  .f-autocomplete-item {
   display: flex;
   align-items: center;
   gap: var(--space-2);
@@ -263,11 +316,11 @@
   outline: none;
 }
 
-:is(.f-data-table, .f-data-browser, .f-data-calendar)
+:is(.f-data-table, .f-data-browser, .f-data-calendar, .f-data-timeline)
   .f-autocomplete-content
   .f-button
   .f-span,
-:is(.f-data-table, .f-data-browser, .f-data-calendar)
+:is(.f-data-table, .f-data-browser, .f-data-calendar, .f-data-timeline)
   .f-autocomplete-item
   .f-span {
   flex: 1;
@@ -277,20 +330,20 @@
   text-overflow: ellipsis;
 }
 
-:is(.f-data-table, .f-data-browser, .f-data-calendar)
+:is(.f-data-table, .f-data-browser, .f-data-calendar, .f-data-timeline)
   .f-autocomplete-content
   .f-button
   > svg:last-child,
-:is(.f-data-table, .f-data-browser, .f-data-calendar)
+:is(.f-data-table, .f-data-browser, .f-data-calendar, .f-data-timeline)
   .f-autocomplete-item
   > svg:last-child {
   color: var(--on-surface-muted);
 }
 
-:is(.f-data-table, .f-data-browser, .f-data-calendar)
+:is(.f-data-table, .f-data-browser, .f-data-calendar, .f-data-timeline)
   .f-autocomplete-content
   .f-button[aria-current],
-:is(.f-data-table, .f-data-browser, .f-data-calendar)
+:is(.f-data-table, .f-data-browser, .f-data-calendar, .f-data-timeline)
   .f-autocomplete-item[data-highlighted] {
   background: color-mix(in oklab, var(--primary-container) 40%, transparent);
   color: var(--on-surface-high-contrast);
@@ -300,7 +353,7 @@
  * A panel with nothing to offer, or still asking for it, says so: a line
  * of text where a trail's panel holds its chosen item.
  */
-:is(.f-data-table, .f-data-browser, .f-data-calendar)
+:is(.f-data-table, .f-data-browser, .f-data-calendar, .f-data-timeline)
   .f-autocomplete-content
   > .f-group
   > .f-span:only-child {

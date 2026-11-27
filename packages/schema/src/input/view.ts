@@ -294,6 +294,44 @@ export const eventView = calendarView({
 });
 
 /**
+ * The schema of a view over one of the admin's timelines: the timeline's
+ * arrangement as it is saved, and as it is put back. A timeline has
+ * neither a sort nor columns nor pages, and runs in one order, so its view
+ * is the search alone, and how often it asks for what changed: `columns`
+ * names the ones the list's API filters by, as a table's do. How far down
+ * the timeline was read is no part of it: a view is put in place from the
+ * first batch. Every member has a default, so a view saved before a member
+ * existed still reads.
+ *
+ * What it yields is the timeline's snapshot, member for member.
+ */
+export const timelineView = ({ columns }: { columns: readonly string[] }) =>
+  z.object({
+    clauses: clauses(columns),
+    interval,
+  });
+
+/**
+ * The columns of the sermons a view may filter by: the timeline's own
+ * filters.
+ */
+export const SERMON_VIEW_COLUMNS = [
+  "title",
+  "speaker",
+  "status",
+  "date",
+  "summary",
+] as const;
+
+export const sermonView = timelineView({
+  columns: SERMON_VIEW_COLUMNS,
+}).meta({
+  id: "SermonView",
+  description:
+    "A view of the sermons: the timeline's search, put in place from the latest preached.",
+});
+
+/**
  * The schema each list's views are held to, by the list's name: what a
  * view's payload is checked against before it is saved, and what the admin
  * reads a stored one through.
@@ -302,6 +340,7 @@ export const VIEW_PAYLOADS = {
   people: peopleView,
   content: contentView,
   events: eventView,
+  sermons: sermonView,
 } satisfies Record<z.infer<typeof viewSurface>, z.ZodType>;
 
 export const viewList = z.object({
@@ -352,9 +391,16 @@ export const eventViewBody = viewBody(eventView).meta({
     "A view of the events as it is saved: what a save writes, or replaces.",
 });
 
+export const sermonViewBody = viewBody(sermonView).meta({
+  id: "SermonViewBody",
+  description:
+    "A view of the sermons as it is saved: what a save writes, or replaces.",
+});
+
 /** What a save of a view carries, by the list the view is of. */
 export const VIEW_BODIES = {
   people: peopleViewBody,
   content: contentViewBody,
   events: eventViewBody,
+  sermons: sermonViewBody,
 } satisfies Record<z.infer<typeof viewSurface>, z.ZodType>;
